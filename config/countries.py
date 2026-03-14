@@ -181,8 +181,8 @@ COUNTRIES = {
         "priority": "core",
         "aliases": [
             "netherlands",
-            "dutch",
             "the netherlands",
+            "dutch",
             "holland",
         ],
     },
@@ -270,7 +270,6 @@ COUNTRIES = {
         "priority": "high",
         "aliases": [
             "united kingdom",
-            "uk",
             "u.k.",
             "britain",
             "great britain",
@@ -335,7 +334,6 @@ EXTERNAL_COUNTRY_CODES = [
     "US", "GB", "RU", "UA", "CN", "TR",
 ]
 
-
 IGNORED_ENTITIES = [
     "eu",
     "european union",
@@ -350,3 +348,4 @@ IGNORED_ENTITIES = [
     "parliament",
     "brussels",
 ]
+
