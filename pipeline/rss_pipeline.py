@@ -4,6 +4,7 @@ from typing import List, Dict, Any
 
 from collectors.rss_fetcher import fetch_all_feeds
 from pipeline.event_builder import build_event, event_is_relevant
+from utils.deduplicator import deduplicate_events
 
 
 def process_rss_items(raw_items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -14,7 +15,6 @@ def process_rss_items(raw_items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     events: List[Dict[str, Any]] = []
 
     for item in raw_items:
-
         event = build_event(
             layer="rss",
             source_name=item.get("source_name", ""),
@@ -39,11 +39,12 @@ def run_rss_pipeline() -> List[Dict[str, Any]]:
     Full RSS pipeline:
     1. fetch feeds
     2. process items
-    3. return relevant events
+    3. deduplicate events
+    4. return relevant events
     """
 
     raw_items = fetch_all_feeds()
-
     events = process_rss_items(raw_items)
+    events = deduplicate_events(events)
 
     return events
