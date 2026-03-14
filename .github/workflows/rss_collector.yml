@@ -1,4 +1,4 @@
-name: RSS Collector
+name: RSS Collector and Network Builder
 
 on:
   schedule:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  collect:
+  collect-and-build:
     runs-on: ubuntu-latest
 
     steps:
@@ -31,11 +31,14 @@ jobs:
         run: |
           python scripts/run_rss_collector.py
 
-      - name: Commit collected data
+      - name: Build daily network
+        run: |
+          python scripts/build_daily_network.py
+
+      - name: Commit collected data and networks
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/events/*.jsonl
-          git diff --cached --quiet || git commit -m "Update RSS events"
+          git add data/events/*.jsonl data/networks/*.json
+          git diff --cached --quiet || git commit -m "Update RSS events and daily networks"
           git push
-
