@@ -5,48 +5,35 @@ from typing import List, Dict, Any
 from config.countries import EU_COUNTRY_CODES
 
 
-def has_eu_country(countries: List[str]) -> bool:
-    """
-    Check if at least one EU country is present.
-    """
-    for c in countries:
-        if c in EU_COUNTRY_CODES:
-            return True
-    return False
+EU_COUNTRY_SET = set(EU_COUNTRY_CODES)
 
 
-def has_minimum_countries(countries: List[str], minimum: int = 2) -> bool:
+def get_eu_countries(countries: List[str]) -> List[str]:
     """
-    Check if there are enough countries for network analysis.
+    Return only EU country codes from a country list.
     """
-    return len(set(countries)) >= minimum
+    return sorted({country for country in countries if country in EU_COUNTRY_SET})
+
+
+def has_minimum_eu_countries(countries: List[str], minimum: int = 2) -> bool:
+    """
+    Check whether an event contains at least `minimum` unique EU countries.
+    """
+    eu_countries = get_eu_countries(countries)
+    return len(eu_countries) >= minimum
 
 
 def is_valid_network_event(event: Dict[str, Any]) -> bool:
     """
-    Decide if an event should be used for country network analysis.
+    Event is valid for EU-only network analysis if it contains
+    at least 2 distinct EU member states.
     """
-
     countries = event.get("countries", [])
-
-    if not has_minimum_countries(countries):
-        return False
-
-    if not has_eu_country(countries):
-        return False
-
-    return True
+    return has_minimum_eu_countries(countries, minimum=2)
 
 
 def filter_network_events(events: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """
-    Keep only events suitable for EU country network analysis.
+    Keep only events suitable for EU-only country network analysis.
     """
-
-    filtered = []
-
-    for event in events:
-        if is_valid_network_event(event):
-            filtered.append(event)
-
-    return filtered
+    return [event for event in events if is_valid_network_event(event)]
