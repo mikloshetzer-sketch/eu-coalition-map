@@ -1,6 +1,12 @@
 # scripts/run_rss_collector.py
 
+import sys
+from pathlib import Path
 from datetime import datetime
+
+# --- add project root to Python path ---
+ROOT_DIR = Path(__file__).resolve().parent.parent
+sys.path.append(str(ROOT_DIR))
 
 from pipeline.rss_pipeline import run_rss_pipeline
 from storage.event_store import append_events
