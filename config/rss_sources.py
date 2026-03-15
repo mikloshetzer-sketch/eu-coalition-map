@@ -1,40 +1,57 @@
 # config/rss_sources.py
 
 RSS_SOURCES = [
+
+    # --- EU POLICY / BRUSSELS ---
+
     {
         "name": "Politico Europe",
-        "url": "https://www.politico.eu/feed/",
-        "type": "media",
-        "enabled": True,
-    },
-    {
-        "name": "Euractiv",
-        "url": "https://www.euractiv.com/feed/",
-        "type": "media",
-        "enabled": True,
+        "url": "https://www.politico.eu/feed/"
     },
     {
         "name": "EUobserver",
-        "url": "https://euobserver.com/rss",
-        "type": "media",
-        "enabled": True,
+        "url": "https://euobserver.com/rss"
     },
+    {
+        "name": "Euractiv",
+        "url": "https://www.euractiv.com/feed/"
+    },
+
+    # --- EU INSTITUTIONS ---
+
+    {
+        "name": "European Commission",
+        "url": "https://ec.europa.eu/commission/presscorner/api/rss"
+    },
+
+    # --- INTERNATIONAL MEDIA (EU COVERAGE) ---
+
     {
         "name": "Reuters Europe",
-        "url": "https://www.reuters.com/world/europe/rss",
-        "type": "media",
-        "enabled": True,
+        "url": "https://www.reuters.com/world/europe/rss"
     },
     {
-        "name": "BBC News Europe",
-        "url": "https://feeds.bbci.co.uk/news/world/europe/rss.xml",
-        "type": "media",
-        "enabled": True,
+        "name": "Financial Times Europe",
+        "url": "https://www.ft.com/europe?format=rss"
     },
     {
-        "name": "European Parliament News",
-        "url": "https://www.europarl.europa.eu/rss/en/news.xml",
-        "type": "institution",
-        "enabled": True,
+        "name": "DW Europe",
+        "url": "https://rss.dw.com/rdf/rss-en-eu"
     },
+    {
+        "name": "Guardian Europe",
+        "url": "https://www.theguardian.com/world/europe-news/rss"
+    },
+
+    # --- MAJOR EUROPEAN NATIONAL MEDIA ---
+
+    {
+        "name": "Le Monde Europe",
+        "url": "https://www.lemonde.fr/en/europe/rss_full.xml"
+    },
+    {
+        "name": "Der Spiegel International",
+        "url": "https://www.spiegel.de/international/index.rss"
+    }
+
 ]
