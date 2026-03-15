@@ -1,13 +1,18 @@
+import sys
 import json
 from pathlib import Path
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+
+# --- add project root to Python path ---
+ROOT_DIR = Path(__file__).resolve().parent.parent
+sys.path.append(str(ROOT_DIR))
 
 from analysis.network_filter import filter_network_events
 from analysis.country_network import build_network_snapshot
 
 
-EVENT_DIR = Path("data/events")
-NETWORK_DIR = Path("data/networks")
+EVENT_DIR = ROOT_DIR / "data" / "events"
+NETWORK_DIR = ROOT_DIR / "data" / "networks"
 
 WINDOWS = {
     "7d": 7,
@@ -32,15 +37,11 @@ def load_events():
 
 
 def filter_by_window(events, days):
-
-    cutoff = datetime.utcnow() - timedelta(days=days)
-
+    cutoff = datetime.now(timezone.utc) - timedelta(days=days)
     filtered = []
 
     for event in events:
-
         date_str = event.get("collected_at")
-
         if not date_str:
             continue
 
@@ -49,6 +50,9 @@ def filter_by_window(events, days):
         except Exception:
             continue
 
+        if event_date.tzinfo is None:
+            event_date = event_date.replace(tzinfo=timezone.utc)
+
         if event_date >= cutoff:
             filtered.append(event)
 
@@ -56,23 +60,21 @@ def filter_by_window(events, days):
 
 
 def build_window_networks():
-
     NETWORK_DIR.mkdir(parents=True, exist_ok=True)
 
     all_events = load_events()
 
     for label, days in WINDOWS.items():
-
         window_events = filter_by_window(all_events, days)
-
         network_events = filter_network_events(window_events)
-
         snapshot = build_network_snapshot(network_events)
 
         output_path = NETWORK_DIR / f"{label}.json"
 
         with open(output_path, "w", encoding="utf-8") as f:
-            json.dump(snapshot, f, indent=2)
+            json.dump(snapshot, f, ensure_ascii=False, indent=2)
+
+        print(f"Built {label}: {output_path}")
 
 
 if __name__ == "__main__":
