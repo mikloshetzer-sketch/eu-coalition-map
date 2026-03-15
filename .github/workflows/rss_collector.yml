@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -35,10 +36,18 @@ jobs:
         run: |
           python scripts/build_daily_network.py
 
-      - name: Commit collected data and networks
+      - name: Build window networks
+        run: |
+          python scripts/build_window_networks.py
+
+      - name: Commit data
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/events/*.jsonl data/networks/*.json
-          git diff --cached --quiet || git commit -m "Update RSS events and daily networks"
+
+          git add data/events/*.jsonl
+          git add data/networks/*.json
+
+          git diff --cached --quiet || git commit -m "Update events and networks"
           git push
+
