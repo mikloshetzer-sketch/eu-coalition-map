@@ -463,6 +463,51 @@
     });
 
     resizeSvg();
+    async function loadNetwork(windowName) {
+
+  try {
+
+    const response = await fetch(`../data/networks/${windowName}.json`);
+
+    const data = await response.json();
+
+    renderNetwork(data);
+
+  } catch (err) {
+
+    console.error("Network load error", err);
+
+  }
+}
+
+
+function createWindowButtons() {
+
+  const controls = document.querySelector(".controls");
+
+  const btn7 = document.createElement("button");
+  btn7.textContent = "7 nap";
+  btn7.onclick = () => loadNetwork("7d");
+
+  const btn30 = document.createElement("button");
+  btn30.textContent = "30 nap";
+  btn30.onclick = () => loadNetwork("30d");
+
+  const btn90 = document.createElement("button");
+  btn90.textContent = "90 nap";
+  btn90.onclick = () => loadNetwork("90d");
+
+  controls.appendChild(btn7);
+  controls.appendChild(btn30);
+  controls.appendChild(btn90);
+}
+
+
+createWindowButtons();
+
+/* default network */
+loadNetwork("30d");
+
   </script>
 </body>
 </html>
