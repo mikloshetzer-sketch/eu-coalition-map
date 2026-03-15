@@ -1,8 +1,14 @@
 from collections import defaultdict
 from typing import Dict, List, Any, Tuple
 
+from config.countries import EU_COUNTRY_CODES
+
+
+EU_SET = set(EU_COUNTRY_CODES)
+
 
 def _normalize_pair(pair: Any) -> Tuple[str, str] | None:
+
     if not isinstance(pair, (list, tuple)):
         return None
 
@@ -17,6 +23,10 @@ def _normalize_pair(pair: Any) -> Tuple[str, str] | None:
     if a == b:
         return None
 
+    # csak EU országok
+    if a not in EU_SET or b not in EU_SET:
+        return None
+
     return tuple(sorted((a, b)))
 
 
@@ -26,11 +36,14 @@ def build_country_edge_weights(events: List[Dict[str, Any]]) -> List[Dict[str, A
     edge_topics: Dict[Tuple[str, str], Dict[str, int]] = defaultdict(lambda: defaultdict(int))
 
     for event in events:
+
         raw_pairs = event.get("country_pairs", [])
         topics = event.get("topics", [])
 
         for raw_pair in raw_pairs:
+
             pair = _normalize_pair(raw_pair)
+
             if not pair:
                 continue
 
@@ -59,10 +72,13 @@ def build_country_node_weights(events: List[Dict[str, Any]]) -> List[Dict[str, A
     node_weights: Dict[str, int] = defaultdict(int)
 
     for event in events:
+
         countries = event.get("countries", [])
 
         for country_code in countries:
-            node_weights[country_code] += 1
+
+            if country_code in EU_SET:
+                node_weights[country_code] += 1
 
     nodes = []
 
