@@ -1,0 +1,46 @@
+{
+  "nodes": [
+    {
+      "id": "CZ",
+      "weight": 10
+    },
+    {
+      "id": "PL",
+      "weight": 10
+    },
+    {
+      "id": "SK",
+      "weight": 2
+    }
+  ],
+  "edges": [
+    {
+      "source": "CZ",
+      "target": "PL",
+      "weight": 10,
+      "topics": {
+        "defence": 10,
+        "ukraine_russia": 10
+      }
+    },
+    {
+      "source": "CZ",
+      "target": "SK",
+      "weight": 2,
+      "topics": {
+        "defence": 2,
+        "ukraine_russia": 2
+      }
+    },
+    {
+      "source": "PL",
+      "target": "SK",
+      "weight": 2,
+      "topics": {
+        "defence": 2,
+        "ukraine_russia": 2
+      }
+    }
+  ],
+  "event_count": 10
+}
