@@ -1,381 +1,242 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-<meta charset="UTF-8">
-<title>EU Coalition Map</title>
-
-<script src="https://d3js.org/d3.v7.min.js"></script>
-
-<style>
-
-body{
-font-family:Arial;
-margin:0;
-background:#f4f4f4;
-}
-
-header{
-background:#0f172a;
-color:white;
-padding:16px;
-}
-
-.controls{
-padding:12px;
-background:white;
-border-bottom:1px solid #ddd;
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-}
-
-button{
-padding:8px 14px;
-border:none;
-border-radius:6px;
-cursor:pointer;
-background:#2563eb;
-color:white;
-}
-
-button.active{
-background:#0f172a;
-}
-
-.layout{
-display:grid;
-grid-template-columns:1fr 320px;
-height:calc(100vh - 110px);
-}
-
-#network{
-width:100%;
-height:100%;
-background:white;
-}
-
-.sidebar{
-background:#fafafa;
-border-left:1px solid #ddd;
-padding:12px;
-}
-
-.panel{
-margin-bottom:16px;
-}
-
-.node{
-stroke:white;
-stroke-width:1.5px;
-}
-
-.link{
-stroke:#94a3b8;
-}
-
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EU Coalition Map</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #f4f4f4; }
+    header { background: #0f172a; color: white; padding: 20px; }
+    .controls {
+      padding: 12px;
+      background: white;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    button {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #2563eb;
+      color: white;
+    }
+    button.active { background: #0f172a; }
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      height: calc(100vh - 110px);
+    }
+    #network { width: 100%; height: 100%; background: white; }
+    .sidebar { background: #fafafa; border-left: 1px solid #ddd; padding: 12px; overflow: auto; }
+    .panel { margin-bottom: 16px; }
+    .node { stroke: white; stroke-width: 1.5px; }
+    .link { stroke: #94a3b8; }
+    .status { font-size: 13px; color: #475569; }
+    .error { color: #b91c1c; white-space: pre-wrap; }
+  </style>
 </head>
-
 <body>
-
-<header>
-<h2>EU Coalition Map</h2>
-</header>
-
-
-<div class="controls">
-
-<b>Source</b>
-
-<button class="source-btn active" data-source="combined">Combined</button>
-<button class="source-btn" data-source="rss">RSS</button>
-<button class="source-btn" data-source="gdelt">GDELT</button>
-
-
-<b>Window</b>
-
-<button class="window-btn" data-window="7d">7d</button>
-<button class="window-btn active" data-window="30d">30d</button>
-<button class="window-btn" data-window="90d">90d</button>
-
-
-<b>Network</b>
-
-<button class="network-btn active" data-kind="diplomatic">Diplomatic</button>
-<button class="network-btn" data-kind="policy">Policy</button>
-
-</div>
-
-
-<div class="layout">
-
-<svg id="network"></svg>
-
-<div class="sidebar">
-
-<div class="panel">
-<b>Info</b>
-<div id="info"></div>
-</div>
-
-</div>
-
-</div>
-
-
-
-<script>
-
-let selectedSource="combined"
-let selectedWindow="30d"
-let selectedKind="diplomatic"
-
-
-const svg=d3.select("#network")
-
-let width=window.innerWidth
-let height=window.innerHeight
-
-
-function basePath(){
-
-let path=window.location.pathname
-
-if(path.includes("/eu-coalition-map"))
-return "/eu-coalition-map"
-
-return ""
-}
-
-
-function networkPath(){
-
-let base=basePath()
-
-let folder=`/data/networks/${selectedSource}`
-
-let name=selectedWindow
-
-if(selectedKind==="policy")
-name=name+"_policy"
-
-return `${base}${folder}/${name}.json`
-}
-
-
-async function loadNetwork(){
-
-let path=networkPath()
-
-try{
-
-let r=await fetch(path,{cache:"no-store"})
-let data=await r.json()
-
-draw(data)
-
-}catch(e){
-
-console.log("Load error",e)
-
-}
-
-}
-
-
-
-function draw(data){
-
-svg.selectAll("*").remove()
-
-let nodes=data.nodes
-let links=data.edges
-
-
-let simulation=d3.forceSimulation(nodes)
-
-.force("link",d3.forceLink(links).id(d=>d.id).distance(120))
-
-.force("charge",d3.forceManyBody().strength(-300))
-
-.force("center",d3.forceCenter(width/2,height/2))
-
-
-
-let link=svg.append("g")
-
-.selectAll("line")
-
-.data(links)
-
-.enter()
-
-.append("line")
-
-.attr("class","link")
-
-.attr("stroke-width",d=>1+Math.sqrt(d.weight))
-
-
-
-let node=svg.append("g")
-
-.selectAll("circle")
-
-.data(nodes)
-
-.enter()
-
-.append("circle")
-
-.attr("class","node")
-
-.attr("r",d=>8+Math.sqrt(d.weight))
-
-.attr("fill","#2563eb")
-
-.call(d3.drag()
-
-.on("start",dragstarted)
-
-.on("drag",dragged)
-
-.on("end",dragended)
-
-)
-
-
-
-let label=svg.append("g")
-
-.selectAll("text")
-
-.data(nodes)
-
-.enter()
-
-.append("text")
-
-.text(d=>d.id)
-
-.attr("font-size",12)
-
-
-
-simulation.on("tick",()=>{
-
-link
-
-.attr("x1",d=>d.source.x)
-
-.attr("y1",d=>d.source.y)
-
-.attr("x2",d=>d.target.x)
-
-.attr("y2",d=>d.target.y)
-
-
-node
-
-.attr("cx",d=>d.x)
-
-.attr("cy",d=>d.y)
-
-
-label
-
-.attr("x",d=>d.x+10)
-
-.attr("y",d=>d.y)
-
-})
-
-
-
-function dragstarted(event,d){
-
-if(!event.active)simulation.alphaTarget(0.3).restart()
-
-d.fx=d.x
-d.fy=d.y
-
-}
-
-function dragged(event,d){
-
-d.fx=event.x
-d.fy=event.y
-
-}
-
-function dragended(event,d){
-
-if(!event.active)simulation.alphaTarget(0)
-
-d.fx=null
-d.fy=null
-
-}
-
-}
-
-
-
-document.querySelectorAll(".source-btn").forEach(b=>{
-
-b.onclick=()=>{
-
-selectedSource=b.dataset.source
-
-document.querySelectorAll(".source-btn").forEach(x=>x.classList.remove("active"))
-
-b.classList.add("active")
-
-loadNetwork()
-
-}
-
-})
-
-
-document.querySelectorAll(".window-btn").forEach(b=>{
-
-b.onclick=()=>{
-
-selectedWindow=b.dataset.window
-
-document.querySelectorAll(".window-btn").forEach(x=>x.classList.remove("active"))
-
-b.classList.add("active")
-
-loadNetwork()
-
-}
-
-})
-
-
-document.querySelectorAll(".network-btn").forEach(b=>{
-
-b.onclick=()=>{
-
-selectedKind=b.dataset.kind
-
-document.querySelectorAll(".network-btn").forEach(x=>x.classList.remove("active"))
-
-b.classList.add("active")
-
-loadNetwork()
-
-}
-
-})
-
-
-loadNetwork()
-
-</script>
-
-
+  <header>
+    <h2>EU Coalition Map</h2>
+  </header>
+
+  <div class="controls">
+    <b>Source</b>
+    <button class="source-btn active" data-source="combined">Combined</button>
+    <button class="source-btn" data-source="rss">RSS</button>
+    <button class="source-btn" data-source="gdelt">GDELT</button>
+
+    <b>Window</b>
+    <button class="window-btn" data-window="7d">7d</button>
+    <button class="window-btn active" data-window="30d">30d</button>
+    <button class="window-btn" data-window="90d">90d</button>
+
+    <b>Network</b>
+    <button class="network-btn active" data-kind="diplomatic">Diplomatic</button>
+    <button class="network-btn" data-kind="policy">Policy</button>
+  </div>
+
+  <div class="layout">
+    <svg id="network"></svg>
+
+    <div class="sidebar">
+      <div class="panel">
+        <b>Info</b>
+        <div id="info"></div>
+      </div>
+      <div class="panel">
+        <b>Betöltés</b>
+        <div id="status" class="status"></div>
+        <div id="error" class="error"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let selectedSource = "combined";
+    let selectedWindow = "30d";
+    let selectedKind = "diplomatic";
+
+    const svg = d3.select("#network");
+    const infoEl = document.getElementById("info");
+    const statusEl = document.getElementById("status");
+    const errorEl = document.getElementById("error");
+
+    let width = window.innerWidth - 320;
+    let height = window.innerHeight - 110;
+
+    function basePath() {
+      const path = window.location.pathname;
+      if (path.includes("/eu-coalition-map/")) return "/eu-coalition-map";
+      return "";
+    }
+
+    function networkPath() {
+      const base = basePath();
+      let name = selectedWindow;
+      if (selectedKind === "policy") name += "_policy";
+
+      return `${base}/docs/data/networks/${selectedSource}/${name}.json`;
+    }
+
+    async function loadNetwork() {
+      const path = networkPath();
+      statusEl.textContent = `Betöltés: ${path}`;
+      errorEl.textContent = "";
+
+      try {
+        const r = await fetch(path, { cache: "no-store" });
+
+        if (!r.ok) {
+          throw new Error(`HTTP ${r.status} - ${r.statusText}`);
+        }
+
+        const data = await r.json();
+        draw(data);
+        infoEl.innerHTML = `
+          <div>Source: ${selectedSource}</div>
+          <div>Window: ${selectedWindow}</div>
+          <div>Network: ${selectedKind}</div>
+          <div>Nodes: ${(data.nodes || []).length}</div>
+          <div>Edges: ${(data.edges || []).length}</div>
+          <div>Events: ${data.event_count ?? 0}</div>
+        `;
+        statusEl.textContent = `Betöltve: ${path}`;
+      } catch (e) {
+        svg.selectAll("*").remove();
+        infoEl.innerHTML = "";
+        errorEl.textContent = `Nem sikerült betölteni.\n${e.message}`;
+        console.error("Load error:", e, "Path:", path);
+      }
+    }
+
+    function draw(data) {
+      svg.selectAll("*").remove();
+
+      const nodes = (data.nodes || []).map(d => ({ ...d }));
+      const links = (data.edges || []).map(d => ({ ...d }));
+
+      const simulation = d3.forceSimulation(nodes)
+        .force("link", d3.forceLink(links).id(d => d.id).distance(120))
+        .force("charge", d3.forceManyBody().strength(-300))
+        .force("center", d3.forceCenter(width / 2, height / 2));
+
+      const link = svg.append("g")
+        .selectAll("line")
+        .data(links)
+        .enter()
+        .append("line")
+        .attr("class", "link")
+        .attr("stroke-width", d => 1 + Math.sqrt(d.weight || 1));
+
+      const node = svg.append("g")
+        .selectAll("circle")
+        .data(nodes)
+        .enter()
+        .append("circle")
+        .attr("class", "node")
+        .attr("r", d => 8 + Math.sqrt(d.weight || 1))
+        .attr("fill", selectedKind === "policy" ? "#7c3aed" : "#2563eb")
+        .call(d3.drag()
+          .on("start", dragstarted)
+          .on("drag", dragged)
+          .on("end", dragended));
+
+      const label = svg.append("g")
+        .selectAll("text")
+        .data(nodes)
+        .enter()
+        .append("text")
+        .text(d => d.id)
+        .attr("font-size", 12);
+
+      simulation.on("tick", () => {
+        link
+          .attr("x1", d => d.source.x)
+          .attr("y1", d => d.source.y)
+          .attr("x2", d => d.target.x)
+          .attr("y2", d => d.target.y);
+
+        node
+          .attr("cx", d => d.x)
+          .attr("cy", d => d.y);
+
+        label
+          .attr("x", d => d.x + 10)
+          .attr("y", d => d.y);
+      });
+
+      function dragstarted(event, d) {
+        if (!event.active) simulation.alphaTarget(0.3).restart();
+        d.fx = d.x;
+        d.fy = d.y;
+      }
+
+      function dragged(event, d) {
+        d.fx = event.x;
+        d.fy = event.y;
+      }
+
+      function dragended(event, d) {
+        if (!event.active) simulation.alphaTarget(0);
+        d.fx = null;
+        d.fy = null;
+      }
+    }
+
+    document.querySelectorAll(".source-btn").forEach(b => {
+      b.onclick = () => {
+        selectedSource = b.dataset.source;
+        document.querySelectorAll(".source-btn").forEach(x => x.classList.remove("active"));
+        b.classList.add("active");
+        loadNetwork();
+      };
+    });
+
+    document.querySelectorAll(".window-btn").forEach(b => {
+      b.onclick = () => {
+        selectedWindow = b.dataset.window;
+        document.querySelectorAll(".window-btn").forEach(x => x.classList.remove("active"));
+        b.classList.add("active");
+        loadNetwork();
+      };
+    });
+
+    document.querySelectorAll(".network-btn").forEach(b => {
+      b.onclick = () => {
+        selectedKind = b.dataset.kind;
+        document.querySelectorAll(".network-btn").forEach(x => x.classList.remove("active"));
+        b.classList.add("active");
+        loadNetwork();
+      };
+    });
+
+    loadNetwork();
+  </script>
 </body>
 </html>
