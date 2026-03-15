@@ -25,18 +25,38 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install requests
+          pip install requests feedparser
 
       - name: Run GDELT collector
         run: |
           python scripts/run_gdelt_collector.py
 
+      - name: Rebuild all networks
+        run: |
+          python scripts/build_window_networks.py
+
+      - name: Copy networks for GitHub Pages
+        run: |
+          mkdir -p docs/data/networks/rss
+          mkdir -p docs/data/networks/gdelt
+          mkdir -p docs/data/networks/combined
+
+          cp data/networks/rss/*.json docs/data/networks/rss/ || true
+          cp data/networks/gdelt/*.json docs/data/networks/gdelt/ || true
+          cp data/networks/combined/*.json docs/data/networks/combined/ || true
+
       - name: Commit data
         run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "actions@github.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add data/events/gdelt/*.jsonl || true
+          git add data/networks/rss/*.json || true
+          git add data/networks/gdelt/*.json || true
+          git add data/networks/combined/*.json || true
+          git add docs/data/networks/rss/*.json || true
+          git add docs/data/networks/gdelt/*.json || true
+          git add docs/data/networks/combined/*.json || true
 
-          git diff --cached --quiet || git commit -m "Update GDELT events"
+          git diff --cached --quiet || git commit -m "Update GDELT events and networks"
           git push
