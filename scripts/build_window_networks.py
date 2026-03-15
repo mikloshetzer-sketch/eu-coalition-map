@@ -11,8 +11,12 @@ from analysis.country_network import build_network_snapshot
 from analysis.policy_network import build_policy_network_snapshot
 
 
-EVENT_DIR = ROOT_DIR / "data" / "events"
-NETWORK_DIR = ROOT_DIR / "data" / "networks"
+RSS_EVENT_DIR = ROOT_DIR / "data" / "events" / "rss"
+GDELT_EVENT_DIR = ROOT_DIR / "data" / "events" / "gdelt"
+
+RSS_NETWORK_DIR = ROOT_DIR / "data" / "networks" / "rss"
+GDELT_NETWORK_DIR = ROOT_DIR / "data" / "networks" / "gdelt"
+COMBINED_NETWORK_DIR = ROOT_DIR / "data" / "networks" / "combined"
 
 
 WINDOWS = {
@@ -22,11 +26,14 @@ WINDOWS = {
 }
 
 
-def load_events():
+def load_events(directory):
 
     events = []
 
-    for file in sorted(EVENT_DIR.glob("*.jsonl")):
+    if not directory.exists():
+        return events
+
+    for file in sorted(directory.glob("*.jsonl")):
 
         with open(file, "r", encoding="utf-8") as f:
 
@@ -69,39 +76,67 @@ def filter_by_window(events, days):
     return filtered
 
 
-def build_window_networks():
+def write_network(directory, name, snapshot):
 
-    NETWORK_DIR.mkdir(parents=True, exist_ok=True)
+    directory.mkdir(parents=True, exist_ok=True)
 
-    all_events = load_events()
+    path = directory / f"{name}.json"
+
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(snapshot, f, ensure_ascii=False, indent=2)
+
+
+def build_all_networks():
+
+    rss_events = load_events(RSS_EVENT_DIR)
+    gdelt_events = load_events(GDELT_EVENT_DIR)
+
+    combined_events = rss_events + gdelt_events
+
+    print(f"RSS events: {len(rss_events)}")
+    print(f"GDELT events: {len(gdelt_events)}")
+    print(f"Combined events: {len(combined_events)}")
 
     for label, days in WINDOWS.items():
 
-        window_events = filter_by_window(all_events, days)
+        # ---- RSS ----
+        rss_window = filter_by_window(rss_events, days)
+        rss_filtered = filter_network_events(rss_window)
 
-        # --- diplomatic network ---
-        network_events = filter_network_events(window_events)
+        rss_snapshot = build_network_snapshot(rss_filtered)
+        write_network(RSS_NETWORK_DIR, label, rss_snapshot)
 
-        snapshot = build_network_snapshot(network_events)
+        rss_policy = build_policy_network_snapshot(rss_window)
+        write_network(RSS_NETWORK_DIR, f"{label}_policy", rss_policy)
 
-        output_path = NETWORK_DIR / f"{label}.json"
-
-        with open(output_path, "w", encoding="utf-8") as f:
-            json.dump(snapshot, f, ensure_ascii=False, indent=2)
-
-        print(f"Built diplomatic network: {label}")
+        print(f"Built RSS network {label}")
 
 
-        # --- policy alignment network ---
-        policy_snapshot = build_policy_network_snapshot(window_events)
+        # ---- GDELT ----
+        gdelt_window = filter_by_window(gdelt_events, days)
+        gdelt_filtered = filter_network_events(gdelt_window)
 
-        policy_output = NETWORK_DIR / f"{label}_policy.json"
+        gdelt_snapshot = build_network_snapshot(gdelt_filtered)
+        write_network(GDELT_NETWORK_DIR, label, gdelt_snapshot)
 
-        with open(policy_output, "w", encoding="utf-8") as f:
-            json.dump(policy_snapshot, f, ensure_ascii=False, indent=2)
+        gdelt_policy = build_policy_network_snapshot(gdelt_window)
+        write_network(GDELT_NETWORK_DIR, f"{label}_policy", gdelt_policy)
 
-        print(f"Built policy network: {label}")
+        print(f"Built GDELT network {label}")
+
+
+        # ---- COMBINED ----
+        combined_window = filter_by_window(combined_events, days)
+        combined_filtered = filter_network_events(combined_window)
+
+        combined_snapshot = build_network_snapshot(combined_filtered)
+        write_network(COMBINED_NETWORK_DIR, label, combined_snapshot)
+
+        combined_policy = build_policy_network_snapshot(combined_window)
+        write_network(COMBINED_NETWORK_DIR, f"{label}_policy", combined_policy)
+
+        print(f"Built COMBINED network {label}")
 
 
 if __name__ == "__main__":
-    build_window_networks()
+    build_all_networks()
