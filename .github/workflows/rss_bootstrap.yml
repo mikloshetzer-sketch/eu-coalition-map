@@ -1,0 +1,46 @@
+name: RSS Bootstrap History
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install feedparser
+
+      - name: Run RSS bootstrap
+        run: |
+          python scripts/bootstrap_rss_history.py
+
+      - name: Rebuild networks
+        run: |
+          python scripts/build_window_networks.py
+
+      - name: Commit results
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add data/events/*.jsonl
+          git add data/networks/*.json
+
+          git diff --cached --quiet || git commit -m "RSS bootstrap history"
+          git push
