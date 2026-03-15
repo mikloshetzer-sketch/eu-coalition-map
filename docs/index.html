@@ -441,7 +441,6 @@
       });
 
       updateStats(data);
-
       setTimeout(() => fitGraph(lastNodes), 300);
 
       function dragstarted(event, d) {
@@ -488,18 +487,28 @@
         );
     }
 
-    function getNetworkPath(windowName, kind) {
-      if (kind === "policy") {
-        return `../data/networks/${windowName}_policy.json`;
+    function getBasePath() {
+      const path = window.location.pathname;
+      if (path.includes("/eu-coalition-map/")) {
+        return "/eu-coalition-map";
       }
-      return `../data/networks/${windowName}.json`;
+      return "";
+    }
+
+    function getNetworkPath(windowName, kind) {
+      const base = getBasePath();
+      if (kind === "policy") {
+        return `${base}/data/networks/${windowName}_policy.json`;
+      }
+      return `${base}/data/networks/${windowName}.json`;
     }
 
     async function loadNetwork(windowName, kind) {
       try {
         const path = getNetworkPath(windowName, kind);
         statusLine.textContent = `Betöltés: ${path}`;
-        const response = await fetch(path);
+
+        const response = await fetch(path, { cache: "no-store" });
 
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}`);
