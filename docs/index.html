@@ -40,6 +40,13 @@
       flex-wrap: wrap;
     }
 
+    .control-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
     .controls label {
       font-size: 14px;
       font-weight: bold;
@@ -61,6 +68,10 @@
 
     .controls button:hover {
       background: #1d4ed8;
+    }
+
+    .controls button.active {
+      background: #0f172a;
     }
 
     .layout {
@@ -171,6 +182,12 @@
       z-index: 10;
     }
 
+    .status-line {
+      font-size: 13px;
+      color: #475569;
+      margin-left: 8px;
+    }
+
     @media (max-width: 960px) {
       .layout {
         grid-template-columns: 1fr;
@@ -186,21 +203,40 @@
 <body>
   <header>
     <h1>EU Coalition Map</h1>
-    <p>Töltsd be a <code>data/networks/YYYY-MM-DD.json</code> fájlt, és kirajzoljuk a napi hálózatot.</p>
+    <p>EU-tagállamok közötti külpolitikai és policy-kapcsolati hálók 7 / 30 / 90 napos ablakokban.</p>
   </header>
 
   <div class="controls">
-    <label for="fileInput">Network JSON betöltése:</label>
-    <input id="fileInput" type="file" accept=".json" />
-    <button id="fitBtn" type="button">Középre igazítás</button>
+    <div class="control-group">
+      <label>Időablak:</label>
+      <button class="window-btn" data-window="7d">7 nap</button>
+      <button class="window-btn active" data-window="30d">30 nap</button>
+      <button class="window-btn" data-window="90d">90 nap</button>
+    </div>
+
+    <div class="control-group">
+      <label>Háló típusa:</label>
+      <button class="network-btn active" data-kind="diplomatic">Diplomatic</button>
+      <button class="network-btn" data-kind="policy">Policy</button>
+    </div>
+
+    <div class="control-group">
+      <button id="fitBtn" type="button">Középre igazítás</button>
+    </div>
+
+    <div class="control-group">
+      <label for="fileInput">Kézi JSON betöltés:</label>
+      <input id="fileInput" type="file" accept=".json" />
+    </div>
+
+    <div id="statusLine" class="status-line"></div>
   </div>
 
   <div class="layout">
     <div class="canvas-wrap">
       <svg id="network"></svg>
       <div id="emptyState" class="empty-state">
-        Még nincs betöltött háló.<br />
-        Válaszd ki a <code>data/networks/...</code> JSON fájlt.
+        Betöltés folyamatban...
       </div>
       <div id="tooltip" class="tooltip"></div>
     </div>
@@ -208,6 +244,8 @@
     <aside class="sidebar">
       <div class="panel">
         <h2>Összegzés</h2>
+        <div class="stat" id="networkType">Háló: -</div>
+        <div class="stat" id="windowType">Időablak: -</div>
         <div class="stat" id="eventCount">Eventek: -</div>
         <div class="stat" id="nodeCount">Országok: -</div>
         <div class="stat" id="edgeCount">Kapcsolatok: -</div>
@@ -226,8 +264,7 @@
       <div class="panel">
         <h2>Használat</h2>
         <div class="hint">
-          A körök országokat jelölnek. A vonalak az együtt-megjelenést mutatják. Minél vastagabb a vonal, annál erősebb a kapcsolat.
-          Az országra húzva az egeret láthatod a súlyát. A kapcsolatra húzva a kapcsolat súlyát és a témákat látod.
+          A diplomatic nézet a közvetlen együtt-említéseket mutatja. A policy nézet az azonos témákban való együttmozgást mutatja. A vastagabb vonal erősebb kapcsolatot jelent.
         </div>
       </div>
     </aside>
@@ -239,12 +276,17 @@
     const tooltip = document.getElementById("tooltip");
     const fitBtn = document.getElementById("fitBtn");
     const fileInput = document.getElementById("fileInput");
+    const statusLine = document.getElementById("statusLine");
 
     let width = 0;
     let height = 0;
     let g = null;
     let zoom = null;
     let simulation = null;
+    let lastNodes = [];
+
+    let selectedWindow = "30d";
+    let selectedKind = "diplomatic";
 
     function resizeSvg() {
       const container = document.querySelector(".canvas-wrap");
@@ -265,6 +307,9 @@
     }
 
     function updateStats(data) {
+      document.getElementById("networkType").textContent =
+        `Háló: ${selectedKind === "diplomatic" ? "Diplomatic" : "Policy"}`;
+      document.getElementById("windowType").textContent = `Időablak: ${selectedWindow}`;
       document.getElementById("eventCount").textContent = `Eventek: ${data.event_count ?? 0}`;
       document.getElementById("nodeCount").textContent = `Országok: ${(data.nodes || []).length}`;
       document.getElementById("edgeCount").textContent = `Kapcsolatok: ${(data.edges || []).length}`;
@@ -314,6 +359,7 @@
 
       const nodes = (data.nodes || []).map(d => ({ ...d }));
       const links = (data.edges || []).map(d => ({ ...d }));
+      lastNodes = nodes;
 
       const weightExtent = d3.extent(nodes, d => d.weight || 1);
       const linkExtent = d3.extent(links, d => d.weight || 1);
@@ -340,15 +386,14 @@
         .attr("class", "link")
         .attr("stroke-width", d => linkWidth(d.weight))
         .on("mousemove", (event, d) => {
-          const topics = d.topics
-            ? Object.entries(d.topics).map(([k, v]) => `${k}: ${v}`).join("<br>")
-            : "-";
+          let html = `<strong>${d.source.id || d.source} — ${d.target.id || d.target}</strong><br>Súly: ${d.weight}`;
 
-          showTooltip(
-            `<strong>${d.source.id || d.source} — ${d.target.id || d.target}</strong><br>Súly: ${d.weight}<br><br>${topics}`,
-            event.pageX,
-            event.pageY
-          );
+          if (d.topics) {
+            const topics = Object.entries(d.topics).map(([k, v]) => `${k}: ${v}`).join("<br>");
+            html += `<br><br>${topics}`;
+          }
+
+          showTooltip(html, event.pageX, event.pageY);
         })
         .on("mouseleave", hideTooltip);
 
@@ -359,7 +404,7 @@
         .append("circle")
         .attr("class", "node")
         .attr("r", d => nodeRadius(d.weight))
-        .attr("fill", "#2563eb")
+        .attr("fill", selectedKind === "diplomatic" ? "#2563eb" : "#7c3aed")
         .call(
           d3.drag()
             .on("start", dragstarted)
@@ -395,10 +440,9 @@
           .attr("y", d => d.y + 4);
       });
 
-      fitBtn.onclick = () => fitGraph(nodes);
-
       updateStats(data);
-      setTimeout(() => fitGraph(nodes), 300);
+
+      setTimeout(() => fitGraph(lastNodes), 300);
 
       function dragstarted(event, d) {
         if (!event.active) simulation.alphaTarget(0.3).restart();
@@ -419,7 +463,7 @@
     }
 
     function fitGraph(nodes) {
-      if (!nodes || !nodes.length) return;
+      if (!nodes || !nodes.length || !zoom) return;
 
       const xs = nodes.map(n => n.x || 0);
       const ys = nodes.map(n => n.y || 0);
@@ -444,6 +488,62 @@
         );
     }
 
+    function getNetworkPath(windowName, kind) {
+      if (kind === "policy") {
+        return `../data/networks/${windowName}_policy.json`;
+      }
+      return `../data/networks/${windowName}.json`;
+    }
+
+    async function loadNetwork(windowName, kind) {
+      try {
+        const path = getNetworkPath(windowName, kind);
+        statusLine.textContent = `Betöltés: ${path}`;
+        const response = await fetch(path);
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        renderNetwork(data);
+        statusLine.textContent = `Betöltve: ${path}`;
+      } catch (err) {
+        emptyState.style.display = "flex";
+        emptyState.innerHTML = "Nem sikerült betölteni a hálót.";
+        console.error("Network load error", err);
+        statusLine.textContent = "Betöltési hiba";
+      }
+    }
+
+    function updateActiveButtons() {
+      document.querySelectorAll(".window-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.window === selectedWindow);
+      });
+
+      document.querySelectorAll(".network-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.kind === selectedKind);
+      });
+    }
+
+    document.querySelectorAll(".window-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        selectedWindow = btn.dataset.window;
+        updateActiveButtons();
+        loadNetwork(selectedWindow, selectedKind);
+      });
+    });
+
+    document.querySelectorAll(".network-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        selectedKind = btn.dataset.kind;
+        updateActiveButtons();
+        loadNetwork(selectedWindow, selectedKind);
+      });
+    });
+
+    fitBtn.onclick = () => fitGraph(lastNodes);
+
     fileInput.addEventListener("change", async (event) => {
       const file = event.target.files[0];
       if (!file) return;
@@ -452,6 +552,7 @@
         const text = await file.text();
         const data = JSON.parse(text);
         renderNetwork(data);
+        statusLine.textContent = `Kézi fájl betöltve: ${file.name}`;
       } catch (err) {
         alert("Nem sikerült beolvasni a JSON fájlt.");
         console.error(err);
@@ -463,51 +564,8 @@
     });
 
     resizeSvg();
-    async function loadNetwork(windowName) {
-
-  try {
-
-    const response = await fetch(`../data/networks/${windowName}.json`);
-
-    const data = await response.json();
-
-    renderNetwork(data);
-
-  } catch (err) {
-
-    console.error("Network load error", err);
-
-  }
-}
-
-
-function createWindowButtons() {
-
-  const controls = document.querySelector(".controls");
-
-  const btn7 = document.createElement("button");
-  btn7.textContent = "7 nap";
-  btn7.onclick = () => loadNetwork("7d");
-
-  const btn30 = document.createElement("button");
-  btn30.textContent = "30 nap";
-  btn30.onclick = () => loadNetwork("30d");
-
-  const btn90 = document.createElement("button");
-  btn90.textContent = "90 nap";
-  btn90.onclick = () => loadNetwork("90d");
-
-  controls.appendChild(btn7);
-  controls.appendChild(btn30);
-  controls.appendChild(btn90);
-}
-
-
-createWindowButtons();
-
-/* default network */
-loadNetwork("30d");
-
+    updateActiveButtons();
+    loadNetwork(selectedWindow, selectedKind);
   </script>
 </body>
 </html>
