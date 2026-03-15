@@ -13,7 +13,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -40,6 +39,11 @@ jobs:
         run: |
           python scripts/build_window_networks.py
 
+      - name: Copy networks for GitHub Pages
+        run: |
+          mkdir -p docs/data/networks
+          cp data/networks/*.json docs/data/networks/
+
       - name: Commit data
         run: |
           git config --global user.name "github-actions[bot]"
@@ -47,7 +51,7 @@ jobs:
 
           git add data/events/*.jsonl
           git add data/networks/*.json
+          git add docs/data/networks/*.json
 
           git diff --cached --quiet || git commit -m "Update events and networks"
           git push
-
