@@ -6,8 +6,18 @@
   <title>EU Coalition Map</title>
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; background: #f4f4f4; }
-    header { background: #0f172a; color: white; padding: 20px; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f4f4f4;
+    }
+
+    header {
+      background: #0f172a;
+      color: white;
+      padding: 20px;
+    }
+
     .controls {
       padding: 12px;
       background: white;
@@ -17,6 +27,7 @@
       flex-wrap: wrap;
       align-items: center;
     }
+
     button {
       padding: 8px 14px;
       border: none;
@@ -25,19 +36,52 @@
       background: #2563eb;
       color: white;
     }
-    button.active { background: #0f172a; }
+
+    button.active {
+      background: #0f172a;
+    }
+
     .layout {
       display: grid;
       grid-template-columns: 1fr 320px;
       height: calc(100vh - 110px);
     }
-    #network { width: 100%; height: 100%; background: white; }
-    .sidebar { background: #fafafa; border-left: 1px solid #ddd; padding: 12px; overflow: auto; }
-    .panel { margin-bottom: 16px; }
-    .node { stroke: white; stroke-width: 1.5px; }
-    .link { stroke: #94a3b8; }
-    .status { font-size: 13px; color: #475569; }
-    .error { color: #b91c1c; white-space: pre-wrap; }
+
+    #network {
+      width: 100%;
+      height: 100%;
+      background: white;
+    }
+
+    .sidebar {
+      background: #fafafa;
+      border-left: 1px solid #ddd;
+      padding: 12px;
+      overflow: auto;
+    }
+
+    .panel {
+      margin-bottom: 16px;
+    }
+
+    .node {
+      stroke: white;
+      stroke-width: 1.5px;
+    }
+
+    .link {
+      stroke: #94a3b8;
+    }
+
+    .status {
+      font-size: 13px;
+      color: #475569;
+    }
+
+    .error {
+      color: #b91c1c;
+      white-space: pre-wrap;
+    }
   </style>
 </head>
 <body>
@@ -101,7 +145,7 @@
       let name = selectedWindow;
       if (selectedKind === "policy") name += "_policy";
 
-      return `${base}/docs/data/networks/${selectedSource}/${name}.json`;
+      return `${base}/data/networks/${selectedSource}/${name}.json`;
     }
 
     async function loadNetwork() {
@@ -118,6 +162,7 @@
 
         const data = await r.json();
         draw(data);
+
         infoEl.innerHTML = `
           <div>Source: ${selectedSource}</div>
           <div>Window: ${selectedWindow}</div>
@@ -126,6 +171,7 @@
           <div>Edges: ${(data.edges || []).length}</div>
           <div>Events: ${data.event_count ?? 0}</div>
         `;
+
         statusEl.textContent = `Betöltve: ${path}`;
       } catch (e) {
         svg.selectAll("*").remove();
