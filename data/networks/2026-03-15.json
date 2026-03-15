@@ -2,23 +2,39 @@
   "nodes": [
     {
       "id": "CZ",
-      "weight": 4
+      "weight": 5
+    },
+    {
+      "id": "FR",
+      "weight": 1
+    },
+    {
+      "id": "IT",
+      "weight": 1
     },
     {
       "id": "PL",
-      "weight": 4
+      "weight": 5
     }
   ],
   "edges": [
     {
       "source": "CZ",
       "target": "PL",
-      "weight": 4,
+      "weight": 5,
       "topics": {
-        "defence": 4,
-        "ukraine_russia": 4
+        "defence": 5,
+        "ukraine_russia": 5
+      }
+    },
+    {
+      "source": "FR",
+      "target": "IT",
+      "weight": 1,
+      "topics": {
+        "energy": 1
       }
     }
   ],
-  "event_count": 4
+  "event_count": 6
 }

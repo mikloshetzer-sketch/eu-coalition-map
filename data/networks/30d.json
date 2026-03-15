@@ -2,11 +2,19 @@
   "nodes": [
     {
       "id": "CZ",
-      "weight": 12
+      "weight": 13
+    },
+    {
+      "id": "FR",
+      "weight": 1
+    },
+    {
+      "id": "IT",
+      "weight": 1
     },
     {
       "id": "PL",
-      "weight": 12
+      "weight": 13
     },
     {
       "id": "SK",
@@ -17,10 +25,10 @@
     {
       "source": "CZ",
       "target": "PL",
-      "weight": 12,
+      "weight": 13,
       "topics": {
-        "defence": 12,
-        "ukraine_russia": 12
+        "defence": 13,
+        "ukraine_russia": 13
       }
     },
     {
@@ -30,6 +38,14 @@
       "topics": {
         "defence": 2,
         "ukraine_russia": 2
+      }
+    },
+    {
+      "source": "FR",
+      "target": "IT",
+      "weight": 1,
+      "topics": {
+        "energy": 1
       }
     },
     {
@@ -42,5 +58,5 @@
       }
     }
   ],
-  "event_count": 12
+  "event_count": 14
 }
