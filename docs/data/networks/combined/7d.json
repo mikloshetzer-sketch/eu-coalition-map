@@ -1,8 +1,16 @@
 {
   "nodes": [
     {
+      "id": "AT",
+      "weight": 1
+    },
+    {
       "id": "BE",
-      "weight": 3
+      "weight": 19
+    },
+    {
+      "id": "CY",
+      "weight": 1
     },
     {
       "id": "CZ",
@@ -10,19 +18,23 @@
     },
     {
       "id": "DE",
-      "weight": 14
+      "weight": 42
+    },
+    {
+      "id": "DK",
+      "weight": 4
     },
     {
       "id": "ES",
-      "weight": 10
+      "weight": 40
+    },
+    {
+      "id": "FI",
+      "weight": 1
     },
     {
       "id": "FR",
-      "weight": 6
-    },
-    {
-      "id": "GR",
-      "weight": 1
+      "weight": 43
     },
     {
       "id": "HU",
@@ -30,19 +42,31 @@
     },
     {
       "id": "IE",
-      "weight": 5
+      "weight": 7
     },
     {
       "id": "IT",
-      "weight": 11
+      "weight": 7
+    },
+    {
+      "id": "LV",
+      "weight": 1
+    },
+    {
+      "id": "NL",
+      "weight": 6
     },
     {
       "id": "PL",
+      "weight": 7
+    },
+    {
+      "id": "RO",
       "weight": 1
     },
     {
       "id": "SI",
-      "weight": 6
+      "weight": 16
     },
     {
       "id": "SK",
@@ -51,11 +75,60 @@
   ],
   "edges": [
     {
+      "source": "AT",
+      "target": "DE",
+      "weight": 1,
+      "topics": {
+        "defence": 1
+      }
+    },
+    {
       "source": "BE",
       "target": "DE",
-      "weight": 3,
+      "weight": 4,
       "topics": {
-        "trade": 3
+        "defence": 4
+      }
+    },
+    {
+      "source": "BE",
+      "target": "ES",
+      "weight": 10,
+      "topics": {
+        "defence": 10
+      }
+    },
+    {
+      "source": "BE",
+      "target": "FR",
+      "weight": 2,
+      "topics": {
+        "rule_of_law": 2
+      }
+    },
+    {
+      "source": "BE",
+      "target": "IT",
+      "weight": 4,
+      "topics": {
+        "defence": 4
+      }
+    },
+    {
+      "source": "BE",
+      "target": "NL",
+      "weight": 4,
+      "topics": {
+        "rule_of_law": 4
+      }
+    },
+    {
+      "source": "CY",
+      "target": "FR",
+      "weight": 1,
+      "topics": {
+        "defence": 1,
+        "ukraine_russia": 1
       }
     },
     {
@@ -70,54 +143,85 @@
     {
       "source": "DE",
       "target": "ES",
-      "weight": 4,
+      "weight": 15,
       "topics": {
-        "defence": 1,
-        "trade": 3
+        "defence": 14,
+        "rule_of_law": 1
       }
     },
     {
       "source": "DE",
       "target": "FR",
+      "weight": 22,
+      "topics": {
+        "defence": 22
+      }
+    },
+    {
+      "source": "DE",
+      "target": "IT",
+      "weight": 1,
+      "topics": {
+        "defence": 1
+      }
+    },
+    {
+      "source": "DE",
+      "target": "PL",
       "weight": 5,
       "topics": {
-        "defence": 2,
-        "trade": 3
+        "defence": 5
       }
     },
     {
-      "source": "DE",
-      "target": "IT",
+      "source": "DK",
+      "target": "FR",
       "weight": 4,
       "topics": {
-        "defence": 1,
-        "trade": 3
+        "defence": 4
       }
     },
     {
       "source": "ES",
       "target": "FR",
-      "weight": 1,
+      "weight": 3,
       "topics": {
-        "defence": 1
+        "defence": 3
       }
     },
     {
       "source": "ES",
       "target": "IT",
-      "weight": 1,
+      "weight": 2,
       "topics": {
-        "defence": 1
+        "defence": 2
       }
     },
     {
       "source": "ES",
       "target": "SI",
-      "weight": 6,
+      "weight": 16,
       "topics": {
-        "defence": 2,
-        "rule_of_law": 3,
+        "defence": 6,
+        "rule_of_law": 4,
+        "trade": 6
+      }
+    },
+    {
+      "source": "FI",
+      "target": "LV",
+      "weight": 1,
+      "topics": {
         "trade": 1
+      }
+    },
+    {
+      "source": "FR",
+      "target": "IE",
+      "weight": 7,
+      "topics": {
+        "defence": 5,
+        "trade": 2
       }
     },
     {
@@ -130,11 +234,27 @@
       }
     },
     {
-      "source": "GR",
-      "target": "IT",
+      "source": "FR",
+      "target": "NL",
+      "weight": 3,
+      "topics": {
+        "rule_of_law": 3
+      }
+    },
+    {
+      "source": "FR",
+      "target": "PL",
       "weight": 1,
       "topics": {
-        "defence": 1
+        "trade": 1
+      }
+    },
+    {
+      "source": "FR",
+      "target": "RO",
+      "weight": 1,
+      "topics": {
+        "rule_of_law": 1
       }
     },
     {
@@ -146,15 +266,7 @@
         "energy": 1,
         "ukraine_russia": 1
       }
-    },
-    {
-      "source": "IE",
-      "target": "IT",
-      "weight": 5,
-      "topics": {
-        "defence": 5
-      }
     }
   ],
-  "event_count": 29
+  "event_count": 96
 }

@@ -1,98 +1,436 @@
 {
   "nodes": [
     {
-      "id": "BE",
-      "weight": 3
-    },
-    {
-      "id": "DE",
-      "weight": 13
-    },
-    {
-      "id": "ES",
-      "weight": 9
-    },
-    {
-      "id": "FR",
+      "id": "AT",
       "weight": 4
     },
     {
-      "id": "GR",
-      "weight": 1
+      "id": "BE",
+      "weight": 33
     },
     {
-      "id": "IE",
+      "id": "BG",
+      "weight": 3
+    },
+    {
+      "id": "CY",
+      "weight": 7
+    },
+    {
+      "id": "DE",
+      "weight": 93
+    },
+    {
+      "id": "DK",
+      "weight": 4
+    },
+    {
+      "id": "EE",
       "weight": 5
     },
     {
+      "id": "ES",
+      "weight": 91
+    },
+    {
+      "id": "FI",
+      "weight": 3
+    },
+    {
+      "id": "FR",
+      "weight": 101
+    },
+    {
+      "id": "GR",
+      "weight": 13
+    },
+    {
+      "id": "HU",
+      "weight": 7
+    },
+    {
+      "id": "IE",
+      "weight": 23
+    },
+    {
       "id": "IT",
-      "weight": 9
+      "weight": 40
+    },
+    {
+      "id": "LT",
+      "weight": 1
+    },
+    {
+      "id": "LV",
+      "weight": 2
+    },
+    {
+      "id": "MT",
+      "weight": 1
+    },
+    {
+      "id": "NL",
+      "weight": 16
+    },
+    {
+      "id": "PL",
+      "weight": 12
+    },
+    {
+      "id": "RO",
+      "weight": 4
+    },
+    {
+      "id": "SE",
+      "weight": 3
     },
     {
       "id": "SI",
-      "weight": 6
+      "weight": 21
+    },
+    {
+      "id": "SK",
+      "weight": 9
     }
   ],
   "edges": [
     {
-      "source": "BE",
+      "source": "AT",
       "target": "DE",
-      "weight": 3,
-      "topics": {
-        "trade": 3
-      }
-    },
-    {
-      "source": "DE",
-      "target": "ES",
-      "weight": 3,
-      "topics": {
-        "trade": 3
-      }
-    },
-    {
-      "source": "DE",
-      "target": "FR",
-      "weight": 4,
-      "topics": {
-        "defence": 1,
-        "trade": 3
-      }
-    },
-    {
-      "source": "DE",
-      "target": "IT",
-      "weight": 3,
-      "topics": {
-        "trade": 3
-      }
-    },
-    {
-      "source": "ES",
-      "target": "SI",
-      "weight": 6,
-      "topics": {
-        "defence": 2,
-        "rule_of_law": 3,
-        "trade": 1
-      }
-    },
-    {
-      "source": "GR",
-      "target": "IT",
       "weight": 1,
       "topics": {
         "defence": 1
       }
     },
     {
-      "source": "IE",
+      "source": "AT",
+      "target": "HU",
+      "weight": 3,
+      "topics": {
+        "defence": 3,
+        "ukraine_russia": 1
+      }
+    },
+    {
+      "source": "BE",
+      "target": "DE",
+      "weight": 4,
+      "topics": {
+        "defence": 4
+      }
+    },
+    {
+      "source": "BE",
+      "target": "ES",
+      "weight": 20,
+      "topics": {
+        "defence": 20
+      }
+    },
+    {
+      "source": "BE",
+      "target": "FR",
+      "weight": 2,
+      "topics": {
+        "rule_of_law": 2
+      }
+    },
+    {
+      "source": "BE",
       "target": "IT",
+      "weight": 4,
+      "topics": {
+        "defence": 4
+      }
+    },
+    {
+      "source": "BE",
+      "target": "NL",
+      "weight": 4,
+      "topics": {
+        "rule_of_law": 4
+      }
+    },
+    {
+      "source": "BE",
+      "target": "SK",
+      "weight": 4,
+      "topics": {
+        "defence": 4
+      }
+    },
+    {
+      "source": "BG",
+      "target": "IT",
+      "weight": 3,
+      "topics": {
+        "defence": 3
+      }
+    },
+    {
+      "source": "CY",
+      "target": "FR",
+      "weight": 5,
+      "topics": {
+        "defence": 5,
+        "ukraine_russia": 1
+      }
+    },
+    {
+      "source": "CY",
+      "target": "GR",
+      "weight": 3,
+      "topics": {
+        "defence": 1,
+        "trade": 2
+      }
+    },
+    {
+      "source": "DE",
+      "target": "ES",
+      "weight": 36,
+      "topics": {
+        "defence": 34,
+        "rule_of_law": 2
+      }
+    },
+    {
+      "source": "DE",
+      "target": "FR",
+      "weight": 50,
+      "topics": {
+        "defence": 45,
+        "rule_of_law": 3,
+        "trade": 2
+      }
+    },
+    {
+      "source": "DE",
+      "target": "IT",
+      "weight": 8,
+      "topics": {
+        "defence": 8
+      }
+    },
+    {
+      "source": "DE",
+      "target": "PL",
+      "weight": 8,
+      "topics": {
+        "defence": 8
+      }
+    },
+    {
+      "source": "DK",
+      "target": "FR",
+      "weight": 4,
+      "topics": {
+        "defence": 4
+      }
+    },
+    {
+      "source": "EE",
+      "target": "FI",
+      "weight": 1,
+      "topics": {
+        "trade": 1
+      }
+    },
+    {
+      "source": "EE",
+      "target": "LT",
+      "weight": 1,
+      "topics": {
+        "trade": 1
+      }
+    },
+    {
+      "source": "EE",
+      "target": "LV",
+      "weight": 1,
+      "topics": {
+        "trade": 1
+      }
+    },
+    {
+      "source": "EE",
+      "target": "PL",
+      "weight": 1,
+      "topics": {
+        "trade": 1
+      }
+    },
+    {
+      "source": "EE",
+      "target": "SE",
+      "weight": 1,
+      "topics": {
+        "trade": 1
+      }
+    },
+    {
+      "source": "ES",
+      "target": "FR",
       "weight": 5,
       "topics": {
         "defence": 5
       }
+    },
+    {
+      "source": "ES",
+      "target": "IE",
+      "weight": 9,
+      "topics": {
+        "defence": 9
+      }
+    },
+    {
+      "source": "ES",
+      "target": "IT",
+      "weight": 7,
+      "topics": {
+        "defence": 5,
+        "fiscal": 2,
+        "trade": 2
+      }
+    },
+    {
+      "source": "ES",
+      "target": "SI",
+      "weight": 21,
+      "topics": {
+        "defence": 6,
+        "rule_of_law": 9,
+        "trade": 6
+      }
+    },
+    {
+      "source": "FI",
+      "target": "LV",
+      "weight": 1,
+      "topics": {
+        "trade": 1
+      }
+    },
+    {
+      "source": "FI",
+      "target": "SE",
+      "weight": 1,
+      "topics": {
+        "trade": 1
+      }
+    },
+    {
+      "source": "FR",
+      "target": "GR",
+      "weight": 7,
+      "topics": {
+        "defence": 7,
+        "ukraine_russia": 6
+      }
+    },
+    {
+      "source": "FR",
+      "target": "IE",
+      "weight": 7,
+      "topics": {
+        "defence": 5,
+        "trade": 2
+      }
+    },
+    {
+      "source": "FR",
+      "target": "IT",
+      "weight": 13,
+      "topics": {
+        "defence": 13
+      }
+    },
+    {
+      "source": "FR",
+      "target": "NL",
+      "weight": 12,
+      "topics": {
+        "defence": 6,
+        "rule_of_law": 3,
+        "trade": 3
+      }
+    },
+    {
+      "source": "FR",
+      "target": "PL",
+      "weight": 4,
+      "topics": {
+        "defence": 3,
+        "trade": 1
+      }
+    },
+    {
+      "source": "FR",
+      "target": "RO",
+      "weight": 4,
+      "topics": {
+        "defence": 1,
+        "rule_of_law": 3
+      }
+    },
+    {
+      "source": "GR",
+      "target": "IT",
+      "weight": 3,
+      "topics": {
+        "trade": 3
+      }
+    },
+    {
+      "source": "GR",
+      "target": "NL",
+      "weight": 1,
+      "topics": {
+        "defence": 1
+      }
+    },
+    {
+      "source": "HU",
+      "target": "SK",
+      "weight": 4,
+      "topics": {
+        "fiscal": 4,
+        "trade": 4
+      }
+    },
+    {
+      "source": "IE",
+      "target": "IT",
+      "weight": 6,
+      "topics": {
+        "defence": 6
+      }
+    },
+    {
+      "source": "IE",
+      "target": "SE",
+      "weight": 1,
+      "topics": {
+        "defence": 1
+      }
+    },
+    {
+      "source": "MT",
+      "target": "PL",
+      "weight": 1,
+      "topics": {
+        "trade": 1
+      }
+    },
+    {
+      "source": "PL",
+      "target": "SK",
+      "weight": 1,
+      "topics": {
+        "defence": 1
+      }
     }
   ],
-  "event_count": 25
+  "event_count": 240
 }

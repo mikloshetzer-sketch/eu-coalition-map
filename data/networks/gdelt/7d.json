@@ -1,84 +1,167 @@
 {
   "nodes": [
     {
-      "id": "BE",
-      "weight": 3
-    },
-    {
-      "id": "DE",
-      "weight": 13
-    },
-    {
-      "id": "ES",
-      "weight": 9
-    },
-    {
-      "id": "FR",
-      "weight": 4
-    },
-    {
-      "id": "GR",
+      "id": "AT",
       "weight": 1
     },
     {
+      "id": "BE",
+      "weight": 19
+    },
+    {
+      "id": "CY",
+      "weight": 1
+    },
+    {
+      "id": "DE",
+      "weight": 41
+    },
+    {
+      "id": "DK",
+      "weight": 4
+    },
+    {
+      "id": "ES",
+      "weight": 39
+    },
+    {
+      "id": "FI",
+      "weight": 1
+    },
+    {
+      "id": "FR",
+      "weight": 41
+    },
+    {
       "id": "IE",
-      "weight": 5
+      "weight": 7
     },
     {
       "id": "IT",
-      "weight": 9
+      "weight": 5
+    },
+    {
+      "id": "LV",
+      "weight": 1
+    },
+    {
+      "id": "NL",
+      "weight": 6
+    },
+    {
+      "id": "PL",
+      "weight": 6
+    },
+    {
+      "id": "RO",
+      "weight": 1
     },
     {
       "id": "SI",
-      "weight": 6
+      "weight": 16
     }
   ],
   "edges": [
     {
+      "source": "AT",
+      "target": "DE",
+      "weight": 1,
+      "topics": {
+        "defence": 1
+      }
+    },
+    {
       "source": "BE",
       "target": "DE",
-      "weight": 3,
+      "weight": 4,
       "topics": {
-        "trade": 3
+        "defence": 4
+      }
+    },
+    {
+      "source": "BE",
+      "target": "ES",
+      "weight": 10,
+      "topics": {
+        "defence": 10
+      }
+    },
+    {
+      "source": "BE",
+      "target": "FR",
+      "weight": 2,
+      "topics": {
+        "rule_of_law": 2
+      }
+    },
+    {
+      "source": "BE",
+      "target": "IT",
+      "weight": 4,
+      "topics": {
+        "defence": 4
+      }
+    },
+    {
+      "source": "BE",
+      "target": "NL",
+      "weight": 4,
+      "topics": {
+        "rule_of_law": 4
+      }
+    },
+    {
+      "source": "CY",
+      "target": "FR",
+      "weight": 1,
+      "topics": {
+        "defence": 1,
+        "ukraine_russia": 1
       }
     },
     {
       "source": "DE",
       "target": "ES",
-      "weight": 3,
+      "weight": 14,
       "topics": {
-        "trade": 3
+        "defence": 13,
+        "rule_of_law": 1
       }
     },
     {
       "source": "DE",
       "target": "FR",
-      "weight": 4,
+      "weight": 21,
       "topics": {
-        "defence": 1,
-        "trade": 3
+        "defence": 21
       }
     },
     {
       "source": "DE",
-      "target": "IT",
-      "weight": 3,
+      "target": "PL",
+      "weight": 5,
       "topics": {
-        "trade": 3
+        "defence": 5
+      }
+    },
+    {
+      "source": "DK",
+      "target": "FR",
+      "weight": 4,
+      "topics": {
+        "defence": 4
       }
     },
     {
       "source": "ES",
-      "target": "SI",
-      "weight": 6,
+      "target": "FR",
+      "weight": 2,
       "topics": {
-        "defence": 2,
-        "rule_of_law": 3,
-        "trade": 1
+        "defence": 2
       }
     },
     {
-      "source": "GR",
+      "source": "ES",
       "target": "IT",
       "weight": 1,
       "topics": {
@@ -86,13 +169,56 @@
       }
     },
     {
-      "source": "IE",
-      "target": "IT",
-      "weight": 5,
+      "source": "ES",
+      "target": "SI",
+      "weight": 16,
       "topics": {
-        "defence": 5
+        "defence": 6,
+        "rule_of_law": 4,
+        "trade": 6
+      }
+    },
+    {
+      "source": "FI",
+      "target": "LV",
+      "weight": 1,
+      "topics": {
+        "trade": 1
+      }
+    },
+    {
+      "source": "FR",
+      "target": "IE",
+      "weight": 7,
+      "topics": {
+        "defence": 5,
+        "trade": 2
+      }
+    },
+    {
+      "source": "FR",
+      "target": "NL",
+      "weight": 3,
+      "topics": {
+        "rule_of_law": 3
+      }
+    },
+    {
+      "source": "FR",
+      "target": "PL",
+      "weight": 1,
+      "topics": {
+        "trade": 1
+      }
+    },
+    {
+      "source": "FR",
+      "target": "RO",
+      "weight": 1,
+      "topics": {
+        "rule_of_law": 1
       }
     }
   ],
-  "event_count": 25
+  "event_count": 92
 }
