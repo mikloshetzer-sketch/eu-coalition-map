@@ -5,7 +5,7 @@ import json
 import time
 from pathlib import Path
 from datetime import datetime, timezone
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Set
 from urllib.parse import urlencode
 
 import requests
@@ -14,8 +14,7 @@ import requests
 ROOT_DIR = Path(__file__).resolve().parent.parent
 sys.path.append(str(ROOT_DIR))
 
-from config.countries import COUNTRIES
-from config.topics import TOPICS, TOPIC_ORDER
+from pipeline.event_builder import build_event
 
 
 OUTPUT_DIR = ROOT_DIR / "data" / "events" / "gdelt"
@@ -23,46 +22,20 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 GDELT_DOC_API = "https://api.gdeltproject.org/api/v2/doc/doc"
 
-MAX_RECORDS_PER_QUERY = 10
+MAX_RECORDS_PER_TOPIC = 25
 TIMESPAN = "24H"
 REQUEST_TIMEOUT = 30
-SLEEP_BETWEEN_REQUESTS = 0.8
+SLEEP_BETWEEN_REQUESTS = 2.0
 
-# Csak a rövidebb, megbízhatóbb aliasokat használjuk queryhez.
-QUERY_ALIASES = {
-    "AT": ["Austria"],
-    "BE": ["Belgium"],
-    "BG": ["Bulgaria"],
-    "HR": ["Croatia"],
-    "CY": ["Cyprus"],
-    "CZ": ["Czech Republic", "Czechia"],
-    "DK": ["Denmark"],
-    "EE": ["Estonia"],
-    "FI": ["Finland"],
-    "FR": ["France"],
-    "DE": ["Germany"],
-    "GR": ["Greece"],
-    "HU": ["Hungary"],
-    "IE": ["Ireland"],
-    "IT": ["Italy"],
-    "LV": ["Latvia"],
-    "LT": ["Lithuania"],
-    "LU": ["Luxembourg"],
-    "MT": ["Malta"],
-    "NL": ["Netherlands"],
-    "PL": ["Poland"],
-    "PT": ["Portugal"],
-    "RO": ["Romania"],
-    "SK": ["Slovakia"],
-    "SI": ["Slovenia"],
-    "ES": ["Spain"],
-    "SE": ["Sweden"],
-    "US": ["United States", "USA"],
-    "GB": ["United Kingdom", "Britain"],
-    "RU": ["Russia"],
-    "UA": ["Ukraine"],
-    "CN": ["China"],
-    "TR": ["Turkey", "Türkiye"],
+TOPIC_QUERIES: Dict[str, str] = {
+    "migration": '"migration" OR asylum OR refugee OR refugees OR border OR schengen OR frontex',
+    "ukraine_russia": 'Ukraine OR Russia OR sanctions OR "military aid" OR ceasefire OR "peace talks"',
+    "enlargement": '"EU enlargement" OR accession OR "candidate country" OR "Western Balkans" OR "membership talks"',
+    "defence": 'defence OR defense OR NATO OR "military cooperation" OR "defence spending" OR "security policy"',
+    "energy": '"energy security" OR gas OR LNG OR oil OR pipeline OR pipelines OR renewables',
+    "fiscal": '"fiscal policy" OR budget OR deficit OR debt OR inflation OR "economic governance"',
+    "rule_of_law": '"rule of law" OR democracy OR "judicial independence" OR conditionality OR corruption',
+    "trade": 'trade OR tariff OR tariffs OR "industrial policy" OR "strategic autonomy" OR "supply chain"',
 }
 
 
@@ -80,103 +53,113 @@ def build_api_url(query: str) -> str:
         "query": query,
         "mode": "artlist",
         "format": "json",
-        "maxrecords": MAX_RECORDS_PER_QUERY,
+        "maxrecords": MAX_RECORDS_PER_TOPIC,
         "timespan": TIMESPAN,
         "sort": "datedesc",
     }
     return f"{GDELT_DOC_API}?{urlencode(params)}"
 
 
-def build_topic_query(topic_id: str) -> str:
-    keywords = TOPICS[topic_id].get("keywords", [])
-    selected = keywords[:6] if len(keywords) >= 6 else keywords
-    return " OR ".join(f'"{kw}"' if " " in kw else kw for kw in selected)
-
-
-def build_country_query(country_code: str) -> str:
-    aliases = QUERY_ALIASES.get(country_code, [COUNTRIES[country_code]["name"]])
-    return " OR ".join(f'"{alias}"' if " " in alias else alias for alias in aliases[:3])
-
-
-def fetch_query_count(country_code: str, topic_id: str) -> Dict[str, Any]:
-    country_query = build_country_query(country_code)
-    topic_query = build_topic_query(topic_id)
-
-    query = f"({country_query}) AND ({topic_query})"
+def fetch_topic_articles(topic_id: str, query: str) -> List[Dict[str, Any]]:
     url = build_api_url(query)
-
     response = requests.get(url, timeout=REQUEST_TIMEOUT)
     response.raise_for_status()
 
     payload = response.json()
     articles = payload.get("articles", [])
 
-    return {
-        "country_code": country_code,
-        "topic_id": topic_id,
-        "query": query,
-        "article_count": len(articles),
-        "sample_titles": [a.get("title", "") for a in articles[:3]],
-        "sample_urls": [a.get("url", "") for a in articles[:3]],
-    }
+    cleaned: List[Dict[str, Any]] = []
+
+    for article in articles:
+        cleaned.append(
+            {
+                "topic": topic_id,
+                "title": article.get("title", "") or "",
+                "url": article.get("url", "") or "",
+                "domain": article.get("domain", "") or "",
+                "seendate": article.get("seendate"),
+                "language": article.get("language", ""),
+                "sourcecountry": article.get("sourcecountry", ""),
+                "socialimage": article.get("socialimage", ""),
+            }
+        )
+
+    return cleaned
 
 
-def build_signal_event(result: Dict[str, Any]) -> Dict[str, Any]:
-    country_code = result["country_code"]
-    topic_id = result["topic_id"]
-    article_count = result["article_count"]
+def collect_all_articles() -> List[Dict[str, Any]]:
+    all_articles: List[Dict[str, Any]] = []
 
-    return {
-        "layer": "gdelt",
-        "source_name": "GDELT",
-        "source_type": "gdelt",
-        "title": f"GDELT signal for {country_code} on {topic_id}",
-        "summary": "",
-        "body": "",
-        "url": result["sample_urls"][0] if result["sample_urls"] else "",
-        "published_at": None,
-        "collected_at": utc_now_iso(),
-        "topics": [topic_id],
-        "primary_topic": topic_id,
-        "countries": [country_code],
-        "country_groups": {
-            "eu": [country_code] if COUNTRIES[country_code]["group"] == "EU" else [],
-            "external": [country_code] if COUNTRIES[country_code]["group"] == "EXTERNAL" else [],
-        },
-        "country_pairs": [],
-        "metadata": {
-            "gdelt_query": result["query"],
-            "gdelt_article_count": article_count,
-            "gdelt_sample_titles": result["sample_titles"],
-            "gdelt_mode": "country_topic_signal",
-        },
-    }
+    for topic_id, query in TOPIC_QUERIES.items():
+        print(f"Fetching GDELT topic: {topic_id}")
+        try:
+            topic_articles = fetch_topic_articles(topic_id, query)
+            print(f"  articles fetched: {len(topic_articles)}")
+            all_articles.extend(topic_articles)
+        except Exception as exc:
+            print(f"  failed: {exc}")
+
+        time.sleep(SLEEP_BETWEEN_REQUESTS)
+
+    return all_articles
 
 
-def collect_gdelt_signals() -> List[Dict[str, Any]]:
+def deduplicate_articles(articles: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    seen_urls: Set[str] = set()
+    deduped: List[Dict[str, Any]] = []
+
+    for article in articles:
+        url = article.get("url", "").strip()
+        if not url:
+            continue
+
+        if url in seen_urls:
+            continue
+
+        seen_urls.add(url)
+        deduped.append(article)
+
+    return deduped
+
+
+def convert_articles_to_events(articles: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """
+    Convert GDELT topic articles into normal event records.
+    We keep articles if they have:
+    - at least one topic (fallback to queried topic)
+    - at least one detected country
+    """
     events: List[Dict[str, Any]] = []
 
-    country_codes = list(COUNTRIES.keys())
+    for article in articles:
+        topic_id = article.get("topic")
 
-    for topic_id in TOPIC_ORDER:
-        print(f"Topic: {topic_id}")
+        event = build_event(
+            layer="gdelt",
+            source_name="GDELT",
+            source_type="gdelt",
+            title=article.get("title", ""),
+            summary="",
+            body="",
+            url=article.get("url", ""),
+            published_at=article.get("seendate"),
+            collected_at=utc_now_iso(),
+            metadata={
+                "gdelt_topic_query": topic_id,
+                "domain": article.get("domain", ""),
+                "language": article.get("language", ""),
+                "sourcecountry": article.get("sourcecountry", ""),
+                "socialimage": article.get("socialimage", ""),
+                "gdelt_mode": "topic_articles",
+            },
+        )
 
-        for country_code in country_codes:
-            try:
-                result = fetch_query_count(country_code, topic_id)
-                count = result["article_count"]
+        if not event.get("topics") and topic_id:
+            event["topics"] = [topic_id]
+            event["primary_topic"] = topic_id
 
-                if count > 0:
-                    event = build_signal_event(result)
-                    events.append(event)
-                    print(f"  {country_code}: {count}")
-                else:
-                    print(f"  {country_code}: 0")
-
-            except Exception as exc:
-                print(f"  {country_code}: failed -> {exc}")
-
-            time.sleep(SLEEP_BETWEEN_REQUESTS)
+        if event.get("topics") and event.get("countries"):
+            events.append(event)
 
     return events
 
@@ -188,14 +171,20 @@ def save_events(events: List[Dict[str, Any]]) -> None:
         for event in events:
             f.write(json.dumps(event, ensure_ascii=False) + "\n")
 
-    print(f"Saved {len(events)} GDELT signal events to {output_file}")
+    print(f"Saved {len(events)} GDELT events to {output_file}")
 
 
 def main() -> None:
     print("Starting GDELT collector...")
 
-    events = collect_gdelt_signals()
-    print(f"Collected GDELT signal events: {len(events)}")
+    raw_articles = collect_all_articles()
+    print(f"Raw GDELT articles: {len(raw_articles)}")
+
+    deduped_articles = deduplicate_articles(raw_articles)
+    print(f"Deduplicated GDELT articles: {len(deduped_articles)}")
+
+    events = convert_articles_to_events(deduped_articles)
+    print(f"Relevant GDELT events: {len(events)}")
 
     save_events(events)
 
