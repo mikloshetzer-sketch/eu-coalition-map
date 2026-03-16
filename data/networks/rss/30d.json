@@ -1,107 +1,236 @@
 {
   "nodes": [
     {
-      "id": "CZ",
-      "weight": 1
+      "id": "BE"
     },
     {
-      "id": "DE",
-      "weight": 1
+      "id": "CN"
     },
     {
-      "id": "ES",
-      "weight": 1
+      "id": "CZ"
     },
     {
-      "id": "FR",
-      "weight": 2
+      "id": "DE"
     },
     {
-      "id": "HU",
-      "weight": 1
+      "id": "ES"
     },
     {
-      "id": "IT",
-      "weight": 2
+      "id": "FR"
     },
     {
-      "id": "PL",
-      "weight": 1
+      "id": "GB"
     },
     {
-      "id": "SK",
-      "weight": 1
+      "id": "HU"
+    },
+    {
+      "id": "IE"
+    },
+    {
+      "id": "IT"
+    },
+    {
+      "id": "PL"
+    },
+    {
+      "id": "RU"
+    },
+    {
+      "id": "SE"
+    },
+    {
+      "id": "SI"
+    },
+    {
+      "id": "SK"
+    },
+    {
+      "id": "TR"
+    },
+    {
+      "id": "UA"
+    },
+    {
+      "id": "US"
     }
   ],
   "edges": [
     {
+      "source": "BE",
+      "target": "RU",
+      "weight": 0.7
+    },
+    {
+      "source": "BE",
+      "target": "UA",
+      "weight": 0.7
+    },
+    {
+      "source": "CN",
+      "target": "RU",
+      "weight": 5.6
+    },
+    {
+      "source": "CZ",
+      "target": "GB",
+      "weight": 1.4
+    },
+    {
       "source": "CZ",
       "target": "PL",
-      "weight": 1,
-      "topics": {
-        "defence": 1,
-        "ukraine_russia": 1
-      }
+      "weight": 12.6
+    },
+    {
+      "source": "CZ",
+      "target": "SK",
+      "weight": 1.4
+    },
+    {
+      "source": "CZ",
+      "target": "UA",
+      "weight": 12.6
     },
     {
       "source": "DE",
       "target": "ES",
-      "weight": 1,
-      "topics": {
-        "defence": 1
-      }
+      "weight": 1.4
     },
     {
       "source": "DE",
       "target": "FR",
-      "weight": 1,
-      "topics": {
-        "defence": 1
-      }
+      "weight": 1.4
     },
     {
       "source": "DE",
       "target": "IT",
-      "weight": 1,
-      "topics": {
-        "defence": 1
-      }
+      "weight": 1.4
+    },
+    {
+      "source": "DE",
+      "target": "TR",
+      "weight": 2.8
     },
     {
       "source": "ES",
       "target": "FR",
-      "weight": 1,
-      "topics": {
-        "defence": 1
-      }
+      "weight": 1.4
     },
     {
       "source": "ES",
       "target": "IT",
-      "weight": 1,
-      "topics": {
-        "defence": 1
-      }
+      "weight": 1.4
     },
     {
       "source": "FR",
       "target": "IT",
-      "weight": 2,
-      "topics": {
-        "defence": 1,
-        "energy": 1
-      }
+      "weight": 5.6
+    },
+    {
+      "source": "GB",
+      "target": "HU",
+      "weight": 4.2
+    },
+    {
+      "source": "GB",
+      "target": "PL",
+      "weight": 6.3
+    },
+    {
+      "source": "GB",
+      "target": "RU",
+      "weight": 10.5
+    },
+    {
+      "source": "GB",
+      "target": "SK",
+      "weight": 1.4
+    },
+    {
+      "source": "GB",
+      "target": "UA",
+      "weight": 15.4
+    },
+    {
+      "source": "HU",
+      "target": "RU",
+      "weight": 28.0
     },
     {
       "source": "HU",
       "target": "SK",
-      "weight": 1,
-      "topics": {
-        "defence": 1,
-        "energy": 1,
-        "ukraine_russia": 1
-      }
+      "weight": 1.4
+    },
+    {
+      "source": "HU",
+      "target": "UA",
+      "weight": 44.8
+    },
+    {
+      "source": "HU",
+      "target": "US",
+      "weight": 1.4
+    },
+    {
+      "source": "IE",
+      "target": "RU",
+      "weight": 2.8
+    },
+    {
+      "source": "PL",
+      "target": "RU",
+      "weight": 11.2
+    },
+    {
+      "source": "PL",
+      "target": "SK",
+      "weight": 1.4
+    },
+    {
+      "source": "PL",
+      "target": "UA",
+      "weight": 15.4
+    },
+    {
+      "source": "RU",
+      "target": "SE",
+      "weight": 0.7
+    },
+    {
+      "source": "RU",
+      "target": "SK",
+      "weight": 14.0
+    },
+    {
+      "source": "RU",
+      "target": "UA",
+      "weight": 102.2
+    },
+    {
+      "source": "RU",
+      "target": "US",
+      "weight": 5.6
+    },
+    {
+      "source": "SI",
+      "target": "UA",
+      "weight": 1.4
+    },
+    {
+      "source": "SK",
+      "target": "UA",
+      "weight": 2.8
+    },
+    {
+      "source": "SK",
+      "target": "US",
+      "weight": 1.4
+    },
+    {
+      "source": "UA",
+      "target": "US",
+      "weight": 11.2
     }
   ],
-  "event_count": 4
+  "event_count": 498
 }
