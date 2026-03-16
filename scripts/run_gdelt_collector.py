@@ -1,41 +1,96 @@
 # scripts/run_gdelt_collector.py
 
 import sys
+import io
+import csv
 import json
-import time
+import zipfile
 from pathlib import Path
 from datetime import datetime, timezone
-from typing import Dict, List, Any, Set
-from urllib.parse import urlencode
+from typing import Dict, List, Any, Set, Optional
 
 import requests
 
+# --- add project root to Python path ---
 ROOT_DIR = Path(__file__).resolve().parent.parent
 sys.path.append(str(ROOT_DIR))
 
-from pipeline.event_builder import build_event
+from config.countries import COUNTRIES, EU_COUNTRY_CODES
 
 
 OUTPUT_DIR = ROOT_DIR / "data" / "events" / "gdelt"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-GDELT_DOC_API = "https://api.gdeltproject.org/api/v2/doc/doc"
+LASTUPDATE_URL = "https://data.gdeltproject.org/gdeltv2/lastupdate.txt"
 
-MAX_RECORDS_PER_TOPIC = 20
-TIMESPAN = "24H"
-REQUEST_TIMEOUT = 30
-SLEEP_BETWEEN_REQUESTS = 2.0
+REQUEST_TIMEOUT = 60
+MAX_FILES = 4  # utolsó 4 export (~1 óra)
+MAX_EVENTS_TO_SAVE = 1500
 
-TOPIC_QUERIES: Dict[str, str] = {
-    "migration": '"migration" OR asylum OR refugee OR refugees OR border OR schengen OR frontex',
-    "ukraine_russia": 'Ukraine OR Russia OR sanctions OR "military aid" OR ceasefire OR "peace talks"',
-    "enlargement": '"EU enlargement" OR accession OR "candidate country" OR "Western Balkans" OR "membership talks"',
-    "defence": 'defence OR defense OR NATO OR "military cooperation" OR "defence spending" OR "security policy"',
-    "energy": '"energy security" OR gas OR LNG OR oil OR pipeline OR pipelines OR renewables',
-    "fiscal": '"fiscal policy" OR budget OR deficit OR debt OR inflation OR "economic governance"',
-    "rule_of_law": '"rule of law" OR democracy OR "judicial independence" OR conditionality OR corruption',
-    "trade": 'trade OR tariff OR tariffs OR "industrial policy" OR "strategic autonomy" OR "supply chain"',
+EU_SET = set(EU_COUNTRY_CODES)
+ALL_TARGET_CODES = set(COUNTRIES.keys())
+
+# GDELT gyakran 2 betűs FIPS-szerű országkódokat használ.
+# Itt csak a számunkra fontosak.
+GDELT_TO_INTERNAL = {
+    "AU": "AT",  # Austria
+    "BE": "BE",
+    "BU": "BG",  # Bulgaria
+    "HR": "HR",  # Croatia
+    "CY": "CY",
+    "EZ": "CZ",  # Czech Republic
+    "DA": "DK",  # Denmark
+    "EN": "EE",  # Estonia
+    "FI": "FI",  # Finland
+    "FR": "FR",
+    "GM": "DE",  # Germany
+    "GR": "GR",  # Greece
+    "HU": "HU",
+    "EI": "IE",  # Ireland
+    "IT": "IT",
+    "LG": "LV",  # Latvia
+    "LH": "LT",  # Lithuania
+    "LU": "LU",
+    "MT": "MT",
+    "NL": "NL",
+    "PL": "PL",
+    "PO": "PT",  # Portugal
+    "RO": "RO",
+    "LO": "SK",  # Slovakia
+    "SI": "SI",
+    "SP": "ES",  # Spain
+    "SW": "SE",  # Sweden
+
+    "US": "US",
+    "UK": "GB",
+    "RS": "RU",  # Russia
+    "UP": "UA",  # Ukraine
+    "CH": "CN",  # China
+    "TU": "TR",  # Turkey
 }
+
+# Egyszerű topic mapping GDELT EventCode / EventRootCode alapján.
+# Ez nem tökéletes, de első működő GDELT hálóhoz jó.
+def infer_topics(event_root_code: str, event_code: str) -> List[str]:
+    topics: List[str] = []
+
+    # 19: fight, 20: unconventional mass violence -> defence / ukraine_russia
+    if event_root_code in {"19", "20"}:
+        topics.extend(["defence", "ukraine_russia"])
+
+    # 13: threaten, 14: protest, 17: coerce -> rule_of_law / ukraine_russia
+    if event_root_code in {"13", "14", "17"}:
+        topics.append("rule_of_law")
+
+    # 05-08 often consult / engage / aid / cooperate -> enlargement / trade / fiscal
+    if event_root_code in {"05", "06", "07", "08"}:
+        topics.append("trade")
+
+    # direct sanctions / coercive economy often appear in 11/12/13 family
+    if event_code.startswith(("112", "113", "120", "121", "122", "123")):
+        topics.extend(["trade", "fiscal"])
+
+    return sorted(set(topics))
 
 
 def utc_now_iso() -> str:
@@ -47,135 +102,217 @@ def get_output_file() -> Path:
     return OUTPUT_DIR / f"{today}.jsonl"
 
 
-def build_api_url(query: str) -> str:
-    params = {
-        "query": query,
-        "mode": "artlist",
-        "format": "json",
-        "maxrecords": MAX_RECORDS_PER_TOPIC,
-        "timespan": TIMESPAN,
-        "sort": "datedesc",
-    }
-    return f"{GDELT_DOC_API}?{urlencode(params)}"
+def fetch_lastupdate_lines() -> List[str]:
+    response = requests.get(LASTUPDATE_URL, timeout=REQUEST_TIMEOUT)
+    response.raise_for_status()
+    lines = [line.strip() for line in response.text.splitlines() if line.strip()]
+    return lines
 
 
-def fetch_topic_articles(topic_id: str, query: str) -> List[Dict[str, Any]]:
-    url = build_api_url(query)
+def extract_export_urls(lines: List[str], max_files: int) -> List[str]:
+    urls: List[str] = []
+
+    # lastupdate.txt sorai formátuma kb:
+    # <size> <md5> <url>
+    for line in lines:
+        parts = line.split()
+        if len(parts) < 3:
+            continue
+
+        url = parts[-1]
+        if url.endswith(".export.CSV.zip"):
+            urls.append(url)
+
+    # a fájl általában a legfrissebbeket tartalmazza, de biztosra megyünk
+    return urls[:max_files]
+
+
+def download_zip_bytes(url: str) -> bytes:
     response = requests.get(url, timeout=REQUEST_TIMEOUT)
     response.raise_for_status()
-
-    payload = response.json()
-    articles = payload.get("articles", [])
-
-    cleaned: List[Dict[str, Any]] = []
-
-    for article in articles:
-        cleaned.append(
-            {
-                "topic": topic_id,
-                "title": article.get("title", "") or "",
-                "url": article.get("url", "") or "",
-                "domain": article.get("domain", "") or "",
-                "seendate": article.get("seendate"),
-                "language": article.get("language", ""),
-                "sourcecountry": article.get("sourcecountry", ""),
-            }
-        )
-
-    return cleaned
+    return response.content
 
 
-def collect_all_articles() -> List[Dict[str, Any]]:
-    all_articles: List[Dict[str, Any]] = []
+def parse_export_zip(content: bytes) -> List[Dict[str, Any]]:
+    rows: List[Dict[str, Any]] = []
 
-    for topic_id, query in TOPIC_QUERIES.items():
-        print(f"Fetching GDELT topic: {topic_id}")
-        try:
-            topic_articles = fetch_topic_articles(topic_id, query)
-            print(f"  articles fetched: {len(topic_articles)}")
-            all_articles.extend(topic_articles)
-        except Exception as exc:
-            print(f"  failed: {exc}")
+    with zipfile.ZipFile(io.BytesIO(content)) as zf:
+        names = zf.namelist()
+        if not names:
+            return rows
 
-        time.sleep(SLEEP_BETWEEN_REQUESTS)
+        with zf.open(names[0]) as f:
+            text = io.TextIOWrapper(f, encoding="utf-8", errors="replace")
+            reader = csv.reader(text, delimiter="\t")
 
-    return all_articles
+            for row in reader:
+                rows.append(
+                    {
+                        "GlobalEventID": row[0],
+                        "Day": row[1],
+                        "MonthYear": row[2],
+                        "Year": row[3],
+                        "FractionDate": row[4],
+                        "Actor1Code": row[5],
+                        "Actor1Name": row[6],
+                        "Actor1CountryCode": row[7],
+                        "Actor2Code": row[15],
+                        "Actor2Name": row[16],
+                        "Actor2CountryCode": row[17],
+                        "IsRootEvent": row[25],
+                        "EventCode": row[26],
+                        "EventBaseCode": row[27],
+                        "EventRootCode": row[28],
+                        "GoldsteinScale": row[30],
+                        "NumMentions": row[31],
+                        "NumSources": row[32],
+                        "NumArticles": row[33],
+                        "AvgTone": row[34],
+                        "Actor1Geo_CountryCode": row[40],
+                        "Actor2Geo_CountryCode": row[47],
+                        "ActionGeo_CountryCode": row[54],
+                        "DATEADDED": row[57] if len(row) > 57 else "",
+                        "SOURCEURL": row[58] if len(row) > 58 else "",
+                    }
+                )
+
+    return rows
 
 
-def deduplicate_articles(articles: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    seen_urls: Set[str] = set()
+def map_country(code: str) -> Optional[str]:
+    code = (code or "").strip().upper()
+    return GDELT_TO_INTERNAL.get(code)
+
+
+def is_relevant_pair(c1: Optional[str], c2: Optional[str]) -> bool:
+    if not c1 or not c2:
+        return False
+    if c1 == c2:
+        return False
+
+    # EU vs EU, vagy EU vs külső kulcsszereplő
+    return (c1 in EU_SET) or (c2 in EU_SET)
+
+
+def build_event_from_row(row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    c1 = map_country(row.get("Actor1CountryCode", ""))
+    c2 = map_country(row.get("Actor2CountryCode", ""))
+
+    if not is_relevant_pair(c1, c2):
+        return None
+
+    event_root = (row.get("EventRootCode") or "").strip()
+    event_code = (row.get("EventCode") or "").strip()
+
+    topics = infer_topics(event_root, event_code)
+    if not topics:
+        # fallback: legalább defence jellegű interakciót mutasson a háló
+        topics = ["defence"]
+
+    countries = sorted({c1, c2})
+    country_pairs = [countries] if len(countries) == 2 else []
+
+    eu_countries = [c for c in countries if c in EU_SET]
+    external_countries = [c for c in countries if c not in EU_SET]
+
+    title = f"GDELT event {c1}-{c2} code {event_code}"
+
+    return {
+        "layer": "gdelt",
+        "source_name": "GDELT",
+        "source_type": "gdelt",
+        "title": title,
+        "summary": "",
+        "body": "",
+        "url": row.get("SOURCEURL", "") or "",
+        "published_at": None,
+        "collected_at": utc_now_iso(),
+        "topics": topics,
+        "primary_topic": topics[0],
+        "countries": countries,
+        "country_groups": {
+            "eu": eu_countries,
+            "external": external_countries,
+        },
+        "country_pairs": country_pairs,
+        "metadata": {
+            "gdelt_mode": "event_export",
+            "GlobalEventID": row.get("GlobalEventID", ""),
+            "EventCode": event_code,
+            "EventBaseCode": row.get("EventBaseCode", ""),
+            "EventRootCode": event_root,
+            "GoldsteinScale": row.get("GoldsteinScale", ""),
+            "NumMentions": row.get("NumMentions", ""),
+            "NumSources": row.get("NumSources", ""),
+            "NumArticles": row.get("NumArticles", ""),
+            "AvgTone": row.get("AvgTone", ""),
+            "Actor1Name": row.get("Actor1Name", ""),
+            "Actor2Name": row.get("Actor2Name", ""),
+            "Actor1CountryCode_raw": row.get("Actor1CountryCode", ""),
+            "Actor2CountryCode_raw": row.get("Actor2CountryCode", ""),
+            "ActionGeo_CountryCode_raw": row.get("ActionGeo_CountryCode", ""),
+        },
+    }
+
+
+def deduplicate_events(events: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    seen: Set[str] = set()
     deduped: List[Dict[str, Any]] = []
 
-    for article in articles:
-        url = article.get("url", "").strip()
-        if not url or url in seen_urls:
+    for event in events:
+        gid = event.get("metadata", {}).get("GlobalEventID", "")
+        key = gid or f"{event.get('title','')}|{event.get('url','')}"
+        if key in seen:
             continue
-        seen_urls.add(url)
-        deduped.append(article)
+        seen.add(key)
+        deduped.append(event)
 
     return deduped
-
-
-def convert_articles_to_events(articles: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    events: List[Dict[str, Any]] = []
-
-    for article in articles:
-        topic_id = article.get("topic")
-
-        event = build_event(
-            layer="gdelt",
-            source_name="GDELT",
-            source_type="gdelt",
-            title=article.get("title", ""),
-            summary="",
-            body="",
-            url=article.get("url", ""),
-            published_at=article.get("seendate"),
-            collected_at=utc_now_iso(),
-            metadata={
-                "gdelt_topic_query": topic_id,
-                "domain": article.get("domain", ""),
-                "language": article.get("language", ""),
-                "sourcecountry": article.get("sourcecountry", ""),
-                "gdelt_mode": "topic_articles",
-            },
-        )
-
-        if not event.get("topics") and topic_id:
-            event["topics"] = [topic_id]
-            event["primary_topic"] = topic_id
-
-        if event.get("topics") and event.get("countries"):
-            events.append(event)
-
-    return events
 
 
 def save_events(events: List[Dict[str, Any]]) -> None:
     output_file = get_output_file()
 
     with open(output_file, "w", encoding="utf-8") as f:
-        for event in events:
+        for event in events[:MAX_EVENTS_TO_SAVE]:
             f.write(json.dumps(event, ensure_ascii=False) + "\n")
 
-    print(f"Saved {len(events)} GDELT events to {output_file}")
+    print(f"Saved {min(len(events), MAX_EVENTS_TO_SAVE)} GDELT events to {output_file}")
 
 
 def main() -> None:
-    print("Starting GDELT collector...")
+    print("Starting GDELT event collector...")
 
-    raw_articles = collect_all_articles()
-    print(f"Raw GDELT articles: {len(raw_articles)}")
+    lines = fetch_lastupdate_lines()
+    urls = extract_export_urls(lines, MAX_FILES)
+    print(f"Export files selected: {len(urls)}")
 
-    deduped_articles = deduplicate_articles(raw_articles)
-    print(f"Deduplicated GDELT articles: {len(deduped_articles)}")
+    raw_rows: List[Dict[str, Any]] = []
 
-    events = convert_articles_to_events(deduped_articles)
+    for url in urls:
+        print(f"Downloading: {url}")
+        try:
+            content = download_zip_bytes(url)
+            rows = parse_export_zip(content)
+            print(f"  rows parsed: {len(rows)}")
+            raw_rows.extend(rows)
+        except Exception as exc:
+            print(f"  failed: {exc}")
+
+    print(f"Total raw rows: {len(raw_rows)}")
+
+    events: List[Dict[str, Any]] = []
+    for row in raw_rows:
+        event = build_event_from_row(row)
+        if event:
+            events.append(event)
+
+    events = deduplicate_events(events)
     print(f"Relevant GDELT events: {len(events)}")
 
     save_events(events)
 
-    print("GDELT collector finished.")
+    print("GDELT event collector finished.")
 
 
 if __name__ == "__main__":
