@@ -2,14 +2,14 @@
 
 import json
 from pathlib import Path
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from collections import defaultdict
 
 ROOT = Path(__file__).resolve().parent.parent
 
-EVENTS_DIR = ROOT / "data/events"
-NETWORK_DIR = ROOT / "data/networks"
-DOCS_NETWORK_DIR = ROOT / "docs/data/networks"
+EVENTS_DIR = ROOT / "data" / "events"
+NETWORK_DIR = ROOT / "data" / "networks"
+DOCS_NETWORK_DIR = ROOT / "docs" / "data" / "networks"
 
 WINDOWS = {
     "7d": 7,
@@ -23,11 +23,12 @@ LAYERS = [
     "combined",
 ]
 
-NOW = datetime.utcnow()
+NOW = datetime.now(timezone.utc)
 
 
-def parse_jsonl(path):
+def parse_jsonl(path: Path):
     events = []
+
     if not path.exists():
         return events
 
@@ -35,65 +36,116 @@ def parse_jsonl(path):
         for line in f:
             try:
                 events.append(json.loads(line))
-            except:
+            except Exception:
                 pass
+
     return events
 
 
-def load_events(layer):
+def load_events(layer: str):
     events = []
 
     if layer == "rss":
         base = EVENTS_DIR / "rss"
+        if base.exists():
+            for f in sorted(base.glob("*.jsonl")):
+                events += parse_jsonl(f)
+
+        # legacy RSS location fallback
+        legacy = EVENTS_DIR
+        if legacy.exists():
+            for f in sorted(legacy.glob("*.jsonl")):
+                events += parse_jsonl(f)
+
     elif layer == "gdelt":
         base = EVENTS_DIR / "gdelt"
-    else:
-        base = None
+        if base.exists():
+            for f in sorted(base.glob("*.jsonl")):
+                events += parse_jsonl(f)
 
-    if base:
-        for f in sorted(base.glob("*.jsonl")):
-            events += parse_jsonl(f)
+    elif layer == "combined":
+        rss_base = EVENTS_DIR / "rss"
+        gdelt_base = EVENTS_DIR / "gdelt"
 
-    if layer == "combined":
-        for f in sorted((EVENTS_DIR / "rss").glob("*.jsonl")):
-            events += parse_jsonl(f)
+        if rss_base.exists():
+            for f in sorted(rss_base.glob("*.jsonl")):
+                events += parse_jsonl(f)
 
-        for f in sorted((EVENTS_DIR / "gdelt").glob("*.jsonl")):
-            events += parse_jsonl(f)
+        # legacy RSS location fallback
+        if EVENTS_DIR.exists():
+            for f in sorted(EVENTS_DIR.glob("*.jsonl")):
+                events += parse_jsonl(f)
+
+        if gdelt_base.exists():
+            for f in sorted(gdelt_base.glob("*.jsonl")):
+                events += parse_jsonl(f)
 
     return events
 
 
-def get_event_date(event):
-    if event.get("published_at"):
-        try:
-            return datetime.fromisoformat(event["published_at"].replace("Z", "+00:00"))
-        except:
-            pass
+def parse_event_datetime(value):
+    """
+    Convert event timestamp to timezone-aware UTC datetime.
+    """
+    if not value:
+        return None
 
-    if event.get("collected_at"):
+    if isinstance(value, datetime):
+        dt = value
+    else:
+        text = str(value).strip()
+
         try:
-            return datetime.fromisoformat(event["collected_at"].replace("Z", "+00:00"))
-        except:
-            pass
+            dt = datetime.fromisoformat(text.replace("Z", "+00:00"))
+        except Exception:
+            return None
+
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    else:
+        dt = dt.astimezone(timezone.utc)
+
+    return dt
+
+
+def get_event_date(event):
+    """
+    Prefer published_at, fallback to collected_at.
+    Always return timezone-aware UTC datetime.
+    """
+    published = parse_event_datetime(event.get("published_at"))
+    if published:
+        return published
+
+    collected = parse_event_datetime(event.get("collected_at"))
+    if collected:
+        return collected
 
     return NOW
 
 
 def compute_weight(event):
     """
-    Súly számítása GDELT metrikák alapján
+    Weighted geopolitical signal.
+    RSS events usually have no GDELT metrics, so they fallback to weight=1.
     """
 
-    meta = event.get("metadata", {})
-
-    mentions = float(meta.get("NumMentions", 1) or 1)
-    articles = float(meta.get("NumArticles", 1) or 1)
+    meta = event.get("metadata", {}) or {}
 
     try:
-        goldstein = abs(float(meta.get("GoldsteinScale", 0)))
-    except:
-        goldstein = 0
+        mentions = float(meta.get("NumMentions", 1) or 1)
+    except Exception:
+        mentions = 1.0
+
+    try:
+        articles = float(meta.get("NumArticles", 1) or 1)
+    except Exception:
+        articles = 1.0
+
+    try:
+        goldstein = abs(float(meta.get("GoldsteinScale", 0) or 0))
+    except Exception:
+        goldstein = 0.0
 
     weight = (
         mentions * 0.4
@@ -102,7 +154,7 @@ def compute_weight(event):
     )
 
     if weight <= 0:
-        weight = 1
+        weight = 1.0
 
     return weight
 
@@ -113,21 +165,25 @@ def build_network(events):
     edges = defaultdict(float)
 
     for event in events:
-
-        pairs = event.get("country_pairs", [])
-
+        pairs = event.get("country_pairs", []) or []
         if not pairs:
             continue
 
         weight = compute_weight(event)
 
-        for a, b in pairs:
+        for pair in pairs:
+            if not isinstance(pair, (list, tuple)) or len(pair) != 2:
+                continue
+
+            a, b = pair
+
+            if not a or not b or a == b:
+                continue
 
             nodes.add(a)
             nodes.add(b)
 
             key = tuple(sorted([a, b]))
-
             edges[key] += weight
 
     node_list = [{"id": n} for n in sorted(nodes)]
@@ -138,26 +194,26 @@ def build_network(events):
             "target": b,
             "weight": round(w, 2),
         }
-        for (a, b), w in edges.items()
+        for (a, b), w in sorted(edges.items())
     ]
 
     return {
         "nodes": node_list,
         "edges": edge_list,
+        "event_count": len(events),
     }
 
 
 def filter_window(events, days):
 
     cutoff = NOW - timedelta(days=days)
-
     result = []
 
-    for e in events:
-        d = get_event_date(e)
+    for event in events:
+        d = get_event_date(event)
 
         if d >= cutoff:
-            result.append(e)
+            result.append(event)
 
     return result
 
@@ -170,7 +226,7 @@ def save_network(layer, window, data):
     path = out_dir / f"{window}.json"
 
     with open(path, "w", encoding="utf-8") as f:
-        json.dump(data, f)
+        json.dump(data, f, ensure_ascii=False, indent=2)
 
     docs_dir = DOCS_NETWORK_DIR / layer
     docs_dir.mkdir(parents=True, exist_ok=True)
@@ -178,9 +234,9 @@ def save_network(layer, window, data):
     docs_path = docs_dir / f"{window}.json"
 
     with open(docs_path, "w", encoding="utf-8") as f:
-        json.dump(data, f)
+        json.dump(data, f, ensure_ascii=False, indent=2)
 
-    print("saved", layer, window)
+    print("saved", layer, window, "->", path)
 
 
 def main():
