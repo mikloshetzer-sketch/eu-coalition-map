@@ -8,12 +8,13 @@ from collections import defaultdict
 from email.utils import parsedate_to_datetime
 
 
-DATA_DIR = Path("data/events")
+# RSS canonical storage location
+DATA_DIR = Path("data/events/rss")
 
 
 def ensure_data_dir() -> None:
     """
-    Ensure the event storage directory exists.
+    Ensure the RSS event storage directory exists.
     """
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -21,7 +22,7 @@ def ensure_data_dir() -> None:
 def get_daily_file_path(date_str: str) -> Path:
     """
     Return the path for a daily JSONL file.
-    Example: data/events/2026-03-14.jsonl
+    Example: data/events/rss/2026-03-15.jsonl
     """
     ensure_data_dir()
     return DATA_DIR / f"{date_str}.jsonl"
@@ -112,7 +113,7 @@ def append_events_grouped_by_event_date(events: List[Dict[str, Any]]) -> Dict[st
 
 def read_events(date_str: str) -> List[Dict[str, Any]]:
     """
-    Read events from a specific day's file.
+    Read events from a specific day's RSS file.
     """
     file_path = get_daily_file_path(date_str)
 
