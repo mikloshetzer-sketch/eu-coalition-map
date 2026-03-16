@@ -31,40 +31,57 @@ MAX_EVENTS_TO_SAVE = 1500
 
 EU_SET = set(EU_COUNTRY_CODES)
 
-GDELT_TO_INTERNAL = {
-    "AU": "AT",
-    "BE": "BE",
-    "BU": "BG",
-    "HR": "HR",
-    "CY": "CY",
-    "EZ": "CZ",
-    "DA": "DK",
-    "EN": "EE",
-    "FI": "FI",
-    "FR": "FR",
-    "GM": "DE",
-    "GR": "GR",
-    "HU": "HU",
-    "EI": "IE",
-    "IT": "IT",
-    "LG": "LV",
-    "LH": "LT",
-    "LU": "LU",
-    "MT": "MT",
-    "NL": "NL",
-    "PL": "PL",
-    "PO": "PT",
-    "RO": "RO",
-    "LO": "SK",
-    "SI": "SI",
-    "SP": "ES",
-    "SW": "SE",
-    "US": "US",
-    "UK": "GB",
-    "RS": "RU",
-    "UP": "UA",
-    "CH": "CN",
-    "TU": "TR",
+# GDELT-ben előforduló tipikus országkódok támogatása:
+# - 3 betűs (pl. DEU, FRA, USA, RUS, UKR)
+# - néhány régebbi / alternatív 2 betűs forma
+COUNTRY_CODE_MAP = {
+    # EU27
+    "AUT": "AT", "AU": "AT",
+    "BEL": "BE", "BE": "BE",
+    "BGR": "BG", "BU": "BG",
+    "HRV": "HR", "HR": "HR",
+    "CYP": "CY", "CY": "CY",
+    "CZE": "CZ", "CZR": "CZ", "EZ": "CZ",
+    "DNK": "DK", "DNM": "DK", "DA": "DK",
+    "EST": "EE", "EN": "EE",
+    "FIN": "FI", "FI": "FI",
+    "FRA": "FR", "FR": "FR",
+    "DEU": "DE", "GER": "DE", "GM": "DE",
+    "GRC": "GR", "GRE": "GR", "GR": "GR",
+    "HUN": "HU", "HU": "HU",
+    "IRL": "IE", "IRE": "IE", "EI": "IE",
+    "ITA": "IT", "IT": "IT",
+    "LVA": "LV", "LAT": "LV", "LG": "LV",
+    "LTU": "LT", "LIT": "LT", "LH": "LT",
+    "LUX": "LU", "LU": "LU",
+    "MLT": "MT", "MT": "MT",
+    "NLD": "NL", "NET": "NL", "NL": "NL",
+    "POL": "PL", "PL": "PL",
+    "PRT": "PT", "POR": "PT", "PO": "PT",
+    "ROU": "RO", "ROM": "RO", "RO": "RO",
+    "SVK": "SK", "SLO": "SK", "LO": "SK",
+    "SVN": "SI", "SLV": "SI", "SI": "SI",
+    "ESP": "ES", "SPN": "ES", "SP": "ES",
+    "SWE": "SE", "SWD": "SE", "SW": "SE",
+
+    # Külső kulcsszereplők
+    "USA": "US", "US": "US",
+    "GBR": "GB", "UK": "GB", "GB": "GB",
+    "RUS": "RU", "RS": "RU",
+    "UKR": "UA", "UP": "UA",
+    "CHN": "CN", "CH": "CN",
+    "TUR": "TR", "TU": "TR",
+}
+
+DEBUG_STATS = {
+    "rows_total": 0,
+    "rows_actor1_mapped": 0,
+    "rows_actor2_mapped": 0,
+    "rows_actiongeo_mapped": 0,
+    "rows_with_any_country": 0,
+    "rows_with_pair": 0,
+    "rows_relevant_pair": 0,
+    "events_built": 0,
 }
 
 
@@ -85,7 +102,6 @@ def fetch_lastupdate_lines() -> List[str]:
 
 
 def extract_export_urls(lines: List[str], max_files: int) -> List[str]:
-
     urls: List[str] = []
 
     for line in lines:
@@ -102,30 +118,25 @@ def extract_export_urls(lines: List[str], max_files: int) -> List[str]:
 
 
 def download_zip_bytes(url: str) -> bytes:
-
     response = requests.get(url, timeout=REQUEST_TIMEOUT, verify=False)
     response.raise_for_status()
     return response.content
 
 
 def parse_export_zip(content: bytes) -> List[Dict[str, Any]]:
-
     rows: List[Dict[str, Any]] = []
 
     with zipfile.ZipFile(io.BytesIO(content)) as zf:
-
         names = zf.namelist()
 
         if not names:
             return rows
 
         with zf.open(names[0]) as f:
-
             text = io.TextIOWrapper(f, encoding="utf-8", errors="replace")
             reader = csv.reader(text, delimiter="\t")
 
             for row in reader:
-
                 rows.append(
                     {
                         "GlobalEventID": row[0],
@@ -141,6 +152,8 @@ def parse_export_zip(content: bytes) -> List[Dict[str, Any]]:
                         "NumSources": row[32],
                         "NumArticles": row[33],
                         "AvgTone": row[34],
+                        "Actor1Geo_CountryCode": row[40],
+                        "Actor2Geo_CountryCode": row[47],
                         "ActionGeo_CountryCode": row[54],
                         "SOURCEURL": row[58] if len(row) > 58 else "",
                     }
@@ -150,25 +163,22 @@ def parse_export_zip(content: bytes) -> List[Dict[str, Any]]:
 
 
 def map_country(code: str) -> Optional[str]:
-
     code = (code or "").strip().upper()
+    if not code:
+        return None
 
-    return GDELT_TO_INTERNAL.get(code)
+    # direkt mapping
+    if code in COUNTRY_CODE_MAP:
+        return COUNTRY_CODE_MAP[code]
 
+    # ha már belső kód lenne
+    if code in COUNTRIES:
+        return code
 
-def is_relevant_pair(c1: Optional[str], c2: Optional[str]) -> bool:
-
-    if not c1 or not c2:
-        return False
-
-    if c1 == c2:
-        return False
-
-    return (c1 in EU_SET) or (c2 in EU_SET)
+    return None
 
 
 def infer_topics(event_root_code: str, event_code: str) -> List[str]:
-
     topics: List[str] = []
 
     if event_root_code in {"19", "20"}:
@@ -186,32 +196,74 @@ def infer_topics(event_root_code: str, event_code: str) -> List[str]:
     return sorted(set(topics))
 
 
-def build_event_from_row(row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-
+def normalize_countries_from_row(row: Dict[str, Any]) -> List[str]:
     c1 = map_country(row.get("Actor1CountryCode", ""))
     c2 = map_country(row.get("Actor2CountryCode", ""))
+    cg = map_country(row.get("ActionGeo_CountryCode", ""))
 
-    if not is_relevant_pair(c1, c2):
+    if c1:
+        DEBUG_STATS["rows_actor1_mapped"] += 1
+    if c2:
+        DEBUG_STATS["rows_actor2_mapped"] += 1
+    if cg:
+        DEBUG_STATS["rows_actiongeo_mapped"] += 1
+
+    countries = []
+    for code in [c1, c2, cg]:
+        if code and code not in countries:
+            countries.append(code)
+
+    if countries:
+        DEBUG_STATS["rows_with_any_country"] += 1
+
+    return sorted(countries)
+
+
+def is_relevant_countries(countries: List[str]) -> bool:
+    if len(countries) < 2:
+        return False
+
+    DEBUG_STATS["rows_with_pair"] += 1
+
+    # Legalább egy EU-tagállam legyen benne
+    if any(c in EU_SET for c in countries):
+        DEBUG_STATS["rows_relevant_pair"] += 1
+        return True
+
+    return False
+
+
+def build_event_from_row(row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    countries = normalize_countries_from_row(row)
+
+    if not is_relevant_countries(countries):
         return None
 
     event_root = (row.get("EventRootCode") or "").strip()
     event_code = (row.get("EventCode") or "").strip()
 
     topics = infer_topics(event_root, event_code)
-
     if not topics:
         topics = ["defence"]
 
-    countries = sorted({c1, c2})
-
-    country_pairs = [countries] if len(countries) == 2 else []
+    # csak az első 2 országpárt képezzük, ha több is van
+    country_pairs: List[List[str]] = []
+    if len(countries) >= 2:
+        for i in range(len(countries)):
+            for j in range(i + 1, len(countries)):
+                country_pairs.append([countries[i], countries[j]])
 
     eu_countries = [c for c in countries if c in EU_SET]
     external_countries = [c for c in countries if c not in EU_SET]
 
-    title = f"GDELT event {c1}-{c2} code {event_code}"
+    title = (
+        f"GDELT event "
+        f"{row.get('Actor1Name','') or countries[0]} - "
+        f"{row.get('Actor2Name','') or countries[1]} "
+        f"code {event_code}"
+    )
 
-    return {
+    event = {
         "layer": "gdelt",
         "source_name": "GDELT",
         "source_type": "gdelt",
@@ -232,6 +284,7 @@ def build_event_from_row(row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         "metadata": {
             "GlobalEventID": row.get("GlobalEventID", ""),
             "EventCode": event_code,
+            "EventBaseCode": row.get("EventBaseCode", ""),
             "EventRootCode": event_root,
             "GoldsteinScale": row.get("GoldsteinScale", ""),
             "NumMentions": row.get("NumMentions", ""),
@@ -240,85 +293,81 @@ def build_event_from_row(row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             "AvgTone": row.get("AvgTone", ""),
             "Actor1Name": row.get("Actor1Name", ""),
             "Actor2Name": row.get("Actor2Name", ""),
+            "Actor1CountryCode_raw": row.get("Actor1CountryCode", ""),
+            "Actor2CountryCode_raw": row.get("Actor2CountryCode", ""),
+            "ActionGeo_CountryCode_raw": row.get("ActionGeo_CountryCode", ""),
+            "gdelt_mode": "event_export",
         },
     }
 
+    DEBUG_STATS["events_built"] += 1
+    return event
+
 
 def deduplicate_events(events: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-
     seen: Set[str] = set()
-
     deduped: List[Dict[str, Any]] = []
 
     for event in events:
-
         gid = event.get("metadata", {}).get("GlobalEventID", "")
-
-        if gid in seen:
+        key = gid or f"{event.get('title','')}|{event.get('url','')}"
+        if key in seen:
             continue
-
-        seen.add(gid)
-
+        seen.add(key)
         deduped.append(event)
 
     return deduped
 
 
 def save_events(events: List[Dict[str, Any]]) -> None:
-
     output_file = get_output_file()
 
     with open(output_file, "w", encoding="utf-8") as f:
-
         for event in events[:MAX_EVENTS_TO_SAVE]:
-
             f.write(json.dumps(event, ensure_ascii=False) + "\n")
 
-    print(f"Saved {len(events[:MAX_EVENTS_TO_SAVE])} events")
+    print(f"Saved {min(len(events), MAX_EVENTS_TO_SAVE)} GDELT events to {output_file}")
+
+
+def print_debug_stats() -> None:
+    print("DEBUG STATS")
+    for key, value in DEBUG_STATS.items():
+        print(f"  {key}: {value}")
 
 
 def main() -> None:
-
     print("Starting GDELT collector")
 
     lines = fetch_lastupdate_lines()
-
     urls = extract_export_urls(lines, MAX_FILES)
 
-    print(f"Export files: {len(urls)}")
+    print(f"Export files selected: {len(urls)}")
 
     raw_rows: List[Dict[str, Any]] = []
 
     for url in urls:
-
         print(f"Downloading {url}")
-
         try:
-
             content = download_zip_bytes(url)
-
             rows = parse_export_zip(content)
-
-            print(f"rows: {len(rows)}")
-
+            print(f"  rows parsed: {len(rows)}")
             raw_rows.extend(rows)
-
         except Exception as exc:
+            print(f"  failed: {exc}")
 
-            print(f"failed: {exc}")
+    print(f"Total raw rows: {len(raw_rows)}")
+    DEBUG_STATS["rows_total"] = len(raw_rows)
 
     events: List[Dict[str, Any]] = []
-
     for row in raw_rows:
-
         event = build_event_from_row(row)
-
         if event:
             events.append(event)
 
     events = deduplicate_events(events)
 
-    print(f"Relevant events: {len(events)}")
+    print_debug_stats()
+    print(f"Relevant GDELT events after dedupe: {len(events)}")
 
     save_events(events)
 
@@ -326,5 +375,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-
     main()
