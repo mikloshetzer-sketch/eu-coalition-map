@@ -1,0 +1,54 @@
+name: GDELT Bootstrap History
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap-gdelt:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install requests
+
+      - name: Run GDELT bootstrap history
+        run: |
+          python scripts/bootstrap_gdelt_history.py
+
+      - name: Rebuild networks
+        run: |
+          python scripts/build_window_networks.py
+
+      - name: Copy networks to GitHub Pages
+        run: |
+          mkdir -p docs/data/networks
+          cp data/networks/*.json docs/data/networks/ || true
+          cp -r data/networks/gdelt docs/data/networks/ || true
+          cp -r data/networks/rss docs/data/networks/ || true
+          cp -r data/networks/combined docs/data/networks/ || true
+
+      - name: Commit results
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add data/events/gdelt/*.jsonl || true
+          git add data/networks/**/* || true
+          git add docs/data/networks/**/* || true
+
+          git diff --cached --quiet || git commit -m "Bootstrap GDELT history"
+          git push
