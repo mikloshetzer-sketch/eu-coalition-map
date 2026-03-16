@@ -1,5 +1,107 @@
 {
-  "nodes": [],
-  "edges": [],
-  "event_count": 0
+  "nodes": [
+    {
+      "id": "CZ",
+      "weight": 1
+    },
+    {
+      "id": "DE",
+      "weight": 1
+    },
+    {
+      "id": "ES",
+      "weight": 1
+    },
+    {
+      "id": "FR",
+      "weight": 2
+    },
+    {
+      "id": "HU",
+      "weight": 1
+    },
+    {
+      "id": "IT",
+      "weight": 2
+    },
+    {
+      "id": "PL",
+      "weight": 1
+    },
+    {
+      "id": "SK",
+      "weight": 1
+    }
+  ],
+  "edges": [
+    {
+      "source": "CZ",
+      "target": "PL",
+      "weight": 1,
+      "topics": {
+        "defence": 1,
+        "ukraine_russia": 1
+      }
+    },
+    {
+      "source": "DE",
+      "target": "ES",
+      "weight": 1,
+      "topics": {
+        "defence": 1
+      }
+    },
+    {
+      "source": "DE",
+      "target": "FR",
+      "weight": 1,
+      "topics": {
+        "defence": 1
+      }
+    },
+    {
+      "source": "DE",
+      "target": "IT",
+      "weight": 1,
+      "topics": {
+        "defence": 1
+      }
+    },
+    {
+      "source": "ES",
+      "target": "FR",
+      "weight": 1,
+      "topics": {
+        "defence": 1
+      }
+    },
+    {
+      "source": "ES",
+      "target": "IT",
+      "weight": 1,
+      "topics": {
+        "defence": 1
+      }
+    },
+    {
+      "source": "FR",
+      "target": "IT",
+      "weight": 2,
+      "topics": {
+        "defence": 1,
+        "energy": 1
+      }
+    },
+    {
+      "source": "HU",
+      "target": "SK",
+      "weight": 1,
+      "topics": {
+        "defence": 1,
+        "energy": 1,
+        "ukraine_russia": 1
+      }
+    }
+  ],
+  "event_count": 4
 }
