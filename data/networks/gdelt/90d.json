@@ -1,5 +1,98 @@
 {
-  "nodes": [],
-  "edges": [],
-  "event_count": 0
+  "nodes": [
+    {
+      "id": "BE",
+      "weight": 3
+    },
+    {
+      "id": "DE",
+      "weight": 13
+    },
+    {
+      "id": "ES",
+      "weight": 9
+    },
+    {
+      "id": "FR",
+      "weight": 4
+    },
+    {
+      "id": "GR",
+      "weight": 1
+    },
+    {
+      "id": "IE",
+      "weight": 5
+    },
+    {
+      "id": "IT",
+      "weight": 9
+    },
+    {
+      "id": "SI",
+      "weight": 6
+    }
+  ],
+  "edges": [
+    {
+      "source": "BE",
+      "target": "DE",
+      "weight": 3,
+      "topics": {
+        "trade": 3
+      }
+    },
+    {
+      "source": "DE",
+      "target": "ES",
+      "weight": 3,
+      "topics": {
+        "trade": 3
+      }
+    },
+    {
+      "source": "DE",
+      "target": "FR",
+      "weight": 4,
+      "topics": {
+        "defence": 1,
+        "trade": 3
+      }
+    },
+    {
+      "source": "DE",
+      "target": "IT",
+      "weight": 3,
+      "topics": {
+        "trade": 3
+      }
+    },
+    {
+      "source": "ES",
+      "target": "SI",
+      "weight": 6,
+      "topics": {
+        "defence": 2,
+        "rule_of_law": 3,
+        "trade": 1
+      }
+    },
+    {
+      "source": "GR",
+      "target": "IT",
+      "weight": 1,
+      "topics": {
+        "defence": 1
+      }
+    },
+    {
+      "source": "IE",
+      "target": "IT",
+      "weight": 5,
+      "topics": {
+        "defence": 5
+      }
+    }
+  ],
+  "event_count": 25
 }

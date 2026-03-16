@@ -1,8 +1,16 @@
 {
   "nodes": [
     {
-      "id": "BE",
+      "id": "AT",
       "weight": 2
+    },
+    {
+      "id": "BE",
+      "weight": 5
+    },
+    {
+      "id": "CY",
+      "weight": 3
     },
     {
       "id": "CZ",
@@ -10,7 +18,7 @@
     },
     {
       "id": "DE",
-      "weight": 3
+      "weight": 20
     },
     {
       "id": "DK",
@@ -18,11 +26,15 @@
     },
     {
       "id": "ES",
-      "weight": 1
+      "weight": 12
     },
     {
       "id": "FR",
-      "weight": 3
+      "weight": 12
+    },
+    {
+      "id": "GR",
+      "weight": 1
     },
     {
       "id": "HU",
@@ -30,11 +42,15 @@
     },
     {
       "id": "IE",
-      "weight": 2
+      "weight": 29
     },
     {
       "id": "IT",
-      "weight": 2
+      "weight": 19
+    },
+    {
+      "id": "NL",
+      "weight": 3
     },
     {
       "id": "PL",
@@ -46,7 +62,7 @@
     },
     {
       "id": "SI",
-      "weight": 3
+      "weight": 9
     },
     {
       "id": "SK",
@@ -55,14 +71,74 @@
   ],
   "edges": [
     {
+      "source": "AT",
+      "target": "BE",
+      "weight": 1
+    },
+    {
+      "source": "AT",
+      "target": "DE",
+      "weight": 1
+    },
+    {
+      "source": "AT",
+      "target": "DK",
+      "weight": 1
+    },
+    {
+      "source": "AT",
+      "target": "ES",
+      "weight": 1
+    },
+    {
+      "source": "AT",
+      "target": "FR",
+      "weight": 1
+    },
+    {
+      "source": "AT",
+      "target": "IE",
+      "weight": 1
+    },
+    {
+      "source": "AT",
+      "target": "IT",
+      "weight": 1
+    },
+    {
+      "source": "AT",
+      "target": "NL",
+      "weight": 1
+    },
+    {
+      "source": "AT",
+      "target": "SI",
+      "weight": 1
+    },
+    {
       "source": "BE",
       "target": "CZ",
       "weight": 1
     },
     {
       "source": "BE",
-      "target": "FR",
+      "target": "DE",
       "weight": 1
+    },
+    {
+      "source": "BE",
+      "target": "DK",
+      "weight": 1
+    },
+    {
+      "source": "BE",
+      "target": "ES",
+      "weight": 1
+    },
+    {
+      "source": "BE",
+      "target": "FR",
+      "weight": 2
     },
     {
       "source": "BE",
@@ -72,11 +148,16 @@
     {
       "source": "BE",
       "target": "IE",
-      "weight": 1
+      "weight": 2
     },
     {
       "source": "BE",
       "target": "IT",
+      "weight": 2
+    },
+    {
+      "source": "BE",
+      "target": "NL",
       "weight": 1
     },
     {
@@ -92,12 +173,67 @@
     {
       "source": "BE",
       "target": "SI",
-      "weight": 2
+      "weight": 3
     },
     {
       "source": "BE",
       "target": "SK",
       "weight": 2
+    },
+    {
+      "source": "CY",
+      "target": "CZ",
+      "weight": 1
+    },
+    {
+      "source": "CY",
+      "target": "DE",
+      "weight": 1
+    },
+    {
+      "source": "CY",
+      "target": "ES",
+      "weight": 1
+    },
+    {
+      "source": "CY",
+      "target": "FR",
+      "weight": 1
+    },
+    {
+      "source": "CY",
+      "target": "GR",
+      "weight": 1
+    },
+    {
+      "source": "CY",
+      "target": "HU",
+      "weight": 1
+    },
+    {
+      "source": "CY",
+      "target": "IE",
+      "weight": 1
+    },
+    {
+      "source": "CY",
+      "target": "IT",
+      "weight": 1
+    },
+    {
+      "source": "CY",
+      "target": "PL",
+      "weight": 1
+    },
+    {
+      "source": "CY",
+      "target": "SI",
+      "weight": 1
+    },
+    {
+      "source": "CY",
+      "target": "SK",
+      "weight": 1
     },
     {
       "source": "CZ",
@@ -116,6 +252,11 @@
     },
     {
       "source": "CZ",
+      "target": "GR",
+      "weight": 1
+    },
+    {
+      "source": "CZ",
       "target": "HU",
       "weight": 2
     },
@@ -142,7 +283,7 @@
     {
       "source": "CZ",
       "target": "SI",
-      "weight": 1
+      "weight": 2
     },
     {
       "source": "CZ",
@@ -151,12 +292,22 @@
     },
     {
       "source": "DE",
-      "target": "ES",
+      "target": "DK",
       "weight": 1
     },
     {
       "source": "DE",
+      "target": "ES",
+      "weight": 2
+    },
+    {
+      "source": "DE",
       "target": "FR",
+      "weight": 2
+    },
+    {
+      "source": "DE",
+      "target": "GR",
       "weight": 1
     },
     {
@@ -167,11 +318,16 @@
     {
       "source": "DE",
       "target": "IE",
-      "weight": 1
+      "weight": 2
     },
     {
       "source": "DE",
       "target": "IT",
+      "weight": 2
+    },
+    {
+      "source": "DE",
+      "target": "NL",
       "weight": 1
     },
     {
@@ -181,7 +337,37 @@
     },
     {
       "source": "DE",
+      "target": "SI",
+      "weight": 2
+    },
+    {
+      "source": "DE",
       "target": "SK",
+      "weight": 1
+    },
+    {
+      "source": "DK",
+      "target": "ES",
+      "weight": 1
+    },
+    {
+      "source": "DK",
+      "target": "FR",
+      "weight": 1
+    },
+    {
+      "source": "DK",
+      "target": "IE",
+      "weight": 1
+    },
+    {
+      "source": "DK",
+      "target": "IT",
+      "weight": 1
+    },
+    {
+      "source": "DK",
+      "target": "NL",
       "weight": 1
     },
     {
@@ -192,21 +378,31 @@
     {
       "source": "ES",
       "target": "FR",
+      "weight": 3
+    },
+    {
+      "source": "ES",
+      "target": "GR",
       "weight": 1
     },
     {
       "source": "ES",
       "target": "HU",
-      "weight": 1
+      "weight": 2
     },
     {
       "source": "ES",
       "target": "IE",
-      "weight": 1
+      "weight": 2
     },
     {
       "source": "ES",
       "target": "IT",
+      "weight": 2
+    },
+    {
+      "source": "ES",
+      "target": "NL",
       "weight": 1
     },
     {
@@ -216,7 +412,17 @@
     },
     {
       "source": "ES",
+      "target": "SI",
+      "weight": 3
+    },
+    {
+      "source": "ES",
       "target": "SK",
+      "weight": 1
+    },
+    {
+      "source": "FR",
+      "target": "GR",
       "weight": 1
     },
     {
@@ -227,12 +433,17 @@
     {
       "source": "FR",
       "target": "IE",
-      "weight": 1
+      "weight": 2
     },
     {
       "source": "FR",
       "target": "IT",
-      "weight": 2
+      "weight": 3
+    },
+    {
+      "source": "FR",
+      "target": "NL",
+      "weight": 1
     },
     {
       "source": "FR",
@@ -242,12 +453,42 @@
     {
       "source": "FR",
       "target": "SI",
-      "weight": 1
+      "weight": 4
     },
     {
       "source": "FR",
       "target": "SK",
       "weight": 2
+    },
+    {
+      "source": "GR",
+      "target": "HU",
+      "weight": 1
+    },
+    {
+      "source": "GR",
+      "target": "IE",
+      "weight": 1
+    },
+    {
+      "source": "GR",
+      "target": "IT",
+      "weight": 1
+    },
+    {
+      "source": "GR",
+      "target": "PL",
+      "weight": 1
+    },
+    {
+      "source": "GR",
+      "target": "SI",
+      "weight": 1
+    },
+    {
+      "source": "GR",
+      "target": "SK",
+      "weight": 1
     },
     {
       "source": "HU",
@@ -272,7 +513,7 @@
     {
       "source": "HU",
       "target": "SI",
-      "weight": 2
+      "weight": 4
     },
     {
       "source": "HU",
@@ -282,6 +523,11 @@
     {
       "source": "IE",
       "target": "IT",
+      "weight": 2
+    },
+    {
+      "source": "IE",
+      "target": "NL",
       "weight": 1
     },
     {
@@ -297,12 +543,17 @@
     {
       "source": "IE",
       "target": "SI",
-      "weight": 1
+      "weight": 3
     },
     {
       "source": "IE",
       "target": "SK",
       "weight": 2
+    },
+    {
+      "source": "IT",
+      "target": "NL",
+      "weight": 1
     },
     {
       "source": "IT",
@@ -312,12 +563,17 @@
     {
       "source": "IT",
       "target": "SI",
-      "weight": 1
+      "weight": 3
     },
     {
       "source": "IT",
       "target": "SK",
       "weight": 2
+    },
+    {
+      "source": "NL",
+      "target": "SI",
+      "weight": 1
     },
     {
       "source": "PL",
@@ -327,7 +583,7 @@
     {
       "source": "PL",
       "target": "SI",
-      "weight": 2
+      "weight": 3
     },
     {
       "source": "PL",
@@ -347,8 +603,8 @@
     {
       "source": "SI",
       "target": "SK",
-      "weight": 2
+      "weight": 3
     }
   ],
-  "event_count": 65
+  "event_count": 138
 }
