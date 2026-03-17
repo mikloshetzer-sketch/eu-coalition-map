@@ -323,6 +323,21 @@
     </div>
 
     <div class="group">
+      <span class="group-label">Téma</span>
+      <select id="topic-select">
+        <option value="all">Összes</option>
+        <option value="migration">migration</option>
+        <option value="ukraine_russia">ukraine_russia</option>
+        <option value="enlargement">enlargement</option>
+        <option value="defence">defence</option>
+        <option value="energy">energy</option>
+        <option value="fiscal">fiscal</option>
+        <option value="rule_of_law">rule_of_law</option>
+        <option value="trade">trade</option>
+      </select>
+    </div>
+
+    <div class="group">
       <button id="fit-btn">Középre rendezés</button>
     </div>
   </div>
@@ -342,6 +357,22 @@
           <h3>Ország értelmezés</h3>
           <div id="country-analysis" class="hint">
             Válassz országot az elemzéshez.
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Rendszer magyarázat</h3>
+          <div class="hint">
+            <b>Adatforrások:</b><br>
+            • <b>RSS:</b> válogatott hírforrások, szerkesztett tartalom.<br>
+            • <b>GDELT:</b> globális automatizált médiamonitoring rendszer, nagy mennyiségű nyers adat.<br><br>
+
+            <b>Nézetek:</b><br>
+            • <b>Graph:</b> országok közötti kapcsolatok<br>
+            • <b>Heatmap:</b> ország–téma aktivitás<br>
+            • <b>Similarity:</b> tematikus hasonlóság<br><br>
+
+            A rendszer médiamegjelenési mintázatokat mutat, nem politikai álláspontot.
           </div>
         </div>
       </div>
@@ -374,6 +405,7 @@
     let currentHeatmapMode = "absolute";
     let currentSort = "total";
     let currentCountry = "";
+    let currentTopic = "all";
 
     const svg = d3.select("#network");
     const infoEl = document.getElementById("info");
@@ -386,6 +418,7 @@
     const heatmapModeGroup = document.getElementById("heatmap-mode-group");
     const sortGroup = document.getElementById("sort-group");
     const countrySelect = document.getElementById("country-select");
+    const topicSelect = document.getElementById("topic-select");
     const viewAnalysisEl = document.getElementById("view-analysis");
     const countryAnalysisEl = document.getElementById("country-analysis");
 
@@ -543,7 +576,13 @@
       renderCurrentView();
     });
 
-    function clear() {
+    topicSelect.addEventListener("change", () => {
+      currentTopic = topicSelect.value;
+      updateCountryInfo();
+      generateCountryAnalysis();
+      renderCurrentView();
+    });
+        function clear() {
       svg.selectAll("*").remove();
       currentNodes = [];
       currentLinks = [];
@@ -624,10 +663,22 @@
       }
     }
 
+    function filterGraphEdgesByTopic(edges) {
+      if (currentTopic === "all") return edges;
+      return edges;
+    }
+
+    function filterHeatmapTopics(topics) {
+      if (currentTopic === "all") return topics;
+      return topics.filter(t => t === currentTopic);
+    }
+
     function topPartnersFromGraph(country, data, limit = 5) {
       if (!country || !data?.edges) return [];
 
-      return data.edges
+      const filteredEdges = filterGraphEdgesByTopic(data.edges);
+
+      return filteredEdges
         .filter(e => (e.source === country || e.target === country || e.source?.id === country || e.target?.id === country))
         .map(e => {
           const source = e.source?.id || e.source;
@@ -646,7 +697,9 @@
       const row = data.rows.find(r => r.country === country);
       if (!row) return [];
 
-      return data.topics
+      const topics = filterHeatmapTopics(data.topics);
+
+      return topics
         .map(t => ({ topic: t, value: row[t] || 0 }))
         .sort((a, b) => b.value - a.value)
         .slice(0, limit);
@@ -735,7 +788,7 @@
       currentNodes = (data.nodes || []).map(d =>
         typeof d === "string" ? { id: d, weight: 1 } : { ...d }
       );
-      currentLinks = (data.edges || []).map(d => ({ ...d }));
+      currentLinks = filterGraphEdgesByTopic((data.edges || []).map(d => ({ ...d })));
 
       zoom = d3.zoom()
         .scaleExtent([0.3, 4])
@@ -743,6 +796,16 @@
 
       svg.call(zoom);
       g = svg.append("g");
+
+      const nodeIdsInEdges = new Set();
+      currentLinks.forEach(e => {
+        nodeIdsInEdges.add(e.source?.id || e.source);
+        nodeIdsInEdges.add(e.target?.id || e.target);
+      });
+
+      if (currentTopic !== "all" && currentLinks.length) {
+        currentNodes = currentNodes.filter(n => nodeIdsInEdges.has(n.id));
+      }
 
       const nodeWeightExtent = d3.extent(currentNodes, d => d.weight || 1);
       const edgeWeightExtent = d3.extent(currentLinks, d => d.weight || 1);
@@ -850,6 +913,7 @@
         <div class="kv"><strong>Source:</strong> ${currentSource}</div>
         <div class="kv"><strong>Window:</strong> ${currentWindow}</div>
         <div class="kv"><strong>Type:</strong> ${currentType}</div>
+        <div class="kv"><strong>Téma:</strong> ${currentTopic}</div>
         <div class="kv"><strong>Nodes:</strong> ${currentNodes.length}</div>
         <div class="kv"><strong>Edges:</strong> ${currentLinks.length}</div>
         ${data.event_count !== undefined ? `<div class="kv"><strong>Events:</strong> ${data.event_count}</div>` : ""}
@@ -879,7 +943,9 @@
       clear();
       updateSize();
 
-      const topics = data.topics || [];
+      let topics = data.topics || [];
+      topics = filterHeatmapTopics(topics);
+
       const rows = sortRows(data.rows || [], topics);
 
       const margin = { top: 80, right: 30, bottom: 170, left: 170 };
@@ -1006,6 +1072,7 @@
         <div class="kv"><strong>Type:</strong> ${currentType}</div>
         <div class="kv"><strong>Mode:</strong> ${currentHeatmapMode}</div>
         <div class="kv"><strong>Sort:</strong> ${currentSort}</div>
+        <div class="kv"><strong>Téma:</strong> ${currentTopic}</div>
         <div class="kv"><strong>Countries:</strong> ${rows.length}</div>
         <div class="kv"><strong>Topics:</strong> ${topics.length}</div>
         <div class="kv"><strong>Events:</strong> ${data.event_count ?? 0}</div>
