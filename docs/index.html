@@ -160,18 +160,18 @@
     }
 
     .heatmap-row-label {
-      font-size: 12px;
+      font-size: 13px;
       fill: #111827;
       font-weight: bold;
     }
 
     .heatmap-col-label {
-      font-size: 11px;
+      font-size: 12px;
       fill: #111827;
     }
 
     .legend-label {
-      font-size: 11px;
+      font-size: 12px;
       fill: #334155;
     }
 
@@ -541,23 +541,24 @@
       const topics = data.topics || [];
       const rows = [...(data.rows || [])].sort((a, b) => (b.total || 0) - (a.total || 0));
 
-      const margin = { top: 70, right: 30, bottom: 120, left: 140 };
-      const cellSize = 34;
+      const margin = { top: 80, right: 30, bottom: 170, left: 170 };
+      const cellSize = 68; // kb. dupla méret
 
       const countries = rows.map(r => r.country);
 
       const gridWidth = countries.length * cellSize;
       const gridHeight = topics.length * cellSize;
 
-      const svgWidth = Math.max(width, margin.left + gridWidth + margin.right + 50);
-      const svgHeight = Math.max(height, margin.top + gridHeight + margin.bottom + 70);
+      const svgWidth = Math.max(width, margin.left + gridWidth + margin.right + 60);
+      const svgHeight = Math.max(height, margin.top + gridHeight + margin.bottom + 80);
 
       svg.attr("width", svgWidth).attr("height", svgHeight);
 
       const maxVal = d3.max(rows, r => d3.max(topics, t => r[t] || 0)) || 1;
 
-      const color = d3.scaleSequential(d3.interpolateTurbo)
-        .domain([0, maxVal]);
+      const color = d3.scaleSequential()
+        .domain([0, maxVal])
+        .interpolator(d3.interpolateRdYlGn);
 
       const group = svg.append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
@@ -588,14 +589,14 @@
         svg.append("text")
           .attr("class", "heatmap-row-label")
           .attr("x", margin.left - 12)
-          .attr("y", margin.top + i * cellSize + 22)
+          .attr("y", margin.top + i * cellSize + cellSize / 2 + 5)
           .attr("text-anchor", "end")
           .text(topic);
       });
 
       countries.forEach((country, i) => {
         const x = margin.left + i * cellSize + cellSize / 2;
-        const y = margin.top + gridHeight + 18;
+        const y = margin.top + gridHeight + 22;
 
         svg.append("text")
           .attr("class", "heatmap-col-label")
@@ -604,10 +605,10 @@
           .text(country);
       });
 
-      const legendWidth = 260;
-      const legendHeight = 14;
+      const legendWidth = 320;
+      const legendHeight = 18;
       const legendX = margin.left;
-      const legendY = 18;
+      const legendY = 20;
 
       const defs = svg.append("defs");
       const gradient = defs.append("linearGradient")
@@ -634,13 +635,13 @@
       svg.append("text")
         .attr("class", "legend-label")
         .attr("x", legendX)
-        .attr("y", legendY - 6)
+        .attr("y", legendY - 8)
         .text("Alacsony");
 
       svg.append("text")
         .attr("class", "legend-label")
-        .attr("x", legendX + legendWidth - 30)
-        .attr("y", legendY - 6)
+        .attr("x", legendX + legendWidth - 28)
+        .attr("y", legendY - 8)
         .text("Magas");
 
       infoEl.classList.remove("empty");
