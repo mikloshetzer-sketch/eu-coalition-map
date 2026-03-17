@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 from datetime import datetime, timedelta, timezone
 from collections import defaultdict
+from email.utils import parsedate_to_datetime
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -24,6 +25,12 @@ LAYERS = [
 ]
 
 NOW = datetime.now(timezone.utc)
+
+EU_CODES = {
+    "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE",
+    "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT",
+    "RO", "SK", "SI", "ES", "SE"
+}
 
 
 def parse_jsonl(path: Path):
@@ -51,7 +58,6 @@ def load_events(layer: str):
             for f in sorted(base.glob("*.jsonl")):
                 events += parse_jsonl(f)
 
-        # legacy RSS location fallback
         legacy = EVENTS_DIR
         if legacy.exists():
             for f in sorted(legacy.glob("*.jsonl")):
@@ -71,7 +77,6 @@ def load_events(layer: str):
             for f in sorted(rss_base.glob("*.jsonl")):
                 events += parse_jsonl(f)
 
-        # legacy RSS location fallback
         if EVENTS_DIR.exists():
             for f in sorted(EVENTS_DIR.glob("*.jsonl")):
                 events += parse_jsonl(f)
@@ -84,35 +89,41 @@ def load_events(layer: str):
 
 
 def parse_event_datetime(value):
-    """
-    Convert event timestamp to timezone-aware UTC datetime.
-    """
     if not value:
         return None
 
-    if isinstance(value, datetime):
-        dt = value
-    else:
-        text = str(value).strip()
+    text = str(value).strip()
+    if not text:
+        return None
 
-        try:
-            dt = datetime.fromisoformat(text.replace("Z", "+00:00"))
-        except Exception:
+    try:
+        dt = datetime.fromisoformat(text.replace("Z", "+00:00"))
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        else:
+            dt = dt.astimezone(timezone.utc)
+        return dt
+    except Exception:
+        pass
+
+    try:
+        dt = parsedate_to_datetime(text)
+        if dt is None:
             return None
 
-    if dt.tzinfo is None:
-        dt = dt.replace(tzinfo=timezone.utc)
-    else:
-        dt = dt.astimezone(timezone.utc)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        else:
+            dt = dt.astimezone(timezone.utc)
 
-    return dt
+        return dt
+    except Exception:
+        pass
+
+    return None
 
 
 def get_event_date(event):
-    """
-    Prefer published_at, fallback to collected_at.
-    Always return timezone-aware UTC datetime.
-    """
     published = parse_event_datetime(event.get("published_at"))
     if published:
         return published
@@ -125,11 +136,6 @@ def get_event_date(event):
 
 
 def compute_weight(event):
-    """
-    Weighted geopolitical signal.
-    RSS events usually have no GDELT metrics, so they fallback to weight=1.
-    """
-
     meta = event.get("metadata", {}) or {}
 
     try:
@@ -159,8 +165,20 @@ def compute_weight(event):
     return weight
 
 
-def build_network(events):
+def pair_type(a: str, b: str) -> str:
+    a_eu = a in EU_CODES
+    b_eu = b in EU_CODES
 
+    if a_eu and b_eu:
+        return "internal"
+
+    if a_eu != b_eu:
+        return "external"
+
+    return "other"
+
+
+def build_network(events, mode="all"):
     nodes = set()
     edges = defaultdict(float)
 
@@ -178,6 +196,17 @@ def build_network(events):
             a, b = pair
 
             if not a or not b or a == b:
+                continue
+
+            relation = pair_type(a, b)
+
+            if mode == "internal" and relation != "internal":
+                continue
+
+            if mode == "external" and relation != "external":
+                continue
+
+            if mode == "all" and relation == "other":
                 continue
 
             nodes.add(a)
@@ -201,29 +230,28 @@ def build_network(events):
         "nodes": node_list,
         "edges": edge_list,
         "event_count": len(events),
+        "mode": mode,
     }
 
 
 def filter_window(events, days):
-
     cutoff = NOW - timedelta(days=days)
     result = []
 
     for event in events:
         d = get_event_date(event)
-
         if d >= cutoff:
             result.append(event)
 
     return result
 
 
-def save_network(layer, window, data):
-
+def save_network(layer, window, data, suffix=""):
     out_dir = NETWORK_DIR / layer
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    path = out_dir / f"{window}.json"
+    filename = f"{window}{suffix}.json"
+    path = out_dir / filename
 
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
@@ -231,33 +259,36 @@ def save_network(layer, window, data):
     docs_dir = DOCS_NETWORK_DIR / layer
     docs_dir.mkdir(parents=True, exist_ok=True)
 
-    docs_path = docs_dir / f"{window}.json"
+    docs_path = docs_dir / filename
 
     with open(docs_path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
-    print("saved", layer, window, "->", path)
+    print("saved", layer, filename, "->", path)
 
 
 def main():
-
     for layer in LAYERS:
-
         print("\nLayer:", layer)
 
         events = load_events(layer)
-
         print("events loaded:", len(events))
 
         for window, days in WINDOWS.items():
-
             filtered = filter_window(events, days)
-
             print("window", window, "events:", len(filtered))
 
-            network = build_network(filtered)
+            # all
+            network_all = build_network(filtered, mode="all")
+            save_network(layer, window, network_all)
 
-            save_network(layer, window, network)
+            # internal EU-EU
+            network_internal = build_network(filtered, mode="internal")
+            save_network(layer, window, network_internal, "_internal")
+
+            # EU-external
+            network_external = build_network(filtered, mode="external")
+            save_network(layer, window, network_external, "_external")
 
 
 if __name__ == "__main__":
