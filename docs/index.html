@@ -1,297 +1,698 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-<meta charset="UTF-8" />
-<title>EU Coalition Map</title>
-<script src="https://d3js.org/d3.v7.min.js"></script>
-
-<style>
-body { margin:0; font-family:Arial; background:#f4f4f4; }
-header { background:#0f172a; color:white; padding:15px; }
-.controls { padding:10px; background:white; display:flex; flex-wrap:wrap; gap:10px; }
-
-button {
-  padding:6px 10px;
-  border:none;
-  border-radius:5px;
-  background:#2563eb;
-  color:white;
-  cursor:pointer;
-}
-button.active { background:#0f172a; }
-
-#network { width:100%; height:80vh; background:white; }
-
-.info { padding:10px; font-size:13px; }
-</style>
-</head>
-
-<body>
-
-<header><h2>EU Coalition Map</h2></header>
-
-<div class="controls">
-
-<b>View</b>
-<button class="view-btn active" data-view="graph">Graph</button>
-<button class="view-btn" data-view="heatmap">Heatmap</button>
-
-<b>Source</b>
-<button class="source-btn active" data-source="combined">Combined</button>
-<button class="source-btn" data-source="rss">RSS</button>
-<button class="source-btn" data-source="gdelt">GDELT</button>
-
-<b>Window</b>
-<button class="window-btn" data-window="7d">7d</button>
-<button class="window-btn active" data-window="30d">30d</button>
-<button class="window-btn" data-window="90d">90d</button>
-
-<b>Type</b>
-<button class="type-btn active" data-type="all">All</button>
-<button class="type-btn" data-type="internal">EU Internal</button>
-<button class="type-btn" data-type="external">EU External</button>
-
-<button id="fit">Középre</button>
-
-</div>
-
-<svg id="network"></svg>
-
-<div class="info" id="info"></div>
-
-<script>
-
-let currentView = "graph";
-let currentSource = "combined";
-let currentWindow = "30d";
-let currentType = "all";
-
-const svg = d3.select("#network");
-const info = document.getElementById("info");
-
-let simulation;
-let g;
-let zoom;
-
-function basePath() {
-  return window.location.pathname.includes("eu-coalition-map")
-    ? "/eu-coalition-map"
-    : "";
-}
-
-function filePath() {
-  let suffix = "";
-
-  if (currentType === "internal") suffix = "_internal";
-  if (currentType === "external") suffix = "_external";
-
-  if (currentView === "heatmap") {
-    return `${basePath()}/data/networks/${currentSource}/${currentWindow}_heatmap${suffix}.json`;
-  }
-
-  return `${basePath()}/data/networks/${currentSource}/${currentWindow}${suffix}.json`;
-}
-
-function setActive(selector, value, attr) {
-  document.querySelectorAll(selector).forEach(b => {
-    b.classList.toggle("active", b.dataset[attr] === value);
-  });
-}
-
-document.querySelectorAll(".view-btn").forEach(b=>{
-  b.onclick = () => {
-    currentView = b.dataset.view;
-    setActive(".view-btn", currentView, "view");
-    load();
-  };
-});
-
-document.querySelectorAll(".source-btn").forEach(b=>{
-  b.onclick = () => {
-    currentSource = b.dataset.source;
-    setActive(".source-btn", currentSource, "source");
-    load();
-  };
-});
-
-document.querySelectorAll(".window-btn").forEach(b=>{
-  b.onclick = () => {
-    currentWindow = b.dataset.window;
-    setActive(".window-btn", currentWindow, "window");
-    load();
-  };
-});
-
-document.querySelectorAll(".type-btn").forEach(b=>{
-  b.onclick = () => {
-    currentType = b.dataset.type;
-    setActive(".type-btn", currentType, "type");
-    load();
-  };
-});
-
-document.getElementById("fit").onclick = () => {
-  if (zoom) {
-    svg.transition().call(zoom.transform, d3.zoomIdentity);
-  }
-};
-
-function clear() {
-  svg.selectAll("*").remove();
-}
-
-function drawGraph(data) {
-
-  clear();
-
-  const width = window.innerWidth;
-  const height = window.innerHeight * 0.8;
-
-  svg.attr("width", width).attr("height", height);
-
-  zoom = d3.zoom().on("zoom", (e)=>g.attr("transform", e.transform));
-  svg.call(zoom);
-
-  g = svg.append("g");
-
-  simulation = d3.forceSimulation(data.nodes)
-    .force("link", d3.forceLink(data.edges).id(d=>d.id).distance(120))
-    .force("charge", d3.forceManyBody().strength(-250))
-    .force("center", d3.forceCenter(width/2, height/2));
-
-  const link = g.selectAll("line")
-    .data(data.edges)
-    .enter()
-    .append("line")
-    .attr("stroke","#999")
-    .attr("stroke-width", d=>Math.sqrt(d.weight));
-
-  const node = g.selectAll("circle")
-    .data(data.nodes)
-    .enter()
-    .append("circle")
-    .attr("r",8)
-    .attr("fill","#2563eb")
-    .call(d3.drag()
-      .on("start", dragstart)
-      .on("drag", drag)
-      .on("end", dragend));
-
-  const label = g.selectAll("text")
-    .data(data.nodes)
-    .enter()
-    .append("text")
-    .text(d=>d.id)
-    .attr("font-size",12);
-
-  simulation.on("tick", () => {
-
-    link
-      .attr("x1",d=>d.source.x)
-      .attr("y1",d=>d.source.y)
-      .attr("x2",d=>d.target.x)
-      .attr("y2",d=>d.target.y);
-
-    node
-      .attr("cx",d=>d.x)
-      .attr("cy",d=>d.y);
-
-    label
-      .attr("x",d=>d.x+8)
-      .attr("y",d=>d.y);
-  });
-
-  function dragstart(e,d){
-    if(!e.active) simulation.alphaTarget(0.3).restart();
-    d.fx=d.x; d.fy=d.y;
-  }
-  function drag(e,d){
-    d.fx=e.x; d.fy=e.y;
-  }
-  function dragend(e,d){
-    if(!e.active) simulation.alphaTarget(0);
-    d.fx=null; d.fy=null;
-  }
-
-  info.innerText = `Nodes: ${data.nodes.length} | Edges: ${data.edges.length}`;
-}
-
-function drawHeatmap(data) {
-
-  clear();
-
-  const margin = {top:50,left:80};
-  const cellSize = 25;
-
-  const width = data.topics.length * cellSize + margin.left;
-  const height = data.rows.length * cellSize + margin.top;
-
-  svg.attr("width", width).attr("height", height);
-
-  const maxVal = d3.max(data.rows, r => d3.max(data.topics, t => r[t]));
-
-  const color = d3.scaleSequential(d3.interpolateOrRd)
-    .domain([0, maxVal || 1]);
-
-  const g = svg.append("g").attr("transform",`translate(${margin.left},${margin.top})`);
-
-  data.rows.forEach((row,i)=>{
-    data.topics.forEach((t,j)=>{
-
-      g.append("rect")
-        .attr("x", j*cellSize)
-        .attr("y", i*cellSize)
-        .attr("width", cellSize)
-        .attr("height", cellSize)
-        .attr("fill", color(row[t] || 0));
-    });
-
-    svg.append("text")
-      .attr("x", 5)
-      .attr("y", margin.top + i*cellSize + 18)
-      .text(row.country)
-      .attr("font-size",12);
-  });
-
-  data.topics.forEach((t,i)=>{
-    svg.append("text")
-      .attr("x", margin.left + i*cellSize + 5)
-      .attr("y", 30)
-      .text(t)
-      .attr("font-size",11)
-      .attr("transform", `rotate(-45 ${margin.left + i*cellSize},30)`);
-  });
-
-  info.innerText = `Heatmap | Countries: ${data.rows.length}`;
-}
-
-async function load() {
-
-  const path = filePath();
-  info.innerText = "Loading: " + path;
-
-  try {
-    const res = await fetch(path);
-
-    if (!res.ok) throw new Error(res.status);
-
-    const data = await res.json();
-
-    if (currentView === "graph") {
-      drawGraph(data);
-    } else {
-      drawHeatmap(data);
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EU Coalition Map</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      color: #111827;
     }
 
-  } catch (e) {
-    info.innerText = "ERROR loading data";
-    console.error(e);
-  }
-}
+    header {
+      background: #0f172a;
+      color: white;
+      padding: 18px 20px;
+    }
 
-load();
+    header h1 {
+      margin: 0;
+      font-size: 22px;
+    }
 
-</script>
+    .controls {
+      padding: 12px 16px;
+      background: white;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 18px;
+      align-items: center;
+    }
 
+    .group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .group-label {
+      font-weight: bold;
+      font-size: 14px;
+      margin-right: 2px;
+    }
+
+    button {
+      padding: 7px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #2563eb;
+      color: white;
+      font-size: 13px;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    button.active {
+      background: #0f172a;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      min-height: calc(100vh - 126px);
+    }
+
+    .main-panel {
+      background: white;
+      position: relative;
+      overflow: auto;
+      padding: 14px;
+    }
+
+    #network {
+      width: 100%;
+      height: 78vh;
+      display: block;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+    }
+
+    .sidebar {
+      background: #fafafa;
+      border-left: 1px solid #ddd;
+      padding: 14px;
+      overflow: auto;
+    }
+
+    .panel {
+      margin-bottom: 18px;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 12px;
+    }
+
+    .panel h3 {
+      margin: 0 0 10px 0;
+      font-size: 16px;
+    }
+
+    .status {
+      font-size: 13px;
+      color: #475569;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .error {
+      color: #b91c1c;
+      white-space: pre-wrap;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .node {
+      stroke: white;
+      stroke-width: 1.5px;
+    }
+
+    .link {
+      stroke: #94a3b8;
+      stroke-opacity: 0.8;
+    }
+
+    .label {
+      font-size: 12px;
+      fill: #111827;
+      pointer-events: none;
+      font-weight: bold;
+    }
+
+    .hint {
+      font-size: 13px;
+      color: #475569;
+      line-height: 1.5;
+    }
+
+    .kv {
+      font-size: 14px;
+      margin: 6px 0;
+    }
+
+    .empty {
+      color: #64748b;
+      font-style: italic;
+    }
+
+    .heatmap-cell {
+      stroke: #ffffff;
+      stroke-width: 1px;
+    }
+
+    .heatmap-row-label {
+      font-size: 12px;
+      fill: #111827;
+      font-weight: bold;
+    }
+
+    .heatmap-col-label {
+      font-size: 11px;
+      fill: #111827;
+    }
+
+    .legend-label {
+      font-size: 11px;
+      fill: #334155;
+    }
+
+    .tooltip {
+      position: absolute;
+      display: none;
+      background: rgba(15, 23, 42, 0.95);
+      color: white;
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      line-height: 1.4;
+      pointer-events: none;
+      z-index: 50;
+      max-width: 260px;
+    }
+
+    @media (max-width: 1100px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        border-left: none;
+        border-top: 1px solid #ddd;
+      }
+
+      #network {
+        height: 70vh;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>EU Coalition Map</h1>
+  </header>
+
+  <div class="controls">
+    <div class="group">
+      <span class="group-label">View</span>
+      <button class="view-btn active" data-view="graph">Graph</button>
+      <button class="view-btn" data-view="heatmap">Heatmap</button>
+    </div>
+
+    <div class="group">
+      <span class="group-label">Source</span>
+      <button class="source-btn active" data-source="combined">Combined</button>
+      <button class="source-btn" data-source="rss">RSS</button>
+      <button class="source-btn" data-source="gdelt">GDELT</button>
+    </div>
+
+    <div class="group">
+      <span class="group-label">Window</span>
+      <button class="window-btn" data-window="7d">7d</button>
+      <button class="window-btn active" data-window="30d">30d</button>
+      <button class="window-btn" data-window="90d">90d</button>
+    </div>
+
+    <div class="group">
+      <span class="group-label">Type</span>
+      <button class="type-btn active" data-type="all">All</button>
+      <button class="type-btn" data-type="internal">EU Internal</button>
+      <button class="type-btn" data-type="external">EU External</button>
+    </div>
+
+    <div class="group">
+      <button id="fit-btn">Középre rendezés</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div class="main-panel">
+      <svg id="network"></svg>
+      <div id="tooltip" class="tooltip"></div>
+    </div>
+
+    <div class="sidebar">
+      <div class="panel">
+        <h3>Info</h3>
+        <div id="info" class="status empty">Nincs betöltött háló.</div>
+      </div>
+
+      <div class="panel">
+        <h3>Betöltés</h3>
+        <div id="status" class="status"></div>
+        <div id="error" class="error"></div>
+      </div>
+
+      <div class="panel">
+        <h3>Nézetek</h3>
+        <div class="hint">
+          <div class="kv"><strong>Graph</strong>: országkapcsolati háló</div>
+          <div class="kv"><strong>Heatmap</strong>: ország–téma intenzitás</div>
+          <div class="kv"><strong>All</strong>: minden releváns kapcsolat</div>
+          <div class="kv"><strong>EU Internal</strong>: csak EU–EU</div>
+          <div class="kv"><strong>EU External</strong>: EU–külső</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentView = "graph";
+    let currentSource = "combined";
+    let currentWindow = "30d";
+    let currentType = "all";
+
+    const svg = d3.select("#network");
+    const infoEl = document.getElementById("info");
+    const statusEl = document.getElementById("status");
+    const errorEl = document.getElementById("error");
+    const fitBtn = document.getElementById("fit-btn");
+    const tooltip = document.getElementById("tooltip");
+
+    let width = 0;
+    let height = 0;
+    let simulation = null;
+    let g = null;
+    let zoom = null;
+    let currentNodes = [];
+    let currentLinks = [];
+
+    function updateSize() {
+      const el = document.getElementById("network");
+      width = el.clientWidth;
+      height = el.clientHeight;
+      svg.attr("width", width).attr("height", height);
+    }
+
+    function showTooltip(html, x, y) {
+      tooltip.innerHTML = html;
+      tooltip.style.display = "block";
+      tooltip.style.left = `${x + 12}px`;
+      tooltip.style.top = `${y + 12}px`;
+    }
+
+    function hideTooltip() {
+      tooltip.style.display = "none";
+    }
+
+    function basePath() {
+      return window.location.pathname.includes("eu-coalition-map")
+        ? "/eu-coalition-map"
+        : "";
+    }
+
+    function filePath() {
+      let suffix = "";
+
+      if (currentType === "internal") suffix = "_internal";
+      if (currentType === "external") suffix = "_external";
+
+      if (currentView === "heatmap") {
+        return `${basePath()}/data/networks/${currentSource}/${currentWindow}_heatmap${suffix}.json`;
+      }
+
+      return `${basePath()}/data/networks/${currentSource}/${currentWindow}${suffix}.json`;
+    }
+
+    function setActive(selector, value, attr) {
+      document.querySelectorAll(selector).forEach(b => {
+        b.classList.toggle("active", b.dataset[attr] === value);
+      });
+    }
+
+    document.querySelectorAll(".view-btn").forEach(b => {
+      b.onclick = () => {
+        currentView = b.dataset.view;
+        setActive(".view-btn", currentView, "view");
+        load();
+      };
+    });
+
+    document.querySelectorAll(".source-btn").forEach(b => {
+      b.onclick = () => {
+        currentSource = b.dataset.source;
+        setActive(".source-btn", currentSource, "source");
+        load();
+      };
+    });
+
+    document.querySelectorAll(".window-btn").forEach(b => {
+      b.onclick = () => {
+        currentWindow = b.dataset.window;
+        setActive(".window-btn", currentWindow, "window");
+        load();
+      };
+    });
+
+    document.querySelectorAll(".type-btn").forEach(b => {
+      b.onclick = () => {
+        currentType = b.dataset.type;
+        setActive(".type-btn", currentType, "type");
+        load();
+      };
+    });
+
+    function clear() {
+      svg.selectAll("*").remove();
+      currentNodes = [];
+      currentLinks = [];
+      simulation = null;
+      g = null;
+      zoom = null;
+      hideTooltip();
+    }
+
+    function fitGraph() {
+      if (!zoom || !g || !currentNodes.length) return;
+
+      const xs = currentNodes.map(d => d.x).filter(v => typeof v === "number" && isFinite(v));
+      const ys = currentNodes.map(d => d.y).filter(v => typeof v === "number" && isFinite(v));
+
+      if (!xs.length || !ys.length) return;
+
+      const minX = Math.min(...xs);
+      const maxX = Math.max(...xs);
+      const minY = Math.min(...ys);
+      const maxY = Math.max(...ys);
+
+      const graphWidth = Math.max(maxX - minX, 1);
+      const graphHeight = Math.max(maxY - minY, 1);
+
+      const scale = Math.min(
+        width / (graphWidth + 120),
+        height / (graphHeight + 120),
+        1.7
+      );
+
+      const tx = width / 2 - scale * (minX + graphWidth / 2);
+      const ty = height / 2 - scale * (minY + graphHeight / 2);
+
+      svg.transition()
+        .duration(500)
+        .call(
+          zoom.transform,
+          d3.zoomIdentity.translate(tx, ty).scale(scale)
+        );
+    }
+
+    function drawGraph(data) {
+      clear();
+      updateSize();
+
+      currentNodes = (data.nodes || []).map(d => ({ ...d }));
+      currentLinks = (data.edges || []).map(d => ({ ...d }));
+
+      zoom = d3.zoom()
+        .scaleExtent([0.3, 4])
+        .on("zoom", e => g.attr("transform", e.transform));
+
+      svg.call(zoom);
+      g = svg.append("g");
+
+      const nodeWeightExtent = d3.extent(currentNodes, d => d.weight || 1);
+      const edgeWeightExtent = d3.extent(currentLinks, d => d.weight || 1);
+
+      const nodeRadius = d3.scaleSqrt()
+        .domain([nodeWeightExtent[0] || 1, nodeWeightExtent[1] || 1])
+        .range([8, 24]);
+
+      const edgeWidth = d3.scaleLinear()
+        .domain([edgeWeightExtent[0] || 1, edgeWeightExtent[1] || 1])
+        .range([1.5, 8]);
+
+      simulation = d3.forceSimulation(currentNodes)
+        .force("link", d3.forceLink(currentLinks).id(d => d.id).distance(130))
+        .force("charge", d3.forceManyBody().strength(-320))
+        .force("center", d3.forceCenter(width / 2, height / 2))
+        .force("collision", d3.forceCollide().radius(d => nodeRadius(d.weight || 1) + 10));
+
+      const link = g.append("g")
+        .selectAll("line")
+        .data(currentLinks)
+        .enter()
+        .append("line")
+        .attr("class", "link")
+        .attr("stroke-width", d => edgeWidth(d.weight || 1))
+        .on("mousemove", (event, d) => {
+          showTooltip(
+            `<strong>${d.source.id || d.source} – ${d.target.id || d.target}</strong><br>Súly: ${d.weight}`,
+            event.pageX,
+            event.pageY
+          );
+        })
+        .on("mouseleave", hideTooltip);
+
+      const node = g.append("g")
+        .selectAll("circle")
+        .data(currentNodes)
+        .enter()
+        .append("circle")
+        .attr("class", "node")
+        .attr("r", d => nodeRadius(d.weight || 1))
+        .attr("fill", currentType === "external" ? "#b45309" : currentType === "internal" ? "#2563eb" : "#7c3aed")
+        .call(
+          d3.drag()
+            .on("start", dragstart)
+            .on("drag", drag)
+            .on("end", dragend)
+        )
+        .on("mousemove", (event, d) => {
+          showTooltip(`<strong>${d.id}</strong>`, event.pageX, event.pageY);
+        })
+        .on("mouseleave", hideTooltip);
+
+      const label = g.append("g")
+        .selectAll("text")
+        .data(currentNodes)
+        .enter()
+        .append("text")
+        .attr("class", "label")
+        .text(d => d.id);
+
+      simulation.on("tick", () => {
+        link
+          .attr("x1", d => d.source.x)
+          .attr("y1", d => d.source.y)
+          .attr("x2", d => d.target.x)
+          .attr("y2", d => d.target.y);
+
+        node
+          .attr("cx", d => d.x)
+          .attr("cy", d => d.y);
+
+        label
+          .attr("x", d => d.x + 10)
+          .attr("y", d => d.y + 4);
+      });
+
+      function dragstart(e, d) {
+        if (!e.active) simulation.alphaTarget(0.3).restart();
+        d.fx = d.x;
+        d.fy = d.y;
+      }
+
+      function drag(e, d) {
+        d.fx = e.x;
+        d.fy = e.y;
+      }
+
+      function dragend(e, d) {
+        if (!e.active) simulation.alphaTarget(0);
+        d.fx = null;
+        d.fy = null;
+      }
+
+      infoEl.classList.remove("empty");
+      infoEl.innerHTML = `
+        <div class="kv"><strong>Nézet:</strong> Graph</div>
+        <div class="kv"><strong>Source:</strong> ${currentSource}</div>
+        <div class="kv"><strong>Window:</strong> ${currentWindow}</div>
+        <div class="kv"><strong>Type:</strong> ${currentType}</div>
+        <div class="kv"><strong>Nodes:</strong> ${currentNodes.length}</div>
+        <div class="kv"><strong>Edges:</strong> ${currentLinks.length}</div>
+        <div class="kv"><strong>Events:</strong> ${data.event_count ?? 0}</div>
+      `;
+
+      setTimeout(() => fitGraph(), 350);
+    }
+
+    function drawHeatmap(data) {
+      clear();
+      updateSize();
+
+      const topics = data.topics || [];
+      const rows = data.rows || [];
+
+      const margin = { top: 120, right: 30, bottom: 30, left: 90 };
+      const cellSize = 28;
+
+      const gridWidth = topics.length * cellSize;
+      const gridHeight = rows.length * cellSize;
+
+      const svgWidth = Math.max(width, margin.left + gridWidth + margin.right + 50);
+      const svgHeight = Math.max(height, margin.top + gridHeight + margin.bottom + 50);
+
+      svg.attr("width", svgWidth).attr("height", svgHeight);
+
+      const maxVal = d3.max(rows, r => d3.max(topics, t => r[t] || 0)) || 1;
+
+      const color = d3.scaleSequential(d3.interpolateOrRd)
+        .domain([0, maxVal]);
+
+      const group = svg.append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+      rows.forEach((row, i) => {
+        topics.forEach((topic, j) => {
+          const value = row[topic] || 0;
+
+          group.append("rect")
+            .attr("class", "heatmap-cell")
+            .attr("x", j * cellSize)
+            .attr("y", i * cellSize)
+            .attr("width", cellSize)
+            .attr("height", cellSize)
+            .attr("fill", color(value))
+            .on("mousemove", (event) => {
+              showTooltip(
+                `<strong>${row.country}</strong><br>${topic}: ${value}`,
+                event.pageX,
+                event.pageY
+              );
+            })
+            .on("mouseleave", hideTooltip);
+        });
+
+        svg.append("text")
+          .attr("class", "heatmap-row-label")
+          .attr("x", margin.left - 10)
+          .attr("y", margin.top + i * cellSize + 18)
+          .attr("text-anchor", "end")
+          .text(row.country);
+      });
+
+      topics.forEach((topic, i) => {
+        const x = margin.left + i * cellSize + cellSize / 2;
+        const y = margin.top - 12;
+
+        svg.append("text")
+          .attr("class", "heatmap-col-label")
+          .attr("text-anchor", "start")
+          .attr("transform", `translate(${x},${y}) rotate(-40)`)
+          .text(topic);
+      });
+
+      // legend
+      const legendWidth = 220;
+      const legendHeight = 12;
+      const legendX = margin.left;
+      const legendY = 30;
+
+      const defs = svg.append("defs");
+      const gradient = defs.append("linearGradient")
+        .attr("id", "heatmap-gradient")
+        .attr("x1", "0%")
+        .attr("x2", "100%")
+        .attr("y1", "0%")
+        .attr("y2", "0%");
+
+      for (let i = 0; i <= 10; i++) {
+        gradient.append("stop")
+          .attr("offset", `${i * 10}%`)
+          .attr("stop-color", color((maxVal / 10) * i));
+      }
+
+      svg.append("rect")
+        .attr("x", legendX)
+        .attr("y", legendY)
+        .attr("width", legendWidth)
+        .attr("height", legendHeight)
+        .attr("fill", "url(#heatmap-gradient)")
+        .attr("stroke", "#cbd5e1");
+
+      svg.append("text")
+        .attr("class", "legend-label")
+        .attr("x", legendX)
+        .attr("y", legendY - 6)
+        .text("Alacsony");
+
+      svg.append("text")
+        .attr("class", "legend-label")
+        .attr("x", legendX + legendWidth - 35)
+        .attr("y", legendY - 6)
+        .text("Magas");
+
+      infoEl.classList.remove("empty");
+      infoEl.innerHTML = `
+        <div class="kv"><strong>Nézet:</strong> Heatmap</div>
+        <div class="kv"><strong>Source:</strong> ${currentSource}</div>
+        <div class="kv"><strong>Window:</strong> ${currentWindow}</div>
+        <div class="kv"><strong>Type:</strong> ${currentType}</div>
+        <div class="kv"><strong>Countries:</strong> ${rows.length}</div>
+        <div class="kv"><strong>Topics:</strong> ${topics.length}</div>
+        <div class="kv"><strong>Events:</strong> ${data.event_count ?? 0}</div>
+      `;
+    }
+
+    async function load() {
+      const path = filePath();
+      statusEl.textContent = "Betöltés: " + path;
+      errorEl.textContent = "";
+
+      try {
+        const res = await fetch(path, { cache: "no-store" });
+
+        if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+
+        const data = await res.json();
+
+        if (currentView === "graph") {
+          drawGraph(data);
+        } else {
+          drawHeatmap(data);
+        }
+
+        statusEl.textContent = "Betöltve: " + path;
+      } catch (e) {
+        clear();
+        infoEl.classList.add("empty");
+        infoEl.textContent = "Nincs betöltött háló.";
+        errorEl.textContent = "Nem sikerült betölteni.\n" + e.message;
+        console.error(e);
+      }
+    }
+
+    fitBtn.onclick = () => {
+      if (currentView === "graph") {
+        fitGraph();
+      }
+    };
+
+    window.addEventListener("resize", () => {
+      updateSize();
+      load();
+    });
+
+    updateSize();
+    load();
+  </script>
 </body>
 </html>
