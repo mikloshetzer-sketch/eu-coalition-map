@@ -96,6 +96,13 @@
       border-radius: 10px;
     }
 
+    .analysis-panel {
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
     .sidebar {
       background: #fafafa;
       border-left: 1px solid #ddd;
@@ -156,7 +163,7 @@
     .hint {
       font-size: 12px;
       color: #475569;
-      line-height: 1.45;
+      line-height: 1.55;
     }
 
     .kv {
@@ -324,6 +331,20 @@
     <div class="main-panel">
       <svg id="network"></svg>
       <div id="tooltip" class="tooltip"></div>
+
+      <div class="analysis-panel">
+        <div class="panel">
+          <h3>Nézet értelmezése</h3>
+          <div id="view-analysis" class="hint"></div>
+        </div>
+
+        <div class="panel">
+          <h3>Ország értelmezés</h3>
+          <div id="country-analysis" class="hint">
+            Válassz országot az elemzéshez.
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="sidebar">
@@ -341,13 +362,6 @@
         <h3>Betöltés</h3>
         <div id="status" class="status"></div>
         <div id="error" class="error"></div>
-      </div>
-
-      <div class="panel">
-        <h3>Értelmezés</h3>
-        <div id="view-help" class="hint">
-          A Graph közvetlen kapcsolati együttmozgást mutat, a Heatmap ország–téma aktivitást, a Similarity pedig tematikus hasonlóságot.
-        </div>
       </div>
     </div>
   </div>
@@ -372,7 +386,8 @@
     const heatmapModeGroup = document.getElementById("heatmap-mode-group");
     const sortGroup = document.getElementById("sort-group");
     const countrySelect = document.getElementById("country-select");
-    const viewHelpEl = document.getElementById("view-help");
+    const viewAnalysisEl = document.getElementById("view-analysis");
+    const countryAnalysisEl = document.getElementById("country-analysis");
 
     let width = 0;
     let height = 0;
@@ -439,14 +454,6 @@
       return `${basePath()}/data/networks/${currentSource}/${currentWindow}_similarity${suffix}.json`;
     }
 
-    function visibleFilePath() {
-      if (currentView === "heatmap") {
-        return currentHeatmapMode === "normalized" ? heatmapNormFilePath() : heatmapAbsFilePath();
-      }
-      if (currentView === "similarity") return similarityFilePath();
-      return graphFilePath();
-    }
-
     function setActive(selector, value, attr) {
       document.querySelectorAll(selector).forEach(b => {
         b.classList.toggle("active", b.dataset[attr] === value);
@@ -459,24 +466,24 @@
       sortGroup.classList.toggle("hidden", !isHeatmap);
     }
 
-    function updateViewHelp() {
+    function updateViewAnalysis() {
       if (currentView === "graph") {
-        viewHelpEl.innerHTML = `
-          <div class="kv"><strong>Graph:</strong> közvetlen országkapcsolatok.</div>
-          <div class="kv">A vastagabb él erősebb együttmozgást jelent.</div>
-          <div class="kv">Kattints egy országra a részletes profilhoz.</div>
+        viewAnalysisEl.innerHTML = `
+          <div class="kv"><strong>Graph:</strong> országok közötti közvetlen kapcsolati együttmozgás.</div>
+          <div class="kv">A vastagabb él erősebb kapcsolatot jelent.</div>
+          <div class="kv">Ez nem feltétlenül szövetséget jelent, hanem azt, hogy a vizsgált időszakban az országok ugyanazon ügyekben erősen összekapcsolódtak.</div>
         `;
       } else if (currentView === "heatmap") {
-        viewHelpEl.innerHTML = `
-          <div class="kv"><strong>Heatmap:</strong> ország–téma intenzitás.</div>
-          <div class="kv"><strong>Absolute:</strong> teljes aktivitás.</div>
-          <div class="kv"><strong>Normalized:</strong> országon belüli tematikus profil.</div>
-          <div class="kv">Kattints egy cellára vagy országcímkére.</div>
+        viewAnalysisEl.innerHTML = `
+          <div class="kv"><strong>Heatmap:</strong> ország–téma aktivitás.</div>
+          <div class="kv"><strong>Absolute:</strong> az ország teljes aktivitását mutatja témánként.</div>
+          <div class="kv"><strong>Normalized:</strong> azt mutatja, hogy az adott országon belül mely témák dominálnak.</div>
+          <div class="kv">Zöld = erősebb jelenlét, piros = gyengébb jelenlét.</div>
         `;
       } else {
-        viewHelpEl.innerHTML = `
-          <div class="kv"><strong>Similarity:</strong> tematikus hasonlóság.</div>
-          <div class="kv">Nem közvetlen diplomáciai kapcsolatot, hanem hasonló ügyprofilokat mutat.</div>
+        viewAnalysisEl.innerHTML = `
+          <div class="kv"><strong>Similarity:</strong> tematikus hasonlóságot mutat.</div>
+          <div class="kv">Nem közvetlen országkapcsolat, hanem azt jelzi, hogy két ország hasonló témákban és hasonló arányban jelenik meg.</div>
           <div class="kv">A vastagabb él erősebb hasonlóságot jelent.</div>
         `;
       }
@@ -487,7 +494,7 @@
         currentView = b.dataset.view;
         setActive(".view-btn", currentView, "view");
         updateControlVisibility();
-        updateViewHelp();
+        updateViewAnalysis();
         renderCurrentView();
       };
     });
@@ -532,6 +539,7 @@
     countrySelect.addEventListener("change", () => {
       currentCountry = countrySelect.value;
       updateCountryInfo();
+      generateCountryAnalysis();
       renderCurrentView();
     });
 
@@ -678,6 +686,48 @@
       `;
     }
 
+    function generateCountryAnalysis() {
+      if (!currentCountry) {
+        countryAnalysisEl.innerHTML = "Válassz országot az elemzéshez.";
+        return;
+      }
+
+      const topics = topTopicsFromHeatmap(currentCountry, heatmapAbsData, 3);
+      const partners = topPartnersFromGraph(currentCountry, graphData, 3);
+      const similar = topPartnersFromGraph(currentCountry, similarityData, 3);
+
+      if (!topics.length && !partners.length) {
+        countryAnalysisEl.innerHTML = "Nincs elegendő adat.";
+        return;
+      }
+
+      const topTopicText = topics.map(t => t.topic).join(", ");
+      const partnerText = partners.map(p => p.partner).join(", ");
+      const similarText = similar.map(s => s.partner).join(", ");
+
+      countryAnalysisEl.innerHTML = `
+        <div class="kv">
+          <strong>${currentCountry}</strong> profilja a vizsgált időszakban főként
+          <strong>${topTopicText || "nincs domináns téma"}</strong> témákra koncentrál.
+        </div>
+
+        <div class="kv">
+          Legerősebb kapcsolatai:
+          <strong>${partnerText || "nincs adat"}</strong>.
+        </div>
+
+        <div class="kv">
+          Tematikus hasonlóság alapján közel áll:
+          <strong>${similarText || "nincs adat"}</strong> országokhoz.
+        </div>
+
+        <div class="kv">
+          Ez arra utal, hogy az ország külpolitikai fókusza és megjelenési mintázata
+          ezekkel a szereplőkkel mutatja a legnagyobb közelséget.
+        </div>
+      `;
+    }
+
     function drawForceGraph(data, infoTitle, fillColor) {
       clear();
       updateSize();
@@ -745,6 +795,7 @@
           currentCountry = d.id;
           countrySelect.value = d.id;
           updateCountryInfo();
+          generateCountryAnalysis();
           renderCurrentView();
         })
         .on("mousemove", (event, d) => {
@@ -867,6 +918,7 @@
               currentCountry = row.country;
               countrySelect.value = row.country;
               updateCountryInfo();
+              generateCountryAnalysis();
               renderCurrentView();
             })
             .on("mousemove", (event) => {
@@ -902,6 +954,7 @@
             currentCountry = country;
             countrySelect.value = country;
             updateCountryInfo();
+            generateCountryAnalysis();
             renderCurrentView();
           });
       });
@@ -984,6 +1037,7 @@
 
         updateCountrySelect();
         updateCountryInfo();
+        generateCountryAnalysis();
         renderCurrentView();
 
         statusEl.textContent = `Betöltve:
@@ -1001,13 +1055,14 @@ similarity: ${similarityFilePath()}`;
         infoEl.textContent = "Nincs betöltött nézet.";
         countryInfoEl.classList.add("empty");
         countryInfoEl.textContent = "Nem érhető el országprofil.";
+        countryAnalysisEl.textContent = "Nem érhető el szöveges értelmezés.";
         errorEl.textContent = "Nem sikerült betölteni.\n" + e.message;
         console.error(e);
       }
     }
 
     function renderCurrentView() {
-      updateViewHelp();
+      updateViewAnalysis();
 
       if (currentView === "graph" && graphData) {
         drawForceGraph(
@@ -1021,6 +1076,8 @@ similarity: ${similarityFilePath()}`;
       } else if (currentView === "similarity" && similarityData) {
         drawForceGraph(similarityData, "Similarity", "#059669");
       }
+
+      generateCountryAnalysis();
     }
 
     fitBtn.onclick = () => {
@@ -1035,7 +1092,7 @@ similarity: ${similarityFilePath()}`;
     });
 
     updateControlVisibility();
-    updateViewHelp();
+    updateViewAnalysis();
     updateSize();
     loadAll();
   </script>
