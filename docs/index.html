@@ -87,6 +87,13 @@
       padding: 14px;
     }
 
+    .viz-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 12px;
+      align-items: start;
+    }
+
     #network {
       width: 100%;
       height: 78vh;
@@ -94,6 +101,16 @@
       background: white;
       border: 1px solid #e5e7eb;
       border-radius: 10px;
+    }
+
+    #dashboard {
+      min-height: 220px;
+    }
+
+    #dashboard-charts {
+      width: 100%;
+      height: 220px;
+      display: block;
     }
 
     .analysis-panel {
@@ -243,6 +260,16 @@
       min-width: 140px;
     }
 
+    @media (max-width: 1200px) {
+      .viz-layout {
+        grid-template-columns: 1fr;
+      }
+
+      #dashboard {
+        order: 2;
+      }
+    }
+
     @media (max-width: 1100px) {
       .layout {
         grid-template-columns: 1fr;
@@ -344,7 +371,15 @@
 
   <div class="layout">
     <div class="main-panel">
-      <svg id="network"></svg>
+      <div class="viz-layout">
+        <svg id="network"></svg>
+
+        <div id="dashboard" class="panel hidden">
+          <h3>Ország dashboard</h3>
+          <svg id="dashboard-charts" width="100%" height="220"></svg>
+        </div>
+      </div>
+
       <div id="tooltip" class="tooltip"></div>
 
       <div class="analysis-panel">
@@ -582,7 +617,8 @@
       generateCountryAnalysis();
       renderCurrentView();
     });
-        function clear() {
+
+    function clear() {
       svg.selectAll("*").remove();
       currentNodes = [];
       currentLinks = [];
@@ -779,6 +815,124 @@
           ezekkel a szereplőkkel mutatja a legnagyobb közelséget.
         </div>
       `;
+    }
+        function drawDashboard() {
+      const dash = document.getElementById("dashboard");
+      const svgDash = d3.select("#dashboard-charts");
+
+      if (!currentCountry || currentView === "heatmap") {
+        dash.classList.add("hidden");
+        svgDash.selectAll("*").remove();
+        return;
+      }
+
+      dash.classList.remove("hidden");
+
+      const dashWidth = document.getElementById("dashboard-charts").clientWidth || 300;
+      const dashHeight = 220;
+
+      svgDash
+        .attr("width", dashWidth)
+        .attr("height", dashHeight);
+
+      svgDash.selectAll("*").remove();
+
+      const partners = topPartnersFromGraph(currentCountry, graphData, 5);
+      const topics = topTopicsFromHeatmap(currentCountry, heatmapAbsData, 5);
+      const similar = topPartnersFromGraph(currentCountry, similarityData, 5);
+
+      const sections = [
+        {
+          title: "Partnerek",
+          color: "#2563eb",
+          data: partners.map(d => ({ name: d.partner, value: d.weight }))
+        },
+        {
+          title: "Témák",
+          color: "#16a34a",
+          data: topics.map(d => ({ name: d.topic, value: d.value }))
+        },
+        {
+          title: "Hasonlók",
+          color: "#7c3aed",
+          data: similar.map(d => ({ name: d.partner, value: d.weight }))
+        }
+      ];
+
+      const sectionWidth = dashWidth / 3;
+
+      sections.forEach((section, i) => {
+        const xOffset = i * sectionWidth;
+        const sectionData = section.data.length ? section.data : [{ name: "-", value: 0 }];
+
+        const group = svgDash.append("g")
+          .attr("transform", `translate(${xOffset + 8},0)`);
+
+        const x = d3.scaleBand()
+          .domain(sectionData.map(d => d.name))
+          .range([0, sectionWidth - 20])
+          .padding(0.2);
+
+        const y = d3.scaleLinear()
+          .domain([0, d3.max(sectionData, d => d.value) || 1])
+          .range([dashHeight - 42, 24]);
+
+        group.append("text")
+          .attr("x", 0)
+          .attr("y", 12)
+          .text(section.title)
+          .style("font-size", "12px")
+          .style("font-weight", "bold");
+
+        group.selectAll("rect")
+          .data(sectionData)
+          .enter()
+          .append("rect")
+          .attr("x", d => x(d.name))
+          .attr("y", d => y(d.value))
+          .attr("width", x.bandwidth())
+          .attr("height", d => Math.max(0, dashHeight - 42 - y(d.value)))
+          .attr("rx", 3)
+          .attr("fill", section.color)
+          .on("mousemove", (event, d) => {
+            showTooltip(
+              `<strong>${section.title}</strong><br>${d.name}: ${Number(d.value).toFixed(2)}`,
+              event.pageX,
+              event.pageY
+            );
+          })
+          .on("mouseleave", hideTooltip);
+
+        group.selectAll("text.value")
+          .data(sectionData)
+          .enter()
+          .append("text")
+          .attr("class", "value")
+          .attr("x", d => x(d.name) + x.bandwidth() / 2)
+          .attr("y", d => y(d.value) - 4)
+          .attr("text-anchor", "middle")
+          .text(d => d.value > 0 ? Number(d.value).toFixed(1) : "")
+          .style("font-size", "9px")
+          .style("fill", "#334155");
+
+        group.selectAll("text.bar")
+          .data(sectionData)
+          .enter()
+          .append("text")
+          .attr("class", "bar")
+          .attr("x", d => x(d.name) + x.bandwidth() / 2)
+          .attr("y", dashHeight - 18)
+          .attr("text-anchor", "middle")
+          .text(d => d.name)
+          .style("font-size", "9px")
+          .each(function() {
+            const txt = d3.select(this);
+            const original = txt.text();
+            if (original.length > 10) {
+              txt.text(original.slice(0, 10) + "…");
+            }
+          });
+      });
     }
 
     function drawForceGraph(data, infoTitle, fillColor) {
@@ -1145,6 +1299,7 @@ similarity: ${similarityFilePath()}`;
       }
 
       generateCountryAnalysis();
+      drawDashboard();
     }
 
     fitBtn.onclick = () => {
