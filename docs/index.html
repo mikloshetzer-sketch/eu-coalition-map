@@ -89,7 +89,7 @@
 
     .viz-layout {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 320px;
+      grid-template-columns: minmax(0, 1fr) 340px;
       gap: 12px;
       align-items: start;
     }
@@ -104,12 +104,12 @@
     }
 
     #dashboard {
-      min-height: 220px;
+      min-height: 420px;
     }
 
     #dashboard-charts {
       width: 100%;
-      height: 220px;
+      height: 420px;
       display: block;
     }
 
@@ -376,7 +376,7 @@
 
         <div id="dashboard" class="panel hidden">
           <h3>Ország dashboard</h3>
-          <svg id="dashboard-charts" width="100%" height="220"></svg>
+          <svg id="dashboard-charts" width="100%" height="420"></svg>
         </div>
       </div>
 
@@ -828,12 +828,16 @@
 
       dash.classList.remove("hidden");
 
-      const dashWidth = document.getElementById("dashboard-charts").clientWidth || 300;
-      const dashHeight = 220;
+      const dashWidth = document.getElementById("dashboard-charts").clientWidth || 320;
+      const sectionHeight = 120;
+      const sectionGap = 18;
+      const topPadding = 10;
+      const bottomPadding = 12;
+      const totalHeight = topPadding + (sectionHeight * 3) + (sectionGap * 2) + bottomPadding;
 
       svgDash
         .attr("width", dashWidth)
-        .attr("height", dashHeight);
+        .attr("height", totalHeight);
 
       svgDash.selectAll("*").remove();
 
@@ -843,46 +847,49 @@
 
       const sections = [
         {
-          title: "Partnerek",
+          title: "Legerősebb partnerek",
           color: "#2563eb",
           data: partners.map(d => ({ name: d.partner, value: d.weight }))
         },
         {
-          title: "Témák",
+          title: "Legfontosabb témák",
           color: "#16a34a",
           data: topics.map(d => ({ name: d.topic, value: d.value }))
         },
         {
-          title: "Hasonlók",
+          title: "Leghasonlóbb országok",
           color: "#7c3aed",
           data: similar.map(d => ({ name: d.partner, value: d.weight }))
         }
       ];
 
-      const sectionWidth = dashWidth / 3;
-
-      sections.forEach((section, i) => {
-        const xOffset = i * sectionWidth;
+      sections.forEach((section, index) => {
+        const yOffset = topPadding + index * (sectionHeight + sectionGap);
         const sectionData = section.data.length ? section.data : [{ name: "-", value: 0 }];
 
         const group = svgDash.append("g")
-          .attr("transform", `translate(${xOffset + 8},0)`);
+          .attr("transform", `translate(10,${yOffset})`);
+
+        const chartTop = 24;
+        const chartBottom = sectionHeight - 28;
+        const chartWidth = dashWidth - 24;
 
         const x = d3.scaleBand()
           .domain(sectionData.map(d => d.name))
-          .range([0, sectionWidth - 20])
-          .padding(0.2);
+          .range([0, chartWidth])
+          .padding(0.22);
 
         const y = d3.scaleLinear()
           .domain([0, d3.max(sectionData, d => d.value) || 1])
-          .range([dashHeight - 42, 24]);
+          .range([chartBottom, chartTop]);
 
         group.append("text")
           .attr("x", 0)
           .attr("y", 12)
           .text(section.title)
           .style("font-size", "12px")
-          .style("font-weight", "bold");
+          .style("font-weight", "bold")
+          .style("fill", "#111827");
 
         group.selectAll("rect")
           .data(sectionData)
@@ -891,7 +898,7 @@
           .attr("x", d => x(d.name))
           .attr("y", d => y(d.value))
           .attr("width", x.bandwidth())
-          .attr("height", d => Math.max(0, dashHeight - 42 - y(d.value)))
+          .attr("height", d => Math.max(0, chartBottom - y(d.value)))
           .attr("rx", 3)
           .attr("fill", section.color)
           .on("mousemove", (event, d) => {
@@ -921,17 +928,26 @@
           .append("text")
           .attr("class", "bar")
           .attr("x", d => x(d.name) + x.bandwidth() / 2)
-          .attr("y", dashHeight - 18)
+          .attr("y", sectionHeight - 8)
           .attr("text-anchor", "middle")
           .text(d => d.name)
           .style("font-size", "9px")
+          .style("fill", "#334155")
           .each(function() {
             const txt = d3.select(this);
             const original = txt.text();
-            if (original.length > 10) {
-              txt.text(original.slice(0, 10) + "…");
+            if (original.length > 14) {
+              txt.text(original.slice(0, 14) + "…");
             }
           });
+
+        group.append("line")
+          .attr("x1", 0)
+          .attr("x2", chartWidth)
+          .attr("y1", chartBottom)
+          .attr("y2", chartBottom)
+          .attr("stroke", "#cbd5e1")
+          .attr("stroke-width", 1);
       });
     }
 
