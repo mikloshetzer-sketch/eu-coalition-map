@@ -76,7 +76,7 @@
 
     .layout {
       display: grid;
-      grid-template-columns: 1fr 260px;
+      grid-template-columns: 1fr 290px;
       min-height: calc(100vh - 126px);
     }
 
@@ -133,6 +133,12 @@
     .node {
       stroke: white;
       stroke-width: 1.5px;
+      cursor: pointer;
+    }
+
+    .node.selected {
+      stroke: #111827;
+      stroke-width: 3px;
     }
 
     .link {
@@ -166,6 +172,12 @@
     .heatmap-cell {
       stroke: #ffffff;
       stroke-width: 1px;
+      cursor: pointer;
+    }
+
+    .heatmap-cell.selected {
+      stroke: #111827;
+      stroke-width: 3px;
     }
 
     .heatmap-row-label {
@@ -177,6 +189,12 @@
     .heatmap-col-label {
       font-size: 12px;
       fill: #111827;
+      cursor: pointer;
+    }
+
+    .heatmap-col-label.selected {
+      fill: #b91c1c;
+      font-weight: bold;
     }
 
     .legend-label {
@@ -200,6 +218,22 @@
 
     .hidden {
       display: none !important;
+    }
+
+    .list {
+      margin: 0;
+      padding-left: 16px;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #334155;
+    }
+
+    .list li {
+      margin: 4px 0;
+    }
+
+    .country-select {
+      min-width: 140px;
     }
 
     @media (max-width: 1100px) {
@@ -275,6 +309,13 @@
     </div>
 
     <div class="group">
+      <span class="group-label">Ország</span>
+      <select id="country-select" class="country-select">
+        <option value="">— válassz —</option>
+      </select>
+    </div>
+
+    <div class="group">
       <button id="fit-btn">Középre rendezés</button>
     </div>
   </div>
@@ -292,19 +333,20 @@
       </div>
 
       <div class="panel">
+        <h3>Kiválasztott ország</h3>
+        <div id="country-info" class="status empty">Válassz országot vagy kattints egy elemre.</div>
+      </div>
+
+      <div class="panel">
         <h3>Betöltés</h3>
         <div id="status" class="status"></div>
         <div id="error" class="error"></div>
       </div>
 
       <div class="panel">
-        <h3>Nézetek</h3>
-        <div class="hint">
-          <div class="kv"><strong>Graph</strong>: országkapcsolati háló</div>
-          <div class="kv"><strong>Heatmap</strong>: ország–téma intenzitás</div>
-          <div class="kv"><strong>Similarity</strong>: országhasonlósági háló</div>
-          <div class="kv"><strong>Absolute</strong>: abszolút aktivitás</div>
-          <div class="kv"><strong>Normalized</strong>: tematikus profil</div>
+        <h3>Értelmezés</h3>
+        <div id="view-help" class="hint">
+          A Graph közvetlen kapcsolati együttmozgást mutat, a Heatmap ország–téma aktivitást, a Similarity pedig tematikus hasonlóságot.
         </div>
       </div>
     </div>
@@ -317,9 +359,11 @@
     let currentType = "all";
     let currentHeatmapMode = "absolute";
     let currentSort = "total";
+    let currentCountry = "";
 
     const svg = d3.select("#network");
     const infoEl = document.getElementById("info");
+    const countryInfoEl = document.getElementById("country-info");
     const statusEl = document.getElementById("status");
     const errorEl = document.getElementById("error");
     const fitBtn = document.getElementById("fit-btn");
@@ -327,6 +371,8 @@
     const sortSelect = document.getElementById("sort-select");
     const heatmapModeGroup = document.getElementById("heatmap-mode-group");
     const sortGroup = document.getElementById("sort-group");
+    const countrySelect = document.getElementById("country-select");
+    const viewHelpEl = document.getElementById("view-help");
 
     let width = 0;
     let height = 0;
@@ -335,6 +381,11 @@
     let zoom = null;
     let currentNodes = [];
     let currentLinks = [];
+
+    let graphData = null;
+    let heatmapAbsData = null;
+    let heatmapNormData = null;
+    let similarityData = null;
 
     function updateSize() {
       const el = document.getElementById("network");
@@ -367,16 +418,18 @@
       return `${basePath()}/data/networks/${currentSource}/${currentWindow}${suffix}.json`;
     }
 
-    function heatmapFilePath() {
+    function heatmapAbsFilePath() {
       let suffix = "";
       if (currentType === "internal") suffix = "_internal";
       if (currentType === "external") suffix = "_external";
-
-      if (currentHeatmapMode === "normalized") {
-        return `${basePath()}/data/networks/${currentSource}/${currentWindow}_heatmap_norm${suffix}.json`;
-      }
-
       return `${basePath()}/data/networks/${currentSource}/${currentWindow}_heatmap${suffix}.json`;
+    }
+
+    function heatmapNormFilePath() {
+      let suffix = "";
+      if (currentType === "internal") suffix = "_internal";
+      if (currentType === "external") suffix = "_external";
+      return `${basePath()}/data/networks/${currentSource}/${currentWindow}_heatmap_norm${suffix}.json`;
     }
 
     function similarityFilePath() {
@@ -386,8 +439,10 @@
       return `${basePath()}/data/networks/${currentSource}/${currentWindow}_similarity${suffix}.json`;
     }
 
-    function filePath() {
-      if (currentView === "heatmap") return heatmapFilePath();
+    function visibleFilePath() {
+      if (currentView === "heatmap") {
+        return currentHeatmapMode === "normalized" ? heatmapNormFilePath() : heatmapAbsFilePath();
+      }
       if (currentView === "similarity") return similarityFilePath();
       return graphFilePath();
     }
@@ -404,12 +459,36 @@
       sortGroup.classList.toggle("hidden", !isHeatmap);
     }
 
+    function updateViewHelp() {
+      if (currentView === "graph") {
+        viewHelpEl.innerHTML = `
+          <div class="kv"><strong>Graph:</strong> közvetlen országkapcsolatok.</div>
+          <div class="kv">A vastagabb él erősebb együttmozgást jelent.</div>
+          <div class="kv">Kattints egy országra a részletes profilhoz.</div>
+        `;
+      } else if (currentView === "heatmap") {
+        viewHelpEl.innerHTML = `
+          <div class="kv"><strong>Heatmap:</strong> ország–téma intenzitás.</div>
+          <div class="kv"><strong>Absolute:</strong> teljes aktivitás.</div>
+          <div class="kv"><strong>Normalized:</strong> országon belüli tematikus profil.</div>
+          <div class="kv">Kattints egy cellára vagy országcímkére.</div>
+        `;
+      } else {
+        viewHelpEl.innerHTML = `
+          <div class="kv"><strong>Similarity:</strong> tematikus hasonlóság.</div>
+          <div class="kv">Nem közvetlen diplomáciai kapcsolatot, hanem hasonló ügyprofilokat mutat.</div>
+          <div class="kv">A vastagabb él erősebb hasonlóságot jelent.</div>
+        `;
+      }
+    }
+
     document.querySelectorAll(".view-btn").forEach(b => {
       b.onclick = () => {
         currentView = b.dataset.view;
         setActive(".view-btn", currentView, "view");
         updateControlVisibility();
-        load();
+        updateViewHelp();
+        renderCurrentView();
       };
     });
 
@@ -417,7 +496,7 @@
       b.onclick = () => {
         currentSource = b.dataset.source;
         setActive(".source-btn", currentSource, "source");
-        load();
+        loadAll();
       };
     });
 
@@ -425,7 +504,7 @@
       b.onclick = () => {
         currentWindow = b.dataset.window;
         setActive(".window-btn", currentWindow, "window");
-        load();
+        loadAll();
       };
     });
 
@@ -433,7 +512,7 @@
       b.onclick = () => {
         currentType = b.dataset.type;
         setActive(".type-btn", currentType, "type");
-        load();
+        loadAll();
       };
     });
 
@@ -441,13 +520,19 @@
       b.onclick = () => {
         currentHeatmapMode = b.dataset.mode;
         setActive(".hm-btn", currentHeatmapMode, "mode");
-        load();
+        renderCurrentView();
       };
     });
 
     sortSelect.addEventListener("change", () => {
       currentSort = sortSelect.value;
-      if (currentView === "heatmap") load();
+      if (currentView === "heatmap") renderCurrentView();
+    });
+
+    countrySelect.addEventListener("change", () => {
+      currentCountry = countrySelect.value;
+      updateCountryInfo();
+      renderCurrentView();
     });
 
     function clear() {
@@ -491,6 +576,106 @@
           zoom.transform,
           d3.zoomIdentity.translate(tx, ty).scale(scale)
         );
+    }
+
+    function allCountriesFromLoadedData() {
+      const set = new Set();
+
+      if (graphData?.nodes) {
+        graphData.nodes.forEach(n => set.add(typeof n === "string" ? n : n.id));
+      }
+      if (heatmapAbsData?.rows) {
+        heatmapAbsData.rows.forEach(r => set.add(r.country));
+      }
+      if (similarityData?.nodes) {
+        similarityData.nodes.forEach(n => set.add(typeof n === "string" ? n : n.id));
+      }
+
+      return Array.from(set).filter(Boolean).sort();
+    }
+
+    function updateCountrySelect() {
+      const countries = allCountriesFromLoadedData();
+      const previous = currentCountry;
+
+      countrySelect.innerHTML = `<option value="">— válassz —</option>`;
+
+      countries.forEach(c => {
+        const opt = document.createElement("option");
+        opt.value = c;
+        opt.textContent = c;
+        countrySelect.appendChild(opt);
+      });
+
+      if (previous && countries.includes(previous)) {
+        currentCountry = previous;
+        countrySelect.value = previous;
+      } else {
+        currentCountry = "";
+        countrySelect.value = "";
+      }
+    }
+
+    function topPartnersFromGraph(country, data, limit = 5) {
+      if (!country || !data?.edges) return [];
+
+      return data.edges
+        .filter(e => (e.source === country || e.target === country || e.source?.id === country || e.target?.id === country))
+        .map(e => {
+          const source = e.source?.id || e.source;
+          const target = e.target?.id || e.target;
+          return {
+            partner: source === country ? target : source,
+            weight: e.weight || 0
+          };
+        })
+        .sort((a, b) => b.weight - a.weight)
+        .slice(0, limit);
+    }
+
+    function topTopicsFromHeatmap(country, data, limit = 5) {
+      if (!country || !data?.rows || !data?.topics) return [];
+      const row = data.rows.find(r => r.country === country);
+      if (!row) return [];
+
+      return data.topics
+        .map(t => ({ topic: t, value: row[t] || 0 }))
+        .sort((a, b) => b.value - a.value)
+        .slice(0, limit);
+    }
+
+    function updateCountryInfo() {
+      if (!currentCountry) {
+        countryInfoEl.classList.add("empty");
+        countryInfoEl.textContent = "Válassz országot vagy kattints egy elemre.";
+        return;
+      }
+
+      const graphPartners = topPartnersFromGraph(currentCountry, graphData, 5);
+      const simPartners = topPartnersFromGraph(currentCountry, similarityData, 5);
+      const absTopics = topTopicsFromHeatmap(currentCountry, heatmapAbsData, 5);
+      const normTopics = topTopicsFromHeatmap(currentCountry, heatmapNormData, 5);
+
+      const graphNode = graphData?.nodes?.find(n => (typeof n === "string" ? n : n.id) === currentCountry);
+      const graphWeight = graphNode ? (typeof graphNode === "string" ? 1 : graphNode.weight || 0) : 0;
+
+      countryInfoEl.classList.remove("empty");
+      countryInfoEl.innerHTML = `
+        <div class="kv"><strong>Ország:</strong> ${currentCountry}</div>
+        <div class="kv"><strong>Kapcsolati súly:</strong> ${Number(graphWeight).toFixed(2)}</div>
+
+        <div class="kv"><strong>Legerősebb partnerek</strong></div>
+        ${graphPartners.length ? `<ul class="list">${graphPartners.map(p => `<li>${p.partner}: ${Number(p.weight).toFixed(2)}</li>`).join("")}</ul>` : `<div class="status">Nincs adat.</div>`}
+
+        <div class="kv"><strong>Legfontosabb témák (Absolute)</strong></div>
+        ${absTopics.length ? `<ul class="list">${absTopics.map(t => `<li>${t.topic}: ${Number(t.value).toFixed(2)}</li>`).join("")}</ul>` : `<div class="status">Nincs adat.</div>`}
+
+        <div class="kv"><strong>Tematikus profil (Normalized)</strong></div>
+        ${normTopics.length ? `<ul class="list">${normTopics.map(t => `<li>${t.topic}: ${Number(t.value).toFixed(3)}</li>`).join("")}</ul>` : `<div class="status">Nincs adat.</div>`}
+
+        <div class="kv"><strong>Leghasonlóbb országok</strong></div>
+        ${simPartners.length ? `<ul class="list">${simPartners.map(p => `<li>${p.partner}: ${Number(p.weight).toFixed(3)}</li>`).join("")}</ul>` : `<div class="status">Nincs adat.</div>`}
+      `;
     }
 
     function drawForceGraph(data, infoTitle, fillColor) {
@@ -547,7 +732,7 @@
         .data(currentNodes)
         .enter()
         .append("circle")
-        .attr("class", "node")
+        .attr("class", d => `node${d.id === currentCountry ? " selected" : ""}`)
         .attr("r", d => nodeRadius(d.weight || 1))
         .attr("fill", fillColor)
         .call(
@@ -556,6 +741,12 @@
             .on("drag", drag)
             .on("end", dragend)
         )
+        .on("click", (event, d) => {
+          currentCountry = d.id;
+          countrySelect.value = d.id;
+          updateCountryInfo();
+          renderCurrentView();
+        })
         .on("mousemove", (event, d) => {
           showTooltip(`<strong>${d.id}</strong>`, event.pageX, event.pageY);
         })
@@ -666,12 +857,18 @@
           const value = row[topic] || 0;
 
           group.append("rect")
-            .attr("class", "heatmap-cell")
+            .attr("class", `heatmap-cell${row.country === currentCountry ? " selected" : ""}`)
             .attr("x", j * cellSize)
             .attr("y", i * cellSize)
             .attr("width", cellSize)
             .attr("height", cellSize)
             .attr("fill", color(value))
+            .on("click", () => {
+              currentCountry = row.country;
+              countrySelect.value = row.country;
+              updateCountryInfo();
+              renderCurrentView();
+            })
             .on("mousemove", (event) => {
               showTooltip(
                 `<strong>${row.country}</strong><br>${topic}: ${Number(value).toFixed(3)}`,
@@ -697,10 +894,16 @@
         const y = margin.top + gridHeight + 22;
 
         svg.append("text")
-          .attr("class", "heatmap-col-label")
+          .attr("class", `heatmap-col-label${country === currentCountry ? " selected" : ""}`)
           .attr("text-anchor", "start")
           .attr("transform", `translate(${x},${y}) rotate(45)`)
-          .text(country);
+          .text(country)
+          .on("click", () => {
+            currentCountry = country;
+            countrySelect.value = country;
+            updateCountryInfo();
+            renderCurrentView();
+          });
       });
 
       const legendWidth = 320;
@@ -756,32 +959,67 @@
       `;
     }
 
-    async function load() {
-      const path = filePath();
-      statusEl.textContent = "Betöltés: " + path;
+    async function fetchJson(path) {
+      const res = await fetch(path, { cache: "no-store" });
+      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+      return await res.json();
+    }
+
+    async function loadAll() {
+      statusEl.textContent = "Betöltés…";
       errorEl.textContent = "";
 
       try {
-        const res = await fetch(path, { cache: "no-store" });
-        if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+        const [graph, hmAbs, hmNorm, sim] = await Promise.all([
+          fetchJson(graphFilePath()),
+          fetchJson(heatmapAbsFilePath()),
+          fetchJson(heatmapNormFilePath()),
+          fetchJson(similarityFilePath())
+        ]);
 
-        const data = await res.json();
+        graphData = graph;
+        heatmapAbsData = hmAbs;
+        heatmapNormData = hmNorm;
+        similarityData = sim;
 
-        if (currentView === "graph") {
-          drawForceGraph(data, "Graph", currentType === "external" ? "#d97706" : currentType === "internal" ? "#2563eb" : "#7c3aed");
-        } else if (currentView === "heatmap") {
-          drawHeatmap(data);
-        } else {
-          drawForceGraph(data, "Similarity", "#059669");
-        }
+        updateCountrySelect();
+        updateCountryInfo();
+        renderCurrentView();
 
-        statusEl.textContent = "Betöltve: " + path;
+        statusEl.textContent = `Betöltve:
+graph: ${graphFilePath()}
+heatmap: ${heatmapAbsFilePath()}
+heatmap_norm: ${heatmapNormFilePath()}
+similarity: ${similarityFilePath()}`;
       } catch (e) {
         clear();
+        graphData = null;
+        heatmapAbsData = null;
+        heatmapNormData = null;
+        similarityData = null;
         infoEl.classList.add("empty");
         infoEl.textContent = "Nincs betöltött nézet.";
+        countryInfoEl.classList.add("empty");
+        countryInfoEl.textContent = "Nem érhető el országprofil.";
         errorEl.textContent = "Nem sikerült betölteni.\n" + e.message;
         console.error(e);
+      }
+    }
+
+    function renderCurrentView() {
+      updateViewHelp();
+
+      if (currentView === "graph" && graphData) {
+        drawForceGraph(
+          graphData,
+          "Graph",
+          currentType === "external" ? "#d97706" : currentType === "internal" ? "#2563eb" : "#7c3aed"
+        );
+      } else if (currentView === "heatmap") {
+        const data = currentHeatmapMode === "normalized" ? heatmapNormData : heatmapAbsData;
+        if (data) drawHeatmap(data);
+      } else if (currentView === "similarity" && similarityData) {
+        drawForceGraph(similarityData, "Similarity", "#059669");
       }
     }
 
@@ -793,12 +1031,13 @@
 
     window.addEventListener("resize", () => {
       updateSize();
-      load();
+      renderCurrentView();
     });
 
     updateControlVisibility();
+    updateViewHelp();
     updateSize();
-    load();
+    loadAll();
   </script>
 </body>
 </html>
