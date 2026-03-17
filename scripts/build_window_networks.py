@@ -32,6 +32,17 @@ EU_CODES = {
     "RO", "SK", "SI", "ES", "SE"
 }
 
+TOPIC_ORDER = [
+    "migration",
+    "ukraine_russia",
+    "enlargement",
+    "defence",
+    "energy",
+    "fiscal",
+    "rule_of_law",
+    "trade",
+]
+
 
 def parse_jsonl(path: Path):
     events = []
@@ -234,6 +245,90 @@ def build_network(events, mode="all"):
     }
 
 
+def build_topic_heatmap(events, mode="all"):
+    """
+    Build country-topic weight matrix.
+
+    mode:
+      - all: all countries except purely external-external pairs don't matter
+      - internal: EU countries only
+      - external: countries that appear in EU-external relations
+    """
+    country_topic = defaultdict(lambda: defaultdict(float))
+    selected_countries = set()
+
+    for event in events:
+        countries = event.get("countries", []) or []
+        topics = event.get("topics", []) or []
+        if not countries or not topics:
+            continue
+
+        weight = compute_weight(event)
+
+        event_internal_countries = set()
+        event_external_countries = set()
+
+        # determine which countries from this event are relevant for the chosen mode
+        if mode == "all":
+            for c in countries:
+                selected_countries.add(c)
+            event_countries = set(countries)
+
+        elif mode == "internal":
+            for c in countries:
+                if c in EU_CODES:
+                    event_internal_countries.add(c)
+                    selected_countries.add(c)
+            event_countries = event_internal_countries
+
+        elif mode == "external":
+            # keep all countries that appear in EU-external relations only
+            event_countries = set()
+            for pair in event.get("country_pairs", []) or []:
+                if not isinstance(pair, (list, tuple)) or len(pair) != 2:
+                    continue
+                a, b = pair
+                if pair_type(a, b) == "external":
+                    event_external_countries.add(a)
+                    event_external_countries.add(b)
+            for c in event_external_countries:
+                selected_countries.add(c)
+            event_countries = event_external_countries
+
+        else:
+            event_countries = set(countries)
+
+        if not event_countries:
+            continue
+
+        for country in event_countries:
+            for topic in topics:
+                country_topic[country][topic] += weight
+
+    countries_sorted = sorted(selected_countries)
+
+    matrix = []
+    for country in countries_sorted:
+        row = {"country": country}
+        total = 0.0
+
+        for topic in TOPIC_ORDER:
+            value = round(country_topic[country].get(topic, 0.0), 2)
+            row[topic] = value
+            total += value
+
+        row["total"] = round(total, 2)
+        matrix.append(row)
+
+    return {
+        "type": "heatmap",
+        "mode": mode,
+        "topics": TOPIC_ORDER,
+        "rows": matrix,
+        "event_count": len(events),
+    }
+
+
 def filter_window(events, days):
     cutoff = NOW - timedelta(days=days)
     result = []
@@ -246,11 +341,10 @@ def filter_window(events, days):
     return result
 
 
-def save_network(layer, window, data, suffix=""):
+def save_json(layer, filename, data):
     out_dir = NETWORK_DIR / layer
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    filename = f"{window}{suffix}.json"
     path = out_dir / filename
 
     with open(path, "w", encoding="utf-8") as f:
@@ -278,17 +372,15 @@ def main():
             filtered = filter_window(events, days)
             print("window", window, "events:", len(filtered))
 
-            # all
-            network_all = build_network(filtered, mode="all")
-            save_network(layer, window, network_all)
+            # Graph outputs
+            save_json(layer, f"{window}.json", build_network(filtered, mode="all"))
+            save_json(layer, f"{window}_internal.json", build_network(filtered, mode="internal"))
+            save_json(layer, f"{window}_external.json", build_network(filtered, mode="external"))
 
-            # internal EU-EU
-            network_internal = build_network(filtered, mode="internal")
-            save_network(layer, window, network_internal, "_internal")
-
-            # EU-external
-            network_external = build_network(filtered, mode="external")
-            save_network(layer, window, network_external, "_external")
+            # Heatmap outputs
+            save_json(layer, f"{window}_heatmap.json", build_topic_heatmap(filtered, mode="all"))
+            save_json(layer, f"{window}_heatmap_internal.json", build_topic_heatmap(filtered, mode="internal"))
+            save_json(layer, f"{window}_heatmap_external.json", build_topic_heatmap(filtered, mode="external"))
 
 
 if __name__ == "__main__":
