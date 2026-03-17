@@ -1,38 +1,19 @@
-# scripts/build_window_networks.py
-
 import json
-from pathlib import Path
+import os
 from datetime import datetime, timedelta, timezone
 from collections import defaultdict
-from email.utils import parsedate_to_datetime
+import math
 
-ROOT = Path(__file__).resolve().parent.parent
-
-EVENTS_DIR = ROOT / "data" / "events"
-NETWORK_DIR = ROOT / "data" / "networks"
-DOCS_NETWORK_DIR = ROOT / "docs" / "data" / "networks"
+BASE = "data/events"
+OUT = "data/networks"
 
 WINDOWS = {
     "7d": 7,
     "30d": 30,
-    "90d": 90,
+    "90d": 90
 }
 
-LAYERS = [
-    "rss",
-    "gdelt",
-    "combined",
-]
-
-NOW = datetime.now(timezone.utc)
-
-EU_CODES = {
-    "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE",
-    "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT",
-    "RO", "SK", "SI", "ES", "SE"
-}
-
-TOPIC_ORDER = [
+TOPICS = [
     "migration",
     "ukraine_russia",
     "enlargement",
@@ -40,347 +21,189 @@ TOPIC_ORDER = [
     "energy",
     "fiscal",
     "rule_of_law",
-    "trade",
+    "trade"
 ]
 
 
-def parse_jsonl(path: Path):
-    events = []
+def parse_date(d):
+    if not d:
+        return None
+    try:
+        return datetime.fromisoformat(d.replace("Z", "+00:00"))
+    except:
+        return None
 
-    if not path.exists():
+
+def load_events(path):
+    events = []
+    if not os.path.exists(path):
         return events
 
     with open(path, "r", encoding="utf-8") as f:
         for line in f:
             try:
                 events.append(json.loads(line))
-            except Exception:
+            except:
                 pass
-
     return events
-
-
-def load_events(layer: str):
-    events = []
-
-    if layer == "rss":
-        base = EVENTS_DIR / "rss"
-        if base.exists():
-            for f in sorted(base.glob("*.jsonl")):
-                events += parse_jsonl(f)
-
-        legacy = EVENTS_DIR
-        if legacy.exists():
-            for f in sorted(legacy.glob("*.jsonl")):
-                events += parse_jsonl(f)
-
-    elif layer == "gdelt":
-        base = EVENTS_DIR / "gdelt"
-        if base.exists():
-            for f in sorted(base.glob("*.jsonl")):
-                events += parse_jsonl(f)
-
-    elif layer == "combined":
-        rss_base = EVENTS_DIR / "rss"
-        gdelt_base = EVENTS_DIR / "gdelt"
-
-        if rss_base.exists():
-            for f in sorted(rss_base.glob("*.jsonl")):
-                events += parse_jsonl(f)
-
-        if EVENTS_DIR.exists():
-            for f in sorted(EVENTS_DIR.glob("*.jsonl")):
-                events += parse_jsonl(f)
-
-        if gdelt_base.exists():
-            for f in sorted(gdelt_base.glob("*.jsonl")):
-                events += parse_jsonl(f)
-
-    return events
-
-
-def parse_event_datetime(value):
-    if not value:
-        return None
-
-    text = str(value).strip()
-    if not text:
-        return None
-
-    try:
-        dt = datetime.fromisoformat(text.replace("Z", "+00:00"))
-        if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=timezone.utc)
-        else:
-            dt = dt.astimezone(timezone.utc)
-        return dt
-    except Exception:
-        pass
-
-    try:
-        dt = parsedate_to_datetime(text)
-        if dt is None:
-            return None
-
-        if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=timezone.utc)
-        else:
-            dt = dt.astimezone(timezone.utc)
-
-        return dt
-    except Exception:
-        pass
-
-    return None
-
-
-def get_event_date(event):
-    published = parse_event_datetime(event.get("published_at"))
-    if published:
-        return published
-
-    collected = parse_event_datetime(event.get("collected_at"))
-    if collected:
-        return collected
-
-    return NOW
-
-
-def compute_weight(event):
-    meta = event.get("metadata", {}) or {}
-
-    try:
-        mentions = float(meta.get("NumMentions", 1) or 1)
-    except Exception:
-        mentions = 1.0
-
-    try:
-        articles = float(meta.get("NumArticles", 1) or 1)
-    except Exception:
-        articles = 1.0
-
-    try:
-        goldstein = abs(float(meta.get("GoldsteinScale", 0) or 0))
-    except Exception:
-        goldstein = 0.0
-
-    weight = (
-        mentions * 0.4
-        + articles * 0.3
-        + goldstein * 0.3
-    )
-
-    if weight <= 0:
-        weight = 1.0
-
-    return weight
-
-
-def pair_type(a: str, b: str) -> str:
-    a_eu = a in EU_CODES
-    b_eu = b in EU_CODES
-
-    if a_eu and b_eu:
-        return "internal"
-
-    if a_eu != b_eu:
-        return "external"
-
-    return "other"
-
-
-def build_network(events, mode="all"):
-    nodes = set()
-    edges = defaultdict(float)
-
-    for event in events:
-        pairs = event.get("country_pairs", []) or []
-        if not pairs:
-            continue
-
-        weight = compute_weight(event)
-
-        for pair in pairs:
-            if not isinstance(pair, (list, tuple)) or len(pair) != 2:
-                continue
-
-            a, b = pair
-
-            if not a or not b or a == b:
-                continue
-
-            relation = pair_type(a, b)
-
-            if mode == "internal" and relation != "internal":
-                continue
-
-            if mode == "external" and relation != "external":
-                continue
-
-            if mode == "all" and relation == "other":
-                continue
-
-            nodes.add(a)
-            nodes.add(b)
-
-            key = tuple(sorted([a, b]))
-            edges[key] += weight
-
-    node_list = [{"id": n} for n in sorted(nodes)]
-
-    edge_list = [
-        {
-            "source": a,
-            "target": b,
-            "weight": round(w, 2),
-        }
-        for (a, b), w in sorted(edges.items())
-    ]
-
-    return {
-        "nodes": node_list,
-        "edges": edge_list,
-        "event_count": len(events),
-        "mode": mode,
-    }
-
-
-def build_topic_heatmap(events, mode="all"):
-    """
-    Build country-topic weight matrix.
-
-    mode:
-      - all: all countries except purely external-external pairs don't matter
-      - internal: EU countries only
-      - external: countries that appear in EU-external relations
-    """
-    country_topic = defaultdict(lambda: defaultdict(float))
-    selected_countries = set()
-
-    for event in events:
-        countries = event.get("countries", []) or []
-        topics = event.get("topics", []) or []
-        if not countries or not topics:
-            continue
-
-        weight = compute_weight(event)
-
-        event_internal_countries = set()
-        event_external_countries = set()
-
-        # determine which countries from this event are relevant for the chosen mode
-        if mode == "all":
-            for c in countries:
-                selected_countries.add(c)
-            event_countries = set(countries)
-
-        elif mode == "internal":
-            for c in countries:
-                if c in EU_CODES:
-                    event_internal_countries.add(c)
-                    selected_countries.add(c)
-            event_countries = event_internal_countries
-
-        elif mode == "external":
-            # keep all countries that appear in EU-external relations only
-            event_countries = set()
-            for pair in event.get("country_pairs", []) or []:
-                if not isinstance(pair, (list, tuple)) or len(pair) != 2:
-                    continue
-                a, b = pair
-                if pair_type(a, b) == "external":
-                    event_external_countries.add(a)
-                    event_external_countries.add(b)
-            for c in event_external_countries:
-                selected_countries.add(c)
-            event_countries = event_external_countries
-
-        else:
-            event_countries = set(countries)
-
-        if not event_countries:
-            continue
-
-        for country in event_countries:
-            for topic in topics:
-                country_topic[country][topic] += weight
-
-    countries_sorted = sorted(selected_countries)
-
-    matrix = []
-    for country in countries_sorted:
-        row = {"country": country}
-        total = 0.0
-
-        for topic in TOPIC_ORDER:
-            value = round(country_topic[country].get(topic, 0.0), 2)
-            row[topic] = value
-            total += value
-
-        row["total"] = round(total, 2)
-        matrix.append(row)
-
-    return {
-        "type": "heatmap",
-        "mode": mode,
-        "topics": TOPIC_ORDER,
-        "rows": matrix,
-        "event_count": len(events),
-    }
 
 
 def filter_window(events, days):
-    cutoff = NOW - timedelta(days=days)
-    result = []
-
-    for event in events:
-        d = get_event_date(event)
-        if d >= cutoff:
-            result.append(event)
-
-    return result
+    cutoff = datetime.now(timezone.utc) - timedelta(days=days)
+    out = []
+    for e in events:
+        d = parse_date(e.get("date"))
+        if d and d >= cutoff:
+            out.append(e)
+    return out
 
 
-def save_json(layer, filename, data):
-    out_dir = NETWORK_DIR / layer
-    out_dir.mkdir(parents=True, exist_ok=True)
+def build_graph(events):
+    edge_weights = defaultdict(int)
+    node_weights = defaultdict(int)
 
-    path = out_dir / filename
+    for e in events:
+        actors = e.get("actors", [])
+        for a in actors:
+            node_weights[a] += 1
 
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+        for i in range(len(actors)):
+            for j in range(i + 1, len(actors)):
+                key = tuple(sorted([actors[i], actors[j]]))
+                edge_weights[key] += 1
 
-    docs_dir = DOCS_NETWORK_DIR / layer
-    docs_dir.mkdir(parents=True, exist_ok=True)
+    nodes = [{"id": k, "weight": v} for k, v in node_weights.items()]
+    edges = [{"source": a, "target": b, "weight": w} for (a, b), w in edge_weights.items()]
 
-    docs_path = docs_dir / filename
+    return nodes, edges
 
-    with open(docs_path, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
 
-    print("saved", layer, filename, "->", path)
+def build_heatmap(events):
+    country_topic = defaultdict(lambda: defaultdict(int))
+
+    for e in events:
+        topic = e.get("topic")
+        if topic not in TOPICS:
+            continue
+
+        for a in e.get("actors", []):
+            country_topic[a][topic] += 1
+
+    rows = []
+    for country, topics in country_topic.items():
+        row = {"country": country}
+        total = 0
+        for t in TOPICS:
+            v = topics.get(t, 0)
+            row[t] = v
+            total += v
+        row["total"] = total
+        rows.append(row)
+
+    return rows
+
+
+def normalize_rows(rows):
+    norm = []
+    for r in rows:
+        total = r.get("total", 0)
+        new = {"country": r["country"]}
+        for t in TOPICS:
+            if total > 0:
+                new[t] = r[t] / total
+            else:
+                new[t] = 0
+        new["total"] = 1
+        norm.append(new)
+    return norm
+
+
+def cosine_similarity(a, b):
+    dot = sum(a[t] * b[t] for t in TOPICS)
+    na = math.sqrt(sum(a[t] ** 2 for t in TOPICS))
+    nb = math.sqrt(sum(b[t] ** 2 for t in TOPICS))
+    if na == 0 or nb == 0:
+        return 0
+    return dot / (na * nb)
+
+
+def build_similarity(rows):
+    sim = []
+    for i in range(len(rows)):
+        for j in range(i + 1, len(rows)):
+            c1 = rows[i]["country"]
+            c2 = rows[j]["country"]
+
+            s = cosine_similarity(rows[i], rows[j])
+            if s > 0.2:  # szűrés
+                sim.append({
+                    "source": c1,
+                    "target": c2,
+                    "weight": round(s, 3)
+                })
+    return sim
+
+
+def ensure_dir(path):
+    os.makedirs(path, exist_ok=True)
+
+
+def process_layer(name):
+    path = os.path.join(BASE, name, "events.jsonl")
+    events = load_events(path)
+
+    if not events:
+        print(f"[WARN] No events for {name}")
+        return
+
+    for wname, days in WINDOWS.items():
+        filtered = filter_window(events, days)
+
+        nodes, edges = build_graph(filtered)
+        rows = build_heatmap(filtered)
+        norm_rows = normalize_rows(rows)
+        sim_edges = build_similarity(norm_rows)
+
+        out_dir = os.path.join(OUT, name)
+        ensure_dir(out_dir)
+
+        # graph
+        with open(f"{out_dir}/{wname}.json", "w") as f:
+            json.dump({
+                "nodes": nodes,
+                "edges": edges,
+                "event_count": len(filtered)
+            }, f)
+
+        # heatmap absolute
+        with open(f"{out_dir}/{wname}_heatmap.json", "w") as f:
+            json.dump({
+                "topics": TOPICS,
+                "rows": rows,
+                "event_count": len(filtered)
+            }, f)
+
+        # heatmap normalized
+        with open(f"{out_dir}/{wname}_heatmap_norm.json", "w") as f:
+            json.dump({
+                "topics": TOPICS,
+                "rows": norm_rows,
+                "event_count": len(filtered)
+            }, f)
+
+        # similarity
+        with open(f"{out_dir}/{wname}_similarity.json", "w") as f:
+            json.dump({
+                "nodes": [r["country"] for r in rows],
+                "edges": sim_edges
+            }, f)
+
+        print(f"[OK] {name} {wname} → {len(filtered)} events")
 
 
 def main():
-    for layer in LAYERS:
-        print("\nLayer:", layer)
-
-        events = load_events(layer)
-        print("events loaded:", len(events))
-
-        for window, days in WINDOWS.items():
-            filtered = filter_window(events, days)
-            print("window", window, "events:", len(filtered))
-
-            # Graph outputs
-            save_json(layer, f"{window}.json", build_network(filtered, mode="all"))
-            save_json(layer, f"{window}_internal.json", build_network(filtered, mode="internal"))
-            save_json(layer, f"{window}_external.json", build_network(filtered, mode="external"))
-
-            # Heatmap outputs
-            save_json(layer, f"{window}_heatmap.json", build_topic_heatmap(filtered, mode="all"))
-            save_json(layer, f"{window}_heatmap_internal.json", build_topic_heatmap(filtered, mode="internal"))
-            save_json(layer, f"{window}_heatmap_external.json", build_topic_heatmap(filtered, mode="external"))
+    for layer in ["rss", "gdelt", "combined"]:
+        process_layer(layer)
 
 
 if __name__ == "__main__":
