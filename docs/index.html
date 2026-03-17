@@ -76,7 +76,7 @@
 
     .layout {
       display: grid;
-      grid-template-columns: 1fr 320px;
+      grid-template-columns: 1fr 260px;
       min-height: calc(100vh - 126px);
     }
 
@@ -99,35 +99,35 @@
     .sidebar {
       background: #fafafa;
       border-left: 1px solid #ddd;
-      padding: 14px;
+      padding: 12px;
       overflow: auto;
     }
 
     .panel {
-      margin-bottom: 18px;
+      margin-bottom: 14px;
       background: white;
       border: 1px solid #e5e7eb;
       border-radius: 10px;
-      padding: 12px;
+      padding: 10px;
     }
 
     .panel h3 {
-      margin: 0 0 10px 0;
-      font-size: 16px;
+      margin: 0 0 8px 0;
+      font-size: 15px;
     }
 
     .status {
-      font-size: 13px;
+      font-size: 12px;
       color: #475569;
-      line-height: 1.5;
+      line-height: 1.45;
       white-space: pre-wrap;
     }
 
     .error {
       color: #b91c1c;
       white-space: pre-wrap;
-      font-size: 13px;
-      line-height: 1.5;
+      font-size: 12px;
+      line-height: 1.45;
     }
 
     .node {
@@ -148,14 +148,14 @@
     }
 
     .hint {
-      font-size: 13px;
+      font-size: 12px;
       color: #475569;
-      line-height: 1.5;
+      line-height: 1.45;
     }
 
     .kv {
-      font-size: 14px;
-      margin: 6px 0;
+      font-size: 13px;
+      margin: 5px 0;
     }
 
     .empty {
@@ -304,7 +304,7 @@
           <div class="kv"><strong>Heatmap</strong>: ország–téma intenzitás</div>
           <div class="kv"><strong>Similarity</strong>: országhasonlósági háló</div>
           <div class="kv"><strong>Absolute</strong>: abszolút aktivitás</div>
-          <div class="kv"><strong>Normalized</strong>: országon belüli tematikus profil</div>
+          <div class="kv"><strong>Normalized</strong>: tematikus profil</div>
         </div>
       </div>
     </div>
@@ -380,7 +380,10 @@
     }
 
     function similarityFilePath() {
-      return `${basePath()}/data/networks/${currentSource}/${currentWindow}_similarity.json`;
+      let suffix = "";
+      if (currentType === "internal") suffix = "_internal";
+      if (currentType === "external") suffix = "_external";
+      return `${basePath()}/data/networks/${currentSource}/${currentWindow}_similarity${suffix}.json`;
     }
 
     function filePath() {
@@ -490,7 +493,7 @@
         );
     }
 
-    function drawForceGraph(data, infoTitle) {
+    function drawForceGraph(data, infoTitle, fillColor) {
       clear();
       updateSize();
 
@@ -546,7 +549,7 @@
         .append("circle")
         .attr("class", "node")
         .attr("r", d => nodeRadius(d.weight || 1))
-        .attr("fill", currentView === "similarity" ? "#059669" : currentType === "external" ? "#d97706" : currentType === "internal" ? "#2563eb" : "#7c3aed")
+        .attr("fill", fillColor)
         .call(
           d3.drag()
             .on("start", dragstart)
@@ -604,7 +607,7 @@
         <div class="kv"><strong>Nézet:</strong> ${infoTitle}</div>
         <div class="kv"><strong>Source:</strong> ${currentSource}</div>
         <div class="kv"><strong>Window:</strong> ${currentWindow}</div>
-        ${currentView === "graph" ? `<div class="kv"><strong>Type:</strong> ${currentType}</div>` : ""}
+        <div class="kv"><strong>Type:</strong> ${currentType}</div>
         <div class="kv"><strong>Nodes:</strong> ${currentNodes.length}</div>
         <div class="kv"><strong>Edges:</strong> ${currentLinks.length}</div>
         ${data.event_count !== undefined ? `<div class="kv"><strong>Events:</strong> ${data.event_count}</div>` : ""}
@@ -765,11 +768,11 @@
         const data = await res.json();
 
         if (currentView === "graph") {
-          drawForceGraph(data, "Graph");
+          drawForceGraph(data, "Graph", currentType === "external" ? "#d97706" : currentType === "internal" ? "#2563eb" : "#7c3aed");
         } else if (currentView === "heatmap") {
           drawHeatmap(data);
         } else {
-          drawForceGraph(data, "Similarity");
+          drawForceGraph(data, "Similarity", "#059669");
         }
 
         statusEl.textContent = "Betöltve: " + path;
