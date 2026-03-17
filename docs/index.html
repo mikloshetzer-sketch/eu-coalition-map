@@ -7,9 +7,10 @@
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <style>
     body {
-      font-family: Arial, sans-serif;
       margin: 0;
+      font-family: Arial, sans-serif;
       background: #f4f4f4;
+      color: #111827;
     }
 
     header {
@@ -18,14 +19,31 @@
       padding: 20px;
     }
 
+    header h1 {
+      margin: 0;
+      font-size: 22px;
+    }
+
     .controls {
-      padding: 12px;
+      padding: 12px 16px;
       background: white;
       border-bottom: 1px solid #ddd;
       display: flex;
-      gap: 10px;
+      gap: 14px;
       flex-wrap: wrap;
       align-items: center;
+    }
+
+    .group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .group-label {
+      font-weight: bold;
+      margin-right: 4px;
     }
 
     button {
@@ -35,6 +53,11 @@
       cursor: pointer;
       background: #2563eb;
       color: white;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background: #1d4ed8;
     }
 
     button.active {
@@ -43,25 +66,49 @@
 
     .layout {
       display: grid;
-      grid-template-columns: 1fr 320px;
-      height: calc(100vh - 110px);
+      grid-template-columns: 1fr 340px;
+      height: calc(100vh - 126px);
     }
 
     #network {
       width: 100%;
       height: 100%;
       background: white;
+      display: block;
     }
 
     .sidebar {
       background: #fafafa;
       border-left: 1px solid #ddd;
-      padding: 12px;
+      padding: 14px;
       overflow: auto;
     }
 
     .panel {
-      margin-bottom: 16px;
+      margin-bottom: 18px;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 12px;
+    }
+
+    .panel h3 {
+      margin: 0 0 10px 0;
+      font-size: 16px;
+    }
+
+    .status {
+      font-size: 13px;
+      color: #475569;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .error {
+      color: #b91c1c;
+      white-space: pre-wrap;
+      font-size: 13px;
+      line-height: 1.5;
     }
 
     .node {
@@ -71,38 +118,78 @@
 
     .link {
       stroke: #94a3b8;
+      stroke-opacity: 0.8;
     }
 
-    .status {
+    .label {
+      font-size: 12px;
+      fill: #111827;
+      pointer-events: none;
+    }
+
+    .hint {
       font-size: 13px;
       color: #475569;
+      line-height: 1.5;
     }
 
-    .error {
-      color: #b91c1c;
-      white-space: pre-wrap;
+    .kv {
+      font-size: 14px;
+      margin: 5px 0;
+    }
+
+    .empty {
+      color: #64748b;
+      font-style: italic;
+    }
+
+    @media (max-width: 1000px) {
+      .layout {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+
+      #network {
+        height: 70vh;
+      }
+
+      .sidebar {
+        border-left: none;
+        border-top: 1px solid #ddd;
+      }
     }
   </style>
 </head>
 <body>
   <header>
-    <h2>EU Coalition Map</h2>
+    <h1>EU Coalition Map</h1>
   </header>
 
   <div class="controls">
-    <b>Source</b>
-    <button class="source-btn active" data-source="combined">Combined</button>
-    <button class="source-btn" data-source="rss">RSS</button>
-    <button class="source-btn" data-source="gdelt">GDELT</button>
+    <div class="group">
+      <span class="group-label">Source</span>
+      <button class="source-btn active" data-source="combined">Combined</button>
+      <button class="source-btn" data-source="rss">RSS</button>
+      <button class="source-btn" data-source="gdelt">GDELT</button>
+    </div>
 
-    <b>Window</b>
-    <button class="window-btn" data-window="7d">7d</button>
-    <button class="window-btn active" data-window="30d">30d</button>
-    <button class="window-btn" data-window="90d">90d</button>
+    <div class="group">
+      <span class="group-label">Window</span>
+      <button class="window-btn" data-window="7d">7d</button>
+      <button class="window-btn active" data-window="30d">30d</button>
+      <button class="window-btn" data-window="90d">90d</button>
+    </div>
 
-    <b>Network</b>
-    <button class="network-btn active" data-kind="diplomatic">Diplomatic</button>
-    <button class="network-btn" data-kind="policy">Policy</button>
+    <div class="group">
+      <span class="group-label">Type</span>
+      <button class="type-btn active" data-type="all">All</button>
+      <button class="type-btn" data-type="internal">EU Internal</button>
+      <button class="type-btn" data-type="external">EU External</button>
+    </div>
+
+    <div class="group">
+      <button id="fit-btn">Középre rendezés</button>
+    </div>
   </div>
 
   <div class="layout">
@@ -110,29 +197,53 @@
 
     <div class="sidebar">
       <div class="panel">
-        <b>Info</b>
-        <div id="info"></div>
+        <h3>Info</h3>
+        <div id="info" class="status empty">Nincs betöltött háló.</div>
       </div>
+
       <div class="panel">
-        <b>Betöltés</b>
+        <h3>Betöltés</h3>
         <div id="status" class="status"></div>
         <div id="error" class="error"></div>
+      </div>
+
+      <div class="panel">
+        <h3>Segítség</h3>
+        <div class="hint">
+          <div class="kv"><strong>All</strong>: minden releváns kapcsolat</div>
+          <div class="kv"><strong>EU Internal</strong>: csak EU–EU kapcsolatok</div>
+          <div class="kv"><strong>EU External</strong>: EU–külső szereplő kapcsolatok</div>
+          <div class="kv">A középre rendezés gomb újra a teljes gráfra igazítja a nézetet.</div>
+        </div>
       </div>
     </div>
   </div>
 
   <script>
-    let selectedSource = "combined";
-    let selectedWindow = "30d";
-    let selectedKind = "diplomatic";
+    let currentSource = "combined";
+    let currentWindow = "30d";
+    let currentType = "all";
 
     const svg = d3.select("#network");
     const infoEl = document.getElementById("info");
     const statusEl = document.getElementById("status");
     const errorEl = document.getElementById("error");
+    const fitBtn = document.getElementById("fit-btn");
 
-    let width = window.innerWidth - 320;
-    let height = window.innerHeight - 110;
+    let width = 0;
+    let height = 0;
+    let simulation = null;
+    let zoom = null;
+    let g = null;
+    let currentNodes = [];
+    let currentLinks = [];
+
+    function updateSize() {
+      const el = document.getElementById("network");
+      width = el.clientWidth;
+      height = el.clientHeight;
+      svg.attr("width", width).attr("height", height);
+    }
 
     function basePath() {
       const path = window.location.pathname;
@@ -140,86 +251,134 @@
       return "";
     }
 
-    function networkPath() {
-      const base = basePath();
-      let name = selectedWindow;
-      if (selectedKind === "policy") name += "_policy";
-
-      return `${base}/data/networks/${selectedSource}/${name}.json`;
+    function networkFileName() {
+      let suffix = "";
+      if (currentType === "internal") suffix = "_internal";
+      if (currentType === "external") suffix = "_external";
+      return `${currentWindow}${suffix}.json`;
     }
 
-    async function loadNetwork() {
-      const path = networkPath();
-      statusEl.textContent = `Betöltés: ${path}`;
-      errorEl.textContent = "";
+    function networkPath() {
+      const base = basePath();
+      return `${base}/data/networks/${currentSource}/${networkFileName()}`;
+    }
 
-      try {
-        const r = await fetch(path, { cache: "no-store" });
+    function setActive(selector, value, attr) {
+      document.querySelectorAll(selector).forEach(btn => {
+        btn.classList.toggle("active", btn.dataset[attr] === value);
+      });
+    }
 
-        if (!r.ok) {
-          throw new Error(`HTTP ${r.status} - ${r.statusText}`);
-        }
+    function clearGraph() {
+      svg.selectAll("*").remove();
+      currentNodes = [];
+      currentLinks = [];
+      simulation = null;
+      zoom = null;
+      g = null;
+    }
 
-        const data = await r.json();
-        draw(data);
+    function fitGraph() {
+      if (!zoom || !g || !currentNodes.length) return;
 
-        infoEl.innerHTML = `
-          <div>Source: ${selectedSource}</div>
-          <div>Window: ${selectedWindow}</div>
-          <div>Network: ${selectedKind}</div>
-          <div>Nodes: ${(data.nodes || []).length}</div>
-          <div>Edges: ${(data.edges || []).length}</div>
-          <div>Events: ${data.event_count ?? 0}</div>
-        `;
+      const xs = currentNodes
+        .map(d => d.x)
+        .filter(v => typeof v === "number" && isFinite(v));
 
-        statusEl.textContent = `Betöltve: ${path}`;
-      } catch (e) {
-        svg.selectAll("*").remove();
-        infoEl.innerHTML = "";
-        errorEl.textContent = `Nem sikerült betölteni.\n${e.message}`;
-        console.error("Load error:", e, "Path:", path);
-      }
+      const ys = currentNodes
+        .map(d => d.y)
+        .filter(v => typeof v === "number" && isFinite(v));
+
+      if (!xs.length || !ys.length) return;
+
+      const minX = Math.min(...xs);
+      const maxX = Math.max(...xs);
+      const minY = Math.min(...ys);
+      const maxY = Math.max(...ys);
+
+      const graphWidth = Math.max(maxX - minX, 1);
+      const graphHeight = Math.max(maxY - minY, 1);
+
+      const scale = Math.min(
+        width / (graphWidth + 120),
+        height / (graphHeight + 120),
+        1.8
+      );
+
+      const tx = width / 2 - scale * (minX + graphWidth / 2);
+      const ty = height / 2 - scale * (minY + graphHeight / 2);
+
+      svg.transition()
+        .duration(500)
+        .call(
+          zoom.transform,
+          d3.zoomIdentity.translate(tx, ty).scale(scale)
+        );
     }
 
     function draw(data) {
-      svg.selectAll("*").remove();
+      clearGraph();
+      updateSize();
 
-      const nodes = (data.nodes || []).map(d => ({ ...d }));
-      const links = (data.edges || []).map(d => ({ ...d }));
+      currentNodes = (data.nodes || []).map(d => ({ ...d }));
+      currentLinks = (data.edges || []).map(d => ({ ...d }));
 
-      const simulation = d3.forceSimulation(nodes)
-        .force("link", d3.forceLink(links).id(d => d.id).distance(120))
-        .force("charge", d3.forceManyBody().strength(-300))
-        .force("center", d3.forceCenter(width / 2, height / 2));
+      zoom = d3.zoom()
+        .scaleExtent([0.3, 4])
+        .on("zoom", (event) => {
+          g.attr("transform", event.transform);
+        });
 
-      const link = svg.append("g")
+      svg.call(zoom);
+      g = svg.append("g");
+
+      const nodeWeightExtent = d3.extent(currentNodes, d => d.weight || 1);
+      const edgeWeightExtent = d3.extent(currentLinks, d => d.weight || 1);
+
+      const nodeRadius = d3.scaleSqrt()
+        .domain([nodeWeightExtent[0] || 1, nodeWeightExtent[1] || 1])
+        .range([8, 24]);
+
+      const edgeWidth = d3.scaleLinear()
+        .domain([edgeWeightExtent[0] || 1, edgeWeightExtent[1] || 1])
+        .range([1.5, 8]);
+
+      simulation = d3.forceSimulation(currentNodes)
+        .force("link", d3.forceLink(currentLinks).id(d => d.id).distance(130))
+        .force("charge", d3.forceManyBody().strength(-320))
+        .force("center", d3.forceCenter(width / 2, height / 2))
+        .force("collision", d3.forceCollide().radius(d => nodeRadius(d.weight || 1) + 10));
+
+      const link = g.append("g")
         .selectAll("line")
-        .data(links)
+        .data(currentLinks)
         .enter()
         .append("line")
         .attr("class", "link")
-        .attr("stroke-width", d => 1 + Math.sqrt(d.weight || 1));
+        .attr("stroke-width", d => edgeWidth(d.weight || 1));
 
-      const node = svg.append("g")
+      const node = g.append("g")
         .selectAll("circle")
-        .data(nodes)
+        .data(currentNodes)
         .enter()
         .append("circle")
         .attr("class", "node")
-        .attr("r", d => 8 + Math.sqrt(d.weight || 1))
-        .attr("fill", selectedKind === "policy" ? "#7c3aed" : "#2563eb")
-        .call(d3.drag()
-          .on("start", dragstarted)
-          .on("drag", dragged)
-          .on("end", dragended));
+        .attr("r", d => nodeRadius(d.weight || 1))
+        .attr("fill", currentType === "external" ? "#b45309" : currentType === "internal" ? "#2563eb" : "#7c3aed")
+        .call(
+          d3.drag()
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended)
+        );
 
-      const label = svg.append("g")
+      const label = g.append("g")
         .selectAll("text")
-        .data(nodes)
+        .data(currentNodes)
         .enter()
         .append("text")
-        .text(d => d.id)
-        .attr("font-size", 12);
+        .attr("class", "label")
+        .text(d => d.id);
 
       simulation.on("tick", () => {
         link
@@ -234,7 +393,7 @@
 
         label
           .attr("x", d => d.x + 10)
-          .attr("y", d => d.y);
+          .attr("y", d => d.y + 4);
       });
 
       function dragstarted(event, d) {
@@ -253,35 +412,86 @@
         d.fx = null;
         d.fy = null;
       }
+
+      const nodesCount = currentNodes.length;
+      const edgesCount = currentLinks.length;
+      const mode = data.mode || currentType;
+
+      infoEl.classList.remove("empty");
+      infoEl.innerHTML = `
+        <div class="kv"><strong>Source:</strong> ${currentSource}</div>
+        <div class="kv"><strong>Window:</strong> ${currentWindow}</div>
+        <div class="kv"><strong>Type:</strong> ${mode}</div>
+        <div class="kv"><strong>Nodes:</strong> ${nodesCount}</div>
+        <div class="kv"><strong>Edges:</strong> ${edgesCount}</div>
+        <div class="kv"><strong>Events:</strong> ${data.event_count ?? 0}</div>
+      `;
+
+      setTimeout(() => fitGraph(), 400);
     }
 
-    document.querySelectorAll(".source-btn").forEach(b => {
-      b.onclick = () => {
-        selectedSource = b.dataset.source;
-        document.querySelectorAll(".source-btn").forEach(x => x.classList.remove("active"));
-        b.classList.add("active");
+    async function loadNetwork() {
+      const path = networkPath();
+
+      statusEl.textContent = `Betöltés: ${path}`;
+      errorEl.textContent = "";
+
+      try {
+        const response = await fetch(path, { cache: "no-store" });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status} - ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        draw(data);
+
+        statusEl.textContent = `Betöltve: ${path}`;
+      } catch (e) {
+        clearGraph();
+        infoEl.classList.add("empty");
+        infoEl.textContent = "Nincs betöltött háló.";
+        errorEl.textContent = `Nem sikerült betölteni.\n${e.message}`;
+        console.error("Load error:", e, "Path:", path);
+      }
+    }
+
+    document.querySelectorAll(".source-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        currentSource = btn.dataset.source;
+        setActive(".source-btn", currentSource, "source");
         loadNetwork();
-      };
+      });
     });
 
-    document.querySelectorAll(".window-btn").forEach(b => {
-      b.onclick = () => {
-        selectedWindow = b.dataset.window;
-        document.querySelectorAll(".window-btn").forEach(x => x.classList.remove("active"));
-        b.classList.add("active");
+    document.querySelectorAll(".window-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        currentWindow = btn.dataset.window;
+        setActive(".window-btn", currentWindow, "window");
         loadNetwork();
-      };
+      });
     });
 
-    document.querySelectorAll(".network-btn").forEach(b => {
-      b.onclick = () => {
-        selectedKind = b.dataset.kind;
-        document.querySelectorAll(".network-btn").forEach(x => x.classList.remove("active"));
-        b.classList.add("active");
+    document.querySelectorAll(".type-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        currentType = btn.dataset.type;
+        setActive(".type-btn", currentType, "type");
         loadNetwork();
-      };
+      });
     });
 
+    fitBtn.addEventListener("click", () => {
+      fitGraph();
+    });
+
+    window.addEventListener("resize", () => {
+      updateSize();
+      if (currentNodes.length) {
+        fitGraph();
+      }
+    });
+
+    updateSize();
     loadNetwork();
   </script>
 </body>
