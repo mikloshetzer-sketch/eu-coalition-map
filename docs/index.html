@@ -467,7 +467,7 @@
         .append("circle")
         .attr("class", "node")
         .attr("r", d => nodeRadius(d.weight || 1))
-        .attr("fill", currentType === "external" ? "#b45309" : currentType === "internal" ? "#2563eb" : "#7c3aed")
+        .attr("fill", currentType === "external" ? "#d97706" : currentType === "internal" ? "#2563eb" : "#7c3aed")
         .call(
           d3.drag()
             .on("start", dragstart)
@@ -539,29 +539,31 @@
       updateSize();
 
       const topics = data.topics || [];
-      const rows = data.rows || [];
+      const rows = [...(data.rows || [])].sort((a, b) => (b.total || 0) - (a.total || 0));
 
-      const margin = { top: 120, right: 30, bottom: 30, left: 90 };
-      const cellSize = 28;
+      const margin = { top: 70, right: 30, bottom: 120, left: 140 };
+      const cellSize = 34;
 
-      const gridWidth = topics.length * cellSize;
-      const gridHeight = rows.length * cellSize;
+      const countries = rows.map(r => r.country);
+
+      const gridWidth = countries.length * cellSize;
+      const gridHeight = topics.length * cellSize;
 
       const svgWidth = Math.max(width, margin.left + gridWidth + margin.right + 50);
-      const svgHeight = Math.max(height, margin.top + gridHeight + margin.bottom + 50);
+      const svgHeight = Math.max(height, margin.top + gridHeight + margin.bottom + 70);
 
       svg.attr("width", svgWidth).attr("height", svgHeight);
 
       const maxVal = d3.max(rows, r => d3.max(topics, t => r[t] || 0)) || 1;
 
-      const color = d3.scaleSequential(d3.interpolateOrRd)
+      const color = d3.scaleSequential(d3.interpolateTurbo)
         .domain([0, maxVal]);
 
       const group = svg.append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
-      rows.forEach((row, i) => {
-        topics.forEach((topic, j) => {
+      topics.forEach((topic, i) => {
+        rows.forEach((row, j) => {
           const value = row[topic] || 0;
 
           group.append("rect")
@@ -580,31 +582,32 @@
             })
             .on("mouseleave", hideTooltip);
         });
-
-        svg.append("text")
-          .attr("class", "heatmap-row-label")
-          .attr("x", margin.left - 10)
-          .attr("y", margin.top + i * cellSize + 18)
-          .attr("text-anchor", "end")
-          .text(row.country);
       });
 
       topics.forEach((topic, i) => {
+        svg.append("text")
+          .attr("class", "heatmap-row-label")
+          .attr("x", margin.left - 12)
+          .attr("y", margin.top + i * cellSize + 22)
+          .attr("text-anchor", "end")
+          .text(topic);
+      });
+
+      countries.forEach((country, i) => {
         const x = margin.left + i * cellSize + cellSize / 2;
-        const y = margin.top - 12;
+        const y = margin.top + gridHeight + 18;
 
         svg.append("text")
           .attr("class", "heatmap-col-label")
           .attr("text-anchor", "start")
-          .attr("transform", `translate(${x},${y}) rotate(-40)`)
-          .text(topic);
+          .attr("transform", `translate(${x},${y}) rotate(45)`)
+          .text(country);
       });
 
-      // legend
-      const legendWidth = 220;
-      const legendHeight = 12;
+      const legendWidth = 260;
+      const legendHeight = 14;
       const legendX = margin.left;
-      const legendY = 30;
+      const legendY = 18;
 
       const defs = svg.append("defs");
       const gradient = defs.append("linearGradient")
@@ -636,7 +639,7 @@
 
       svg.append("text")
         .attr("class", "legend-label")
-        .attr("x", legendX + legendWidth - 35)
+        .attr("x", legendX + legendWidth - 30)
         .attr("y", legendY - 6)
         .text("Magas");
 
