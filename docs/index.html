@@ -1,498 +1,297 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EU Coalition Map</title>
-  <script src="https://d3js.org/d3.v7.min.js"></script>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      color: #111827;
-    }
+<meta charset="UTF-8" />
+<title>EU Coalition Map</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
 
-    header {
-      background: #0f172a;
-      color: white;
-      padding: 20px;
-    }
+<style>
+body { margin:0; font-family:Arial; background:#f4f4f4; }
+header { background:#0f172a; color:white; padding:15px; }
+.controls { padding:10px; background:white; display:flex; flex-wrap:wrap; gap:10px; }
 
-    header h1 {
-      margin: 0;
-      font-size: 22px;
-    }
+button {
+  padding:6px 10px;
+  border:none;
+  border-radius:5px;
+  background:#2563eb;
+  color:white;
+  cursor:pointer;
+}
+button.active { background:#0f172a; }
 
-    .controls {
-      padding: 12px 16px;
-      background: white;
-      border-bottom: 1px solid #ddd;
-      display: flex;
-      gap: 14px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
+#network { width:100%; height:80vh; background:white; }
 
-    .group {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .group-label {
-      font-weight: bold;
-      margin-right: 4px;
-    }
-
-    button {
-      padding: 8px 14px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      background: #2563eb;
-      color: white;
-      font-size: 14px;
-    }
-
-    button:hover {
-      background: #1d4ed8;
-    }
-
-    button.active {
-      background: #0f172a;
-    }
-
-    .layout {
-      display: grid;
-      grid-template-columns: 1fr 340px;
-      height: calc(100vh - 126px);
-    }
-
-    #network {
-      width: 100%;
-      height: 100%;
-      background: white;
-      display: block;
-    }
-
-    .sidebar {
-      background: #fafafa;
-      border-left: 1px solid #ddd;
-      padding: 14px;
-      overflow: auto;
-    }
-
-    .panel {
-      margin-bottom: 18px;
-      background: white;
-      border: 1px solid #e5e7eb;
-      border-radius: 10px;
-      padding: 12px;
-    }
-
-    .panel h3 {
-      margin: 0 0 10px 0;
-      font-size: 16px;
-    }
-
-    .status {
-      font-size: 13px;
-      color: #475569;
-      line-height: 1.5;
-      white-space: pre-wrap;
-    }
-
-    .error {
-      color: #b91c1c;
-      white-space: pre-wrap;
-      font-size: 13px;
-      line-height: 1.5;
-    }
-
-    .node {
-      stroke: white;
-      stroke-width: 1.5px;
-    }
-
-    .link {
-      stroke: #94a3b8;
-      stroke-opacity: 0.8;
-    }
-
-    .label {
-      font-size: 12px;
-      fill: #111827;
-      pointer-events: none;
-    }
-
-    .hint {
-      font-size: 13px;
-      color: #475569;
-      line-height: 1.5;
-    }
-
-    .kv {
-      font-size: 14px;
-      margin: 5px 0;
-    }
-
-    .empty {
-      color: #64748b;
-      font-style: italic;
-    }
-
-    @media (max-width: 1000px) {
-      .layout {
-        grid-template-columns: 1fr;
-        height: auto;
-      }
-
-      #network {
-        height: 70vh;
-      }
-
-      .sidebar {
-        border-left: none;
-        border-top: 1px solid #ddd;
-      }
-    }
-  </style>
+.info { padding:10px; font-size:13px; }
+</style>
 </head>
+
 <body>
-  <header>
-    <h1>EU Coalition Map</h1>
-  </header>
 
-  <div class="controls">
-    <div class="group">
-      <span class="group-label">Source</span>
-      <button class="source-btn active" data-source="combined">Combined</button>
-      <button class="source-btn" data-source="rss">RSS</button>
-      <button class="source-btn" data-source="gdelt">GDELT</button>
-    </div>
+<header><h2>EU Coalition Map</h2></header>
 
-    <div class="group">
-      <span class="group-label">Window</span>
-      <button class="window-btn" data-window="7d">7d</button>
-      <button class="window-btn active" data-window="30d">30d</button>
-      <button class="window-btn" data-window="90d">90d</button>
-    </div>
+<div class="controls">
 
-    <div class="group">
-      <span class="group-label">Type</span>
-      <button class="type-btn active" data-type="all">All</button>
-      <button class="type-btn" data-type="internal">EU Internal</button>
-      <button class="type-btn" data-type="external">EU External</button>
-    </div>
+<b>View</b>
+<button class="view-btn active" data-view="graph">Graph</button>
+<button class="view-btn" data-view="heatmap">Heatmap</button>
 
-    <div class="group">
-      <button id="fit-btn">Középre rendezés</button>
-    </div>
-  </div>
+<b>Source</b>
+<button class="source-btn active" data-source="combined">Combined</button>
+<button class="source-btn" data-source="rss">RSS</button>
+<button class="source-btn" data-source="gdelt">GDELT</button>
 
-  <div class="layout">
-    <svg id="network"></svg>
+<b>Window</b>
+<button class="window-btn" data-window="7d">7d</button>
+<button class="window-btn active" data-window="30d">30d</button>
+<button class="window-btn" data-window="90d">90d</button>
 
-    <div class="sidebar">
-      <div class="panel">
-        <h3>Info</h3>
-        <div id="info" class="status empty">Nincs betöltött háló.</div>
-      </div>
+<b>Type</b>
+<button class="type-btn active" data-type="all">All</button>
+<button class="type-btn" data-type="internal">EU Internal</button>
+<button class="type-btn" data-type="external">EU External</button>
 
-      <div class="panel">
-        <h3>Betöltés</h3>
-        <div id="status" class="status"></div>
-        <div id="error" class="error"></div>
-      </div>
+<button id="fit">Középre</button>
 
-      <div class="panel">
-        <h3>Segítség</h3>
-        <div class="hint">
-          <div class="kv"><strong>All</strong>: minden releváns kapcsolat</div>
-          <div class="kv"><strong>EU Internal</strong>: csak EU–EU kapcsolatok</div>
-          <div class="kv"><strong>EU External</strong>: EU–külső szereplő kapcsolatok</div>
-          <div class="kv">A középre rendezés gomb újra a teljes gráfra igazítja a nézetet.</div>
-        </div>
-      </div>
-    </div>
-  </div>
+</div>
 
-  <script>
-    let currentSource = "combined";
-    let currentWindow = "30d";
-    let currentType = "all";
+<svg id="network"></svg>
 
-    const svg = d3.select("#network");
-    const infoEl = document.getElementById("info");
-    const statusEl = document.getElementById("status");
-    const errorEl = document.getElementById("error");
-    const fitBtn = document.getElementById("fit-btn");
+<div class="info" id="info"></div>
 
-    let width = 0;
-    let height = 0;
-    let simulation = null;
-    let zoom = null;
-    let g = null;
-    let currentNodes = [];
-    let currentLinks = [];
+<script>
 
-    function updateSize() {
-      const el = document.getElementById("network");
-      width = el.clientWidth;
-      height = el.clientHeight;
-      svg.attr("width", width).attr("height", height);
-    }
+let currentView = "graph";
+let currentSource = "combined";
+let currentWindow = "30d";
+let currentType = "all";
 
-    function basePath() {
-      const path = window.location.pathname;
-      if (path.includes("/eu-coalition-map/")) return "/eu-coalition-map";
-      return "";
-    }
+const svg = d3.select("#network");
+const info = document.getElementById("info");
 
-    function networkFileName() {
-      let suffix = "";
-      if (currentType === "internal") suffix = "_internal";
-      if (currentType === "external") suffix = "_external";
-      return `${currentWindow}${suffix}.json`;
-    }
+let simulation;
+let g;
+let zoom;
 
-    function networkPath() {
-      const base = basePath();
-      return `${base}/data/networks/${currentSource}/${networkFileName()}`;
-    }
+function basePath() {
+  return window.location.pathname.includes("eu-coalition-map")
+    ? "/eu-coalition-map"
+    : "";
+}
 
-    function setActive(selector, value, attr) {
-      document.querySelectorAll(selector).forEach(btn => {
-        btn.classList.toggle("active", btn.dataset[attr] === value);
-      });
-    }
+function filePath() {
+  let suffix = "";
 
-    function clearGraph() {
-      svg.selectAll("*").remove();
-      currentNodes = [];
-      currentLinks = [];
-      simulation = null;
-      zoom = null;
-      g = null;
-    }
+  if (currentType === "internal") suffix = "_internal";
+  if (currentType === "external") suffix = "_external";
 
-    function fitGraph() {
-      if (!zoom || !g || !currentNodes.length) return;
+  if (currentView === "heatmap") {
+    return `${basePath()}/data/networks/${currentSource}/${currentWindow}_heatmap${suffix}.json`;
+  }
 
-      const xs = currentNodes
-        .map(d => d.x)
-        .filter(v => typeof v === "number" && isFinite(v));
+  return `${basePath()}/data/networks/${currentSource}/${currentWindow}${suffix}.json`;
+}
 
-      const ys = currentNodes
-        .map(d => d.y)
-        .filter(v => typeof v === "number" && isFinite(v));
+function setActive(selector, value, attr) {
+  document.querySelectorAll(selector).forEach(b => {
+    b.classList.toggle("active", b.dataset[attr] === value);
+  });
+}
 
-      if (!xs.length || !ys.length) return;
+document.querySelectorAll(".view-btn").forEach(b=>{
+  b.onclick = () => {
+    currentView = b.dataset.view;
+    setActive(".view-btn", currentView, "view");
+    load();
+  };
+});
 
-      const minX = Math.min(...xs);
-      const maxX = Math.max(...xs);
-      const minY = Math.min(...ys);
-      const maxY = Math.max(...ys);
+document.querySelectorAll(".source-btn").forEach(b=>{
+  b.onclick = () => {
+    currentSource = b.dataset.source;
+    setActive(".source-btn", currentSource, "source");
+    load();
+  };
+});
 
-      const graphWidth = Math.max(maxX - minX, 1);
-      const graphHeight = Math.max(maxY - minY, 1);
+document.querySelectorAll(".window-btn").forEach(b=>{
+  b.onclick = () => {
+    currentWindow = b.dataset.window;
+    setActive(".window-btn", currentWindow, "window");
+    load();
+  };
+});
 
-      const scale = Math.min(
-        width / (graphWidth + 120),
-        height / (graphHeight + 120),
-        1.8
-      );
+document.querySelectorAll(".type-btn").forEach(b=>{
+  b.onclick = () => {
+    currentType = b.dataset.type;
+    setActive(".type-btn", currentType, "type");
+    load();
+  };
+});
 
-      const tx = width / 2 - scale * (minX + graphWidth / 2);
-      const ty = height / 2 - scale * (minY + graphHeight / 2);
+document.getElementById("fit").onclick = () => {
+  if (zoom) {
+    svg.transition().call(zoom.transform, d3.zoomIdentity);
+  }
+};
 
-      svg.transition()
-        .duration(500)
-        .call(
-          zoom.transform,
-          d3.zoomIdentity.translate(tx, ty).scale(scale)
-        );
-    }
+function clear() {
+  svg.selectAll("*").remove();
+}
 
-    function draw(data) {
-      clearGraph();
-      updateSize();
+function drawGraph(data) {
 
-      currentNodes = (data.nodes || []).map(d => ({ ...d }));
-      currentLinks = (data.edges || []).map(d => ({ ...d }));
+  clear();
 
-      zoom = d3.zoom()
-        .scaleExtent([0.3, 4])
-        .on("zoom", (event) => {
-          g.attr("transform", event.transform);
-        });
+  const width = window.innerWidth;
+  const height = window.innerHeight * 0.8;
 
-      svg.call(zoom);
-      g = svg.append("g");
+  svg.attr("width", width).attr("height", height);
 
-      const nodeWeightExtent = d3.extent(currentNodes, d => d.weight || 1);
-      const edgeWeightExtent = d3.extent(currentLinks, d => d.weight || 1);
+  zoom = d3.zoom().on("zoom", (e)=>g.attr("transform", e.transform));
+  svg.call(zoom);
 
-      const nodeRadius = d3.scaleSqrt()
-        .domain([nodeWeightExtent[0] || 1, nodeWeightExtent[1] || 1])
-        .range([8, 24]);
+  g = svg.append("g");
 
-      const edgeWidth = d3.scaleLinear()
-        .domain([edgeWeightExtent[0] || 1, edgeWeightExtent[1] || 1])
-        .range([1.5, 8]);
+  simulation = d3.forceSimulation(data.nodes)
+    .force("link", d3.forceLink(data.edges).id(d=>d.id).distance(120))
+    .force("charge", d3.forceManyBody().strength(-250))
+    .force("center", d3.forceCenter(width/2, height/2));
 
-      simulation = d3.forceSimulation(currentNodes)
-        .force("link", d3.forceLink(currentLinks).id(d => d.id).distance(130))
-        .force("charge", d3.forceManyBody().strength(-320))
-        .force("center", d3.forceCenter(width / 2, height / 2))
-        .force("collision", d3.forceCollide().radius(d => nodeRadius(d.weight || 1) + 10));
+  const link = g.selectAll("line")
+    .data(data.edges)
+    .enter()
+    .append("line")
+    .attr("stroke","#999")
+    .attr("stroke-width", d=>Math.sqrt(d.weight));
 
-      const link = g.append("g")
-        .selectAll("line")
-        .data(currentLinks)
-        .enter()
-        .append("line")
-        .attr("class", "link")
-        .attr("stroke-width", d => edgeWidth(d.weight || 1));
+  const node = g.selectAll("circle")
+    .data(data.nodes)
+    .enter()
+    .append("circle")
+    .attr("r",8)
+    .attr("fill","#2563eb")
+    .call(d3.drag()
+      .on("start", dragstart)
+      .on("drag", drag)
+      .on("end", dragend));
 
-      const node = g.append("g")
-        .selectAll("circle")
-        .data(currentNodes)
-        .enter()
-        .append("circle")
-        .attr("class", "node")
-        .attr("r", d => nodeRadius(d.weight || 1))
-        .attr("fill", currentType === "external" ? "#b45309" : currentType === "internal" ? "#2563eb" : "#7c3aed")
-        .call(
-          d3.drag()
-            .on("start", dragstarted)
-            .on("drag", dragged)
-            .on("end", dragended)
-        );
+  const label = g.selectAll("text")
+    .data(data.nodes)
+    .enter()
+    .append("text")
+    .text(d=>d.id)
+    .attr("font-size",12);
 
-      const label = g.append("g")
-        .selectAll("text")
-        .data(currentNodes)
-        .enter()
-        .append("text")
-        .attr("class", "label")
-        .text(d => d.id);
+  simulation.on("tick", () => {
 
-      simulation.on("tick", () => {
-        link
-          .attr("x1", d => d.source.x)
-          .attr("y1", d => d.source.y)
-          .attr("x2", d => d.target.x)
-          .attr("y2", d => d.target.y);
+    link
+      .attr("x1",d=>d.source.x)
+      .attr("y1",d=>d.source.y)
+      .attr("x2",d=>d.target.x)
+      .attr("y2",d=>d.target.y);
 
-        node
-          .attr("cx", d => d.x)
-          .attr("cy", d => d.y);
+    node
+      .attr("cx",d=>d.x)
+      .attr("cy",d=>d.y);
 
-        label
-          .attr("x", d => d.x + 10)
-          .attr("y", d => d.y + 4);
-      });
+    label
+      .attr("x",d=>d.x+8)
+      .attr("y",d=>d.y);
+  });
 
-      function dragstarted(event, d) {
-        if (!event.active) simulation.alphaTarget(0.3).restart();
-        d.fx = d.x;
-        d.fy = d.y;
-      }
+  function dragstart(e,d){
+    if(!e.active) simulation.alphaTarget(0.3).restart();
+    d.fx=d.x; d.fy=d.y;
+  }
+  function drag(e,d){
+    d.fx=e.x; d.fy=e.y;
+  }
+  function dragend(e,d){
+    if(!e.active) simulation.alphaTarget(0);
+    d.fx=null; d.fy=null;
+  }
 
-      function dragged(event, d) {
-        d.fx = event.x;
-        d.fy = event.y;
-      }
+  info.innerText = `Nodes: ${data.nodes.length} | Edges: ${data.edges.length}`;
+}
 
-      function dragended(event, d) {
-        if (!event.active) simulation.alphaTarget(0);
-        d.fx = null;
-        d.fy = null;
-      }
+function drawHeatmap(data) {
 
-      const nodesCount = currentNodes.length;
-      const edgesCount = currentLinks.length;
-      const mode = data.mode || currentType;
+  clear();
 
-      infoEl.classList.remove("empty");
-      infoEl.innerHTML = `
-        <div class="kv"><strong>Source:</strong> ${currentSource}</div>
-        <div class="kv"><strong>Window:</strong> ${currentWindow}</div>
-        <div class="kv"><strong>Type:</strong> ${mode}</div>
-        <div class="kv"><strong>Nodes:</strong> ${nodesCount}</div>
-        <div class="kv"><strong>Edges:</strong> ${edgesCount}</div>
-        <div class="kv"><strong>Events:</strong> ${data.event_count ?? 0}</div>
-      `;
+  const margin = {top:50,left:80};
+  const cellSize = 25;
 
-      setTimeout(() => fitGraph(), 400);
-    }
+  const width = data.topics.length * cellSize + margin.left;
+  const height = data.rows.length * cellSize + margin.top;
 
-    async function loadNetwork() {
-      const path = networkPath();
+  svg.attr("width", width).attr("height", height);
 
-      statusEl.textContent = `Betöltés: ${path}`;
-      errorEl.textContent = "";
+  const maxVal = d3.max(data.rows, r => d3.max(data.topics, t => r[t]));
 
-      try {
-        const response = await fetch(path, { cache: "no-store" });
+  const color = d3.scaleSequential(d3.interpolateOrRd)
+    .domain([0, maxVal || 1]);
 
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status} - ${response.statusText}`);
-        }
+  const g = svg.append("g").attr("transform",`translate(${margin.left},${margin.top})`);
 
-        const data = await response.json();
-        draw(data);
+  data.rows.forEach((row,i)=>{
+    data.topics.forEach((t,j)=>{
 
-        statusEl.textContent = `Betöltve: ${path}`;
-      } catch (e) {
-        clearGraph();
-        infoEl.classList.add("empty");
-        infoEl.textContent = "Nincs betöltött háló.";
-        errorEl.textContent = `Nem sikerült betölteni.\n${e.message}`;
-        console.error("Load error:", e, "Path:", path);
-      }
-    }
-
-    document.querySelectorAll(".source-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        currentSource = btn.dataset.source;
-        setActive(".source-btn", currentSource, "source");
-        loadNetwork();
-      });
+      g.append("rect")
+        .attr("x", j*cellSize)
+        .attr("y", i*cellSize)
+        .attr("width", cellSize)
+        .attr("height", cellSize)
+        .attr("fill", color(row[t] || 0));
     });
 
-    document.querySelectorAll(".window-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        currentWindow = btn.dataset.window;
-        setActive(".window-btn", currentWindow, "window");
-        loadNetwork();
-      });
-    });
+    svg.append("text")
+      .attr("x", 5)
+      .attr("y", margin.top + i*cellSize + 18)
+      .text(row.country)
+      .attr("font-size",12);
+  });
 
-    document.querySelectorAll(".type-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        currentType = btn.dataset.type;
-        setActive(".type-btn", currentType, "type");
-        loadNetwork();
-      });
-    });
+  data.topics.forEach((t,i)=>{
+    svg.append("text")
+      .attr("x", margin.left + i*cellSize + 5)
+      .attr("y", 30)
+      .text(t)
+      .attr("font-size",11)
+      .attr("transform", `rotate(-45 ${margin.left + i*cellSize},30)`);
+  });
 
-    fitBtn.addEventListener("click", () => {
-      fitGraph();
-    });
+  info.innerText = `Heatmap | Countries: ${data.rows.length}`;
+}
 
-    window.addEventListener("resize", () => {
-      updateSize();
-      if (currentNodes.length) {
-        fitGraph();
-      }
-    });
+async function load() {
 
-    updateSize();
-    loadNetwork();
-  </script>
+  const path = filePath();
+  info.innerText = "Loading: " + path;
+
+  try {
+    const res = await fetch(path);
+
+    if (!res.ok) throw new Error(res.status);
+
+    const data = await res.json();
+
+    if (currentView === "graph") {
+      drawGraph(data);
+    } else {
+      drawHeatmap(data);
+    }
+
+  } catch (e) {
+    info.innerText = "ERROR loading data";
+    console.error(e);
+  }
+}
+
+load();
+
+</script>
+
 </body>
 </html>
