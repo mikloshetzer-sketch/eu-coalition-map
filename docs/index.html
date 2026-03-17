@@ -47,14 +47,17 @@
       margin-right: 2px;
     }
 
-    button {
+    button, select {
       padding: 7px 12px;
       border: none;
       border-radius: 6px;
+      font-size: 13px;
+    }
+
+    button {
       cursor: pointer;
       background: #2563eb;
       color: white;
-      font-size: 13px;
     }
 
     button:hover {
@@ -63,6 +66,12 @@
 
     button.active {
       background: #0f172a;
+    }
+
+    select {
+      border: 1px solid #cbd5e1;
+      background: white;
+      color: #111827;
     }
 
     .layout {
@@ -189,6 +198,10 @@
       max-width: 260px;
     }
 
+    .hidden {
+      display: none !important;
+    }
+
     @media (max-width: 1100px) {
       .layout {
         grid-template-columns: 1fr;
@@ -215,6 +228,7 @@
       <span class="group-label">View</span>
       <button class="view-btn active" data-view="graph">Graph</button>
       <button class="view-btn" data-view="heatmap">Heatmap</button>
+      <button class="view-btn" data-view="similarity">Similarity</button>
     </div>
 
     <div class="group">
@@ -238,6 +252,28 @@
       <button class="type-btn" data-type="external">EU External</button>
     </div>
 
+    <div class="group" id="heatmap-mode-group">
+      <span class="group-label">Heatmap</span>
+      <button class="hm-btn active" data-mode="absolute">Absolute</button>
+      <button class="hm-btn" data-mode="normalized">Normalized</button>
+    </div>
+
+    <div class="group" id="sort-group">
+      <span class="group-label">Sort</span>
+      <select id="sort-select">
+        <option value="total">Total</option>
+        <option value="alphabetical">Alphabetical</option>
+        <option value="migration">migration</option>
+        <option value="ukraine_russia">ukraine_russia</option>
+        <option value="enlargement">enlargement</option>
+        <option value="defence">defence</option>
+        <option value="energy">energy</option>
+        <option value="fiscal">fiscal</option>
+        <option value="rule_of_law">rule_of_law</option>
+        <option value="trade">trade</option>
+      </select>
+    </div>
+
     <div class="group">
       <button id="fit-btn">Középre rendezés</button>
     </div>
@@ -252,7 +288,7 @@
     <div class="sidebar">
       <div class="panel">
         <h3>Info</h3>
-        <div id="info" class="status empty">Nincs betöltött háló.</div>
+        <div id="info" class="status empty">Nincs betöltött nézet.</div>
       </div>
 
       <div class="panel">
@@ -266,9 +302,9 @@
         <div class="hint">
           <div class="kv"><strong>Graph</strong>: országkapcsolati háló</div>
           <div class="kv"><strong>Heatmap</strong>: ország–téma intenzitás</div>
-          <div class="kv"><strong>All</strong>: minden releváns kapcsolat</div>
-          <div class="kv"><strong>EU Internal</strong>: csak EU–EU</div>
-          <div class="kv"><strong>EU External</strong>: EU–külső</div>
+          <div class="kv"><strong>Similarity</strong>: országhasonlósági háló</div>
+          <div class="kv"><strong>Absolute</strong>: abszolút aktivitás</div>
+          <div class="kv"><strong>Normalized</strong>: országon belüli tematikus profil</div>
         </div>
       </div>
     </div>
@@ -279,6 +315,8 @@
     let currentSource = "combined";
     let currentWindow = "30d";
     let currentType = "all";
+    let currentHeatmapMode = "absolute";
+    let currentSort = "total";
 
     const svg = d3.select("#network");
     const infoEl = document.getElementById("info");
@@ -286,6 +324,9 @@
     const errorEl = document.getElementById("error");
     const fitBtn = document.getElementById("fit-btn");
     const tooltip = document.getElementById("tooltip");
+    const sortSelect = document.getElementById("sort-select");
+    const heatmapModeGroup = document.getElementById("heatmap-mode-group");
+    const sortGroup = document.getElementById("sort-group");
 
     let width = 0;
     let height = 0;
@@ -319,17 +360,33 @@
         : "";
     }
 
-    function filePath() {
+    function graphFilePath() {
       let suffix = "";
+      if (currentType === "internal") suffix = "_internal";
+      if (currentType === "external") suffix = "_external";
+      return `${basePath()}/data/networks/${currentSource}/${currentWindow}${suffix}.json`;
+    }
 
+    function heatmapFilePath() {
+      let suffix = "";
       if (currentType === "internal") suffix = "_internal";
       if (currentType === "external") suffix = "_external";
 
-      if (currentView === "heatmap") {
-        return `${basePath()}/data/networks/${currentSource}/${currentWindow}_heatmap${suffix}.json`;
+      if (currentHeatmapMode === "normalized") {
+        return `${basePath()}/data/networks/${currentSource}/${currentWindow}_heatmap_norm${suffix}.json`;
       }
 
-      return `${basePath()}/data/networks/${currentSource}/${currentWindow}${suffix}.json`;
+      return `${basePath()}/data/networks/${currentSource}/${currentWindow}_heatmap${suffix}.json`;
+    }
+
+    function similarityFilePath() {
+      return `${basePath()}/data/networks/${currentSource}/${currentWindow}_similarity.json`;
+    }
+
+    function filePath() {
+      if (currentView === "heatmap") return heatmapFilePath();
+      if (currentView === "similarity") return similarityFilePath();
+      return graphFilePath();
     }
 
     function setActive(selector, value, attr) {
@@ -338,10 +395,17 @@
       });
     }
 
+    function updateControlVisibility() {
+      const isHeatmap = currentView === "heatmap";
+      heatmapModeGroup.classList.toggle("hidden", !isHeatmap);
+      sortGroup.classList.toggle("hidden", !isHeatmap);
+    }
+
     document.querySelectorAll(".view-btn").forEach(b => {
       b.onclick = () => {
         currentView = b.dataset.view;
         setActive(".view-btn", currentView, "view");
+        updateControlVisibility();
         load();
       };
     });
@@ -368,6 +432,19 @@
         setActive(".type-btn", currentType, "type");
         load();
       };
+    });
+
+    document.querySelectorAll(".hm-btn").forEach(b => {
+      b.onclick = () => {
+        currentHeatmapMode = b.dataset.mode;
+        setActive(".hm-btn", currentHeatmapMode, "mode");
+        load();
+      };
+    });
+
+    sortSelect.addEventListener("change", () => {
+      currentSort = sortSelect.value;
+      if (currentView === "heatmap") load();
     });
 
     function clear() {
@@ -413,11 +490,13 @@
         );
     }
 
-    function drawGraph(data) {
+    function drawForceGraph(data, infoTitle) {
       clear();
       updateSize();
 
-      currentNodes = (data.nodes || []).map(d => ({ ...d }));
+      currentNodes = (data.nodes || []).map(d =>
+        typeof d === "string" ? { id: d, weight: 1 } : { ...d }
+      );
       currentLinks = (data.edges || []).map(d => ({ ...d }));
 
       zoom = d3.zoom()
@@ -432,17 +511,17 @@
 
       const nodeRadius = d3.scaleSqrt()
         .domain([nodeWeightExtent[0] || 1, nodeWeightExtent[1] || 1])
-        .range([8, 24]);
+        .range([8, 26]);
 
       const edgeWidth = d3.scaleLinear()
-        .domain([edgeWeightExtent[0] || 1, edgeWeightExtent[1] || 1])
-        .range([1.5, 8]);
+        .domain([edgeWeightExtent[0] || 0.2, edgeWeightExtent[1] || 1])
+        .range([1.2, 8]);
 
       simulation = d3.forceSimulation(currentNodes)
-        .force("link", d3.forceLink(currentLinks).id(d => d.id).distance(130))
-        .force("charge", d3.forceManyBody().strength(-320))
+        .force("link", d3.forceLink(currentLinks).id(d => d.id).distance(135))
+        .force("charge", d3.forceManyBody().strength(-340))
         .force("center", d3.forceCenter(width / 2, height / 2))
-        .force("collision", d3.forceCollide().radius(d => nodeRadius(d.weight || 1) + 10));
+        .force("collision", d3.forceCollide().radius(d => nodeRadius(d.weight || 1) + 12));
 
       const link = g.append("g")
         .selectAll("line")
@@ -467,7 +546,7 @@
         .append("circle")
         .attr("class", "node")
         .attr("r", d => nodeRadius(d.weight || 1))
-        .attr("fill", currentType === "external" ? "#d97706" : currentType === "internal" ? "#2563eb" : "#7c3aed")
+        .attr("fill", currentView === "similarity" ? "#059669" : currentType === "external" ? "#d97706" : currentType === "internal" ? "#2563eb" : "#7c3aed")
         .call(
           d3.drag()
             .on("start", dragstart)
@@ -522,16 +601,33 @@
 
       infoEl.classList.remove("empty");
       infoEl.innerHTML = `
-        <div class="kv"><strong>Nézet:</strong> Graph</div>
+        <div class="kv"><strong>Nézet:</strong> ${infoTitle}</div>
         <div class="kv"><strong>Source:</strong> ${currentSource}</div>
         <div class="kv"><strong>Window:</strong> ${currentWindow}</div>
-        <div class="kv"><strong>Type:</strong> ${currentType}</div>
+        ${currentView === "graph" ? `<div class="kv"><strong>Type:</strong> ${currentType}</div>` : ""}
         <div class="kv"><strong>Nodes:</strong> ${currentNodes.length}</div>
         <div class="kv"><strong>Edges:</strong> ${currentLinks.length}</div>
-        <div class="kv"><strong>Events:</strong> ${data.event_count ?? 0}</div>
+        ${data.event_count !== undefined ? `<div class="kv"><strong>Events:</strong> ${data.event_count}</div>` : ""}
       `;
 
       setTimeout(() => fitGraph(), 350);
+    }
+
+    function sortRows(rows, topics) {
+      const out = [...rows];
+
+      if (currentSort === "alphabetical") {
+        out.sort((a, b) => a.country.localeCompare(b.country));
+        return out;
+      }
+
+      if (topics.includes(currentSort)) {
+        out.sort((a, b) => (b[currentSort] || 0) - (a[currentSort] || 0));
+        return out;
+      }
+
+      out.sort((a, b) => (b.total || 0) - (a.total || 0));
+      return out;
     }
 
     function drawHeatmap(data) {
@@ -539,13 +635,12 @@
       updateSize();
 
       const topics = data.topics || [];
-      const rows = [...(data.rows || [])].sort((a, b) => (b.total || 0) - (a.total || 0));
+      const rows = sortRows(data.rows || [], topics);
 
       const margin = { top: 80, right: 30, bottom: 170, left: 170 };
-      const cellSize = 68; // kb. dupla méret
+      const cellSize = 68;
 
       const countries = rows.map(r => r.country);
-
       const gridWidth = countries.length * cellSize;
       const gridHeight = topics.length * cellSize;
 
@@ -576,7 +671,7 @@
             .attr("fill", color(value))
             .on("mousemove", (event) => {
               showTooltip(
-                `<strong>${row.country}</strong><br>${topic}: ${value}`,
+                `<strong>${row.country}</strong><br>${topic}: ${Number(value).toFixed(3)}`,
                 event.pageX,
                 event.pageY
               );
@@ -650,6 +745,8 @@
         <div class="kv"><strong>Source:</strong> ${currentSource}</div>
         <div class="kv"><strong>Window:</strong> ${currentWindow}</div>
         <div class="kv"><strong>Type:</strong> ${currentType}</div>
+        <div class="kv"><strong>Mode:</strong> ${currentHeatmapMode}</div>
+        <div class="kv"><strong>Sort:</strong> ${currentSort}</div>
         <div class="kv"><strong>Countries:</strong> ${rows.length}</div>
         <div class="kv"><strong>Topics:</strong> ${topics.length}</div>
         <div class="kv"><strong>Events:</strong> ${data.event_count ?? 0}</div>
@@ -663,29 +760,30 @@
 
       try {
         const res = await fetch(path, { cache: "no-store" });
-
         if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
 
         const data = await res.json();
 
         if (currentView === "graph") {
-          drawGraph(data);
-        } else {
+          drawForceGraph(data, "Graph");
+        } else if (currentView === "heatmap") {
           drawHeatmap(data);
+        } else {
+          drawForceGraph(data, "Similarity");
         }
 
         statusEl.textContent = "Betöltve: " + path;
       } catch (e) {
         clear();
         infoEl.classList.add("empty");
-        infoEl.textContent = "Nincs betöltött háló.";
+        infoEl.textContent = "Nincs betöltött nézet.";
         errorEl.textContent = "Nem sikerült betölteni.\n" + e.message;
         console.error(e);
       }
     }
 
     fitBtn.onclick = () => {
-      if (currentView === "graph") {
+      if (currentView === "graph" || currentView === "similarity") {
         fitGraph();
       }
     };
@@ -695,6 +793,7 @@
       load();
     });
 
+    updateControlVisibility();
     updateSize();
     load();
   </script>
