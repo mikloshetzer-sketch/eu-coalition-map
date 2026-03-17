@@ -1,6 +1,9 @@
 {
   "nodes": [
     {
+      "id": "BE"
+    },
+    {
       "id": "CZ"
     },
     {
@@ -22,10 +25,23 @@
       "id": "PL"
     },
     {
+      "id": "SE"
+    },
+    {
       "id": "SK"
     }
   ],
   "edges": [
+    {
+      "source": "BE",
+      "target": "ES",
+      "weight": 0.7
+    },
+    {
+      "source": "BE",
+      "target": "FR",
+      "weight": 0.7
+    },
     {
       "source": "CZ",
       "target": "PL",
@@ -39,32 +55,37 @@
     {
       "source": "DE",
       "target": "ES",
-      "weight": 1.4
+      "weight": 2.1
     },
     {
       "source": "DE",
       "target": "FR",
-      "weight": 1.4
+      "weight": 2.8
     },
     {
       "source": "DE",
       "target": "IT",
-      "weight": 1.4
+      "weight": 3.5
     },
     {
       "source": "ES",
       "target": "FR",
-      "weight": 1.4
+      "weight": 2.8
     },
     {
       "source": "ES",
       "target": "IT",
-      "weight": 1.4
+      "weight": 2.1
     },
     {
       "source": "FR",
       "target": "IT",
-      "weight": 5.6
+      "weight": 7.0
+    },
+    {
+      "source": "HU",
+      "target": "SE",
+      "weight": 0.7
     },
     {
       "source": "HU",
@@ -77,6 +98,6 @@
       "weight": 1.4
     }
   ],
-  "event_count": 474,
+  "event_count": 521,
   "mode": "internal"
 }
