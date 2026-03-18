@@ -1,16 +1,22 @@
 # scripts/run_votes_collector.py
 
 import json
+import re
+import time
 from pathlib import Path
 from datetime import datetime, timezone
+from urllib.parse import urljoin
+import requests
+from bs4 import BeautifulSoup
 
 ROOT = Path(__file__).resolve().parent.parent
 
-RAW_DIR = ROOT / "data" / "raw" / "votes"
 OUT_DIR = ROOT / "data" / "events" / "votes"
-
-SOURCE_FILE = RAW_DIR / "council_votes_source.json"
 OUTPUT_FILE = OUT_DIR / "council_votes.json"
+
+BASE_URL = "https://www.consilium.europa.eu"
+SEARCH_URL = "https://www.consilium.europa.eu/en/general-secretariat/corporate-policies/transparency/voting-results/"
+PUBLIC_VOTES_URL = "https://www.consilium.europa.eu/en/documents/public-register/votes/"
 
 TOPICS = {
     "migration",
@@ -29,147 +35,283 @@ EU_CODES = {
     "RO", "SK", "SI", "ES", "SE"
 }
 
-VALID_VOTES = {"for", "against", "abstain", "not_participating"}
+COUNTRY_NAME_TO_CODE = {
+    "austria": "AT",
+    "belgium": "BE",
+    "bulgaria": "BG",
+    "croatia": "HR",
+    "cyprus": "CY",
+    "czech republic": "CZ",
+    "czechia": "CZ",
+    "denmark": "DK",
+    "estonia": "EE",
+    "finland": "FI",
+    "france": "FR",
+    "germany": "DE",
+    "greece": "GR",
+    "hungary": "HU",
+    "ireland": "IE",
+    "italy": "IT",
+    "latvia": "LV",
+    "lithuania": "LT",
+    "luxembourg": "LU",
+    "malta": "MT",
+    "netherlands": "NL",
+    "poland": "PL",
+    "portugal": "PT",
+    "romania": "RO",
+    "slovakia": "SK",
+    "slovenia": "SI",
+    "spain": "ES",
+    "sweden": "SE",
+}
+
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (compatible; EUCoalitionMap/1.0; +https://github.com/mikloshetzer-sketch/eu-coalition-map)"
+}
 
 
-def load_source(path: Path):
+def fetch_html(url: str, timeout: int = 30) -> str:
+    r = requests.get(url, headers=HEADERS, timeout=timeout)
+    r.raise_for_status()
+    return r.text
+
+
+def load_existing(path: Path):
     if not path.exists():
-        raise FileNotFoundError(f"Hiányzó forrásfájl: {path}")
-
-    with path.open("r", encoding="utf-8") as f:
-        data = json.load(f)
-
-    if not isinstance(data, list):
-        raise ValueError("A forrásfájl gyökere listának kell legyen.")
-
-    return data
-
-
-def normalize_date(value: str) -> str:
-    if not value:
-        raise ValueError("Hiányzó date mező.")
-
-    text = str(value).strip()
-
-    for fmt in ("%Y-%m-%d", "%Y/%m/%d"):
-        try:
-            dt = datetime.strptime(text, fmt)
-            return dt.strftime("%Y-%m-%d")
-        except ValueError:
-            continue
-
+        return []
     try:
-        dt = datetime.fromisoformat(text.replace("Z", "+00:00"))
-        return dt.strftime("%Y-%m-%d")
-    except Exception as exc:
-        raise ValueError(f"Érvénytelen dátum: {value}") from exc
-
-
-def normalize_topic(value: str) -> str:
-    if not value:
-        raise ValueError("Hiányzó topic mező.")
-
-    topic = str(value).strip().lower()
-
-    if topic not in TOPICS:
-        raise ValueError(f"Ismeretlen topic: {topic}")
-
-    return topic
-
-
-def normalize_country_vote_map(countries):
-    if not isinstance(countries, dict):
-        raise ValueError("A countries mezőnek objektumnak kell lennie.")
-
-    out = {}
-
-    for code, vote in countries.items():
-        c = str(code).strip().upper()
-        v = str(vote).strip().lower()
-
-        if c not in EU_CODES:
-            continue
-
-        if v not in VALID_VOTES:
-            raise ValueError(f"Érvénytelen szavazati érték: {c} -> {v}")
-
-        out[c] = v
-
-    if not out:
-        raise ValueError("A countries mezőben nincs használható EU tagállami szavazat.")
-
-    return out
-
-
-def normalize_record(record, index: int):
-    if not isinstance(record, dict):
-        raise ValueError(f"A rekord nem objektum: index={index}")
-
-    rec_id = record.get("id")
-    if rec_id is None or str(rec_id).strip() == "":
-        rec_id = f"vote_{index + 1:04d}"
-
-    title = str(record.get("title", "")).strip()
-    if not title:
-        title = f"Council vote {index + 1}"
-
-    normalized = {
-        "id": str(rec_id).strip(),
-        "date": normalize_date(record.get("date")),
-        "title": title,
-        "topic": normalize_topic(record.get("topic")),
-        "countries": normalize_country_vote_map(record.get("countries", {})),
-        "source": "votes",
-        "institution": "council",
-        "collected_at": datetime.now(timezone.utc).isoformat()
-    }
-
-    return normalized
-
-
-def deduplicate(records):
-    seen = set()
-    out = []
-
-    for rec in records:
-        key = rec["id"]
-        if key in seen:
-            continue
-        seen.add(key)
-        out.append(rec)
-
-    out.sort(key=lambda x: (x["date"], x["id"]))
-    return out
+        with path.open("r", encoding="utf-8") as f:
+            data = json.load(f)
+            if isinstance(data, list):
+                return data
+    except Exception:
+        pass
+    return []
 
 
 def save_output(records, path: Path):
     path.parent.mkdir(parents=True, exist_ok=True)
-
     with path.open("w", encoding="utf-8") as f:
         json.dump(records, f, ensure_ascii=False, indent=2)
 
 
-def main():
-    raw_records = load_source(SOURCE_FILE)
+def normalize_date(text: str):
+    if not text:
+        return None
 
-    normalized = []
+    text = text.strip()
+
+    for fmt in ("%d %B %Y", "%d %b %Y", "%Y-%m-%d"):
+        try:
+            dt = datetime.strptime(text, fmt)
+            return dt.strftime("%Y-%m-%d")
+        except Exception:
+            pass
+
+    # pl. "13-14 November 2025" -> vegyük az első napot
+    m = re.match(r"(\d{1,2})-\d{1,2}\s+([A-Za-z]+)\s+(\d{4})", text)
+    if m:
+        simplified = f"{m.group(1)} {m.group(2)} {m.group(3)}"
+        for fmt in ("%d %B %Y", "%d %b %Y"):
+            try:
+                dt = datetime.strptime(simplified, fmt)
+                return dt.strftime("%Y-%m-%d")
+            except Exception:
+                pass
+
+    return None
+
+
+def classify_topic(title: str) -> str:
+    t = (title or "").lower()
+
+    rules = [
+        ("migration", ["migration", "asylum", "border", "refugee", "solidarity mechanism"]),
+        ("ukraine_russia", ["ukraine", "russia", "russian", "sanctions", "restrictive measures"]),
+        ("enlargement", ["enlargement", "accession", "candidate country"]),
+        ("defence", ["defence", "defense", "military", "security assistance", "armed forces"]),
+        ("energy", ["energy", "gas", "electricity", "electric", "power market", "oil", "renewable"]),
+        ("fiscal", ["budget", "fiscal", "deficit", "financial framework", "appropriations"]),
+        ("rule_of_law", ["rule of law", "judicial", "justice reform", "fundamental rights"]),
+        ("trade", ["trade", "tariff", "customs", "import", "export", "market access"]),
+    ]
+
+    for topic, keywords in rules:
+        if any(k in t for k in keywords):
+            return topic
+
+    return "trade"
+
+
+def extract_vote_rows_from_text(text: str):
+    """
+    Best-effort ország -> szavazat kinyerés.
+    Csak akkor ad vissza adatot, ha egyértelmű mintát talál.
+    """
+    if not text:
+        return {}
+
+    txt = " ".join(text.split()).lower()
+    result = {}
+
+    for country_name, code in COUNTRY_NAME_TO_CODE.items():
+        # nagyon egyszerű minták
+        patterns = [
+            (rf"{re.escape(country_name)}[^.:\n]{{0,40}}voted in favour", "for"),
+            (rf"{re.escape(country_name)}[^.:\n]{{0,40}}voted for", "for"),
+            (rf"{re.escape(country_name)}[^.:\n]{{0,40}}voted against", "against"),
+            (rf"{re.escape(country_name)}[^.:\n]{{0,40}}abstained", "abstain"),
+            (rf"{re.escape(country_name)}[^.:\n]{{0,40}}abstention", "abstain"),
+            (rf"{re.escape(country_name)}[^.:\n]{{0,40}}did not participate", "not_participating"),
+        ]
+
+        for pattern, vote in patterns:
+            if re.search(pattern, txt):
+                result[code] = vote
+                break
+
+    return result
+
+
+def parse_search_page():
+    """
+    Első körben a nyilvános votes listából gyűjtünk rekordokat.
+    """
+    html = fetch_html(PUBLIC_VOTES_URL)
+    soup = BeautifulSoup(html, "html.parser")
+
+    records = []
+
+    # Keress linkeket a listában
+    links = soup.find_all("a", href=True)
+    seen = set()
+
+    for a in links:
+        href = a["href"]
+        title = a.get_text(" ", strip=True)
+
+        if not title:
+            continue
+
+        if "Voting result" not in title and "voting result" not in title:
+            continue
+
+        full_url = urljoin(BASE_URL, href)
+        if full_url in seen:
+            continue
+        seen.add(full_url)
+
+        records.append({
+            "title": title,
+            "url": full_url,
+        })
+
+    return records
+
+
+def parse_record_detail(url: str, fallback_title: str):
+    html = fetch_html(url)
+    soup = BeautifulSoup(html, "html.parser")
+
+    full_text = soup.get_text("\n", strip=True)
+
+    # cím
+    title = fallback_title
+    h1 = soup.find("h1")
+    if h1:
+        title = h1.get_text(" ", strip=True) or fallback_title
+
+    # dátum keresése
+    date = None
+
+    # próbáljuk a szövegből kinyerni
+    date_patterns = [
+        r"\b(\d{1,2}\s+[A-Za-z]+\s+\d{4})\b",
+        r"\b(\d{1,2}-\d{1,2}\s+[A-Za-z]+\s+\d{4})\b",
+        r"\b(\d{4}-\d{2}-\d{2})\b",
+    ]
+
+    for pattern in date_patterns:
+        m = re.search(pattern, full_text)
+        if m:
+            date = normalize_date(m.group(1))
+            if date:
+                break
+
+    topic = classify_topic(title)
+    countries = extract_vote_rows_from_text(full_text)
+
+    # stabil ID
+    doc_id = re.sub(r"[^A-Za-z0-9]+", "_", url.strip("/").split("/")[-1]).strip("_")
+    if not doc_id:
+        doc_id = re.sub(r"[^A-Za-z0-9]+", "_", title.lower()).strip("_")
+
+    return {
+        "id": f"vote_{doc_id}",
+        "date": date,
+        "title": title,
+        "topic": topic,
+        "countries": countries,
+        "source": "votes",
+        "institution": "council",
+        "url": url,
+        "collected_at": datetime.now(timezone.utc).isoformat()
+    }
+
+
+def merge_records(existing, new_records):
+    merged = {}
+    for rec in existing:
+        merged[rec["id"]] = rec
+
+    for rec in new_records:
+        if not rec.get("id"):
+            continue
+        merged[rec["id"]] = rec
+
+    out = list(merged.values())
+    out.sort(key=lambda x: (x.get("date") or "0000-00-00", x.get("id") or ""))
+    return out
+
+
+def main():
+    existing = load_existing(OUTPUT_FILE)
+
+    print("Meglévő rekordok:", len(existing))
+
+    search_results = parse_search_page()
+    print("Talált szavazási találatok:", len(search_results))
+
+    new_records = []
     errors = []
 
-    for i, rec in enumerate(raw_records):
+    for i, item in enumerate(search_results, start=1):
         try:
-            normalized.append(normalize_record(rec, i))
+            record = parse_record_detail(item["url"], item["title"])
+
+            # csak akkor használjuk, ha van dátum
+            if not record.get("date"):
+                continue
+
+            new_records.append(record)
+
+            # kíméljük a szervert
+            time.sleep(0.8)
+
         except Exception as exc:
-            errors.append(f"Rekord {i + 1}: {exc}")
+            errors.append(f"{item.get('url')}: {exc}")
 
-    normalized = deduplicate(normalized)
-    save_output(normalized, OUTPUT_FILE)
+    merged = merge_records(existing, new_records)
+    save_output(merged, OUTPUT_FILE)
 
-    print(f"Kész: {OUTPUT_FILE}")
-    print(f"Mentett rekordok: {len(normalized)}")
+    print("Új rekordok:", len(new_records))
+    print("Összes mentett rekord:", len(merged))
+    print("Kimenet:", OUTPUT_FILE)
 
     if errors:
-        print("\nHibás rekordok:")
-        for err in errors:
+        print("\nHibák:")
+        for err in errors[:20]:
             print("-", err)
 
 
