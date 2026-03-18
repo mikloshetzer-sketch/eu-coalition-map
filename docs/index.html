@@ -335,6 +335,7 @@
       <button class="source-btn active" data-source="combined">Combined</button>
       <button class="source-btn" data-source="rss">RSS</button>
       <button class="source-btn" data-source="gdelt">GDELT</button>
+      <button class="source-btn" data-source="votes">Votes</button>
     </div>
 
     <div class="group">
@@ -438,14 +439,15 @@
           <div class="hint">
             <b>Adatforrások:</b><br>
             • <b>RSS:</b> válogatott hírforrások, szerkesztett tartalom.<br>
-            • <b>GDELT:</b> globális automatizált médiamonitoring rendszer, nagy mennyiségű nyers adat.<br><br>
+            • <b>GDELT:</b> globális automatizált médiamonitoring rendszer, nagy mennyiségű nyers adat.<br>
+            • <b>Votes:</b> hivatalos intézményi szavazási adatok, amelyek azt mutatják, hogy a tagállamok hogyan viselkednek konkrét döntéshozatali helyzetekben.<br><br>
 
             <b>Nézetek:</b><br>
-            • <b>Graph:</b> országok közötti kapcsolatok<br>
-            • <b>Heatmap:</b> ország–téma aktivitás<br>
-            • <b>Similarity:</b> tematikus hasonlóság<br><br>
+            • <b>Graph:</b> országok közötti kapcsolatok vagy együttszavazási mintázat<br>
+            • <b>Heatmap:</b> ország–téma aktivitás vagy szavazási profil<br>
+            • <b>Similarity:</b> tematikus vagy szavazási hasonlóság<br><br>
 
-            A rendszer médiamegjelenési mintázatokat mutat, nem politikai álláspontot.
+            A rendszer médiamegjelenési vagy intézményi mintázatokat mutat, nem hivatalos politikai álláspont-összegzést.
           </div>
         </div>
       </div>
@@ -574,6 +576,30 @@
     }
 
     function updateViewAnalysis() {
+      if (currentSource === "votes") {
+        if (currentView === "graph") {
+          viewAnalysisEl.innerHTML = `
+            <div class="kv"><strong>Votes / Graph:</strong> országok közötti együttszavazási mintázat.</div>
+            <div class="kv">A vastagabb él magasabb együttszavazási arányt jelent.</div>
+            <div class="kv">Ez intézményi döntési közelséget mutat, nem médiamegjelenési együttmozgást.</div>
+          `;
+        } else if (currentView === "heatmap") {
+          viewAnalysisEl.innerHTML = `
+            <div class="kv"><strong>Votes / Heatmap:</strong> ország–téma szavazási aktivitás.</div>
+            <div class="kv"><strong>Absolute:</strong> az adott témában rögzített szavazási jelenlét mennyiségét mutatja.</div>
+            <div class="kv"><strong>Normalized:</strong> azt mutatja, hogy az ország szavazási profilján belül mely témák dominálnak.</div>
+            <div class="kv">Ez a nézet döntéshozatali mintázatot mutat.</div>
+          `;
+        } else {
+          viewAnalysisEl.innerHTML = `
+            <div class="kv"><strong>Votes / Similarity:</strong> szavazási profil-hasonlóság.</div>
+            <div class="kv">A kapcsolat azt jelzi, hogy két ország milyen mértékben szavaz hasonló szerkezetben az egyes témákban.</div>
+            <div class="kv">Ez nem közvetlen szövetséget, hanem döntéshozatali közelséget jelez.</div>
+          `;
+        }
+        return;
+      }
+
       if (currentView === "graph") {
         viewAnalysisEl.innerHTML = `
           <div class="kv"><strong>Graph:</strong> országok közötti közvetlen kapcsolati együttmozgás.</div>
@@ -835,6 +861,32 @@
       const partnerText = partners.map(p => p.partner).join(", ");
       const similarText = similar.map(s => s.partner).join(", ");
 
+      if (currentSource === "votes") {
+        countryAnalysisEl.innerHTML = `
+          <div class="kv">
+            <strong>${currentCountry}</strong> szavazási profilja a vizsgált időszakban főként
+            <strong>${topTopicText || "nincs domináns téma"}</strong> ügyek köré rendeződik.
+          </div>
+
+          <div class="kv">
+            Együttszavazási mintázata alapján legerősebben
+            <strong>${partnerText || "nincs adat"}</strong>
+            országokkal mutat közelséget.
+          </div>
+
+          <div class="kv">
+            A teljes témaszerkezet alapján leginkább
+            <strong>${similarText || "nincs adat"}</strong>
+            országokhoz áll közel.
+          </div>
+
+          <div class="kv">
+            Ez intézményi viselkedési mintát jelez, vagyis azt, hogy az ország mely szereplőkkel és mely ügykörökben szavaz hasonló módon.
+          </div>
+        `;
+        return;
+      }
+
       countryAnalysisEl.innerHTML = `
         <div class="kv">
           <strong>${currentCountry}</strong> profilja a vizsgált időszakban főként
@@ -900,6 +952,10 @@
     }
 
     function describeTypeContext() {
+      if (currentSource === "votes" && currentType === "external") {
+        return "A votes forrásnál az external nézet jellemzően üres vagy korlátozott, mert a tanácsi szavazási adatok alapvetően tagállami szintűek.";
+      }
+
       if (currentType === "internal") {
         return "Ez a nézet kifejezetten az EU-n belüli kapcsolati és tematikus mintázatokat emeli ki.";
       }
@@ -910,6 +966,16 @@
     }
 
     function describeViewContext() {
+      if (currentSource === "votes") {
+        if (currentView === "graph") {
+          return "A jelenlegi értelmezésben a hangsúly az együttszavazási mintázaton van.";
+        }
+        if (currentView === "heatmap") {
+          return "A jelenlegi értelmezésben a hangsúly az ország szavazási aktivitásának tematikus szerkezetén van.";
+        }
+        return "A jelenlegi értelmezésben a hangsúly a szavazási profilok hasonlóságán van.";
+      }
+
       if (currentView === "graph") {
         return "A jelenlegi értelmezésben a hangsúly a közvetlen kapcsolati együttmozgáson van.";
       }
@@ -959,14 +1025,14 @@
       if (focusedTheme && (dominantAbsolute || normTop >= 0.45)) {
         return {
           label: "tematikusan specializált szereplő",
-          description: "Az ország médiaképe és tematikus profilja markánsan egy vagy néhány ügykör köré rendeződik."
+          description: "Az ország médiaképe vagy szavazási profilja markánsan egy vagy néhány ügykör köré rendeződik."
         };
       }
 
       if (bridgePattern) {
         return {
           label: "hasonlósági hídpozíció",
-          description: "Az ország kevésbé a közvetlen kapcsolatokban, inkább a tematikus mintázatokon keresztül kapcsolódik más szereplőkhöz."
+          description: "Az ország kevésbé a közvetlen kapcsolatokban, inkább a teljes mintázatokon keresztül kapcsolódik más szereplőkhöz."
         };
       }
 
@@ -1036,8 +1102,8 @@
       } else if (dominantAbsTopics.length) {
         strategicSummary = `
           <div class="kv">
-            <strong>${currentCountry}</strong> médiaprofilját jelenleg főként
-            <strong>${dominantAbsTopics.join(", ")}</strong> témák határozzák meg.
+            <strong>${currentCountry}</strong> profilját jelenleg főként
+            <strong>${dominantAbsTopics.join(", ")}</strong> ügykörök határozzák meg.
           </div>
         `;
       } else if (strongestPartners.length) {
@@ -1067,10 +1133,10 @@
       if (closestCountries.length) {
         similaritySummary = `
           <div class="kv">
-            Tematikus szerkezete alapján <strong>${currentCountry}</strong>
+            Teljes mintázata alapján <strong>${currentCountry}</strong>
             legközelebb
             <strong>${closestCountries.join(", ")}</strong>
-            országokhoz áll, ami hasonló prioritási mintára és hasonló médiamegjelenési szerkezetre utal.
+            országokhoz áll, ami hasonló prioritási szerkezetre utal.
           </div>
         `;
       }
@@ -1106,6 +1172,18 @@
         </div>
       `;
 
+      let sourceSpecificNote = currentSource === "votes"
+        ? `
+          <div class="kv eval-muted">
+            A votes forrás esetén az értelmezés a döntéshozatali és együttszavazási mintázatokra épül.
+          </div>
+        `
+        : `
+          <div class="kv eval-muted">
+            A médiás források esetén az értelmezés médiamegjelenési és tematikus mintázatokra épül.
+          </div>
+        `;
+
       let synthesisBlock = `
         <div class="eval-block">
           <div class="eval-title">Értelmező összegzés</div>
@@ -1113,6 +1191,7 @@
           ${thematicSummary}
           ${similaritySummary}
           ${networkSummary}
+          ${sourceSpecificNote}
         </div>
       `;
 
@@ -1121,8 +1200,8 @@
           <div class="eval-title">Összkép</div>
           <div class="kv">
             A jelenlegi mintázat alapján <strong>${currentCountry}</strong> nem egyszerűen egy kiemelt szereplőként,
-            hanem egy meghatározható tematikus profillal rendelkező országként jelenik meg.
-            Az abszolút aktivitás megmutatja, mely ügyekben erősebb a láthatósága,
+            hanem egy meghatározható profillal rendelkező országként jelenik meg.
+            Az abszolút aktivitás megmutatja, mely ügyekben erősebb a láthatósága vagy részvétele,
             a normalizált profil pedig azt, hogy saját belső súlypontjai hol helyezkednek el.
             A partneri és hasonlósági kapcsolatok együtt azt jelzik, hogy az ország körül
             mennyire koherens vagy mennyire szórt mintázat rajzolódik ki.
@@ -1132,7 +1211,7 @@
             amely a kapcsolati sűrűség, a tematikus fókusz és a hasonlósági mintázat kombinációjából épül fel.
           </div>
           <div class="kv eval-muted">
-            Ez az értékelés médiamegjelenési és tematikus mintázatokat ír le, nem közvetlen politikai szándékot vagy hivatalos álláspontot.
+            Ez az értékelés médiamegjelenési vagy intézményi mintázatokat ír le, nem közvetlen politikai szándékot vagy hivatalos álláspontot.
           </div>
         </div>
       `;
@@ -1171,7 +1250,7 @@
       const sections = [
         {
           title: "Legerősebb partnerek",
-          color: "#2563eb",
+          color: currentSource === "votes" ? "#0f766e" : "#2563eb",
           data: partners.map(d => ({ name: d.partner, value: d.weight }))
         },
         {
@@ -1181,7 +1260,7 @@
         },
         {
           title: "Leghasonlóbb országok",
-          color: "#7c3aed",
+          color: currentSource === "votes" ? "#b45309" : "#7c3aed",
           data: similar.map(d => ({ name: d.partner, value: d.weight }))
         }
       ];
@@ -1630,16 +1709,26 @@ similarity: ${similarityFilePath()}`;
       updateViewAnalysis();
 
       if (currentView === "graph" && graphData) {
-        drawForceGraph(
-          graphData,
-          "Graph",
-          currentType === "external" ? "#d97706" : currentType === "internal" ? "#2563eb" : "#7c3aed"
-        );
+        let graphColor = "#7c3aed";
+
+        if (currentSource === "votes") {
+          graphColor = "#0f766e";
+        } else if (currentType === "external") {
+          graphColor = "#d97706";
+        } else if (currentType === "internal") {
+          graphColor = "#2563eb";
+        }
+
+        drawForceGraph(graphData, "Graph", graphColor);
       } else if (currentView === "heatmap") {
         const data = currentHeatmapMode === "normalized" ? heatmapNormData : heatmapAbsData;
         if (data) drawHeatmap(data);
       } else if (currentView === "similarity" && similarityData) {
-        drawForceGraph(similarityData, "Similarity", "#059669");
+        drawForceGraph(
+          similarityData,
+          "Similarity",
+          currentSource === "votes" ? "#b45309" : "#059669"
+        );
       }
 
       generateCountryAnalysis();
