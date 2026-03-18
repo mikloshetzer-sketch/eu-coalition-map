@@ -1,0 +1,42 @@
+name: Build EU Networks
+
+on:
+  schedule:
+    - cron: "0 4 * * *"   # minden nap 04:00 UTC
+  workflow_dispatch:       # manuális futtatás
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+
+      - name: Run votes collector
+        run: |
+          python scripts/run_votes_collector.py
+
+      - name: Build networks
+        run: |
+          python scripts/build_window_networks.py
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git add data/networks docs/data/networks data/events/votes
+
+          git diff --quiet && git diff --staged --quiet || git commit -m "Auto update networks"
+
+          git push
