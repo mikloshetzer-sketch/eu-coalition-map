@@ -92,7 +92,7 @@ POSITION_MAP = {
 
 
 def download_bytes(url: str) -> bytes:
-    r = requests.get(url, headers=HEADERS, timeout=120)
+    r = requests.get(url, headers=HEADERS, timeout=180)
     r.raise_for_status()
     return r.content
 
@@ -101,6 +101,12 @@ def load_gzip_csv(url: str) -> pd.DataFrame:
     raw = download_bytes(url)
     with gzip.GzipFile(fileobj=io.BytesIO(raw)) as gz:
         return pd.read_csv(gz, low_memory=False)
+
+
+def load_member_votes_chunks(url: str, chunksize: int = 500_000):
+    raw = download_bytes(url)
+    gz = gzip.GzipFile(fileobj=io.BytesIO(raw))
+    return pd.read_csv(gz, chunksize=chunksize, low_memory=False)
 
 
 def load_json_list(path: Path):
@@ -228,30 +234,16 @@ def merge_records(existing, new_records):
     return out
 
 
+def nested_vote_counter():
+    return {"for": 0, "against": 0, "abstain": 0}
+
+
 def main():
     print("Downloading votes.csv.gz ...")
     votes_df = load_gzip_csv(VOTES_URL)
-
-    print("Downloading member_votes.csv.gz ...")
-    member_votes_df = load_gzip_csv(MEMBER_VOTES_URL)
-
     print("Votes rows:", len(votes_df))
-    print("Member vote rows:", len(member_votes_df))
 
-    print("Normalizing member vote fields ...")
-    member_votes_df["position_norm"] = member_votes_df["position"].map(normalize_position)
-    member_votes_df["country_norm"] = member_votes_df["country_code"].map(normalize_country_code)
-    member_votes_df["group_norm"] = member_votes_df["group_code"].map(normalize_group_code)
-
-    member_votes_df = member_votes_df[
-        member_votes_df["position_norm"].isin(["for", "against", "abstain"])
-    ].copy()
-
-    member_votes_df = member_votes_df[
-        member_votes_df["country_norm"].isin(EU_CODES_2)
-    ].copy()
-
-    print("Filtered member vote rows:", len(member_votes_df))
+    votes_indexed = votes_df.set_index("id", drop=False)
 
     try:
         last_updated = download_bytes(LAST_UPDATED_URL).decode("utf-8", errors="replace").strip()
@@ -261,16 +253,58 @@ def main():
     existing = load_json_list(OUTPUT_FILE)
     print("Existing vote records:", len(existing))
 
-    print("Aggregating member votes by vote_id ...")
-    grouped = member_votes_df.groupby("vote_id", sort=True)
+    # chunkos aggregálás
+    country_vote_counts_all = defaultdict(lambda: defaultdict(nested_vote_counter))
+    group_vote_counts_all = defaultdict(lambda: defaultdict(nested_vote_counter))
+    matched_totals_all = defaultdict(nested_vote_counter)
 
-    votes_indexed = votes_df.set_index("id", drop=False)
+    print("Processing member_votes.csv.gz in chunks ...")
+    processed_rows = 0
+    kept_rows = 0
+    chunk_idx = 0
+
+    for chunk in load_member_votes_chunks(MEMBER_VOTES_URL, chunksize=500_000):
+        chunk_idx += 1
+        processed_rows += len(chunk)
+
+        chunk["position_norm"] = chunk["position"].map(normalize_position)
+        chunk["country_norm"] = chunk["country_code"].map(normalize_country_code)
+        chunk["group_norm"] = chunk["group_code"].map(normalize_group_code)
+
+        chunk = chunk[
+            chunk["position_norm"].isin(["for", "against", "abstain"])
+        ].copy()
+
+        chunk = chunk[
+            chunk["country_norm"].isin(EU_CODES_2)
+        ].copy()
+
+        kept_rows += len(chunk)
+
+        for row in chunk.itertuples(index=False):
+            vote_id = row.vote_id
+            position = row.position_norm
+            country = row.country_norm
+            group_code = row.group_norm
+
+            country_vote_counts_all[vote_id][country][position] += 1
+            matched_totals_all[vote_id][position] += 1
+
+            if group_code:
+                group_vote_counts_all[vote_id][group_code][position] += 1
+
+        print(
+            f"Chunk {chunk_idx} done | raw rows: {processed_rows} | "
+            f"kept rows: {kept_rows} | vote groups so far: {len(matched_totals_all)}"
+        )
+
     new_records = []
-
     processed_votes = 0
     kept_votes = 0
 
-    for vote_id, group_df in grouped:
+    print("Building final records ...")
+
+    for vote_id in sorted(matched_totals_all.keys()):
         processed_votes += 1
 
         if vote_id not in votes_indexed.index:
@@ -280,24 +314,9 @@ def main():
         if isinstance(vote_row, pd.DataFrame):
             vote_row = vote_row.iloc[0]
 
-        country_vote_counts = defaultdict(lambda: {"for": 0, "against": 0, "abstain": 0})
-        group_vote_counts = defaultdict(lambda: {"for": 0, "against": 0, "abstain": 0})
-
-        matched_totals = {"for": 0, "against": 0, "abstain": 0}
-
-        for _, mv in group_df.iterrows():
-            position = mv["position_norm"]
-            country = mv["country_norm"]
-            group_code = mv["group_norm"]
-
-            if not position or not country:
-                continue
-
-            country_vote_counts[country][position] += 1
-            matched_totals[position] += 1
-
-            if group_code:
-                group_vote_counts[group_code][position] += 1
+        country_vote_counts = country_vote_counts_all[vote_id]
+        group_vote_counts = group_vote_counts_all[vote_id]
+        matched_totals = matched_totals_all[vote_id]
 
         countries_majority = {}
         for country, counts in country_vote_counts.items():
@@ -337,15 +356,17 @@ def main():
             "groups": dict(groups_majority),
 
             # részletes adatok
-            "country_vote_counts": dict(country_vote_counts),
-            "group_vote_counts": dict(group_vote_counts),
+            "country_vote_counts": {k: dict(v) for k, v in country_vote_counts.items()},
+            "group_vote_counts": {k: dict(v) for k, v in group_vote_counts.items()},
             "matched_members": int(total_matched),
             "expected_vote_totals": expected_totals,
-            "matched_vote_totals": matched_totals,
+            "matched_vote_totals": dict(matched_totals),
             "match_quality": {
-                "summary": f"for:{matched_totals['for']}/{expected_totals['for']}, "
-                           f"against:{matched_totals['against']}/{expected_totals['against']}, "
-                           f"abstain:{matched_totals['abstain']}/{expected_totals['abstain']}",
+                "summary": (
+                    f"for:{matched_totals['for']}/{expected_totals['for']}, "
+                    f"against:{matched_totals['against']}/{expected_totals['against']}, "
+                    f"abstain:{matched_totals['abstain']}/{expected_totals['abstain']}"
+                ),
                 "total_ratio": total_ratio,
             },
 
@@ -366,6 +387,9 @@ def main():
 
         new_records.append(record)
         kept_votes += 1
+
+        if kept_votes % 1000 == 0:
+            print(f"Built records: {kept_votes}")
 
     merged = merge_records(existing, new_records)
     save_output(merged, OUTPUT_FILE)
