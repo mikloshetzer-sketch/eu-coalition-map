@@ -5,6 +5,7 @@ from pathlib import Path
 from datetime import datetime, timedelta, timezone
 from collections import defaultdict
 from email.utils import parsedate_to_datetime
+from itertools import combinations
 import math
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -23,6 +24,7 @@ LAYERS = [
     "rss",
     "gdelt",
     "combined",
+    "votes",
 ]
 
 TOPICS = [
@@ -44,6 +46,19 @@ EU_CODES = {
 
 NOW = datetime.now(timezone.utc)
 
+VALID_VOTES = {"for", "against", "abstain"}
+PAIR_SCORE = {
+    ("for", "for"): 1.0,
+    ("against", "against"): 1.0,
+    ("abstain", "abstain"): 0.75,
+    ("for", "abstain"): 0.25,
+    ("abstain", "for"): 0.25,
+    ("against", "abstain"): 0.25,
+    ("abstain", "against"): 0.25,
+    ("for", "against"): 0.0,
+    ("against", "for"): 0.0,
+}
+
 
 def parse_jsonl(path: Path):
     items = []
@@ -57,6 +72,21 @@ def parse_jsonl(path: Path):
             except Exception:
                 pass
     return items
+
+
+def parse_json(path: Path):
+    if not path.exists():
+        return []
+
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            if isinstance(data, list):
+                return data
+    except Exception:
+        pass
+
+    return []
 
 
 def load_events(layer: str):
@@ -93,6 +123,11 @@ def load_events(layer: str):
             for f in sorted(gdelt_dir.glob("*.jsonl")):
                 events += parse_jsonl(f)
 
+    elif layer == "votes":
+        votes_dir = EVENTS_DIR / "votes"
+        votes_file = votes_dir / "council_votes.json"
+        events = parse_json(votes_file)
+
     return events
 
 
@@ -128,10 +163,21 @@ def parse_event_datetime(value):
     except Exception:
         pass
 
+    try:
+        dt = datetime.strptime(text, "%Y-%m-%d")
+        dt = dt.replace(tzinfo=timezone.utc)
+        return dt
+    except Exception:
+        pass
+
     return None
 
 
 def get_event_date(event):
+    vote_date = parse_event_datetime(event.get("date"))
+    if vote_date:
+        return vote_date
+
     published = parse_event_datetime(event.get("published_at"))
     if published:
         return published
@@ -202,6 +248,10 @@ def filter_pair_by_mode(a: str, b: str, mode: str) -> bool:
 
     return False
 
+
+# -----------------------------
+# RSS / GDELT / COMBINED LOGIC
+# -----------------------------
 
 def build_graph(events, mode="all"):
     edge_weights = defaultdict(float)
@@ -295,21 +345,7 @@ def build_heatmap(events, mode="all", normalized=False):
         rows.append(row)
 
     if normalized:
-        norm_rows = []
-        for row in rows:
-            total = row.get("total", 0.0)
-            new_row = {"country": row["country"]}
-
-            for t in TOPICS:
-                if total > 0:
-                    new_row[t] = round(row[t] / total, 6)
-                else:
-                    new_row[t] = 0.0
-
-            new_row["total"] = 1.0 if total > 0 else 0.0
-            norm_rows.append(new_row)
-
-        rows = norm_rows
+        rows = normalize_heatmap_rows(rows)
 
     return {
         "topics": TOPICS,
@@ -357,6 +393,194 @@ def build_similarity(events, mode="all"):
     }
 
 
+# -----------------------------
+# VOTES LOGIC
+# -----------------------------
+
+def vote_record_countries(vote):
+    countries = vote.get("countries", {}) or {}
+    if isinstance(countries, dict):
+        return countries
+    return {}
+
+
+def countries_for_votes_mode(vote, mode="all"):
+    countries = vote_record_countries(vote).keys()
+
+    if mode == "all":
+        return sorted([c for c in countries if c in EU_CODES])
+
+    if mode == "internal":
+        return sorted([c for c in countries if c in EU_CODES])
+
+    if mode == "external":
+        # Council votes are EU-member-state based.
+        # Keep this empty so the external slice does not create misleading output.
+        return []
+
+    return sorted([c for c in countries if c in EU_CODES])
+
+
+def build_votes_graph(votes, mode="all"):
+    if mode == "external":
+        return {
+            "nodes": [],
+            "edges": [],
+            "event_count": len(votes),
+            "mode": mode,
+        }
+
+    node_counts = defaultdict(int)
+    pair_sum = defaultdict(float)
+    pair_count = defaultdict(int)
+
+    for vote in votes:
+        countries = vote_record_countries(vote)
+        filtered = {
+            c: val for c, val in countries.items()
+            if c in EU_CODES and val in VALID_VOTES
+        }
+
+        selected_countries = countries_for_votes_mode(vote, mode)
+        filtered = {c: filtered[c] for c in selected_countries if c in filtered}
+
+        for c in filtered:
+            node_counts[c] += 1
+
+        for a, b in combinations(sorted(filtered.keys()), 2):
+            if not filter_pair_by_mode(a, b, mode):
+                continue
+
+            va = filtered[a]
+            vb = filtered[b]
+            score = PAIR_SCORE.get((va, vb))
+            if score is None:
+                continue
+
+            key = tuple(sorted([a, b]))
+            pair_sum[key] += score
+            pair_count[key] += 1
+
+    nodes = [{"id": c, "weight": node_counts[c]} for c in sorted(node_counts.keys()) if node_counts[c] > 0]
+
+    edges = []
+    for (a, b), total in sorted(pair_sum.items()):
+        count = pair_count[(a, b)]
+        if count <= 0:
+            continue
+
+        weight = total / count
+        if weight > 0:
+            edges.append({
+                "source": a,
+                "target": b,
+                "weight": round(weight, 3),
+            })
+
+    return {
+        "nodes": nodes,
+        "edges": edges,
+        "event_count": len(votes),
+        "mode": mode,
+    }
+
+
+def build_votes_heatmap(votes, mode="all", normalized=False):
+    country_topic = defaultdict(lambda: defaultdict(float))
+
+    for vote in votes:
+        topic = vote.get("topic")
+        if topic not in TOPICS:
+            continue
+
+        countries = vote_record_countries(vote)
+        selected_countries = countries_for_votes_mode(vote, mode)
+
+        for c in selected_countries:
+            val = countries.get(c)
+            if val in VALID_VOTES:
+                country_topic[c][topic] += 1.0
+
+    rows = []
+    for country in sorted(country_topic.keys()):
+        row = {"country": country}
+        total = 0.0
+
+        for t in TOPICS:
+            value = country_topic[country].get(t, 0.0)
+            row[t] = round(value, 3)
+            total += value
+
+        row["total"] = round(total, 3)
+        rows.append(row)
+
+    if normalized:
+        rows = normalize_heatmap_rows(rows)
+
+    return {
+        "topics": TOPICS,
+        "rows": rows,
+        "event_count": len(votes),
+        "mode": mode,
+        "normalized": normalized,
+    }
+
+
+def normalize_heatmap_rows(rows):
+    norm_rows = []
+
+    for row in rows:
+        total = row.get("total", 0.0)
+        new_row = {"country": row["country"]}
+
+        for t in TOPICS:
+            if total > 0:
+                new_row[t] = round(row[t] / total, 6)
+            else:
+                new_row[t] = 0.0
+
+        new_row["total"] = 1.0 if total > 0 else 0.0
+        norm_rows.append(new_row)
+
+    return norm_rows
+
+
+def build_votes_similarity(votes, mode="all"):
+    heatmap = build_votes_heatmap(votes, mode=mode, normalized=True)
+    rows = heatmap["rows"]
+
+    nodes = []
+    for r in rows:
+        strength = sum(r[t] for t in TOPICS)
+        nodes.append({
+            "id": r["country"],
+            "weight": round(strength, 3),
+        })
+
+    edges = []
+    for i in range(len(rows)):
+        for j in range(i + 1, len(rows)):
+            sim = cosine_similarity(rows[i], rows[j])
+
+            if sim >= 0.2:
+                edges.append({
+                    "source": rows[i]["country"],
+                    "target": rows[j]["country"],
+                    "weight": round(sim, 3),
+                })
+
+    return {
+        "nodes": nodes,
+        "edges": edges,
+        "event_count": len(votes),
+        "mode": mode,
+    }
+
+
+# -----------------------------
+# SAVE
+# -----------------------------
+
 def save_json(layer, filename, payload):
     out_dir = NETWORK_DIR / layer
     docs_dir = DOCS_NETWORK_DIR / layer
@@ -372,6 +596,10 @@ def save_json(layer, filename, payload):
 
     print("saved", layer, filename)
 
+
+# -----------------------------
+# MAIN
+# -----------------------------
 
 def main():
     for layer in LAYERS:
@@ -390,10 +618,16 @@ def main():
                 elif mode == "external":
                     suffix = "_external"
 
-                save_json(layer, f"{window_name}{suffix}.json", build_graph(filtered, mode=mode))
-                save_json(layer, f"{window_name}_heatmap{suffix}.json", build_heatmap(filtered, mode=mode, normalized=False))
-                save_json(layer, f"{window_name}_heatmap_norm{suffix}.json", build_heatmap(filtered, mode=mode, normalized=True))
-                save_json(layer, f"{window_name}_similarity{suffix}.json", build_similarity(filtered, mode=mode))
+                if layer == "votes":
+                    save_json(layer, f"{window_name}{suffix}.json", build_votes_graph(filtered, mode=mode))
+                    save_json(layer, f"{window_name}_heatmap{suffix}.json", build_votes_heatmap(filtered, mode=mode, normalized=False))
+                    save_json(layer, f"{window_name}_heatmap_norm{suffix}.json", build_votes_heatmap(filtered, mode=mode, normalized=True))
+                    save_json(layer, f"{window_name}_similarity{suffix}.json", build_votes_similarity(filtered, mode=mode))
+                else:
+                    save_json(layer, f"{window_name}{suffix}.json", build_graph(filtered, mode=mode))
+                    save_json(layer, f"{window_name}_heatmap{suffix}.json", build_heatmap(filtered, mode=mode, normalized=False))
+                    save_json(layer, f"{window_name}_heatmap_norm{suffix}.json", build_heatmap(filtered, mode=mode, normalized=True))
+                    save_json(layer, f"{window_name}_similarity{suffix}.json", build_similarity(filtered, mode=mode))
 
 
 if __name__ == "__main__":
