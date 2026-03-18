@@ -4,7 +4,6 @@ import io
 import gzip
 import json
 from collections import defaultdict
-from datetime import datetime, timezone
 from pathlib import Path
 
 import pandas as pd
@@ -17,7 +16,6 @@ OUTPUT_FILE = OUT_DIR / "council_votes.json"
 
 VOTES_URL = "https://github.com/HowTheyVote/data/releases/latest/download/votes.csv.gz"
 MEMBER_VOTES_URL = "https://github.com/HowTheyVote/data/releases/latest/download/member_votes.csv.gz"
-LAST_UPDATED_URL = "https://github.com/HowTheyVote/data/releases/latest/download/last_updated.txt"
 
 HEADERS = {
     "User-Agent": "eu-coalition-map/1.0",
@@ -123,7 +121,7 @@ def load_json_list(path: Path):
 def save_output(records, path: Path):
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as f:
-        json.dump(records, f, ensure_ascii=False, indent=2)
+        json.dump(records, f, ensure_ascii=False, separators=(",", ":"))
 
 
 def normalize_group_code(value) -> str:
@@ -194,26 +192,8 @@ def build_vote_title(row) -> str:
     return f"EP vote {row.get('id')}"
 
 
-def build_expected_vote_totals(row) -> dict:
-    def safe_int(v):
-        if pd.isna(v):
-            return None
-        try:
-            return int(v)
-        except Exception:
-            return None
-
-    return {
-        "for": safe_int(row.get("count_for")),
-        "against": safe_int(row.get("count_against")),
-        "abstain": safe_int(row.get("count_abstention")),
-    }
-
-
-def is_good_record(countries_majority: dict, matched_totals: dict) -> bool:
-    if not countries_majority or len(countries_majority) < 2:
-        return False
-    return sum(matched_totals.values()) > 0
+def is_good_record(countries_majority: dict, total_matched: int) -> bool:
+    return bool(countries_majority) and len(countries_majority) >= 2 and total_matched > 0
 
 
 def merge_records(existing, new_records):
@@ -245,15 +225,9 @@ def main():
 
     votes_indexed = votes_df.set_index("id", drop=False)
 
-    try:
-        last_updated = download_bytes(LAST_UPDATED_URL).decode("utf-8", errors="replace").strip()
-    except Exception:
-        last_updated = None
-
     existing = load_json_list(OUTPUT_FILE)
     print("Existing vote records:", len(existing))
 
-    # chunkos aggregálás
     country_vote_counts_all = defaultdict(lambda: defaultdict(nested_vote_counter))
     group_vote_counts_all = defaultdict(lambda: defaultdict(nested_vote_counter))
     matched_totals_all = defaultdict(nested_vote_counter)
@@ -317,6 +291,7 @@ def main():
         country_vote_counts = country_vote_counts_all[vote_id]
         group_vote_counts = group_vote_counts_all[vote_id]
         matched_totals = matched_totals_all[vote_id]
+        total_matched = sum(matched_totals.values())
 
         countries_majority = {}
         for country, counts in country_vote_counts.items():
@@ -330,7 +305,7 @@ def main():
             if mv:
                 groups_majority[group_code] = mv
 
-        if not is_good_record(countries_majority, matched_totals):
+        if not is_good_record(countries_majority, total_matched):
             continue
 
         title = build_vote_title(vote_row)
@@ -339,50 +314,18 @@ def main():
         timestamp = str(vote_row.get("timestamp", "") or "").strip()
         date = timestamp[:10] if len(timestamp) >= 10 else None
 
-        expected_totals = build_expected_vote_totals(vote_row)
-
-        total_expected = sum(v for v in expected_totals.values() if isinstance(v, int))
-        total_matched = sum(matched_totals.values())
-        total_ratio = round(total_matched / total_expected, 4) if total_expected > 0 else None
-
         record = {
             "id": f"vote_htv_{int(vote_id)}",
             "date": date,
             "title": title,
             "topic": topic,
-
-            # repo kompatibilitás
             "countries": dict(countries_majority),
             "groups": dict(groups_majority),
-
-            # részletes adatok
             "country_vote_counts": {k: dict(v) for k, v in country_vote_counts.items()},
             "group_vote_counts": {k: dict(v) for k, v in group_vote_counts.items()},
-            "matched_members": int(total_matched),
-            "expected_vote_totals": expected_totals,
-            "matched_vote_totals": dict(matched_totals),
-            "match_quality": {
-                "summary": (
-                    f"for:{matched_totals['for']}/{expected_totals['for']}, "
-                    f"against:{matched_totals['against']}/{expected_totals['against']}, "
-                    f"abstain:{matched_totals['abstain']}/{expected_totals['abstain']}"
-                ),
-                "total_ratio": total_ratio,
-            },
-
-            # meta
             "source": "votes",
             "institution": "europarl",
             "url": f"https://howtheyvote.eu/votes/{int(vote_id)}",
-            "reference": str(vote_row.get("reference", "") or "").strip(),
-            "procedure_reference": str(vote_row.get("procedure_reference", "") or "").strip(),
-            "procedure_title": str(vote_row.get("procedure_title", "") or "").strip(),
-            "procedure_type": str(vote_row.get("procedure_type", "") or "").strip(),
-            "procedure_stage": str(vote_row.get("procedure_stage", "") or "").strip(),
-            "result": str(vote_row.get("result", "") or "").strip(),
-            "texts_adopted_reference": str(vote_row.get("texts_adopted_reference", "") or "").strip(),
-            "howtheyvote_last_updated": last_updated,
-            "collected_at": datetime.now(timezone.utc).isoformat(),
         }
 
         new_records.append(record)
@@ -402,15 +345,7 @@ def main():
 
     if new_records:
         avg_countries = sum(len(r.get("countries", {})) for r in new_records) / len(new_records)
-        ratios = []
-        for r in new_records:
-            ratio = (r.get("match_quality") or {}).get("total_ratio")
-            if isinstance(ratio, (int, float)):
-                ratios.append(ratio)
-
         print("Average countries per record:", round(avg_countries, 2))
-        if ratios:
-            print("Average total match ratio:", round(sum(ratios) / len(ratios), 4))
 
 
 if __name__ == "__main__":
