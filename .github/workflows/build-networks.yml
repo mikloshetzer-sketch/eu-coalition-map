@@ -46,6 +46,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Auto update networks and votes data"
+            git commit -m "Auto update networks and EP votes data"
             git push
           fi
