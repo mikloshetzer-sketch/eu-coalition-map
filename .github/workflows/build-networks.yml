@@ -2,6 +2,7 @@ name: Build EU Networks
 
 on:
   schedule:
+    # Hetente hétfőn 04:00 UTC
     - cron: "0 4 * * 1"
   workflow_dispatch:
 
@@ -13,32 +14,44 @@ jobs:
       contents: write
 
     steps:
+      # 1️⃣ Repo letöltése
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      # 2️⃣ Python beállítás
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
+      # 3️⃣ Függőségek telepítése
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install requests beautifulsoup4
 
+      # 4️⃣ MEP referencia lista építése (ÚJ!)
+      - name: Build MEP reference
+        run: |
+          python scripts/build_mep_reference.py
+
+      # 5️⃣ Votes collector futtatása (EP XML + MEP párosítás később)
       - name: Run votes collector
         run: |
           python scripts/run_votes_collector.py
 
+      # 6️⃣ Network generálás (változatlan)
       - name: Build networks
         run: |
           python scripts/build_window_networks.py
 
+      # 7️⃣ Commit + push ha van változás
       - name: Commit generated files
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+          git add data/reference
           git add data/events/votes
           git add data/networks
           git add docs/data/networks
@@ -46,6 +59,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Auto update networks and EP votes data"
+            git commit -m "Auto update networks, MEP reference and votes data"
             git push
           fi
