@@ -208,6 +208,17 @@
       color: #64748b;
     }
 
+    .role-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #dbeafe;
+      color: #1d4ed8;
+      font-weight: bold;
+      font-size: 12px;
+      margin: 4px 0 8px 0;
+    }
+
     .empty {
       color: #64748b;
       font-style: italic;
@@ -908,6 +919,77 @@
       return "A jelenlegi értelmezésben a hangsúly a tematikus hasonlóságon van.";
     }
 
+    function sumValues(items, key) {
+      return items.reduce((acc, item) => acc + (item[key] || 0), 0);
+    }
+
+    function classifyCountryRole(partners, topicsAbs, topicsNorm, similar) {
+      const partnerTop = partners[0]?.weight || 0;
+      const partnerTotal = sumValues(partners, "weight");
+      const similarTop = similar[0]?.weight || 0;
+      const similarTotal = sumValues(similar, "weight");
+      const absTop = topicsAbs[0]?.value || 0;
+      const absSecond = topicsAbs[1]?.value || 0;
+      const normTop = topicsNorm[0]?.value || 0;
+      const normSecond = topicsNorm[1]?.value || 0;
+
+      const strongNetwork = partnerTotal >= 4 || partnerTop >= 1.5;
+      const strongSimilarity = similarTotal >= 1.2 || similarTop >= 0.4;
+      const focusedTheme = normTop >= 0.40 || (normTop >= 0.30 && (normTop - normSecond) >= 0.10);
+      const balancedTheme = normTop > 0 && normTop < 0.24;
+      const weakNetwork = partnerTotal < 1 && similarTotal < 0.4;
+      const bridgePattern = strongSimilarity && !strongNetwork;
+      const noisyNetwork = strongNetwork && !focusedTheme && normTop < 0.28;
+      const dominantAbsolute = absTop > 0 && absTop >= (absSecond * 1.6 || 0);
+
+      if (weakNetwork && normTop < 0.20) {
+        return {
+          label: "periférikus megjelenés",
+          description: "Az ország jelenléte jelenleg kevésbé rajzol ki erős kapcsolati vagy tematikus központot."
+        };
+      }
+
+      if (strongNetwork && strongSimilarity && !focusedTheme && partnerTotal >= 5) {
+        return {
+          label: "központi koordinátor",
+          description: "Az ország egyszerre erős kapcsolati és hasonlósági beágyazottságot mutat, miközben több irányban is látható együttmozgás kapcsolódik hozzá."
+        };
+      }
+
+      if (focusedTheme && (dominantAbsolute || normTop >= 0.45)) {
+        return {
+          label: "tematikusan specializált szereplő",
+          description: "Az ország médiaképe és tematikus profilja markánsan egy vagy néhány ügykör köré rendeződik."
+        };
+      }
+
+      if (bridgePattern) {
+        return {
+          label: "hasonlósági hídpozíció",
+          description: "Az ország kevésbé a közvetlen kapcsolatokban, inkább a tematikus mintázatokon keresztül kapcsolódik más szereplőkhöz."
+        };
+      }
+
+      if (noisyNetwork) {
+        return {
+          label: "kapcsolatilag aktív, de tematikusan szórt szereplő",
+          description: "Az ország több irányban is kapcsolódik, de a tematikus fókusza kevésbé koncentrált."
+        };
+      }
+
+      if (balancedTheme && (strongNetwork || strongSimilarity)) {
+        return {
+          label: "kiegyensúlyozott profilú ország",
+          description: "Az ország több témában is megjelenik, miközben kapcsolati és hasonlósági mintázata is viszonylag stabil."
+        };
+      }
+
+      return {
+        label: "közepesen tagolt profilú szereplő",
+        description: "Az ország pozíciója értelmezhető, de nem egyetlen domináns mintázat határozza meg."
+      };
+    }
+
     function generateAutoEvaluation() {
       if (!currentCountry) {
         autoEvaluationEl.innerHTML = "Válassz országot az automatikus értékeléshez.";
@@ -921,6 +1003,7 @@
 
       const concentration = classifyConcentration(topicsNorm);
       const networkPosition = classifyNetworkPosition(partners, similar);
+      const role = classifyCountryRole(partners, topicsAbs, topicsNorm, similar);
 
       const dominantAbsTopics = topicsAbs.slice(0, 3).map(t => t.topic);
       const dominantNormTopics = topicsNorm.slice(0, 3).map(t => t.topic);
@@ -1005,6 +1088,14 @@
         <div class="kv">${describeViewContext()}</div>
       `;
 
+      let roleBlock = `
+        <div class="eval-block">
+          <div class="eval-title">Automatikus kategorizálás</div>
+          <div class="role-badge">${role.label}</div>
+          <div class="kv">${role.description}</div>
+        </div>
+      `;
+
       let metricBlock = `
         <div class="eval-block">
           <div class="eval-title">Kulcsmutatók</div>
@@ -1036,13 +1127,17 @@
             A partneri és hasonlósági kapcsolatok együtt azt jelzik, hogy az ország körül
             mennyire koherens vagy mennyire szórt mintázat rajzolódik ki.
           </div>
+          <div class="kv">
+            A fenti kategorizálás nem politikai minősítés, hanem egy automatikus elemző címke,
+            amely a kapcsolati sűrűség, a tematikus fókusz és a hasonlósági mintázat kombinációjából épül fel.
+          </div>
           <div class="kv eval-muted">
             Ez az értékelés médiamegjelenési és tematikus mintázatokat ír le, nem közvetlen politikai szándékot vagy hivatalos álláspontot.
           </div>
         </div>
       `;
 
-      autoEvaluationEl.innerHTML = contextualSummary + synthesisBlock + metricBlock + conclusionText;
+      autoEvaluationEl.innerHTML = contextualSummary + roleBlock + synthesisBlock + metricBlock + conclusionText;
     }
         function drawDashboard() {
       const dash = document.getElementById("dashboard");
