@@ -3,7 +3,7 @@
 import json
 import re
 import time
-from collections import Counter, defaultdict
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urljoin
@@ -85,6 +85,9 @@ XML_ACCEPT_HEADERS = {
     **HEADERS,
     "Accept": "application/xml,text/xml;q=0.9,*/*;q=0.8",
 }
+
+MIN_COUNTRIES_PER_RECORD = 4
+MAX_DOMINANCE_SHARE = 0.70
 
 
 def fetch_text(url: str, xml: bool = False, timeout: int = 45) -> str:
@@ -203,9 +206,6 @@ def find_xml_links():
 
 
 def possible_vote_blocks(root):
-    """
-    Best-effort: olyan blokkokat keres, amelyek valószínűleg egy szavazási egységet reprezentálnak.
-    """
     blocks = []
     candidate_tag_names = {
         "rollcallvoteresult",
@@ -223,7 +223,6 @@ def possible_vote_blocks(root):
         if tag in candidate_tag_names:
             blocks.append(el)
 
-    # ha semmit nem találtunk, próbáljuk a teljes rootot egy blokknak venni
     if not blocks:
         blocks = [root]
 
@@ -242,7 +241,7 @@ def detect_vote_label(text: str):
     if any(x in t for x in ["against", "rejected", "elutasít", "ellene"]):
         return "against"
 
-    if any(x in t for x in ["for", "adopted", "approved", "favour", "igen", "mellette"]):
+    if any(x in t for x in ["for", "adopted", "approved", "favour", "favor", "igen", "mellette"]):
         return "for"
 
     return None
@@ -263,24 +262,18 @@ def detect_country_code_from_text(text: str):
 
 
 def extract_country_votes_from_block(block):
-    """
-    Best-effort: a blokkon belül megpróbál ország -> szavazat map-et gyártani.
-    """
     country_votes = {}
-
     current_vote_context = None
 
     for el in block.iter():
         tag = strip_ns(el.tag).lower()
         txt = " ".join(el.itertext()).strip()
 
-        # ha egy szekció címe szavazattípust jelez
         section_vote = detect_vote_label(f"{tag} {txt}")
         if tag in {"for", "against", "abstention", "abstain"} and section_vote:
             current_vote_context = section_vote
             continue
 
-        # attribútumokból is nézzük
         attrs_joined = " ".join([f"{k}={v}" for k, v in el.attrib.items()])
         joined = f"{tag} {txt} {attrs_joined}"
 
@@ -311,7 +304,6 @@ def extract_country_votes_from_block(block):
         if vote in {"for", "against", "abstain"}:
             country_votes.setdefault(code, []).append(vote)
 
-    # országon belül többségi döntés
     aggregated = {}
     for code, votes in country_votes.items():
         if not votes:
@@ -320,6 +312,25 @@ def extract_country_votes_from_block(block):
         aggregated[code] = cnt.most_common(1)[0][0]
 
     return aggregated
+
+
+def is_good_record(countries: dict) -> bool:
+    if not countries:
+        return False
+
+    if len(countries) < MIN_COUNTRIES_PER_RECORD:
+        return False
+
+    vote_counts = Counter(countries.values())
+    total = sum(vote_counts.values())
+    if total <= 0:
+        return False
+
+    dominance_share = vote_counts.most_common(1)[0][1] / total
+    if dominance_share > MAX_DOMINANCE_SHARE and len(countries) < 6:
+        return False
+
+    return True
 
 
 def parse_xml_document(xml_url: str):
@@ -342,19 +353,26 @@ def parse_xml_document(xml_url: str):
     blocks = possible_vote_blocks(root)
     records = []
 
+    stats = {
+        "blocks_total": len(blocks),
+        "blocks_with_countries": 0,
+        "blocks_kept": 0,
+    }
+
     for idx, block in enumerate(blocks, start=1):
         title = first_nonempty_text(block, {
             "title", "subject", "label", "text", "amendmenttitle", "description"
         }) or doc_title or f"EP vote {idx}"
 
         countries = extract_country_votes_from_block(block)
-        topic = classify_topic(title)
 
-        # ha nincs egyetlen ország sem, ezt a blokkot most kihagyjuk,
-        # mert a jelenlegi hálózatépítő országszintű rekordot vár
-        if not countries:
+        if countries:
+            stats["blocks_with_countries"] += 1
+
+        if not is_good_record(countries):
             continue
 
+        topic = classify_topic(title)
         stable_source = f"{xml_url}::{idx}"
         stable_id = re.sub(r"[^A-Za-z0-9]+", "_", stable_source).strip("_")
 
@@ -369,8 +387,9 @@ def parse_xml_document(xml_url: str):
             "url": xml_url,
             "collected_at": datetime.now(timezone.utc).isoformat()
         })
+        stats["blocks_kept"] += 1
 
-    return records
+    return records, stats
 
 
 def merge_records(existing, new_records):
@@ -406,10 +425,19 @@ def main():
     all_new_records = []
     errors = []
 
-    for i, xml_url in enumerate(xml_urls, start=1):
+    total_blocks = 0
+    blocks_with_countries = 0
+    kept_blocks = 0
+
+    for xml_url in xml_urls:
         try:
-            records = parse_xml_document(xml_url)
+            records, stats = parse_xml_document(xml_url)
             all_new_records.extend(records)
+
+            total_blocks += stats["blocks_total"]
+            blocks_with_countries += stats["blocks_with_countries"]
+            kept_blocks += stats["blocks_kept"]
+
             time.sleep(0.6)
         except Exception as exc:
             errors.append(f"{xml_url}: {exc}")
@@ -417,9 +445,16 @@ def main():
     merged = merge_records(existing, all_new_records)
     save_output(merged, OUTPUT_FILE)
 
+    print("Összes XML blokk:", total_blocks)
+    print("Blokkok ország-adattal:", blocks_with_countries)
+    print("Megtartott blokkok:", kept_blocks)
     print("Új rekordok:", len(all_new_records))
     print("Összes mentett rekord:", len(merged))
     print("Kimenet:", OUTPUT_FILE)
+
+    if all_new_records:
+        avg_countries = sum(len(r.get("countries", {})) for r in all_new_records) / len(all_new_records)
+        print("Átlagos ország / rekord:", round(avg_countries, 2))
 
     if errors:
         print("\nRészleges hibák:")
