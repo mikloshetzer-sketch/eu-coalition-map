@@ -22,17 +22,6 @@ OUTPUT_FILE = OUT_DIR / "council_votes.json"
 BASE_URL = "https://www.europarl.europa.eu"
 VOTES_PAGE_URL = "https://www.europarl.europa.eu/plenary/hu/votes.html?tab=votes"
 
-TOPICS = {
-    "migration",
-    "ukraine_russia",
-    "enlargement",
-    "defence",
-    "energy",
-    "fiscal",
-    "rule_of_law",
-    "trade",
-}
-
 EU_CODES = {
     "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE",
     "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT",
@@ -100,10 +89,6 @@ def normalize_person_name(name: str) -> str:
 
 
 def build_mep_lookup(mep_records):
-    """
-    Név -> legvalószínűbb MEP rekord.
-    Ha több rekord jut ugyanarra a névre, az elsőt tartjuk meg.
-    """
     lookup = {}
     duplicates = 0
 
@@ -126,6 +111,26 @@ def build_mep_lookup(mep_records):
         lookup[key] = rec
 
     return lookup, duplicates
+
+
+def build_mep_name_index(mep_records):
+    """
+    Utolsó szó + névkulcsok indexe.
+    Segít akkor is, ha az XML-ben csak vezetéknevek vagy tömör névlisták vannak.
+    """
+    by_lastname = defaultdict(list)
+    all_names = set()
+
+    for rec in mep_records:
+        key = normalize_person_name(rec.get("full_name", ""))
+        if not key:
+            continue
+        all_names.add(key)
+        parts = key.split()
+        if parts:
+            by_lastname[parts[-1]].append(key)
+
+    return by_lastname, all_names
 
 
 def classify_topic(title: str) -> str:
@@ -255,11 +260,83 @@ def detect_vote_label(text: str):
     return None
 
 
-def extract_member_votes_from_block(block):
+def split_name_list(raw_text: str):
     """
-    Best-effort: blokkból személynév -> szavazat.
+    Egy nagy névlistát próbál egyéni nevekre bontani.
+    Az EP XML gyakran ilyen formában adja:
+    'Axinia Berlato Geadi Gosiewska Müller ...'
     """
-    member_votes = {}
+    text = raw_text.strip()
+    if not text:
+        return []
+
+    # zaj kiszűrése az elejéről
+    noise_prefixes = [
+        "keddi napirend",
+        "hétfői napirend",
+        "szerdai napirend",
+        "csütörtöki napirend",
+        "a pfe kepviselocsoport kerelme",
+        "a képviselőcsoport kérelme",
+    ]
+    norm_text = normalize_person_name(text)
+    for prefix in noise_prefixes:
+        if norm_text.startswith(prefix):
+            # ha nagyon zajos fejléc, inkább engedjük el
+            return []
+
+    # Sokszor a teljes lista egyszerűen szavak egymás után.
+    # Konzervatív megközelítés: 1-3 tokenes névablakokat próbálunk illeszteni.
+    tokens = text.split()
+    candidates = []
+
+    i = 0
+    while i < len(tokens):
+        # 3 szavas név
+        if i + 2 < len(tokens):
+            candidates.append(" ".join(tokens[i:i+3]))
+        # 2 szavas név
+        if i + 1 < len(tokens):
+            candidates.append(" ".join(tokens[i:i+2]))
+        # 1 szavas elem
+        candidates.append(tokens[i])
+        i += 1
+
+    # A tényleges illesztést később végezzük, itt csak jelöltek jönnek
+    return candidates
+
+
+def extract_member_vote_candidates_from_text(text: str, vote: str, tag: str, attrs: dict):
+    out = []
+
+    text = (text or "").strip()
+    if not text:
+        return out
+
+    split_candidates = split_name_list(text)
+    for candidate in split_candidates:
+        normalized = normalize_person_name(candidate)
+
+        if len(normalized.split()) < 1:
+            continue
+        if len(normalized) < 3:
+            continue
+        if normalized in {"for", "against", "abstain", "abstention"}:
+            continue
+
+        out.append({
+            "raw": candidate,
+            "normalized": normalized,
+            "vote": vote,
+            "tag": tag,
+            "attrs": attrs,
+        })
+
+    return out
+
+
+def extract_member_vote_candidates(block):
+    candidates = []
     current_vote_context = None
 
     for el in block.iter():
@@ -269,9 +346,8 @@ def extract_member_votes_from_block(block):
         joined = f"{tag} {txt} {attrs_joined}"
 
         section_vote = detect_vote_label(joined)
-        if tag in {"for", "against", "abstention", "abstain"} and section_vote:
+        if tag in {"for", "against", "abstention", "abstain", "result.for", "result.against", "result.abstention"} and section_vote:
             current_vote_context = section_vote
-            continue
 
         vote = detect_vote_label(joined)
         if not vote and current_vote_context:
@@ -280,40 +356,73 @@ def extract_member_votes_from_block(block):
         if vote not in {"for", "against", "abstain"}:
             continue
 
-        # potenciális név attribútumok
-        name_candidates = []
+        # attribútumos névjelöltek
         for attr_name in ["name", "fullname", "fullName", "mepname", "membername", "persname"]:
             if attr_name in el.attrib:
-                name_candidates.append(str(el.attrib[attr_name]).strip())
+                raw = str(el.attrib[attr_name]).strip()
+                normalized = normalize_person_name(raw)
+                if len(normalized.split()) >= 2:
+                    candidates.append({
+                        "raw": raw,
+                        "normalized": normalized,
+                        "vote": vote,
+                        "tag": tag,
+                        "attrs": dict(el.attrib),
+                    })
 
-        # ha nincs attribútum, a szövegből próbáljuk
+        # szöveges tömör névlista bontása
         if txt:
-            name_candidates.append(txt)
+            candidates.extend(
+                extract_member_vote_candidates_from_text(
+                    txt, vote, tag, dict(el.attrib)
+                )
+            )
 
-        for candidate in name_candidates:
-            normalized = normalize_person_name(candidate)
-            if len(normalized.split()) < 2:
-                continue
-            if len(normalized) < 5:
-                continue
+    # deduplikáció
+    dedup = {}
+    for c in candidates:
+        key = (c["normalized"], c["vote"])
+        if key not in dedup:
+            dedup[key] = c
 
-            # ne fogjunk meg "for", "against" jellegű zajt
-            if normalized in {"for", "against", "abstain", "abstention"}:
-                continue
-
-            member_votes[normalized] = vote
-            break
-
-    return member_votes
+    return list(dedup.values())
 
 
-def aggregate_countries_and_groups(member_votes, mep_lookup):
+def match_candidate_to_mep(normalized_name: str, mep_lookup, by_lastname):
+    # 1. teljes egyezés
+    if normalized_name in mep_lookup:
+        return mep_lookup[normalized_name]
+
+    parts = normalized_name.split()
+    if not parts:
+        return None
+
+    # 2. utolsó szó alapján próbáljuk
+    last = parts[-1]
+    candidates = by_lastname.get(last, [])
+    if len(candidates) == 1:
+        return mep_lookup.get(candidates[0])
+
+    # 3. ha két szavas név és első/utolsó szó alapján egyértelmű
+    if len(parts) >= 2:
+        first = parts[0]
+        narrowed = [c for c in candidates if c.startswith(first + " ")]
+        if len(narrowed) == 1:
+            return mep_lookup.get(narrowed[0])
+
+    return None
+
+
+def aggregate_countries_and_groups(member_vote_candidates, mep_lookup, by_lastname):
     country_to_votes = defaultdict(list)
     group_to_votes = defaultdict(list)
     matched_members = 0
 
-    for normalized_name, vote in member_votes.items():
-        mep = mep_lookup.get(normalized_name)
+    for item in member_vote_candidates:
+        normalized_name = item["normalized"]
+        vote = item["vote"]
+
+        mep = match_candidate_to_mep(normalized_name, mep_lookup, by_lastname)
         if not mep:
             continue
 
@@ -351,7 +460,7 @@ def is_good_record(countries: dict) -> bool:
     return bool(countries) and len(countries) >= MIN_COUNTRIES_PER_RECORD
 
 
-def parse_xml_document(xml_url: str, mep_lookup):
+def parse_xml_document(xml_url: str, mep_lookup, by_lastname):
     xml_text = fetch_text(xml_url, xml=True)
     root = ET.fromstring(xml_text)
 
@@ -384,11 +493,13 @@ def parse_xml_document(xml_url: str, mep_lookup):
             "title", "subject", "label", "text", "amendmenttitle", "description"
         }) or doc_title or f"EP vote {idx}"
 
-        member_votes = extract_member_votes_from_block(block)
-        if member_votes:
+        member_vote_candidates = extract_member_vote_candidates(block)
+        if member_vote_candidates:
             stats["blocks_with_member_votes"] += 1
 
-        countries, groups, matched_members = aggregate_countries_and_groups(member_votes, mep_lookup)
+        countries, groups, matched_members = aggregate_countries_and_groups(
+            member_vote_candidates, mep_lookup, by_lastname
+        )
         stats["matched_members_total"] += matched_members
 
         if countries:
@@ -439,6 +550,8 @@ def main():
         return
 
     mep_lookup, duplicates = build_mep_lookup(mep_records)
+    by_lastname, _ = build_mep_name_index(mep_records)
+
     print("MEP rekordok:", len(mep_records))
     print("MEP lookup elemek:", len(mep_lookup))
     print("Duplikált nevek kihagyva:", duplicates)
@@ -468,7 +581,7 @@ def main():
 
     for xml_url in xml_urls:
         try:
-            records, stats = parse_xml_document(xml_url, mep_lookup)
+            records, stats = parse_xml_document(xml_url, mep_lookup, by_lastname)
             all_new_records.extend(records)
 
             total_blocks += stats["blocks_total"]
