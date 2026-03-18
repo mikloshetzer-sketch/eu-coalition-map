@@ -46,7 +46,6 @@ XML_ACCEPT_HEADERS = {
     "Accept": "application/xml,text/xml;q=0.9,*/*;q=0.8",
 }
 
-# Fejlesztési fázisban lazább küszöbök
 MIN_COUNTRIES_PER_RECORD = 2
 MIN_MATCH_RATIO_IF_EXPECTED = 0.10
 MAX_ALIAS_TOKENS = 7
@@ -261,9 +260,10 @@ def expected_count_from_attrs(attrs: dict):
         return None
 
 
-def build_mep_alias_index(mep_records):
-    alias_to_meps = defaultdict(list)
+def build_mep_alias_indexes(mep_records):
     full_lookup = {}
+    alias_to_meps_global = defaultdict(list)
+    alias_to_meps_by_group = defaultdict(lambda: defaultdict(list))
     duplicates = 0
 
     for rec in mep_records:
@@ -283,20 +283,17 @@ def build_mep_alias_index(mep_records):
 
         full_lookup[norm] = rec
         parts = norm.split()
-        aliases = set()
 
+        aliases = set()
         aliases.add(norm)
 
-        # teljes suffixek
         for i in range(len(parts)):
             aliases.add(" ".join(parts[i:]))
 
-        # utolsó 1-3 token
         for n in (1, 2, 3):
             if len(parts) >= n:
                 aliases.add(" ".join(parts[-n:]))
 
-        # első + utolsó
         if len(parts) >= 2:
             aliases.add(parts[0] + " " + parts[-1])
 
@@ -304,54 +301,51 @@ def build_mep_alias_index(mep_records):
             alias = alias.strip()
             if not alias or len(alias) < 3:
                 continue
-            alias_to_meps[alias].append(rec)
+            alias_to_meps_global[alias].append(rec)
+            alias_to_meps_by_group[group][alias].append(rec)
 
-    # egytokenes aliasokból csak az egyedi maradjon
-    filtered = defaultdict(list)
+    filtered_global = defaultdict(list)
+    filtered_by_group = defaultdict(lambda: defaultdict(list))
     removed_single_token_aliases = 0
 
-    for alias, recs in alias_to_meps.items():
+    for alias, recs in alias_to_meps_global.items():
         if len(alias.split()) == 1 and len(recs) > 1:
             removed_single_token_aliases += 1
             continue
-        filtered[alias] = recs
+        filtered_global[alias] = recs
 
-    return full_lookup, filtered, duplicates, removed_single_token_aliases
+    for group, alias_map in alias_to_meps_by_group.items():
+        for alias, recs in alias_map.items():
+            # frakción belül kisebb a keresési tér, ezért itt megtartjuk
+            filtered_by_group[group][alias] = recs
+
+    return (
+        full_lookup,
+        filtered_global,
+        filtered_by_group,
+        duplicates,
+        removed_single_token_aliases,
+    )
 
 
-def choose_best_mep(candidates, group_hint=None):
+def choose_best_mep(candidates):
     if not candidates:
         return None
 
     if len(candidates) == 1:
         return candidates[0]
 
-    working = list(candidates)
-
-    if group_hint:
-        ng = normalize_group_name(group_hint)
-        narrowed = [
-            c for c in working
-            if normalize_group_name(c.get("group", "")) == ng
-        ]
-        if len(narrowed) == 1:
-            return narrowed[0]
-        if len(narrowed) > 1:
-            working = narrowed
-
     working = sorted(
-        working,
+        candidates,
         key=lambda c: (
             -len(normalize_person_name(c.get("full_name", "")).split()),
             normalize_person_name(c.get("full_name", "")),
         )
     )
-
-    # Fejlesztési fázisban inkább legyen találat, mint teljes eldobás.
     return working[0]
 
 
-def segment_name_stream(raw_text: str, alias_to_meps, group_hint=None, max_alias_tokens=MAX_ALIAS_TOKENS):
+def segment_name_stream(raw_text: str, alias_map, max_alias_tokens=MAX_ALIAS_TOKENS):
     cleaned = strip_noise_prefix(raw_text)
     if not cleaned:
         return []
@@ -377,11 +371,11 @@ def segment_name_stream(raw_text: str, alias_to_meps, group_hint=None, max_alias
             if not alias:
                 continue
 
-            matches = alias_to_meps.get(alias, [])
+            matches = alias_map.get(alias, [])
             if not matches:
                 continue
 
-            rec = choose_best_mep(matches, group_hint=group_hint)
+            rec = choose_best_mep(matches)
             if rec:
                 best_rec = rec
                 best_alias = alias
@@ -441,12 +435,19 @@ def find_xml_links():
 
     for a in soup.find_all("a", href=True):
         href = a["href"]
-        if ".xml" not in href.lower():
+        href_l = href.lower()
+
+        if ".xml" not in href_l:
+            continue
+
+        # Csak roll-call / rcv XML
+        if "rcv" not in href_l and "roll-call" not in href_l:
             continue
 
         full_url = urljoin(BASE_URL, href)
         if full_url in seen:
             continue
+
         seen.add(full_url)
         urls.append(full_url)
 
@@ -475,106 +476,6 @@ def possible_vote_blocks(root):
         blocks = [root]
 
     return blocks
-
-
-def extract_attr_name_candidates(attrs, alias_to_meps, group_hint, vote, tag):
-    out = []
-    for attr_name in ["name", "fullname", "fullName", "mepname", "membername", "persname"]:
-        if attr_name not in attrs:
-            continue
-
-        raw = str(attrs[attr_name]).strip()
-        norm = normalize_person_name(raw)
-        if not norm:
-            continue
-
-        matches = alias_to_meps.get(norm, [])
-        if not matches:
-            continue
-
-        rec = choose_best_mep(matches, group_hint=group_hint)
-        if rec:
-            out.append({
-                "raw": raw,
-                "normalized": norm,
-                "vote": vote,
-                "tag": tag,
-                "attrs": dict(attrs),
-                "matched": rec,
-            })
-    return out
-
-
-def extract_vote_sections_from_block(block):
-    sections = []
-
-    for el in block.iter():
-        tag = strip_ns(el.tag).lower()
-        txt = " ".join(el.itertext()).strip()
-        attrs = dict(el.attrib)
-
-        if not txt and not attrs:
-            continue
-
-        vote = detect_vote_label_from_tag_or_text(tag, txt, attrs)
-        if vote not in {"for", "against", "abstain"}:
-            continue
-
-        group_hint = None
-        group_id = attrs.get("Identifier") or attrs.get("identifier")
-        if tag == "result.politicalgroup.list" and group_id:
-            group_hint = group_id
-
-        sections.append({
-            "vote": vote,
-            "tag": tag,
-            "attrs": attrs,
-            "text": txt,
-            "group_hint": group_hint,
-        })
-
-    return sections
-
-
-def extract_member_vote_candidates(block, alias_to_meps):
-    candidates = []
-    sections = extract_vote_sections_from_block(block)
-
-    for sec in sections:
-        vote = sec["vote"]
-        tag = sec["tag"]
-        attrs = sec["attrs"]
-        txt = sec["text"]
-        group_hint = sec["group_hint"]
-
-        candidates.extend(
-            extract_attr_name_candidates(attrs, alias_to_meps, group_hint, vote, tag)
-        )
-
-        if txt:
-            segmented = segment_name_stream(txt, alias_to_meps, group_hint=group_hint)
-            for item in segmented:
-                candidates.append({
-                    "raw": item["raw"],
-                    "normalized": item["normalized"],
-                    "vote": vote,
-                    "tag": tag,
-                    "attrs": attrs,
-                    "matched": item["matched"],
-                })
-
-    dedup = {}
-    for c in candidates:
-        mep = c.get("matched")
-        if not mep:
-            continue
-
-        full_norm = normalize_person_name(mep.get("full_name", ""))
-        key = (full_norm, c["vote"])
-        if key not in dedup:
-            dedup[key] = c
-
-    return list(dedup.values()), sections
 
 
 def aggregate_countries_and_groups(member_vote_candidates):
@@ -619,9 +520,9 @@ def aggregate_countries_and_groups(member_vote_candidates):
     )
 
 
-def collect_expected_vote_totals(sections):
+def collect_expected_vote_totals_from_vote_sections(vote_sections):
     expected = {"for": None, "against": None, "abstain": None}
-    for sec in sections:
+    for sec in vote_sections:
         exp = expected_count_from_attrs(sec["attrs"])
         if exp is None:
             continue
@@ -678,7 +579,89 @@ def is_good_record(countries_majority: dict, expected_totals: dict, matched_tota
     return ratio >= MIN_MATCH_RATIO_IF_EXPECTED
 
 
-def parse_xml_document(xml_url: str, alias_to_meps):
+def extract_member_vote_candidates(block, alias_to_meps_global, alias_to_meps_by_group):
+    candidates = []
+    vote_sections = []
+
+    for el in block.iter():
+        tag = strip_ns(el.tag).lower()
+        if tag not in {"result.for", "result.against", "result.abstention", "result.abstain"}:
+            continue
+
+        attrs = dict(el.attrib)
+        vote = detect_vote_label_from_tag_or_text(tag, "", attrs)
+        if vote not in {"for", "against", "abstain"}:
+            continue
+
+        vote_sections.append({
+            "vote": vote,
+            "tag": tag,
+            "attrs": attrs,
+        })
+
+        group_lists = []
+        for child in el.iter():
+            child_tag = strip_ns(child.tag).lower()
+            if child_tag == "result.politicalgroup.list":
+                group_lists.append(child)
+
+        if group_lists:
+            for gl in group_lists:
+                gl_attrs = dict(gl.attrib)
+                txt = " ".join(gl.itertext()).strip()
+                group_hint = gl_attrs.get("Identifier") or gl_attrs.get("identifier")
+
+                if not txt:
+                    continue
+
+                group_alias_map = None
+                if group_hint:
+                    group_alias_map = alias_to_meps_by_group.get(group_hint)
+
+                if group_alias_map:
+                    alias_map = group_alias_map
+                else:
+                    alias_map = alias_to_meps_global
+
+                segmented = segment_name_stream(txt, alias_map)
+                for item in segmented:
+                    candidates.append({
+                        "raw": item["raw"],
+                        "normalized": item["normalized"],
+                        "vote": vote,
+                        "tag": "result.politicalgroup.list",
+                        "attrs": gl_attrs,
+                        "matched": item["matched"],
+                    })
+        else:
+            # fallback: ha nincs politikai csoport lista, akkor a teljes vote blokk szöveg
+            txt = " ".join(el.itertext()).strip()
+            if txt:
+                segmented = segment_name_stream(txt, alias_to_meps_global)
+                for item in segmented:
+                    candidates.append({
+                        "raw": item["raw"],
+                        "normalized": item["normalized"],
+                        "vote": vote,
+                        "tag": tag,
+                        "attrs": attrs,
+                        "matched": item["matched"],
+                    })
+
+    dedup = {}
+    for c in candidates:
+        mep = c.get("matched")
+        if not mep:
+            continue
+        full_norm = normalize_person_name(mep.get("full_name", ""))
+        key = (full_norm, c["vote"])
+        if key not in dedup:
+            dedup[key] = c
+
+    return list(dedup.values()), vote_sections
+
+
+def parse_xml_document(xml_url: str, alias_to_meps_global, alias_to_meps_by_group):
     xml_text = fetch_text(xml_url, xml=True)
     root = ET.fromstring(xml_text)
 
@@ -711,7 +694,11 @@ def parse_xml_document(xml_url: str, alias_to_meps):
             "title", "subject", "label", "text", "amendmenttitle", "description"
         }) or doc_title or f"EP vote {idx}"
 
-        member_vote_candidates, sections = extract_member_vote_candidates(block, alias_to_meps)
+        member_vote_candidates, vote_sections = extract_member_vote_candidates(
+            block,
+            alias_to_meps_global,
+            alias_to_meps_by_group,
+        )
 
         if member_vote_candidates:
             stats["blocks_with_member_votes"] += 1
@@ -729,7 +716,7 @@ def parse_xml_document(xml_url: str, alias_to_meps):
         if countries_majority:
             stats["blocks_with_country_votes"] += 1
 
-        expected_totals = collect_expected_vote_totals(sections)
+        expected_totals = collect_expected_vote_totals_from_vote_sections(vote_sections)
         matched_totals = collect_matched_vote_totals(member_vote_candidates)
         match_quality = compute_match_quality(expected_totals, matched_totals)
 
@@ -746,11 +733,11 @@ def parse_xml_document(xml_url: str, alias_to_meps):
             "title": title,
             "topic": topic,
 
-            # meglévő repo kompatibilitás
+            # repo kompatibilitás
             "countries": countries_majority,
             "groups": groups_majority,
 
-            # részletesebb adatok
+            # részletesebb mezők
             "country_vote_counts": country_vote_counts,
             "group_vote_counts": group_vote_counts,
             "matched_members": matched_members,
@@ -792,11 +779,18 @@ def main():
         print(f"Hiányzó vagy üres MEP referenciafájl: {REF_FILE}")
         return
 
-    full_lookup, alias_to_meps, duplicates, removed_single_token_aliases = build_mep_alias_index(mep_records)
+    (
+        full_lookup,
+        alias_to_meps_global,
+        alias_to_meps_by_group,
+        duplicates,
+        removed_single_token_aliases,
+    ) = build_mep_alias_indexes(mep_records)
 
     print("MEP rekordok:", len(mep_records))
     print("MEP full lookup elemek:", len(full_lookup))
-    print("Alias elemek:", len(alias_to_meps))
+    print("Globális alias elemek:", len(alias_to_meps_global))
+    print("Frakció alias csoportok:", len(alias_to_meps_by_group))
     print("Duplikált teljes nevek:", duplicates)
     print("Eltávolított többértelmű 1-token aliasok:", removed_single_token_aliases)
 
@@ -812,7 +806,7 @@ def main():
             save_output(existing, OUTPUT_FILE)
         return
 
-    print("Talált XML linkek:", len(xml_urls))
+    print("Talált RCV XML linkek:", len(xml_urls))
 
     all_new_records = []
     errors = []
@@ -825,7 +819,11 @@ def main():
 
     for xml_url in xml_urls:
         try:
-            records, stats = parse_xml_document(xml_url, alias_to_meps)
+            records, stats = parse_xml_document(
+                xml_url,
+                alias_to_meps_global,
+                alias_to_meps_by_group,
+            )
             all_new_records.extend(records)
 
             total_blocks += stats["blocks_total"]
