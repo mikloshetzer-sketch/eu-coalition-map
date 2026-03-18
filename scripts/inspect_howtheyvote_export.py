@@ -10,10 +10,10 @@ import requests
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT_DIR = ROOT / "data" / "debug"
-OUT_FILE = OUT_DIR / "howtheyvote_vote_results_schema.json"
+OUT_FILE = OUT_DIR / "howtheyvote_member_votes_schema.json"
 
-# 🔴 EZ A LÉNYEGES VÁLTÁS
-VOTE_RESULTS_URL = "https://github.com/HowTheyVote/data/releases/latest/download/vote_results.csv.gz"
+# EZ A HELYES FÁJL
+MEMBER_VOTES_URL = "https://github.com/HowTheyVote/data/releases/latest/download/member_votes.csv.gz"
 LAST_UPDATED_URL = "https://github.com/HowTheyVote/data/releases/latest/download/last_updated.txt"
 
 HEADERS = {
@@ -38,8 +38,8 @@ def main():
         last_updated = None
         print("Could not fetch last_updated.txt:", exc)
 
-    print("Downloading vote_results.csv.gz ...")
-    raw = download_bytes(VOTE_RESULTS_URL)
+    print("Downloading member_votes.csv.gz ...")
+    raw = download_bytes(MEMBER_VOTES_URL)
 
     print("Reading CSV ...")
     with gzip.GzipFile(fileobj=io.BytesIO(raw)) as gz:
