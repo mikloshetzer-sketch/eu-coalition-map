@@ -86,8 +86,7 @@ XML_ACCEPT_HEADERS = {
     "Accept": "application/xml,text/xml;q=0.9,*/*;q=0.8",
 }
 
-MIN_COUNTRIES_PER_RECORD = 4
-MAX_DOMINANCE_SHARE = 0.70
+MIN_COUNTRIES_PER_RECORD = 2
 
 
 def fetch_text(url: str, xml: bool = False, timeout: int = 45) -> str:
@@ -319,15 +318,6 @@ def is_good_record(countries: dict) -> bool:
         return False
 
     if len(countries) < MIN_COUNTRIES_PER_RECORD:
-        return False
-
-    vote_counts = Counter(countries.values())
-    total = sum(vote_counts.values())
-    if total <= 0:
-        return False
-
-    dominance_share = vote_counts.most_common(1)[0][1] / total
-    if dominance_share > MAX_DOMINANCE_SHARE and len(countries) < 6:
         return False
 
     return True
