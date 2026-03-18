@@ -8,7 +8,6 @@ from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urljoin
-import xml.etree.ElementTree as ET
 
 import requests
 from bs4 import BeautifulSoup
@@ -20,7 +19,7 @@ OUT_DIR = ROOT / "data" / "events" / "votes"
 OUTPUT_FILE = OUT_DIR / "council_votes.json"
 
 BASE_URL = "https://www.europarl.europa.eu"
-VOTES_PAGE_URL = "https://www.europarl.europa.eu/plenary/hu/votes.html?tab=votes"
+VOTES_PAGE_URL = "https://www.europarl.europa.eu/plenary/en/votes.html?tab=votes"
 
 EU_CODES = {
     "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE",
@@ -35,20 +34,17 @@ HEADERS = {
         "Chrome/123.0.0.0 Safari/537.36"
     ),
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-    "Accept-Language": "hu,en;q=0.9",
+    "Accept-Language": "en,hu;q=0.9",
     "Referer": "https://www.europarl.europa.eu/",
     "Cache-Control": "no-cache",
     "Pragma": "no-cache",
 }
 
-XML_ACCEPT_HEADERS = {
-    **HEADERS,
-    "Accept": "application/xml,text/xml;q=0.9,*/*;q=0.8",
-}
-
 MIN_COUNTRIES_PER_RECORD = 2
-MIN_MATCH_RATIO_IF_EXPECTED = 0.10
-MAX_ALIAS_TOKENS = 7
+
+GROUP_CODES = {
+    "EPP", "S&D", "ECR", "PfE", "Renew", "Greens/EFA", "The Left", "ESN", "NI"
+}
 
 CHAR_REPLACEMENTS = {
     "ß": "ss",
@@ -71,36 +67,9 @@ CHAR_REPLACEMENTS = {
     "Ñ": "n",
 }
 
-NOISE_PREFIX_PATTERNS = [
-    r"^keddi napirend\b.*?(?:kerelme|kérelme)\s+",
-    r"^hetfoi napirend\b.*?(?:kerelme|kérelme)\s+",
-    r"^hétfői napirend\b.*?(?:kerelme|kérelme)\s+",
-    r"^szerdai napirend\b.*?(?:kerelme|kérelme)\s+",
-    r"^csutortoki napirend\b.*?(?:kerelme|kérelme)\s+",
-    r"^csütörtöki napirend\b.*?(?:kerelme|kérelme)\s+",
-    r"^a pfe kepviselocsoport kerelme\s+",
-    r"^a pfe képviselőcsoport kérelme\s+",
-    r"^a kepviselocsoport kerelme\s+",
-    r"^a képviselőcsoport kérelme\s+",
-]
 
-VOTE_TAG_HINTS = {
-    "for": {
-        "result.for", "for", "votefor", "vote.for", "resultfor"
-    },
-    "against": {
-        "result.against", "against", "voteagainst", "vote.against", "resultagainst"
-    },
-    "abstain": {
-        "result.abstention", "result.abstain", "abstention", "abstain",
-        "voteabstention", "vote.abstention", "resultabstention"
-    },
-}
-
-
-def fetch_text(url: str, xml: bool = False, timeout: int = 45) -> str:
-    headers = XML_ACCEPT_HEADERS if xml else HEADERS
-    r = requests.get(url, headers=headers, timeout=timeout)
+def fetch_text(url: str, timeout: int = 45) -> str:
+    r = requests.get(url, headers=HEADERS, timeout=timeout)
     r.raise_for_status()
     return r.text
 
@@ -127,7 +96,6 @@ def normalize_person_name(name: str) -> str:
         return ""
 
     text = str(name).strip().lower()
-
     for src, dst in CHAR_REPLACEMENTS.items():
         text = text.replace(src.lower(), dst)
 
@@ -152,53 +120,15 @@ def normalize_person_name(name: str) -> str:
 
 
 def normalize_group_name(group: str) -> str:
-    if not group:
-        return ""
-    return str(group).strip().upper()
+    return str(group or "").strip()
 
 
-def strip_ns(tag: str) -> str:
-    return tag.split("}", 1)[-1] if "}" in tag else tag
-
-
-def first_nonempty_text(root, candidate_tags):
-    candidate_tags = {t.lower() for t in candidate_tags}
-    for el in root.iter():
-        tag = strip_ns(el.tag).lower()
-        if tag in candidate_tags:
-            txt = " ".join(el.itertext()).strip()
-            if txt:
-                return txt
-    return ""
-
-
-def normalize_date(text: str):
-    if not text:
+def majority_vote(vote_counts: dict):
+    items = [(k, v) for k, v in vote_counts.items() if v > 0]
+    if not items:
         return None
-
-    text = text.strip()
-
-    patterns = [
-        "%Y-%m-%d",
-        "%Y-%m-%d %H:%M:%S",
-        "%d/%m/%Y",
-        "%d.%m.%Y",
-        "%d %B %Y",
-        "%d %b %Y",
-    ]
-
-    for fmt in patterns:
-        try:
-            dt = datetime.strptime(text, fmt)
-            return dt.strftime("%Y-%m-%d")
-        except Exception:
-            pass
-
-    m = re.search(r"(\d{4}-\d{2}-\d{2})", text)
-    if m:
-        return m.group(1)
-
-    return None
+    items.sort(key=lambda x: (-x[1], x[0]))
+    return items[0][0]
 
 
 def classify_topic(title: str) -> str:
@@ -222,46 +152,9 @@ def classify_topic(title: str) -> str:
     return "trade"
 
 
-def majority_vote(vote_counts: dict):
-    if not vote_counts:
-        return None
-    items = [(k, v) for k, v in vote_counts.items() if v > 0]
-    if not items:
-        return None
-    items.sort(key=lambda x: (-x[1], x[0]))
-    return items[0][0]
-
-
-def strip_noise_prefix(text: str) -> str:
-    norm = normalize_person_name(text)
-    if not norm:
-        return ""
-
-    cleaned = norm
-    for pat in NOISE_PREFIX_PATTERNS:
-        cleaned = re.sub(pat, "", cleaned, flags=re.IGNORECASE)
-
-    cleaned = re.sub(
-        r"^(?:keddi|hetfoi|hétfői|szerdai|csutortoki|csütörtöki)\s+napirend\s+",
-        "",
-        cleaned,
-        flags=re.IGNORECASE,
-    )
-    return cleaned.strip()
-
-
-def expected_count_from_attrs(attrs: dict):
-    val = attrs.get("Number") or attrs.get("number")
-    if not val:
-        return None
-    try:
-        return int(val)
-    except Exception:
-        return None
-
-
-def build_mep_alias_indexes(mep_records):
+def build_mep_indexes(mep_records):
     full_lookup = {}
+    by_group = defaultdict(list)
     alias_to_meps_global = defaultdict(list)
     alias_to_meps_by_group = defaultdict(lambda: defaultdict(list))
     duplicates = 0
@@ -280,12 +173,11 @@ def build_mep_alias_indexes(mep_records):
 
         if norm in full_lookup:
             duplicates += 1
-
         full_lookup[norm] = rec
-        parts = norm.split()
+        by_group[group].append(rec)
 
-        aliases = set()
-        aliases.add(norm)
+        parts = norm.split()
+        aliases = set([norm])
 
         for i in range(len(parts)):
             aliases.add(" ".join(parts[i:]))
@@ -305,143 +197,103 @@ def build_mep_alias_indexes(mep_records):
             alias_to_meps_by_group[group][alias].append(rec)
 
     filtered_global = defaultdict(list)
-    filtered_by_group = defaultdict(lambda: defaultdict(list))
-    removed_single_token_aliases = 0
+    removed_ambiguous_singletons = 0
 
     for alias, recs in alias_to_meps_global.items():
         if len(alias.split()) == 1 and len(recs) > 1:
-            removed_single_token_aliases += 1
+            removed_ambiguous_singletons += 1
             continue
         filtered_global[alias] = recs
-
-    for group, alias_map in alias_to_meps_by_group.items():
-        for alias, recs in alias_map.items():
-            # frakción belül kisebb a keresési tér, ezért itt megtartjuk
-            filtered_by_group[group][alias] = recs
 
     return (
         full_lookup,
         filtered_global,
-        filtered_by_group,
+        alias_to_meps_by_group,
         duplicates,
-        removed_single_token_aliases,
+        removed_ambiguous_singletons,
     )
 
 
 def choose_best_mep(candidates):
     if not candidates:
         return None
-
     if len(candidates) == 1:
         return candidates[0]
 
-    working = sorted(
+    candidates = sorted(
         candidates,
         key=lambda c: (
             -len(normalize_person_name(c.get("full_name", "")).split()),
             normalize_person_name(c.get("full_name", "")),
         )
     )
-    return working[0]
+    return candidates[0]
 
 
-def segment_name_stream(raw_text: str, alias_map, max_alias_tokens=MAX_ALIAS_TOKENS):
-    cleaned = strip_noise_prefix(raw_text)
-    if not cleaned:
+def split_group_names(text: str):
+    if not text:
         return []
 
-    tokens = cleaned.split()
-    if not tokens:
-        return []
+    text = text.strip()
+    text = re.sub(r"\s+", " ", text)
 
-    out = []
-    i = 0
+    # A HTML névlisták tipikusan vesszővel elválasztottak.
+    parts = [p.strip(" ,;:.") for p in text.split(",")]
+    parts = [p for p in parts if p]
 
-    while i < len(tokens):
-        best_rec = None
-        best_alias = None
-        best_raw = None
-        best_len = 0
+    cleaned = []
+    for p in parts:
+        # néhány zajszűrés
+        if re.fullmatch(r"\d+", p):
+            continue
+        if p in {"+", "-", "0"}:
+            continue
+        cleaned.append(p)
 
-        max_len = min(max_alias_tokens, len(tokens) - i)
-
-        for n in range(max_len, 0, -1):
-            raw_piece = " ".join(tokens[i:i + n])
-            alias = normalize_person_name(raw_piece)
-            if not alias:
-                continue
-
-            matches = alias_map.get(alias, [])
-            if not matches:
-                continue
-
-            rec = choose_best_mep(matches)
-            if rec:
-                best_rec = rec
-                best_alias = alias
-                best_raw = raw_piece
-                best_len = n
-                break
-
-        if best_rec:
-            out.append({
-                "raw": best_raw,
-                "normalized": best_alias,
-                "matched": best_rec,
-            })
-            i += best_len
-        else:
-            i += 1
-
-    dedup = {}
-    for item in out:
-        full_norm = normalize_person_name(item["matched"].get("full_name", ""))
-        if full_norm and full_norm not in dedup:
-            dedup[full_norm] = item
-
-    return list(dedup.values())
+    return cleaned
 
 
-def detect_vote_label_from_tag_or_text(tag: str, text: str, attrs: dict):
-    tag = (tag or "").lower()
-    joined = f"{tag} {text or ''} " + " ".join(f"{k}={v}" for k, v in attrs.items())
-    joined = joined.lower()
+def match_name_to_mep(raw_name, alias_to_meps_global, alias_to_meps_by_group, group_hint=None):
+    norm = normalize_person_name(raw_name)
+    if not norm:
+        return None
 
-    if tag in VOTE_TAG_HINTS["abstain"]:
-        return "abstain"
-    if tag in VOTE_TAG_HINTS["against"]:
-        return "against"
-    if tag in VOTE_TAG_HINTS["for"]:
-        return "for"
+    if group_hint and group_hint in alias_to_meps_by_group:
+        recs = alias_to_meps_by_group[group_hint].get(norm, [])
+        if recs:
+            return choose_best_mep(recs)
 
-    if any(x in joined for x in ["abstention", "abstain", "abstained", "tartózk", "tartozk"]):
-        return "abstain"
+    recs = alias_to_meps_global.get(norm, [])
+    if recs:
+        return choose_best_mep(recs)
 
-    if any(x in joined for x in ["against", "rejected", "elutasít", "elutasit", "ellene"]):
-        return "against"
-
-    if any(x in joined for x in ["for", "adopted", "approved", "favour", "favor", "igen", "mellette"]):
-        return "for"
+    # suffix fallback
+    parts = norm.split()
+    for i in range(1, len(parts)):
+        suffix = " ".join(parts[i:])
+        if group_hint and group_hint in alias_to_meps_by_group:
+            recs = alias_to_meps_by_group[group_hint].get(suffix, [])
+            if recs:
+                return choose_best_mep(recs)
+        recs = alias_to_meps_global.get(suffix, [])
+        if recs:
+            return choose_best_mep(recs)
 
     return None
 
 
-def find_xml_links():
-    html = fetch_text(VOTES_PAGE_URL, xml=False)
+def find_rcv_html_links():
+    html = fetch_text(VOTES_PAGE_URL)
     soup = BeautifulSoup(html, "html.parser")
 
-    urls = []
+    links = []
     seen = set()
 
     for a in soup.find_all("a", href=True):
+        label = " ".join(a.stripped_strings).strip().lower()
         href = a["href"]
-        href_l = href.lower()
 
-        if ".xml" not in href_l:
-            continue
-
-        # Csak roll-call / rcv XML
-        if "rcv" not in href_l and "roll-call" not in href_l:
+        if "roll-call votes" not in label:
             continue
 
         full_url = urljoin(BASE_URL, href)
@@ -449,55 +301,166 @@ def find_xml_links():
             continue
 
         seen.add(full_url)
-        urls.append(full_url)
+        links.append(full_url)
 
-    return urls
+    return links
 
 
-def possible_vote_blocks(root):
-    blocks = []
-    candidate_tag_names = {
-        "rollcallvoteresult",
-        "rollcallvote.result",
-        "roll-call-vote",
-        "vote",
-        "voting",
-        "rcv",
-        "rollcall",
-        "result",
+def parse_vote_header_line(text: str):
+    """
+    Példa:
+    87 +
+    291 -
+    22 0
+    """
+    text = " ".join((text or "").split()).strip()
+    m = re.match(r"^(\d+)\s*([+\-0])$", text)
+    if not m:
+        return None
+
+    count = int(m.group(1))
+    symbol = m.group(2)
+    vote = {"+": "for", "-": "against", "0": "abstain"}[symbol]
+    return {"expected": count, "vote": vote}
+
+
+def parse_group_line(text: str):
+    """
+    Példa:
+    ECR : Axinia, Berlato, Geadi
+    """
+    text = " ".join((text or "").split()).strip()
+    m = re.match(r"^([^:]+)\s*:\s*(.+)$", text)
+    if not m:
+        return None
+
+    group = m.group(1).strip()
+    names_part = m.group(2).strip()
+
+    # csak ismert frakciók + NI
+    if group not in GROUP_CODES:
+        return None
+
+    return {
+        "group": group,
+        "names": split_group_names(names_part),
     }
 
-    for el in root.iter():
-        tag = strip_ns(el.tag).lower()
-        if tag in candidate_tag_names:
-            blocks.append(el)
 
-    if not blocks:
-        blocks = [root]
+def extract_rcv_blocks_from_html(html: str):
+    """
+    A HTML lineáris szövegéből dolgozunk:
+    - cím
+    - "87 +"
+    - "ECR : Axinia, Berlato..."
+    - "ESN : Anderson, Aust..."
+    """
+    soup = BeautifulSoup(html, "html.parser")
+    lines = []
+
+    for s in soup.stripped_strings:
+        line = " ".join(str(s).split()).strip()
+        if line:
+            lines.append(line)
+
+    blocks = []
+    current_title = None
+    current_vote = None
+    current_expected = None
+    current_groups = []
+
+    for line in lines:
+        vh = parse_vote_header_line(line)
+        if vh:
+            if current_title and current_vote and current_groups:
+                blocks.append({
+                    "title": current_title,
+                    "vote": current_vote,
+                    "expected": current_expected,
+                    "groups": current_groups,
+                })
+            current_vote = vh["vote"]
+            current_expected = vh["expected"]
+            current_groups = []
+            continue
+
+        gl = parse_group_line(line)
+        if gl and current_vote:
+            current_groups.append(gl)
+            continue
+
+        # ha nem vote count és nem group line, tekintjük címnek
+        # szűrünk néhány zajt
+        if line in {
+            "Minutes - Results of roll-call votes",
+            "NOTICE",
+            "Key to symbols: + (in favour), - (against), 0 (abstention)",
+            "PDF Download in PDF format",
+        }:
+            continue
+
+        # új szavazási pont címe
+        if len(line) > 5 and ":" not in line and not re.match(r"^\d+\.\d+", line):
+            current_title = line
+        elif re.match(r"^\d+(\.\d+)*\s+", line):
+            current_title = re.sub(r"^\d+(\.\d+)*\s*", "", line).strip()
+
+    if current_title and current_vote and current_groups:
+        blocks.append({
+            "title": current_title,
+            "vote": current_vote,
+            "expected": current_expected,
+            "groups": current_groups,
+        })
 
     return blocks
 
 
-def aggregate_countries_and_groups(member_vote_candidates):
+def aggregate_vote_block(block, alias_to_meps_global, alias_to_meps_by_group):
+    member_matches = []
     country_vote_counts = defaultdict(lambda: {"for": 0, "against": 0, "abstain": 0})
     group_vote_counts = defaultdict(lambda: {"for": 0, "against": 0, "abstain": 0})
-    matched_members = 0
 
-    for item in member_vote_candidates:
-        mep = item.get("matched")
-        if not mep:
-            continue
+    vote = block["vote"]
+    expected = block.get("expected")
 
-        vote = item["vote"]
-        country = mep.get("country", "")
-        group = mep.get("group", "")
+    seen_full_names = set()
 
-        if country in EU_CODES:
-            country_vote_counts[country][vote] += 1
-        if group:
-            group_vote_counts[group][vote] += 1
+    for group_entry in block.get("groups", []):
+        group = group_entry["group"]
+        names = group_entry["names"]
 
-        matched_members += 1
+        for raw_name in names:
+            mep = match_name_to_mep(
+                raw_name,
+                alias_to_meps_global=alias_to_meps_global,
+                alias_to_meps_by_group=alias_to_meps_by_group,
+                group_hint=group,
+            )
+            if not mep:
+                continue
+
+            full_norm = normalize_person_name(mep.get("full_name", ""))
+            if full_norm in seen_full_names:
+                continue
+            seen_full_names.add(full_norm)
+
+            member_matches.append({
+                "raw": raw_name,
+                "vote": vote,
+                "group_hint": group,
+                "matched_full_name": mep.get("full_name"),
+                "matched_country": mep.get("country"),
+                "matched_group": mep.get("group"),
+            })
+
+            country = mep.get("country", "")
+            mep_group = mep.get("group", "")
+
+            if country in EU_CODES:
+                country_vote_counts[country][vote] += 1
+            if mep_group:
+                group_vote_counts[mep_group][vote] += 1
 
     countries_majority = {}
     for country, counts in country_vote_counts.items():
@@ -511,174 +474,46 @@ def aggregate_countries_and_groups(member_vote_candidates):
         if mv:
             groups_majority[group] = mv
 
-    return (
-        dict(country_vote_counts),
-        dict(group_vote_counts),
-        countries_majority,
-        groups_majority,
-        matched_members,
-    )
+    matched_totals = {"for": 0, "against": 0, "abstain": 0}
+    matched_totals[vote] = len(member_matches)
 
+    expected_totals = {"for": None, "against": None, "abstain": None}
+    expected_totals[vote] = expected
 
-def collect_expected_vote_totals_from_vote_sections(vote_sections):
-    expected = {"for": None, "against": None, "abstain": None}
-    for sec in vote_sections:
-        exp = expected_count_from_attrs(sec["attrs"])
-        if exp is None:
-            continue
-        vote = sec["vote"]
-        if expected[vote] is None:
-            expected[vote] = exp
-    return expected
-
-
-def collect_matched_vote_totals(member_vote_candidates):
-    out = {"for": 0, "against": 0, "abstain": 0}
-    for item in member_vote_candidates:
-        vote = item["vote"]
-        if vote in out:
-            out[vote] += 1
-    return out
-
-
-def compute_match_quality(expected_totals, matched_totals):
-    parts = []
-    for vote in ["for", "against", "abstain"]:
-        exp = expected_totals.get(vote)
-        got = matched_totals.get(vote, 0)
-        if exp and exp > 0:
-            parts.append(f"{vote}:{got}/{exp}")
-        elif got > 0:
-            parts.append(f"{vote}:{got}")
-
-    total_expected = sum(v for v in expected_totals.values() if isinstance(v, int) and v > 0)
-    total_matched = sum(matched_totals.values())
-    total_ratio = round(total_matched / total_expected, 4) if total_expected > 0 else None
+    total_ratio = None
+    if expected and expected > 0:
+        total_ratio = round(len(member_matches) / expected, 4)
 
     return {
-        "summary": ", ".join(parts),
-        "total_ratio": total_ratio,
+        "member_matches": member_matches,
+        "country_vote_counts": dict(country_vote_counts),
+        "group_vote_counts": dict(group_vote_counts),
+        "countries": countries_majority,
+        "groups": groups_majority,
+        "matched_members": len(member_matches),
+        "expected_vote_totals": expected_totals,
+        "matched_vote_totals": matched_totals,
+        "match_quality": {
+            "summary": f"{vote}:{len(member_matches)}/{expected}" if expected else f"{vote}:{len(member_matches)}",
+            "total_ratio": total_ratio,
+        },
     }
 
 
-def is_good_record(countries_majority: dict, expected_totals: dict, matched_totals: dict) -> bool:
-    if not countries_majority or len(countries_majority) < MIN_COUNTRIES_PER_RECORD:
-        return False
-
-    expected_values = [v for v in expected_totals.values() if isinstance(v, int) and v > 0]
-    if not expected_values:
-        return True
-
-    total_expected = sum(expected_values)
-    total_matched = sum(matched_totals.values())
-
-    if total_expected <= 0:
-        return True
-
-    ratio = total_matched / total_expected
-    return ratio >= MIN_MATCH_RATIO_IF_EXPECTED
+def is_good_record(countries_majority, matched_members):
+    return bool(countries_majority) and len(countries_majority) >= MIN_COUNTRIES_PER_RECORD and matched_members > 0
 
 
-def extract_member_vote_candidates(block, alias_to_meps_global, alias_to_meps_by_group):
-    candidates = []
-    vote_sections = []
-
-    for el in block.iter():
-        tag = strip_ns(el.tag).lower()
-        if tag not in {"result.for", "result.against", "result.abstention", "result.abstain"}:
-            continue
-
-        attrs = dict(el.attrib)
-        vote = detect_vote_label_from_tag_or_text(tag, "", attrs)
-        if vote not in {"for", "against", "abstain"}:
-            continue
-
-        vote_sections.append({
-            "vote": vote,
-            "tag": tag,
-            "attrs": attrs,
-        })
-
-        group_lists = []
-        for child in el.iter():
-            child_tag = strip_ns(child.tag).lower()
-            if child_tag == "result.politicalgroup.list":
-                group_lists.append(child)
-
-        if group_lists:
-            for gl in group_lists:
-                gl_attrs = dict(gl.attrib)
-                txt = " ".join(gl.itertext()).strip()
-                group_hint = gl_attrs.get("Identifier") or gl_attrs.get("identifier")
-
-                if not txt:
-                    continue
-
-                group_alias_map = None
-                if group_hint:
-                    group_alias_map = alias_to_meps_by_group.get(group_hint)
-
-                if group_alias_map:
-                    alias_map = group_alias_map
-                else:
-                    alias_map = alias_to_meps_global
-
-                segmented = segment_name_stream(txt, alias_map)
-                for item in segmented:
-                    candidates.append({
-                        "raw": item["raw"],
-                        "normalized": item["normalized"],
-                        "vote": vote,
-                        "tag": "result.politicalgroup.list",
-                        "attrs": gl_attrs,
-                        "matched": item["matched"],
-                    })
-        else:
-            # fallback: ha nincs politikai csoport lista, akkor a teljes vote blokk szöveg
-            txt = " ".join(el.itertext()).strip()
-            if txt:
-                segmented = segment_name_stream(txt, alias_to_meps_global)
-                for item in segmented:
-                    candidates.append({
-                        "raw": item["raw"],
-                        "normalized": item["normalized"],
-                        "vote": vote,
-                        "tag": tag,
-                        "attrs": attrs,
-                        "matched": item["matched"],
-                    })
-
-    dedup = {}
-    for c in candidates:
-        mep = c.get("matched")
-        if not mep:
-            continue
-        full_norm = normalize_person_name(mep.get("full_name", ""))
-        key = (full_norm, c["vote"])
-        if key not in dedup:
-            dedup[key] = c
-
-    return list(dedup.values()), vote_sections
+def infer_date_from_url(url: str):
+    m = re.search(r"(\d{4})-(\d{2})-(\d{2})", url)
+    if m:
+        return f"{m.group(1)}-{m.group(2)}-{m.group(3)}"
+    return None
 
 
-def parse_xml_document(xml_url: str, alias_to_meps_global, alias_to_meps_by_group):
-    xml_text = fetch_text(xml_url, xml=True)
-    root = ET.fromstring(xml_text)
-
-    doc_title = first_nonempty_text(root, {
-        "title", "subject", "label", "proceduretitle", "documenttitle"
-    })
-    doc_date = first_nonempty_text(root, {
-        "date", "votedate", "sittingdate", "sessiondate"
-    })
-
-    normalized_date = normalize_date(doc_date)
-    if not normalized_date:
-        m = re.search(r"(\d{4}-\d{2}-\d{2})", xml_url)
-        if m:
-            normalized_date = m.group(1)
-
-    blocks = possible_vote_blocks(root)
+def parse_rcv_html_document(url, alias_to_meps_global, alias_to_meps_by_group):
+    html = fetch_text(url)
+    blocks = extract_rcv_blocks_from_html(html)
     records = []
 
     stats = {
@@ -689,65 +524,42 @@ def parse_xml_document(xml_url: str, alias_to_meps_global, alias_to_meps_by_grou
         "matched_members_total": 0,
     }
 
+    doc_date = infer_date_from_url(url)
+
     for idx, block in enumerate(blocks, start=1):
-        title = first_nonempty_text(block, {
-            "title", "subject", "label", "text", "amendmenttitle", "description"
-        }) or doc_title or f"EP vote {idx}"
+        aggregated = aggregate_vote_block(block, alias_to_meps_global, alias_to_meps_by_group)
 
-        member_vote_candidates, vote_sections = extract_member_vote_candidates(
-            block,
-            alias_to_meps_global,
-            alias_to_meps_by_group,
-        )
-
-        if member_vote_candidates:
+        if aggregated["matched_members"] > 0:
             stats["blocks_with_member_votes"] += 1
-
-        (
-            country_vote_counts,
-            group_vote_counts,
-            countries_majority,
-            groups_majority,
-            matched_members,
-        ) = aggregate_countries_and_groups(member_vote_candidates)
-
-        stats["matched_members_total"] += matched_members
-
-        if countries_majority:
+        if aggregated["countries"]:
             stats["blocks_with_country_votes"] += 1
 
-        expected_totals = collect_expected_vote_totals_from_vote_sections(vote_sections)
-        matched_totals = collect_matched_vote_totals(member_vote_candidates)
-        match_quality = compute_match_quality(expected_totals, matched_totals)
+        stats["matched_members_total"] += aggregated["matched_members"]
 
-        if not is_good_record(countries_majority, expected_totals, matched_totals):
+        if not is_good_record(aggregated["countries"], aggregated["matched_members"]):
             continue
 
+        title = block.get("title") or f"EP vote {idx}"
         topic = classify_topic(title)
-        stable_source = f"{xml_url}::{idx}"
+        stable_source = f"{url}::{idx}"
         stable_id = re.sub(r"[^A-Za-z0-9]+", "_", stable_source).strip("_")
 
         records.append({
             "id": f"vote_{stable_id}",
-            "date": normalized_date,
+            "date": doc_date,
             "title": title,
             "topic": topic,
-
-            # repo kompatibilitás
-            "countries": countries_majority,
-            "groups": groups_majority,
-
-            # részletesebb mezők
-            "country_vote_counts": country_vote_counts,
-            "group_vote_counts": group_vote_counts,
-            "matched_members": matched_members,
-            "expected_vote_totals": expected_totals,
-            "matched_vote_totals": matched_totals,
-            "match_quality": match_quality,
-
+            "countries": aggregated["countries"],
+            "groups": aggregated["groups"],
+            "country_vote_counts": aggregated["country_vote_counts"],
+            "group_vote_counts": aggregated["group_vote_counts"],
+            "matched_members": aggregated["matched_members"],
+            "expected_vote_totals": aggregated["expected_vote_totals"],
+            "matched_vote_totals": aggregated["matched_vote_totals"],
+            "match_quality": aggregated["match_quality"],
             "source": "votes",
             "institution": "europarl",
-            "url": xml_url,
+            "url": url,
             "collected_at": datetime.now(timezone.utc).isoformat()
         })
         stats["blocks_kept"] += 1
@@ -784,29 +596,29 @@ def main():
         alias_to_meps_global,
         alias_to_meps_by_group,
         duplicates,
-        removed_single_token_aliases,
-    ) = build_mep_alias_indexes(mep_records)
+        removed_ambiguous_singletons,
+    ) = build_mep_indexes(mep_records)
 
     print("MEP rekordok:", len(mep_records))
     print("MEP full lookup elemek:", len(full_lookup))
     print("Globális alias elemek:", len(alias_to_meps_global))
     print("Frakció alias csoportok:", len(alias_to_meps_by_group))
     print("Duplikált teljes nevek:", duplicates)
-    print("Eltávolított többértelmű 1-token aliasok:", removed_single_token_aliases)
+    print("Eltávolított többértelmű 1-token aliasok:", removed_ambiguous_singletons)
 
     existing = load_json_list(OUTPUT_FILE)
     print("Meglévő vote rekordok:", len(existing))
 
     try:
-        xml_urls = find_xml_links()
+        rcv_links = find_rcv_html_links()
     except Exception as exc:
-        print("FIGYELEM: az EP XML linkek begyűjtése nem sikerült, a meglévő fájl megmarad.")
+        print("FIGYELEM: az EP RCV HTML linkek begyűjtése nem sikerült.")
         print(f"Hiba: {exc}")
         if not OUTPUT_FILE.exists():
             save_output(existing, OUTPUT_FILE)
         return
 
-    print("Talált RCV XML linkek:", len(xml_urls))
+    print("Talált RCV HTML linkek:", len(rcv_links))
 
     all_new_records = []
     errors = []
@@ -817,10 +629,10 @@ def main():
     kept_blocks = 0
     matched_members_total = 0
 
-    for xml_url in xml_urls:
+    for url in rcv_links:
         try:
-            records, stats = parse_xml_document(
-                xml_url,
+            records, stats = parse_rcv_html_document(
+                url,
                 alias_to_meps_global,
                 alias_to_meps_by_group,
             )
@@ -834,12 +646,12 @@ def main():
 
             time.sleep(0.5)
         except Exception as exc:
-            errors.append(f"{xml_url}: {exc}")
+            errors.append(f"{url}: {exc}")
 
     merged = merge_records(existing, all_new_records)
     save_output(merged, OUTPUT_FILE)
 
-    print("Összes XML blokk:", total_blocks)
+    print("Összes blokk:", total_blocks)
     print("Blokkok személy-szavazattal:", blocks_with_member_votes)
     print("Blokkok ország-szavazattal:", blocks_with_country_votes)
     print("Megtartott blokkok:", kept_blocks)
@@ -850,17 +662,15 @@ def main():
 
     if all_new_records:
         avg_countries = sum(len(r.get("countries", {})) for r in all_new_records) / len(all_new_records)
-        total_ratios = []
-
+        ratios = []
         for r in all_new_records:
-            mq = r.get("match_quality", {})
-            ratio = mq.get("total_ratio")
+            ratio = (r.get("match_quality") or {}).get("total_ratio")
             if isinstance(ratio, (int, float)):
-                total_ratios.append(ratio)
+                ratios.append(ratio)
 
         print("Átlagos ország / rekord:", round(avg_countries, 2))
-        if total_ratios:
-            print("Átlagos total match arány:", round(sum(total_ratios) / len(total_ratios), 4))
+        if ratios:
+            print("Átlagos match arány:", round(sum(ratios) / len(ratios), 4))
 
     if errors:
         print("\nRészleges hibák:")
