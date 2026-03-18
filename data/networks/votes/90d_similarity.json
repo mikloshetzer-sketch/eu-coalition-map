@@ -1,21 +1,54 @@
 {
   "nodes": [
     {
+      "id": "AT",
+      "weight": 1.0
+    },
+    {
       "id": "BE",
       "weight": 1.0
     },
     {
       "id": "DE",
       "weight": 1.0
+    },
+    {
+      "id": "LU",
+      "weight": 1.0
     }
   ],
   "edges": [
     {
+      "source": "AT",
+      "target": "BE",
+      "weight": 1.0
+    },
+    {
+      "source": "AT",
+      "target": "DE",
+      "weight": 1.0
+    },
+    {
+      "source": "AT",
+      "target": "LU",
+      "weight": 1.0
+    },
+    {
       "source": "BE",
       "target": "DE",
       "weight": 1.0
+    },
+    {
+      "source": "BE",
+      "target": "LU",
+      "weight": 1.0
+    },
+    {
+      "source": "DE",
+      "target": "LU",
+      "weight": 1.0
     }
   ],
-  "event_count": 1,
+  "event_count": 2,
   "mode": "all"
 }

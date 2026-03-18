@@ -1,21 +1,34 @@
 {
   "nodes": [
     {
+      "id": "AT",
+      "weight": 1
+    },
+    {
       "id": "BE",
       "weight": 1
     },
     {
       "id": "DE",
       "weight": 1
+    },
+    {
+      "id": "LU",
+      "weight": 1
     }
   ],
   "edges": [
+    {
+      "source": "AT",
+      "target": "LU",
+      "weight": 0.25
+    },
     {
       "source": "BE",
       "target": "DE",
       "weight": 1.0
     }
   ],
-  "event_count": 1,
+  "event_count": 2,
   "mode": "all"
 }
