@@ -15,7 +15,6 @@ OUT_DIR = ROOT / "data" / "events" / "votes"
 OUTPUT_FILE = OUT_DIR / "council_votes.json"
 
 BASE_URL = "https://www.consilium.europa.eu"
-SEARCH_URL = "https://www.consilium.europa.eu/en/general-secretariat/corporate-policies/transparency/voting-results/"
 PUBLIC_VOTES_URL = "https://www.consilium.europa.eu/en/documents/public-register/votes/"
 
 TOPICS = {
@@ -67,12 +66,22 @@ COUNTRY_NAME_TO_CODE = {
 }
 
 HEADERS = {
-    "User-Agent": "Mozilla/5.0 (compatible; EUCoalitionMap/1.0; +https://github.com/mikloshetzer-sketch/eu-coalition-map)"
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/122.0.0.0 Safari/537.36"
+    ),
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Referer": "https://www.consilium.europa.eu/",
+    "Cache-Control": "no-cache",
+    "Pragma": "no-cache",
 }
 
 
 def fetch_html(url: str, timeout: int = 30) -> str:
-    r = requests.get(url, headers=HEADERS, timeout=timeout)
+    session = requests.Session()
+    r = session.get(url, headers=HEADERS, timeout=timeout)
     r.raise_for_status()
     return r.text
 
@@ -109,7 +118,6 @@ def normalize_date(text: str):
         except Exception:
             pass
 
-    # pl. "13-14 November 2025" -> vegyük az első napot
     m = re.match(r"(\d{1,2})-\d{1,2}\s+([A-Za-z]+)\s+(\d{4})", text)
     if m:
         simplified = f"{m.group(1)} {m.group(2)} {m.group(3)}"
@@ -132,9 +140,9 @@ def classify_topic(title: str) -> str:
         ("enlargement", ["enlargement", "accession", "candidate country"]),
         ("defence", ["defence", "defense", "military", "security assistance", "armed forces"]),
         ("energy", ["energy", "gas", "electricity", "electric", "power market", "oil", "renewable"]),
-        ("fiscal", ["budget", "fiscal", "deficit", "financial framework", "appropriations"]),
+        ("fiscal", ["budget", "fiscal", "deficit", "financial framework", "appropriations", "deposit", "resolution"]),
         ("rule_of_law", ["rule of law", "judicial", "justice reform", "fundamental rights"]),
-        ("trade", ["trade", "tariff", "customs", "import", "export", "market access"]),
+        ("trade", ["trade", "tariff", "customs", "import", "export", "market access", "mercosur"]),
     ]
 
     for topic, keywords in rules:
@@ -145,10 +153,6 @@ def classify_topic(title: str) -> str:
 
 
 def extract_vote_rows_from_text(text: str):
-    """
-    Best-effort ország -> szavazat kinyerés.
-    Csak akkor ad vissza adatot, ha egyértelmű mintát talál.
-    """
     if not text:
         return {}
 
@@ -156,7 +160,6 @@ def extract_vote_rows_from_text(text: str):
     result = {}
 
     for country_name, code in COUNTRY_NAME_TO_CODE.items():
-        # nagyon egyszerű minták
         patterns = [
             (rf"{re.escape(country_name)}[^.:\n]{{0,40}}voted in favour", "for"),
             (rf"{re.escape(country_name)}[^.:\n]{{0,40}}voted for", "for"),
@@ -175,25 +178,18 @@ def extract_vote_rows_from_text(text: str):
 
 
 def parse_search_page():
-    """
-    Első körben a nyilvános votes listából gyűjtünk rekordokat.
-    """
     html = fetch_html(PUBLIC_VOTES_URL)
     soup = BeautifulSoup(html, "html.parser")
 
     records = []
-
-    # Keress linkeket a listában
-    links = soup.find_all("a", href=True)
     seen = set()
 
-    for a in links:
+    for a in soup.find_all("a", href=True):
         href = a["href"]
         title = a.get_text(" ", strip=True)
 
         if not title:
             continue
-
         if "Voting result" not in title and "voting result" not in title:
             continue
 
@@ -213,19 +209,14 @@ def parse_search_page():
 def parse_record_detail(url: str, fallback_title: str):
     html = fetch_html(url)
     soup = BeautifulSoup(html, "html.parser")
-
     full_text = soup.get_text("\n", strip=True)
 
-    # cím
     title = fallback_title
     h1 = soup.find("h1")
     if h1:
         title = h1.get_text(" ", strip=True) or fallback_title
 
-    # dátum keresése
     date = None
-
-    # próbáljuk a szövegből kinyerni
     date_patterns = [
         r"\b(\d{1,2}\s+[A-Za-z]+\s+\d{4})\b",
         r"\b(\d{1,2}-\d{1,2}\s+[A-Za-z]+\s+\d{4})\b",
@@ -242,7 +233,6 @@ def parse_record_detail(url: str, fallback_title: str):
     topic = classify_topic(title)
     countries = extract_vote_rows_from_text(full_text)
 
-    # stabil ID
     doc_id = re.sub(r"[^A-Za-z0-9]+", "_", url.strip("/").split("/")[-1]).strip("_")
     if not doc_id:
         doc_id = re.sub(r"[^A-Za-z0-9]+", "_", title.lower()).strip("_")
@@ -277,28 +267,28 @@ def merge_records(existing, new_records):
 
 def main():
     existing = load_existing(OUTPUT_FILE)
-
     print("Meglévő rekordok:", len(existing))
 
-    search_results = parse_search_page()
-    print("Talált szavazási találatok:", len(search_results))
+    try:
+        search_results = parse_search_page()
+        print("Talált szavazási találatok:", len(search_results))
+    except Exception as exc:
+        print("FIGYELEM: a votes scrape nem sikerült, a meglévő fájl megmarad.")
+        print(f"Hiba: {exc}")
+        if not OUTPUT_FILE.exists():
+            save_output(existing, OUTPUT_FILE)
+        return
 
     new_records = []
     errors = []
 
-    for i, item in enumerate(search_results, start=1):
+    for item in search_results:
         try:
             record = parse_record_detail(item["url"], item["title"])
-
-            # csak akkor használjuk, ha van dátum
             if not record.get("date"):
                 continue
-
             new_records.append(record)
-
-            # kíméljük a szervert
             time.sleep(0.8)
-
         except Exception as exc:
             errors.append(f"{item.get('url')}: {exc}")
 
@@ -310,7 +300,7 @@ def main():
     print("Kimenet:", OUTPUT_FILE)
 
     if errors:
-        print("\nHibák:")
+        print("\nRészleges hibák:")
         for err in errors[:20]:
             print("-", err)
 
