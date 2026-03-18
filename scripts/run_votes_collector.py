@@ -4,7 +4,7 @@ import json
 import re
 import time
 import unicodedata
-from collections import Counter, defaultdict
+from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urljoin
@@ -46,20 +46,10 @@ XML_ACCEPT_HEADERS = {
     "Accept": "application/xml,text/xml;q=0.9,*/*;q=0.8",
 }
 
-# Legalább ennyi ország kell ahhoz, hogy megtartsuk a rekordot
-MIN_COUNTRIES_PER_RECORD = 3
-
-# Ha egy vote-lista Number attribútuma pl. 87, akkor legalább ennyi arányban
-# szeretnénk megtalálni a neveket, hogy komolyan vegyük a blokkot.
-MIN_MATCH_RATIO_IF_EXPECTED = 0.35
-
-# Max ennyi tokenből állhat egy alias
-MAX_ALIAS_TOKENS = 6
-
-NAME_PARTICLES = {
-    "de", "del", "de la", "van", "von", "der", "den", "ter", "ten",
-    "di", "da", "dos", "du", "la", "le", "i", "al"
-}
+# Fejlesztési fázisban lazább küszöbök
+MIN_COUNTRIES_PER_RECORD = 2
+MIN_MATCH_RATIO_IF_EXPECTED = 0.10
+MAX_ALIAS_TOKENS = 7
 
 CHAR_REPLACEMENTS = {
     "ß": "ss",
@@ -94,6 +84,19 @@ NOISE_PREFIX_PATTERNS = [
     r"^a kepviselocsoport kerelme\s+",
     r"^a képviselőcsoport kérelme\s+",
 ]
+
+VOTE_TAG_HINTS = {
+    "for": {
+        "result.for", "for", "votefor", "vote.for", "resultfor"
+    },
+    "against": {
+        "result.against", "against", "voteagainst", "vote.against", "resultagainst"
+    },
+    "abstain": {
+        "result.abstention", "result.abstain", "abstention", "abstain",
+        "voteabstention", "vote.abstention", "resultabstention"
+    },
+}
 
 
 def fetch_text(url: str, xml: bool = False, timeout: int = 45) -> str:
@@ -150,7 +153,9 @@ def normalize_person_name(name: str) -> str:
 
 
 def normalize_group_name(group: str) -> str:
-    return normalize_person_name(group).upper()
+    if not group:
+        return ""
+    return str(group).strip().upper()
 
 
 def strip_ns(tag: str) -> str:
@@ -218,6 +223,215 @@ def classify_topic(title: str) -> str:
     return "trade"
 
 
+def majority_vote(vote_counts: dict):
+    if not vote_counts:
+        return None
+    items = [(k, v) for k, v in vote_counts.items() if v > 0]
+    if not items:
+        return None
+    items.sort(key=lambda x: (-x[1], x[0]))
+    return items[0][0]
+
+
+def strip_noise_prefix(text: str) -> str:
+    norm = normalize_person_name(text)
+    if not norm:
+        return ""
+
+    cleaned = norm
+    for pat in NOISE_PREFIX_PATTERNS:
+        cleaned = re.sub(pat, "", cleaned, flags=re.IGNORECASE)
+
+    cleaned = re.sub(
+        r"^(?:keddi|hetfoi|hétfői|szerdai|csutortoki|csütörtöki)\s+napirend\s+",
+        "",
+        cleaned,
+        flags=re.IGNORECASE,
+    )
+    return cleaned.strip()
+
+
+def expected_count_from_attrs(attrs: dict):
+    val = attrs.get("Number") or attrs.get("number")
+    if not val:
+        return None
+    try:
+        return int(val)
+    except Exception:
+        return None
+
+
+def build_mep_alias_index(mep_records):
+    alias_to_meps = defaultdict(list)
+    full_lookup = {}
+    duplicates = 0
+
+    for rec in mep_records:
+        full_name = rec.get("full_name", "")
+        country = rec.get("country", "")
+        group = rec.get("group", "")
+
+        if not full_name or not country or not group:
+            continue
+
+        norm = normalize_person_name(full_name)
+        if not norm:
+            continue
+
+        if norm in full_lookup:
+            duplicates += 1
+
+        full_lookup[norm] = rec
+        parts = norm.split()
+        aliases = set()
+
+        aliases.add(norm)
+
+        # teljes suffixek
+        for i in range(len(parts)):
+            aliases.add(" ".join(parts[i:]))
+
+        # utolsó 1-3 token
+        for n in (1, 2, 3):
+            if len(parts) >= n:
+                aliases.add(" ".join(parts[-n:]))
+
+        # első + utolsó
+        if len(parts) >= 2:
+            aliases.add(parts[0] + " " + parts[-1])
+
+        for alias in aliases:
+            alias = alias.strip()
+            if not alias or len(alias) < 3:
+                continue
+            alias_to_meps[alias].append(rec)
+
+    # egytokenes aliasokból csak az egyedi maradjon
+    filtered = defaultdict(list)
+    removed_single_token_aliases = 0
+
+    for alias, recs in alias_to_meps.items():
+        if len(alias.split()) == 1 and len(recs) > 1:
+            removed_single_token_aliases += 1
+            continue
+        filtered[alias] = recs
+
+    return full_lookup, filtered, duplicates, removed_single_token_aliases
+
+
+def choose_best_mep(candidates, group_hint=None):
+    if not candidates:
+        return None
+
+    if len(candidates) == 1:
+        return candidates[0]
+
+    working = list(candidates)
+
+    if group_hint:
+        ng = normalize_group_name(group_hint)
+        narrowed = [
+            c for c in working
+            if normalize_group_name(c.get("group", "")) == ng
+        ]
+        if len(narrowed) == 1:
+            return narrowed[0]
+        if len(narrowed) > 1:
+            working = narrowed
+
+    working = sorted(
+        working,
+        key=lambda c: (
+            -len(normalize_person_name(c.get("full_name", "")).split()),
+            normalize_person_name(c.get("full_name", "")),
+        )
+    )
+
+    # Fejlesztési fázisban inkább legyen találat, mint teljes eldobás.
+    return working[0]
+
+
+def segment_name_stream(raw_text: str, alias_to_meps, group_hint=None, max_alias_tokens=MAX_ALIAS_TOKENS):
+    cleaned = strip_noise_prefix(raw_text)
+    if not cleaned:
+        return []
+
+    tokens = cleaned.split()
+    if not tokens:
+        return []
+
+    out = []
+    i = 0
+
+    while i < len(tokens):
+        best_rec = None
+        best_alias = None
+        best_raw = None
+        best_len = 0
+
+        max_len = min(max_alias_tokens, len(tokens) - i)
+
+        for n in range(max_len, 0, -1):
+            raw_piece = " ".join(tokens[i:i + n])
+            alias = normalize_person_name(raw_piece)
+            if not alias:
+                continue
+
+            matches = alias_to_meps.get(alias, [])
+            if not matches:
+                continue
+
+            rec = choose_best_mep(matches, group_hint=group_hint)
+            if rec:
+                best_rec = rec
+                best_alias = alias
+                best_raw = raw_piece
+                best_len = n
+                break
+
+        if best_rec:
+            out.append({
+                "raw": best_raw,
+                "normalized": best_alias,
+                "matched": best_rec,
+            })
+            i += best_len
+        else:
+            i += 1
+
+    dedup = {}
+    for item in out:
+        full_norm = normalize_person_name(item["matched"].get("full_name", ""))
+        if full_norm and full_norm not in dedup:
+            dedup[full_norm] = item
+
+    return list(dedup.values())
+
+
+def detect_vote_label_from_tag_or_text(tag: str, text: str, attrs: dict):
+    tag = (tag or "").lower()
+    joined = f"{tag} {text or ''} " + " ".join(f"{k}={v}" for k, v in attrs.items())
+    joined = joined.lower()
+
+    if tag in VOTE_TAG_HINTS["abstain"]:
+        return "abstain"
+    if tag in VOTE_TAG_HINTS["against"]:
+        return "against"
+    if tag in VOTE_TAG_HINTS["for"]:
+        return "for"
+
+    if any(x in joined for x in ["abstention", "abstain", "abstained", "tartózk", "tartozk"]):
+        return "abstain"
+
+    if any(x in joined for x in ["against", "rejected", "elutasít", "elutasit", "ellene"]):
+        return "against"
+
+    if any(x in joined for x in ["for", "adopted", "approved", "favour", "favor", "igen", "mellette"]):
+        return "for"
+
+    return None
+
+
 def find_xml_links():
     html = fetch_text(VOTES_PAGE_URL, xml=False)
     soup = BeautifulSoup(html, "html.parser")
@@ -263,210 +477,21 @@ def possible_vote_blocks(root):
     return blocks
 
 
-def detect_vote_label(text: str):
-    t = " ".join((text or "").split()).strip().lower()
-
-    if not t:
-        return None
-
-    if any(x in t for x in ["abstention", "abstain", "abstained", "tartózk", "tartozk"]):
-        return "abstain"
-
-    if any(x in t for x in ["against", "rejected", "elutasít", "elutasit", "ellene"]):
-        return "against"
-
-    if any(x in t for x in ["for", "adopted", "approved", "favour", "favor", "igen", "mellette"]):
-        return "for"
-
-    return None
-
-
-def majority_vote(vote_counts: dict):
-    if not vote_counts:
-        return None
-    items = [(k, v) for k, v in vote_counts.items() if v > 0]
-    if not items:
-        return None
-    items.sort(key=lambda x: (-x[1], x[0]))
-    return items[0][0]
-
-
-def strip_noise_prefix(text: str) -> str:
-    norm = normalize_person_name(text)
-    if not norm:
-        return ""
-
-    cleaned = norm
-    for pat in NOISE_PREFIX_PATTERNS:
-        cleaned = re.sub(pat, "", cleaned, flags=re.IGNORECASE)
-
-    # Biztonsági fallback: ha nagyon hosszú fejléc eleje maradna bent
-    cleaned = re.sub(
-        r"^(?:keddi|hetfoi|hétfői|szerdai|csutortoki|csütörtöki)\s+napirend\s+",
-        "",
-        cleaned,
-        flags=re.IGNORECASE,
-    )
-    return cleaned.strip()
-
-
-def expected_count_from_attrs(attrs: dict):
-    val = attrs.get("Number") or attrs.get("number")
-    if not val:
-        return None
-    try:
-        return int(val)
-    except Exception:
-        return None
-
-
-def build_mep_alias_index(mep_records):
-    alias_to_meps = defaultdict(list)
-    full_lookup = {}
-    duplicates = 0
-
-    for rec in mep_records:
-        full_name = rec.get("full_name", "")
-        country = rec.get("country", "")
-        group = rec.get("group", "")
-
-        if not full_name or not country or not group:
-            continue
-
-        norm = normalize_person_name(full_name)
-        if not norm:
-            continue
-
-        if norm in full_lookup:
-            duplicates += 1
-
-        full_lookup[norm] = rec
-        parts = norm.split()
-        aliases = set()
-
-        # teljes név
-        aliases.add(norm)
-
-        # teljes suffixek: pl. "de la pisa carrion", "pisa carrion", "carrion"
-        for i in range(len(parts)):
-            aliases.add(" ".join(parts[i:]))
-
-        # utolsó 1-3 token
-        for n in (1, 2, 3):
-            if len(parts) >= n:
-                aliases.add(" ".join(parts[-n:]))
-
-        # első + utolsó
-        if len(parts) >= 2:
-            aliases.add(parts[0] + " " + parts[-1])
-
-        # particle-ös végződések külön támogatása
-        # pl. van leeuwen, de meo, de la pisa carrion, riba i giner
-        for start in range(len(parts)):
-            suffix = parts[start:]
-            if not suffix:
-                continue
-            aliases.add(" ".join(suffix))
-
-        # kötőjeles nevek már normalize után szóközösek, itt az is működik
-
-        for alias in aliases:
-            alias = alias.strip()
-            if not alias or len(alias) < 3:
-                continue
-            alias_to_meps[alias].append(rec)
-
-    return full_lookup, alias_to_meps, duplicates
-
-
-def choose_best_mep(candidates, group_hint=None):
-    if not candidates:
-        return None
-
-    if len(candidates) == 1:
-        return candidates[0]
-
-    if group_hint:
-        ng = normalize_group_name(group_hint)
-        narrowed = [
-            c for c in candidates
-            if normalize_group_name(c.get("group", "")) == ng
-        ]
-        if len(narrowed) == 1:
-            return narrowed[0]
-        if narrowed:
-            candidates = narrowed
-
-    # Ha még mindig nem egyértelmű, inkább ne találjunk hamisat.
-    return None
-
-
-def segment_name_stream(raw_text: str, alias_to_meps, group_hint=None, max_alias_tokens=MAX_ALIAS_TOKENS):
-    cleaned = strip_noise_prefix(raw_text)
-    if not cleaned:
-        return []
-
-    tokens = cleaned.split()
-    if not tokens:
-        return []
-
-    out = []
-    i = 0
-
-    while i < len(tokens):
-        best_rec = None
-        best_alias = None
-        best_raw = None
-        best_len = 0
-
-        max_len = min(max_alias_tokens, len(tokens) - i)
-
-        for n in range(max_len, 0, -1):
-            raw_piece = " ".join(tokens[i:i + n])
-            alias = normalize_person_name(raw_piece)
-            if not alias:
-                continue
-
-            matches = alias_to_meps.get(alias, [])
-            rec = choose_best_mep(matches, group_hint=group_hint)
-            if rec:
-                best_rec = rec
-                best_alias = alias
-                best_raw = raw_piece
-                best_len = n
-                break
-
-        if best_rec:
-            out.append({
-                "raw": best_raw,
-                "normalized": best_alias,
-                "matched": best_rec,
-            })
-            i += best_len
-        else:
-            i += 1
-
-    # dedup ugyanazon teljes névre
-    dedup = {}
-    for item in out:
-        full_norm = normalize_person_name(item["matched"].get("full_name", ""))
-        if full_norm and full_norm not in dedup:
-            dedup[full_norm] = item
-
-    return list(dedup.values())
-
-
-def extract_attr_name_candidates(el, alias_to_meps, group_hint, vote, tag):
+def extract_attr_name_candidates(attrs, alias_to_meps, group_hint, vote, tag):
     out = []
     for attr_name in ["name", "fullname", "fullName", "mepname", "membername", "persname"]:
-        if attr_name not in el.attrib:
+        if attr_name not in attrs:
             continue
-        raw = str(el.attrib[attr_name]).strip()
+
+        raw = str(attrs[attr_name]).strip()
         norm = normalize_person_name(raw)
         if not norm:
             continue
 
         matches = alias_to_meps.get(norm, [])
+        if not matches:
+            continue
+
         rec = choose_best_mep(matches, group_hint=group_hint)
         if rec:
             out.append({
@@ -474,16 +499,13 @@ def extract_attr_name_candidates(el, alias_to_meps, group_hint, vote, tag):
                 "normalized": norm,
                 "vote": vote,
                 "tag": tag,
-                "attrs": dict(el.attrib),
+                "attrs": dict(attrs),
                 "matched": rec,
             })
     return out
 
 
 def extract_vote_sections_from_block(block):
-    """
-    Elsősorban a tipikus EP XML tagekre koncentrálunk.
-    """
     sections = []
 
     for el in block.iter():
@@ -491,33 +513,25 @@ def extract_vote_sections_from_block(block):
         txt = " ".join(el.itertext()).strip()
         attrs = dict(el.attrib)
 
-        if not txt:
+        if not txt and not attrs:
             continue
 
-        vote = None
+        vote = detect_vote_label_from_tag_or_text(tag, txt, attrs)
+        if vote not in {"for", "against", "abstain"}:
+            continue
+
         group_hint = None
+        group_id = attrs.get("Identifier") or attrs.get("identifier")
+        if tag == "result.politicalgroup.list" and group_id:
+            group_hint = group_id
 
-        if tag == "result.for":
-            vote = "for"
-        elif tag == "result.against":
-            vote = "against"
-        elif tag in {"result.abstention", "result.abstain"}:
-            vote = "abstain"
-        elif tag == "result.politicalgroup.list":
-            vote = detect_vote_label(tag + " " + txt + " " + " ".join(f"{k}={v}" for k, v in attrs.items()))
-            group_hint = attrs.get("Identifier") or attrs.get("identifier")
-        else:
-            # fallback
-            vote = detect_vote_label(tag + " " + txt + " " + " ".join(f"{k}={v}" for k, v in attrs.items()))
-
-        if vote in {"for", "against", "abstain"}:
-            sections.append({
-                "vote": vote,
-                "tag": tag,
-                "attrs": attrs,
-                "text": txt,
-                "group_hint": group_hint,
-            })
+        sections.append({
+            "vote": vote,
+            "tag": tag,
+            "attrs": attrs,
+            "text": txt,
+            "group_hint": group_hint,
+        })
 
     return sections
 
@@ -533,28 +547,28 @@ def extract_member_vote_candidates(block, alias_to_meps):
         txt = sec["text"]
         group_hint = sec["group_hint"]
 
-        # attribútumból jövő explicit név
-        dummy_el = type("Dummy", (), {"attrib": attrs})()
-        candidates.extend(extract_attr_name_candidates(dummy_el, alias_to_meps, group_hint, vote, tag))
+        candidates.extend(
+            extract_attr_name_candidates(attrs, alias_to_meps, group_hint, vote, tag)
+        )
 
-        # szöveges névfolyam szegmentálása
-        segmented = segment_name_stream(txt, alias_to_meps, group_hint=group_hint)
-        for item in segmented:
-            candidates.append({
-                "raw": item["raw"],
-                "normalized": item["normalized"],
-                "vote": vote,
-                "tag": tag,
-                "attrs": attrs,
-                "matched": item["matched"],
-            })
+        if txt:
+            segmented = segment_name_stream(txt, alias_to_meps, group_hint=group_hint)
+            for item in segmented:
+                candidates.append({
+                    "raw": item["raw"],
+                    "normalized": item["normalized"],
+                    "vote": vote,
+                    "tag": tag,
+                    "attrs": attrs,
+                    "matched": item["matched"],
+                })
 
-    # dedup teljes név + vote alapon
     dedup = {}
     for c in candidates:
         mep = c.get("matched")
         if not mep:
             continue
+
         full_norm = normalize_person_name(mep.get("full_name", ""))
         key = (full_norm, c["vote"])
         if key not in dedup:
@@ -584,7 +598,6 @@ def aggregate_countries_and_groups(member_vote_candidates):
 
         matched_members += 1
 
-    # kompatibilitás miatt megmarad a többségi forma is
     countries_majority = {}
     for country, counts in country_vote_counts.items():
         mv = majority_vote(counts)
@@ -629,24 +642,21 @@ def collect_matched_vote_totals(member_vote_candidates):
 
 def compute_match_quality(expected_totals, matched_totals):
     parts = []
-    ratios = []
-
     for vote in ["for", "against", "abstain"]:
         exp = expected_totals.get(vote)
         got = matched_totals.get(vote, 0)
-
         if exp and exp > 0:
-            ratio = got / exp
-            ratios.append(ratio)
             parts.append(f"{vote}:{got}/{exp}")
         elif got > 0:
             parts.append(f"{vote}:{got}")
 
-    avg_ratio = sum(ratios) / len(ratios) if ratios else None
+    total_expected = sum(v for v in expected_totals.values() if isinstance(v, int) and v > 0)
+    total_matched = sum(matched_totals.values())
+    total_ratio = round(total_matched / total_expected, 4) if total_expected > 0 else None
 
     return {
         "summary": ", ".join(parts),
-        "avg_ratio": round(avg_ratio, 4) if avg_ratio is not None else None,
+        "total_ratio": total_ratio,
     }
 
 
@@ -658,18 +668,14 @@ def is_good_record(countries_majority: dict, expected_totals: dict, matched_tota
     if not expected_values:
         return True
 
-    ratios = []
-    for vote in ["for", "against", "abstain"]:
-        exp = expected_totals.get(vote)
-        got = matched_totals.get(vote, 0)
-        if exp and exp > 0:
-            ratios.append(got / exp)
+    total_expected = sum(expected_values)
+    total_matched = sum(matched_totals.values())
 
-    if not ratios:
-        return False
+    if total_expected <= 0:
+        return True
 
-    avg_ratio = sum(ratios) / len(ratios)
-    return avg_ratio >= MIN_MATCH_RATIO_IF_EXPECTED
+    ratio = total_matched / total_expected
+    return ratio >= MIN_MATCH_RATIO_IF_EXPECTED
 
 
 def parse_xml_document(xml_url: str, alias_to_meps):
@@ -740,11 +746,11 @@ def parse_xml_document(xml_url: str, alias_to_meps):
             "title": title,
             "topic": topic,
 
-            # kompatibilitás a meglévő repo logikával
+            # meglévő repo kompatibilitás
             "countries": countries_majority,
             "groups": groups_majority,
 
-            # új, részletes mezők
+            # részletesebb adatok
             "country_vote_counts": country_vote_counts,
             "group_vote_counts": group_vote_counts,
             "matched_members": matched_members,
@@ -786,12 +792,13 @@ def main():
         print(f"Hiányzó vagy üres MEP referenciafájl: {REF_FILE}")
         return
 
-    full_lookup, alias_to_meps, duplicates = build_mep_alias_index(mep_records)
+    full_lookup, alias_to_meps, duplicates, removed_single_token_aliases = build_mep_alias_index(mep_records)
 
     print("MEP rekordok:", len(mep_records))
     print("MEP full lookup elemek:", len(full_lookup))
     print("Alias elemek:", len(alias_to_meps))
     print("Duplikált teljes nevek:", duplicates)
+    print("Eltávolított többértelmű 1-token aliasok:", removed_single_token_aliases)
 
     existing = load_json_list(OUTPUT_FILE)
     print("Meglévő vote rekordok:", len(existing))
@@ -845,16 +852,17 @@ def main():
 
     if all_new_records:
         avg_countries = sum(len(r.get("countries", {})) for r in all_new_records) / len(all_new_records)
-        avg_match_ratio = []
+        total_ratios = []
+
         for r in all_new_records:
             mq = r.get("match_quality", {})
-            ratio = mq.get("avg_ratio")
+            ratio = mq.get("total_ratio")
             if isinstance(ratio, (int, float)):
-                avg_match_ratio.append(ratio)
+                total_ratios.append(ratio)
 
         print("Átlagos ország / rekord:", round(avg_countries, 2))
-        if avg_match_ratio:
-            print("Átlagos match arány:", round(sum(avg_match_ratio) / len(avg_match_ratio), 4))
+        if total_ratios:
+            print("Átlagos total match arány:", round(sum(total_ratios) / len(total_ratios), 4))
 
     if errors:
         print("\nRészleges hibák:")
