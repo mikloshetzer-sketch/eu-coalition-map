@@ -3,7 +3,8 @@
 import json
 import re
 import time
-from collections import Counter
+import unicodedata
+from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urljoin
@@ -14,6 +15,7 @@ from bs4 import BeautifulSoup
 
 ROOT = Path(__file__).resolve().parent.parent
 
+REF_FILE = ROOT / "data" / "reference" / "mep_members.json"
 OUT_DIR = ROOT / "data" / "events" / "votes"
 OUTPUT_FILE = OUT_DIR / "council_votes.json"
 
@@ -37,37 +39,6 @@ EU_CODES = {
     "RO", "SK", "SI", "ES", "SE"
 }
 
-COUNTRY_NAME_TO_CODE = {
-    "austria": "AT",
-    "belgium": "BE",
-    "bulgaria": "BG",
-    "croatia": "HR",
-    "cyprus": "CY",
-    "czech republic": "CZ",
-    "czechia": "CZ",
-    "denmark": "DK",
-    "estonia": "EE",
-    "finland": "FI",
-    "france": "FR",
-    "germany": "DE",
-    "greece": "GR",
-    "hungary": "HU",
-    "ireland": "IE",
-    "italy": "IT",
-    "latvia": "LV",
-    "lithuania": "LT",
-    "luxembourg": "LU",
-    "malta": "MT",
-    "netherlands": "NL",
-    "poland": "PL",
-    "portugal": "PT",
-    "romania": "RO",
-    "slovakia": "SK",
-    "slovenia": "SI",
-    "spain": "ES",
-    "sweden": "SE",
-}
-
 HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -86,7 +57,7 @@ XML_ACCEPT_HEADERS = {
     "Accept": "application/xml,text/xml;q=0.9,*/*;q=0.8",
 }
 
-MIN_COUNTRIES_PER_RECORD = 2
+MIN_COUNTRIES_PER_RECORD = 3
 
 
 def fetch_text(url: str, xml: bool = False, timeout: int = 45) -> str:
@@ -96,23 +67,65 @@ def fetch_text(url: str, xml: bool = False, timeout: int = 45) -> str:
     return r.text
 
 
-def load_existing(path: Path):
+def load_json_list(path: Path):
     if not path.exists():
         return []
     try:
         with path.open("r", encoding="utf-8") as f:
             data = json.load(f)
-            if isinstance(data, list):
-                return data
+            return data if isinstance(data, list) else []
     except Exception:
-        pass
-    return []
+        return []
 
 
 def save_output(records, path: Path):
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as f:
         json.dump(records, f, ensure_ascii=False, indent=2)
+
+
+def normalize_person_name(name: str) -> str:
+    if not name:
+        return ""
+
+    text = str(name).strip().lower()
+    text = "".join(
+        ch for ch in unicodedata.normalize("NFD", text)
+        if unicodedata.category(ch) != "Mn"
+    )
+    text = text.replace("-", " ")
+    text = re.sub(r"[^\w\s]", " ", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return text
+
+
+def build_mep_lookup(mep_records):
+    """
+    Név -> legvalószínűbb MEP rekord.
+    Ha több rekord jut ugyanarra a névre, az elsőt tartjuk meg.
+    """
+    lookup = {}
+    duplicates = 0
+
+    for rec in mep_records:
+        full_name = rec.get("full_name", "")
+        country = rec.get("country", "")
+        group = rec.get("group", "")
+
+        if not full_name or not country or not group:
+            continue
+
+        key = normalize_person_name(full_name)
+        if not key:
+            continue
+
+        if key in lookup:
+            duplicates += 1
+            continue
+
+        lookup[key] = rec
+
+    return lookup, duplicates
 
 
 def classify_topic(title: str) -> str:
@@ -126,7 +139,7 @@ def classify_topic(title: str) -> str:
         ("energy", ["energy", "gas", "electricity", "power market", "oil", "renewable", "energia", "villamos", "gáz"]),
         ("fiscal", ["budget", "fiscal", "deficit", "financial framework", "appropriations", "költségvetés", "fiskális"]),
         ("rule_of_law", ["rule of law", "judicial", "justice reform", "fundamental rights", "jogállam", "igazságszolgáltatás"]),
-        ("trade", ["trade", "tariff", "customs", "import", "export", "market access", "keresked", "vám"]),
+        ("trade", ["trade", "tariff", "customs", "import", "export", "market access", "keresked", "vám", "lakhatás", "housing"]),
     ]
 
     for topic, keywords in rules:
@@ -166,10 +179,6 @@ def normalize_date(text: str):
 
 def strip_ns(tag: str) -> str:
     return tag.split("}", 1)[-1] if "}" in tag else tag
-
-
-def lower_clean(text: str) -> str:
-    return " ".join((text or "").split()).strip().lower()
 
 
 def first_nonempty_text(root, candidate_tags):
@@ -229,7 +238,7 @@ def possible_vote_blocks(root):
 
 
 def detect_vote_label(text: str):
-    t = lower_clean(text)
+    t = " ".join((text or "").split()).strip().lower()
 
     if not t:
         return None
@@ -246,84 +255,103 @@ def detect_vote_label(text: str):
     return None
 
 
-def detect_country_code_from_text(text: str):
-    t = lower_clean(text)
-
-    for name, code in COUNTRY_NAME_TO_CODE.items():
-        if name in t:
-            return code
-
-    m = re.search(r"\b(AT|BE|BG|HR|CY|CZ|DK|EE|FI|FR|DE|GR|HU|IE|IT|LV|LT|LU|MT|NL|PL|PT|RO|SK|SI|ES|SE)\b", text.upper())
-    if m:
-        return m.group(1)
-
-    return None
-
-
-def extract_country_votes_from_block(block):
-    country_votes = {}
+def extract_member_votes_from_block(block):
+    """
+    Best-effort: blokkból személynév -> szavazat.
+    """
+    member_votes = {}
     current_vote_context = None
 
     for el in block.iter():
         tag = strip_ns(el.tag).lower()
         txt = " ".join(el.itertext()).strip()
-
-        section_vote = detect_vote_label(f"{tag} {txt}")
-        if tag in {"for", "against", "abstention", "abstain"} and section_vote:
-            current_vote_context = section_vote
-            continue
-
         attrs_joined = " ".join([f"{k}={v}" for k, v in el.attrib.items()])
         joined = f"{tag} {txt} {attrs_joined}"
 
-        code = None
-
-        for attr_name in ["country", "countrycode", "nationality", "nat", "memberstate"]:
-            if attr_name in el.attrib:
-                raw = str(el.attrib[attr_name]).strip()
-                raw_up = raw.upper()
-                if raw_up in EU_CODES:
-                    code = raw_up
-                    break
-                maybe = detect_country_code_from_text(raw)
-                if maybe:
-                    code = maybe
-                    break
-
-        if not code:
-            code = detect_country_code_from_text(joined)
-
-        if not code:
+        section_vote = detect_vote_label(joined)
+        if tag in {"for", "against", "abstention", "abstain"} and section_vote:
+            current_vote_context = section_vote
             continue
 
         vote = detect_vote_label(joined)
         if not vote and current_vote_context:
             vote = current_vote_context
 
-        if vote in {"for", "against", "abstain"}:
-            country_votes.setdefault(code, []).append(vote)
-
-    aggregated = {}
-    for code, votes in country_votes.items():
-        if not votes:
+        if vote not in {"for", "against", "abstain"}:
             continue
-        cnt = Counter(votes)
-        aggregated[code] = cnt.most_common(1)[0][0]
 
-    return aggregated
+        # potenciális név attribútumok
+        name_candidates = []
+        for attr_name in ["name", "fullname", "fullName", "mepname", "membername", "persname"]:
+            if attr_name in el.attrib:
+                name_candidates.append(str(el.attrib[attr_name]).strip())
+
+        # ha nincs attribútum, a szövegből próbáljuk
+        if txt:
+            name_candidates.append(txt)
+
+        for candidate in name_candidates:
+            normalized = normalize_person_name(candidate)
+            if len(normalized.split()) < 2:
+                continue
+            if len(normalized) < 5:
+                continue
+
+            # ne fogjunk meg "for", "against" jellegű zajt
+            if normalized in {"for", "against", "abstain", "abstention"}:
+                continue
+
+            member_votes[normalized] = vote
+            break
+
+    return member_votes
+
+
+def aggregate_countries_and_groups(member_votes, mep_lookup):
+    country_to_votes = defaultdict(list)
+    group_to_votes = defaultdict(list)
+    matched_members = 0
+
+    for normalized_name, vote in member_votes.items():
+        mep = mep_lookup.get(normalized_name)
+        if not mep:
+            continue
+
+        country = mep.get("country", "")
+        group = mep.get("group", "")
+
+        if country in EU_CODES:
+            country_to_votes[country].append(vote)
+        if group:
+            group_to_votes[group].append(vote)
+
+        matched_members += 1
+
+    def majority_vote(votes):
+        if not votes:
+            return None
+        return Counter(votes).most_common(1)[0][0]
+
+    countries = {}
+    for country, votes in country_to_votes.items():
+        mv = majority_vote(votes)
+        if mv:
+            countries[country] = mv
+
+    groups = {}
+    for group, votes in group_to_votes.items():
+        mv = majority_vote(votes)
+        if mv:
+            groups[group] = mv
+
+    return countries, groups, matched_members
 
 
 def is_good_record(countries: dict) -> bool:
-    if not countries:
-        return False
-
-    if len(countries) < MIN_COUNTRIES_PER_RECORD:
-        return False
-
-    return True
+    return bool(countries) and len(countries) >= MIN_COUNTRIES_PER_RECORD
 
 
-def parse_xml_document(xml_url: str):
+def parse_xml_document(xml_url: str, mep_lookup):
     xml_text = fetch_text(xml_url, xml=True)
     root = ET.fromstring(xml_text)
 
@@ -345,8 +373,10 @@ def parse_xml_document(xml_url: str):
 
     stats = {
         "blocks_total": len(blocks),
-        "blocks_with_countries": 0,
+        "blocks_with_member_votes": 0,
+        "blocks_with_country_votes": 0,
         "blocks_kept": 0,
+        "matched_members_total": 0,
     }
 
     for idx, block in enumerate(blocks, start=1):
@@ -354,10 +384,15 @@ def parse_xml_document(xml_url: str):
             "title", "subject", "label", "text", "amendmenttitle", "description"
         }) or doc_title or f"EP vote {idx}"
 
-        countries = extract_country_votes_from_block(block)
+        member_votes = extract_member_votes_from_block(block)
+        if member_votes:
+            stats["blocks_with_member_votes"] += 1
+
+        countries, groups, matched_members = aggregate_countries_and_groups(member_votes, mep_lookup)
+        stats["matched_members_total"] += matched_members
 
         if countries:
-            stats["blocks_with_countries"] += 1
+            stats["blocks_with_country_votes"] += 1
 
         if not is_good_record(countries):
             continue
@@ -372,6 +407,7 @@ def parse_xml_document(xml_url: str):
             "title": title,
             "topic": topic,
             "countries": countries,
+            "groups": groups,
             "source": "votes",
             "institution": "europarl",
             "url": xml_url,
@@ -388,9 +424,8 @@ def merge_records(existing, new_records):
         merged[rec["id"]] = rec
 
     for rec in new_records:
-        if not rec.get("id"):
-            continue
-        merged[rec["id"]] = rec
+        if rec.get("id"):
+            merged[rec["id"]] = rec
 
     out = list(merged.values())
     out.sort(key=lambda x: (x.get("date") or "0000-00-00", x.get("id") or ""))
@@ -398,8 +433,18 @@ def merge_records(existing, new_records):
 
 
 def main():
-    existing = load_existing(OUTPUT_FILE)
-    print("Meglévő rekordok:", len(existing))
+    mep_records = load_json_list(REF_FILE)
+    if not mep_records:
+        print(f"Hiányzó vagy üres MEP referenciafájl: {REF_FILE}")
+        return
+
+    mep_lookup, duplicates = build_mep_lookup(mep_records)
+    print("MEP rekordok:", len(mep_records))
+    print("MEP lookup elemek:", len(mep_lookup))
+    print("Duplikált nevek kihagyva:", duplicates)
+
+    existing = load_json_list(OUTPUT_FILE)
+    print("Meglévő vote rekordok:", len(existing))
 
     try:
         xml_urls = find_xml_links()
@@ -416,19 +461,23 @@ def main():
     errors = []
 
     total_blocks = 0
-    blocks_with_countries = 0
+    blocks_with_member_votes = 0
+    blocks_with_country_votes = 0
     kept_blocks = 0
+    matched_members_total = 0
 
     for xml_url in xml_urls:
         try:
-            records, stats = parse_xml_document(xml_url)
+            records, stats = parse_xml_document(xml_url, mep_lookup)
             all_new_records.extend(records)
 
             total_blocks += stats["blocks_total"]
-            blocks_with_countries += stats["blocks_with_countries"]
+            blocks_with_member_votes += stats["blocks_with_member_votes"]
+            blocks_with_country_votes += stats["blocks_with_country_votes"]
             kept_blocks += stats["blocks_kept"]
+            matched_members_total += stats["matched_members_total"]
 
-            time.sleep(0.6)
+            time.sleep(0.5)
         except Exception as exc:
             errors.append(f"{xml_url}: {exc}")
 
@@ -436,8 +485,10 @@ def main():
     save_output(merged, OUTPUT_FILE)
 
     print("Összes XML blokk:", total_blocks)
-    print("Blokkok ország-adattal:", blocks_with_countries)
+    print("Blokkok személy-szavazattal:", blocks_with_member_votes)
+    print("Blokkok ország-szavazattal:", blocks_with_country_votes)
     print("Megtartott blokkok:", kept_blocks)
+    print("Párosított képviselők összesen:", matched_members_total)
     print("Új rekordok:", len(all_new_records))
     print("Összes mentett rekord:", len(merged))
     print("Kimenet:", OUTPUT_FILE)
