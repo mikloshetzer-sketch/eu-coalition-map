@@ -29,65 +29,29 @@ EU_CODES_2 = {
 }
 
 ISO3_TO_ISO2 = {
-    "AUT": "AT",
-    "BEL": "BE",
-    "BGR": "BG",
-    "HRV": "HR",
-    "CYP": "CY",
-    "CZE": "CZ",
-    "DNK": "DK",
-    "EST": "EE",
-    "FIN": "FI",
-    "FRA": "FR",
-    "DEU": "DE",
-    "GRC": "GR",
-    "HUN": "HU",
-    "IRL": "IE",
-    "ITA": "IT",
-    "LVA": "LV",
-    "LTU": "LT",
-    "LUX": "LU",
-    "MLT": "MT",
-    "NLD": "NL",
-    "POL": "PL",
-    "PRT": "PT",
-    "ROU": "RO",
-    "SVK": "SK",
-    "SVN": "SI",
-    "ESP": "ES",
-    "SWE": "SE",
+    "AUT": "AT","BEL": "BE","BGR": "BG","HRV": "HR","CYP": "CY","CZE": "CZ",
+    "DNK": "DK","EST": "EE","FIN": "FI","FRA": "FR","DEU": "DE","GRC": "GR",
+    "HUN": "HU","IRL": "IE","ITA": "IT","LVA": "LV","LTU": "LT","LUX": "LU",
+    "MLT": "MT","NLD": "NL","POL": "PL","PRT": "PT","ROU": "RO","SVK": "SK",
+    "SVN": "SI","ESP": "ES","SWE": "SE",
 }
 
 GROUP_MAP = {
-    "PPE": "EPP",
-    "EPP": "EPP",
-    "SD": "S&D",
-    "S&D": "S&D",
-    "RE": "Renew",
-    "RENEW": "Renew",
-    "VERTS/ALE": "Greens/EFA",
-    "GREENS/EFA": "Greens/EFA",
-    "ECR": "ECR",
-    "ID": "ID",
-    "PFE": "PfE",
-    "THE LEFT": "The Left",
-    "GUE/NGL": "The Left",
-    "LEFT": "The Left",
-    "ESN": "ESN",
-    "NI": "NI",
+    "PPE": "EPP","EPP": "EPP","SD": "S&D","S&D": "S&D",
+    "RE": "Renew","RENEW": "Renew","VERTS/ALE": "Greens/EFA",
+    "GREENS/EFA": "Greens/EFA","ECR": "ECR","ID": "ID",
+    "PFE": "PfE","THE LEFT": "The Left","GUE/NGL": "The Left",
+    "LEFT": "The Left","ESN": "ESN","NI": "NI",
 }
 
 POSITION_MAP = {
-    "FOR": "for",
-    "IN_FAVOUR": "for",
-    "IN FAVOUR": "for",
-    "FAVOUR": "for",
-    "FAVOR": "for",
-    "AGAINST": "against",
-    "ABSTENTION": "abstain",
-    "ABSTAIN": "abstain",
+    "FOR": "for","IN_FAVOUR": "for","IN FAVOUR": "for",
+    "AGAINST": "against","ABSTENTION": "abstain","ABSTAIN": "abstain",
 }
 
+# -----------------------------
+# UTILS
+# -----------------------------
 
 def download_bytes(url: str) -> bytes:
     r = requests.get(url, headers=HEADERS, timeout=180)
@@ -112,8 +76,7 @@ def load_json_list(path: Path):
         return []
     try:
         with path.open("r", encoding="utf-8") as f:
-            data = json.load(f)
-            return data if isinstance(data, list) else []
+            return json.load(f)
     except Exception:
         return []
 
@@ -121,242 +84,127 @@ def load_json_list(path: Path):
 def save_output(records, path: Path):
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as f:
-        json.dump(records, f, ensure_ascii=False, separators=(",", ":"))
+        json.dump(records, f, ensure_ascii=False, indent=1)
 
 
-def normalize_group_code(value) -> str:
-    if pd.isna(value):
-        return ""
-    raw = str(value).strip().upper()
-    return GROUP_MAP.get(raw, raw)
+# -----------------------------
+# NORMALIZÁLÁS
+# -----------------------------
+
+def normalize_group_code(v):
+    if pd.isna(v): return ""
+    return GROUP_MAP.get(str(v).upper().strip(), str(v).upper())
 
 
-def normalize_country_code(value) -> str:
-    if pd.isna(value):
-        return ""
-    raw = str(value).strip().upper()
-    if raw in EU_CODES_2:
-        return raw
-    return ISO3_TO_ISO2.get(raw, "")
+def normalize_country_code(v):
+    if pd.isna(v): return ""
+    v = str(v).upper().strip()
+    return v if v in EU_CODES_2 else ISO3_TO_ISO2.get(v, "")
 
 
-def normalize_position(value) -> str:
-    if pd.isna(value):
-        return ""
-    raw = str(value).strip().upper()
-    return POSITION_MAP.get(raw, "")
+def normalize_position(v):
+    if pd.isna(v): return ""
+    return POSITION_MAP.get(str(v).upper().strip(), "")
 
 
-def classify_topic(title: str) -> str:
+# -----------------------------
+# LOGIKA
+# -----------------------------
+
+def is_recent_vote(date):
+    return date and str(date) >= "2024-01-01"
+
+
+def majority_vote(d):
+    return max(d.items(), key=lambda x: x[1])[0] if d else None
+
+
+def classify_topic(title):
     t = (title or "").lower()
 
-    rules = [
-        ("migration", ["migration", "asylum", "border", "refugee", "schengen", "menekült", "migr"]),
-        ("ukraine_russia", ["ukraine", "russia", "russian", "moscow", "szankció", "orosz", "ukrajna"]),
-        ("enlargement", ["enlargement", "accession", "candidate country", "bővítés", "csatlakozás"]),
-        ("defence", ["defence", "defense", "military", "security assistance", "armed forces", "védel", "katonai"]),
-        ("energy", ["energy", "gas", "electricity", "power market", "oil", "renewable", "energia", "villamos", "gáz"]),
-        ("fiscal", ["budget", "fiscal", "deficit", "financial framework", "appropriations", "költségvetés", "fiskális"]),
-        ("rule_of_law", ["rule of law", "judicial", "justice reform", "fundamental rights", "jogállam", "igazságszolgáltatás"]),
-        ("trade", ["trade", "tariff", "customs", "import", "export", "market access", "keresked", "vám", "lakhatás", "housing"]),
-    ]
-
-    for topic, keywords in rules:
-        if any(k in t for k in keywords):
-            return topic
+    if "russia" in t or "ukraine" in t:
+        return "ukraine_russia"
+    if "migration" in t or "asylum" in t:
+        return "migration"
+    if "energy" in t:
+        return "energy"
 
     return "trade"
 
 
-def majority_vote(vote_counts: dict):
-    items = [(k, v) for k, v in vote_counts.items() if v > 0]
-    if not items:
-        return None
-    items.sort(key=lambda x: (-x[1], x[0]))
-    return items[0][0]
-
-
-def build_vote_title(row) -> str:
-    display_title = str(row.get("display_title", "") or "").strip()
-    reference = str(row.get("reference", "") or "").strip()
-    description = str(row.get("description", "") or "").strip()
-
-    parts = [p for p in [display_title, reference, description] if p]
-    if parts:
-        return " — ".join(parts)
-
-    procedure_title = str(row.get("procedure_title", "") or "").strip()
-    if procedure_title:
-        return procedure_title
-
-    return f"EP vote {row.get('id')}"
-
-
-def is_recent_vote(vote_date):
-    if not vote_date:
-        return False
-    return str(vote_date) >= "2024-01-01"
-
-
-def merge_records(existing, new_records):
-    merged = {}
-
-    for rec in existing:
-        rec_id = rec.get("id")
-        if rec_id:
-            merged[rec_id] = rec
-
-    for rec in new_records:
-        rec_id = rec.get("id")
-        if rec_id:
-            merged[rec_id] = rec
-
-    out = list(merged.values())
-    out.sort(key=lambda x: (x.get("date") or "0000-00-00", x.get("id") or ""))
-    return out
-
-
-def nested_vote_counter():
-    return {"for": 0, "against": 0, "abstain": 0}
-
+# -----------------------------
+# MAIN
+# -----------------------------
 
 def main():
-    print("Downloading votes.csv.gz ...")
+    print("Loading votes...")
     votes_df = load_gzip_csv(VOTES_URL)
-    print("Votes rows:", len(votes_df))
-
-    votes_indexed = votes_df.set_index("id", drop=False)
+    votes_df = votes_df.set_index("id")
 
     existing = load_json_list(OUTPUT_FILE)
-    print("Existing vote records:", len(existing))
 
-    country_vote_counts_all = defaultdict(lambda: defaultdict(nested_vote_counter))
-    group_vote_counts_all = defaultdict(lambda: defaultdict(nested_vote_counter))
-    matched_totals_all = defaultdict(nested_vote_counter)
+    country_counts = defaultdict(lambda: defaultdict(lambda: {"for":0,"against":0,"abstain":0}))
+    group_counts = defaultdict(lambda: defaultdict(lambda: {"for":0,"against":0,"abstain":0}))
+    totals = defaultdict(lambda: {"for":0,"against":0,"abstain":0})
 
-    print("Processing member_votes.csv.gz in chunks ...")
-    processed_rows = 0
-    kept_rows = 0
-    chunk_idx = 0
+    print("Processing member votes...")
 
-    for chunk in load_member_votes_chunks(MEMBER_VOTES_URL, chunksize=500_000):
-        chunk_idx += 1
-        processed_rows += len(chunk)
+    for chunk in load_member_votes_chunks(MEMBER_VOTES_URL):
+        chunk["p"] = chunk["position"].map(normalize_position)
+        chunk["c"] = chunk["country_code"].map(normalize_country_code)
+        chunk["g"] = chunk["group_code"].map(normalize_group_code)
 
-        chunk["position_norm"] = chunk["position"].map(normalize_position)
-        chunk["country_norm"] = chunk["country_code"].map(normalize_country_code)
-        chunk["group_norm"] = chunk["group_code"].map(normalize_group_code)
+        chunk = chunk[chunk["p"].isin(["for","against","abstain"])]
+        chunk = chunk[chunk["c"].isin(EU_CODES_2)]
 
-        chunk = chunk[
-            chunk["position_norm"].isin(["for", "against", "abstain"])
-        ].copy()
+        for r in chunk.itertuples():
+            vid = r.vote_id
+            country_counts[vid][r.c][r.p] += 1
+            totals[vid][r.p] += 1
+            if r.g:
+                group_counts[vid][r.g][r.p] += 1
 
-        chunk = chunk[
-            chunk["country_norm"].isin(EU_CODES_2)
-        ].copy()
+    print("Building records...")
 
-        kept_rows += len(chunk)
+    records = []
 
-        for row in chunk.itertuples(index=False):
-            vote_id = row.vote_id
-            position = row.position_norm
-            country = row.country_norm
-            group_code = row.group_norm
-
-            country_vote_counts_all[vote_id][country][position] += 1
-            matched_totals_all[vote_id][position] += 1
-
-            if group_code:
-                group_vote_counts_all[vote_id][group_code][position] += 1
-
-        print(
-            f"Chunk {chunk_idx} done | raw rows: {processed_rows} | "
-            f"kept rows: {kept_rows} | vote groups so far: {len(matched_totals_all)}"
-        )
-
-    new_records = []
-    processed_votes = 0
-
-    print("Building final records ...")
-
-    for vote_id in sorted(matched_totals_all.keys()):
-        processed_votes += 1
-
-        if vote_id not in votes_indexed.index:
+    for vid in totals:
+        if vid not in votes_df.index:
             continue
 
-        vote_row = votes_indexed.loc[vote_id]
-        if isinstance(vote_row, pd.DataFrame):
-            vote_row = vote_row.iloc[0]
+        row = votes_df.loc[vid]
+        title = str(row.get("display_title",""))
+        date = str(row.get("timestamp",""))[:10]
 
-        country_vote_counts = country_vote_counts_all[vote_id]
-        group_vote_counts = group_vote_counts_all[vote_id]
-        matched_totals = matched_totals_all[vote_id]
-        total_matched = sum(matched_totals.values())
-
-        countries_majority = {}
-        for country, counts in country_vote_counts.items():
-            mv = majority_vote(counts)
-            if mv:
-                countries_majority[country] = mv
-
-        groups_majority = {}
-        for group_code, counts in group_vote_counts.items():
-            mv = majority_vote(counts)
-            if mv:
-                groups_majority[group_code] = mv
-
-        title = build_vote_title(vote_row)
-        topic = classify_topic(title)
-
-        timestamp = str(vote_row.get("timestamp", "") or "").strip()
-        date = timestamp[:10] if len(timestamp) >= 10 else None
-
-        # 2024-től tartjuk meg a vote-okat
         if not is_recent_vote(date):
             continue
 
-        record = {
-            "id": f"vote_htv_{int(vote_id)}",
-            "date": date,
-            "title": title,
-            "topic": topic,
-            "countries": dict(countries_majority),
-            "groups": dict(groups_majority),
-            "country_vote_counts": {k: dict(v) for k, v in country_vote_counts.items()},
-            "group_vote_counts": {k: dict(v) for k, v in group_vote_counts.items()},
-            "source": "votes",
-            "institution": "europarl",
-            "url": f"https://howtheyvote.eu/votes/{int(vote_id)}",
+        countries = {
+            c: majority_vote(v)
+            for c, v in country_counts[vid].items()
         }
 
-        new_records.append(record)
+        record = {
+            "id": f"vote_{vid}",
+            "date": date,
+            "title": title,
+            "topic": classify_topic(title),
+            "countries": countries,
+            "groups": {},
+        }
 
-        print(
-            "SAVED RECORD:",
-            record["date"],
-            len(record["countries"]),
-            record["title"][:80]
-        )
+        records.append(record)
 
-        if len(new_records) % 1000 == 0:
-            print(f"Built records: {len(new_records)}")
+        if len(records) < 10:
+            print("SAVED:", date, len(countries), title[:60])
 
-    merged = merge_records(existing, new_records)
-    save_output(merged, OUTPUT_FILE)
+    save_output(records, OUTPUT_FILE)
 
-    print("Processed vote groups:", processed_votes)
-    print("NEW RECORDS COUNT:", len(new_records))
-    print("Total saved records:", len(merged))
-    print("Output:", OUTPUT_FILE)
+    print("NEW RECORDS:", len(records))
+    print("FILE:", OUTPUT_FILE)
 
-    if new_records:
-        avg_countries = sum(len(r.get("countries", {})) for r in new_records) / len(new_records)
-        print("Average countries per record:", round(avg_countries, 2))
-        dates = [r.get("date") for r in new_records if r.get("date")]
-        if dates:
-            print("MIN DATE:", min(dates))
-            print("MAX DATE:", max(dates))
+    size_mb = OUTPUT_FILE.stat().st_size / (1024 * 1024)
+    print("OUTPUT SIZE MB:", round(size_mb, 2))
 
 
 if __name__ == "__main__":
