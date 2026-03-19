@@ -59,6 +59,11 @@ PAIR_SCORE = {
     ("against", "for"): 0.0,
 }
 
+# Votes-layer tuning
+MIN_CONFLICT_WEIGHT = 0.15
+MIN_EDGE_COUNT = 5
+MIN_EDGE_WEIGHT = 0.60
+
 
 def parse_jsonl(path: Path):
     items = []
@@ -404,6 +409,13 @@ def vote_record_countries(vote):
     return {}
 
 
+def vote_record_country_counts(vote):
+    counts = vote.get("country_vote_counts", {}) or {}
+    if isinstance(counts, dict):
+        return counts
+    return {}
+
+
 def countries_for_votes_mode(vote, mode="all"):
     countries = vote_record_countries(vote).keys()
 
@@ -421,6 +433,35 @@ def countries_for_votes_mode(vote, mode="all"):
     return sorted([c for c in countries if c in EU_CODES])
 
 
+def vote_conflict_weight(vote):
+    """
+    0.0 = teljes konszenzus
+    1.0 = erősen megosztó szavazás
+    """
+    countries = vote_record_countries(vote)
+    valid = [v for v in countries.values() if v in VALID_VOTES]
+
+    if len(valid) < 2:
+        return 0.0
+
+    count_for = sum(1 for v in valid if v == "for")
+    count_against = sum(1 for v in valid if v == "against")
+    count_abstain = sum(1 for v in valid if v == "abstain")
+
+    total = count_for + count_against + count_abstain
+    if total == 0:
+        return 0.0
+
+    shares = [
+        count_for / total,
+        count_against / total,
+        count_abstain / total,
+    ]
+    max_share = max(shares)
+
+    return round(1.0 - max_share, 6)
+
+
 def build_votes_graph(votes, mode="all"):
     if mode == "external":
         return {
@@ -432,7 +473,8 @@ def build_votes_graph(votes, mode="all"):
 
     node_counts = defaultdict(int)
     pair_sum = defaultdict(float)
-    pair_count = defaultdict(int)
+    pair_weight_sum = defaultdict(float)
+    pair_event_count = defaultdict(int)
 
     for vote in votes:
         countries = vote_record_countries(vote)
@@ -443,6 +485,15 @@ def build_votes_graph(votes, mode="all"):
 
         selected_countries = countries_for_votes_mode(vote, mode)
         filtered = {c: filtered[c] for c in selected_countries if c in filtered}
+
+        if len(filtered) < 2:
+            continue
+
+        conflict_weight = vote_conflict_weight(vote)
+
+        # Majdnem teljes konszenzusos szavazások kiszűrése
+        if conflict_weight < MIN_CONFLICT_WEIGHT:
+            continue
 
         for c in filtered:
             node_counts[c] += 1
@@ -458,23 +509,29 @@ def build_votes_graph(votes, mode="all"):
                 continue
 
             key = tuple(sorted([a, b]))
-            pair_sum[key] += score
-            pair_count[key] += 1
+            pair_sum[key] += score * conflict_weight
+            pair_weight_sum[key] += conflict_weight
+            pair_event_count[key] += 1
 
     nodes = [{"id": c, "weight": node_counts[c]} for c in sorted(node_counts.keys()) if node_counts[c] > 0]
 
     edges = []
     for (a, b), total in sorted(pair_sum.items()):
-        count = pair_count[(a, b)]
-        if count <= 0:
+        denom = pair_weight_sum[(a, b)]
+        count = pair_event_count[(a, b)]
+
+        if denom <= 0:
             continue
 
-        weight = total / count
-        if weight > 0:
+        weight = total / denom
+
+        # Zajszűrés: minimum közös releváns vote + minimum hasonlóság
+        if count >= MIN_EDGE_COUNT and weight >= MIN_EDGE_WEIGHT:
             edges.append({
                 "source": a,
                 "target": b,
                 "weight": round(weight, 3),
+                "count": count,
             })
 
     return {
@@ -495,11 +552,15 @@ def build_votes_heatmap(votes, mode="all", normalized=False):
 
         countries = vote_record_countries(vote)
         selected_countries = countries_for_votes_mode(vote, mode)
+        conflict_weight = vote_conflict_weight(vote)
+
+        if conflict_weight < MIN_CONFLICT_WEIGHT:
+            continue
 
         for c in selected_countries:
             val = countries.get(c)
             if val in VALID_VOTES:
-                country_topic[c][topic] += 1.0
+                country_topic[c][topic] += conflict_weight
 
     rows = []
     for country in sorted(country_topic.keys()):
