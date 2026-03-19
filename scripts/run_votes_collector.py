@@ -192,8 +192,10 @@ def build_vote_title(row) -> str:
     return f"EP vote {row.get('id')}"
 
 
-def is_good_record(countries_majority: dict, total_matched: int) -> bool:
-    return bool(countries_majority) and len(countries_majority) >= 2 and total_matched > 0
+def is_recent_vote(vote_date):
+    if not vote_date:
+        return False
+    return str(vote_date) >= "2024-01-01"
 
 
 def merge_records(existing, new_records):
@@ -274,7 +276,6 @@ def main():
 
     new_records = []
     processed_votes = 0
-    kept_votes = 0
 
     print("Building final records ...")
 
@@ -305,14 +306,15 @@ def main():
             if mv:
                 groups_majority[group_code] = mv
 
-        if not is_good_record(countries_majority, total_matched):
-            continue
-
         title = build_vote_title(vote_row)
         topic = classify_topic(title)
 
         timestamp = str(vote_row.get("timestamp", "") or "").strip()
         date = timestamp[:10] if len(timestamp) >= 10 else None
+
+        # 2024-től tartjuk meg a vote-okat
+        if not is_recent_vote(date):
+            continue
 
         record = {
             "id": f"vote_htv_{int(vote_id)}",
@@ -329,23 +331,32 @@ def main():
         }
 
         new_records.append(record)
-        kept_votes += 1
 
-        if kept_votes % 1000 == 0:
-            print(f"Built records: {kept_votes}")
+        print(
+            "SAVED RECORD:",
+            record["date"],
+            len(record["countries"]),
+            record["title"][:80]
+        )
+
+        if len(new_records) % 1000 == 0:
+            print(f"Built records: {len(new_records)}")
 
     merged = merge_records(existing, new_records)
     save_output(merged, OUTPUT_FILE)
 
     print("Processed vote groups:", processed_votes)
-    print("Kept vote records:", kept_votes)
-    print("New records:", len(new_records))
+    print("NEW RECORDS COUNT:", len(new_records))
     print("Total saved records:", len(merged))
     print("Output:", OUTPUT_FILE)
 
     if new_records:
         avg_countries = sum(len(r.get("countries", {})) for r in new_records) / len(new_records)
         print("Average countries per record:", round(avg_countries, 2))
+        dates = [r.get("date") for r in new_records if r.get("date")]
+        if dates:
+            print("MIN DATE:", min(dates))
+            print("MAX DATE:", max(dates))
 
 
 if __name__ == "__main__":
