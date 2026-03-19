@@ -59,10 +59,11 @@ PAIR_SCORE = {
     ("against", "for"): 0.0,
 }
 
-# Votes-layer tuning
+# Votes-layer finomhangolás
 MIN_CONFLICT_WEIGHT = 0.15
 MIN_EDGE_COUNT = 5
 MIN_EDGE_WEIGHT = 0.60
+MIN_SIMILARITY_EDGE = 0.20
 
 
 def parse_jsonl(path: Path):
@@ -383,7 +384,7 @@ def build_similarity(events, mode="all"):
         for j in range(i + 1, len(rows)):
             sim = cosine_similarity(rows[i], rows[j])
 
-            if sim >= 0.2:
+            if sim >= MIN_SIMILARITY_EDGE:
                 edges.append({
                     "source": rows[i]["country"],
                     "target": rows[j]["country"],
@@ -426,8 +427,7 @@ def countries_for_votes_mode(vote, mode="all"):
         return sorted([c for c in countries if c in EU_CODES])
 
     if mode == "external":
-        # Council votes are EU-member-state based.
-        # Keep this empty so the external slice does not create misleading output.
+        # Votes layer is EU-member-state based, so external slice stays empty.
         return []
 
     return sorted([c for c in countries if c in EU_CODES])
@@ -491,7 +491,7 @@ def build_votes_graph(votes, mode="all"):
 
         conflict_weight = vote_conflict_weight(vote)
 
-        # Majdnem teljes konszenzusos szavazások kiszűrése
+        # közel teljes konszenzusos vote-ok ne domináljanak
         if conflict_weight < MIN_CONFLICT_WEIGHT:
             continue
 
@@ -513,8 +513,6 @@ def build_votes_graph(votes, mode="all"):
             pair_weight_sum[key] += conflict_weight
             pair_event_count[key] += 1
 
-    nodes = [{"id": c, "weight": node_counts[c]} for c in sorted(node_counts.keys()) if node_counts[c] > 0]
-
     edges = []
     for (a, b), total in sorted(pair_sum.items()):
         denom = pair_weight_sum[(a, b)]
@@ -525,7 +523,6 @@ def build_votes_graph(votes, mode="all"):
 
         weight = total / denom
 
-        # Zajszűrés: minimum közös releváns vote + minimum hasonlóság
         if count >= MIN_EDGE_COUNT and weight >= MIN_EDGE_WEIGHT:
             edges.append({
                 "source": a,
@@ -533,6 +530,23 @@ def build_votes_graph(votes, mode="all"):
                 "weight": round(weight, 3),
                 "count": count,
             })
+
+    # A node weight itt már ne csak jelenlét legyen,
+    # hanem a kapcsolati erősségek összege.
+    node_strength = defaultdict(float)
+    for edge in edges:
+        node_strength[edge["source"]] += edge["weight"]
+        node_strength[edge["target"]] += edge["weight"]
+
+    nodes = [
+        {
+            "id": c,
+            "weight": round(node_strength.get(c, 0.0), 3),
+            "count": node_counts[c],
+        }
+        for c in sorted(node_counts.keys())
+        if node_counts[c] > 0
+    ]
 
     return {
         "nodes": nodes,
@@ -610,6 +624,8 @@ def build_votes_similarity(votes, mode="all"):
     heatmap = build_votes_heatmap(votes, mode=mode, normalized=True)
     rows = heatmap["rows"]
 
+    # Itt is legyen informatívabb node weight:
+    # a normalizált topic-vektor teljes ereje.
     nodes = []
     for r in rows:
         strength = sum(r[t] for t in TOPICS)
@@ -623,7 +639,7 @@ def build_votes_similarity(votes, mode="all"):
         for j in range(i + 1, len(rows)):
             sim = cosine_similarity(rows[i], rows[j])
 
-            if sim >= 0.2:
+            if sim >= MIN_SIMILARITY_EDGE:
                 edges.append({
                     "source": rows[i]["country"],
                     "target": rows[j]["country"],
