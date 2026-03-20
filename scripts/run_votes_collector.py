@@ -202,12 +202,14 @@ def contains_any(text: str, keywords) -> bool:
 
 def classify_topic(title):
     """
-    Megtartja a korábbi topic készletet:
+    Megtartott topicok:
     migration, ukraine_russia, enlargement, defence, energy,
     fiscal, rule_of_law, trade
 
-    A besorolás prioritásos. A trade csak végső fallback legyen,
-    ne gyűjtsön be mindent automatikusan.
+    Fontos:
+    - prioritásos besorolás
+    - a trade csak a végén fusson
+    - migration kulcsszavak bővítve
     """
     t = normalize_topic_text(title)
 
@@ -217,33 +219,37 @@ def classify_topic(title):
     ukraine_russia_keywords = [
         "ukraine", "ukrainian", "russia", "russian", "moscow", "kremlin",
         "crimea", "donbas", "donetsk", "luhansk", "zelensky", "putin",
-        "sanctions on russia", "war of aggression", "aggression against ukraine",
+        "war of aggression", "aggression against ukraine", "sanctions on russia",
+        "military support for ukraine", "reconstruction of ukraine",
         "ukrajna", "orosz", "oroszorszag", "szankcio", "szankció",
-        "russie", "ukraine", "agression russe",
+        "agression russe", "guerre en ukraine",
     ]
 
     migration_keywords = [
         "migration", "migrant", "migrants", "asylum", "asylum seekers",
-        "border control", "external borders", "schengen", "refugee", "refugees",
-        "return policy", "relocation", "resettlement", "visa policy",
-        "human trafficking", "trafficking in human beings",
+        "refugee", "refugees", "schengen", "border control", "external borders",
+        "returns", "return policy", "readmission", "relocation", "resettlement",
+        "smuggling", "migrant smuggling", "human trafficking",
+        "trafficking in human beings", "frontex", "visa policy", "visa suspension",
+        "lampedusa", "mediterranean", "mediterranean route",
         "menekult", "menekült", "migracio", "migráció", "hatar", "határ",
-        "asile", "migratoire", "réfugié", "refugie",
+        "asile", "réfugié", "refugie", "frontex", "retours",
     ]
 
     enlargement_keywords = [
         "enlargement", "accession", "candidate country", "candidate status",
-        "membership application", "pre-accession", "western balkans",
-        "albania", "serbia", "montenegro", "north macedonia", "bosnia",
-        "kosovo", "moldova", "georgia", "türkiye", "turkey accession",
-        "bovites", "bővítés", "csatlakozas", "csatlakozás", "tagjelolt", "tagjelölt",
-        "élargissement", "adhesion",
+        "membership application", "pre accession", "pre-accession",
+        "western balkans", "albania", "serbia", "montenegro",
+        "north macedonia", "bosnia", "kosovo", "moldova", "georgia",
+        "turkey accession", "türkiye",
+        "bovites", "bővítés", "csatlakozas", "csatlakozás",
+        "tagjelolt", "tagjelölt", "élargissement", "adhesion",
     ]
 
     defence_keywords = [
         "defence", "defense", "military", "armed forces", "security assistance",
         "weapon", "weapons", "ammunition", "missile", "air defence", "air defense",
-        "nato", "cyber defence", "cyber defense", "troops", "battlefield",
+        "cyber defence", "cyber defense", "battlefield", "troops", "nato",
         "vedel", "védel", "katonai", "hadero", "haderő",
         "défense", "militaire",
     ]
@@ -251,26 +257,27 @@ def classify_topic(title):
     energy_keywords = [
         "energy", "gas", "oil", "electricity", "power market", "renewable",
         "nuclear", "hydrogen", "grid", "pipeline", "lng", "emissions trading",
-        "climate neutrality", "fit for 55", "carbon market",
+        "carbon market", "fit for 55", "climate neutrality",
         "energia", "gaz", "gáz", "villamos", "atomenergia",
-        "énergie", "gaz naturel", "pétrole",
+        "énergie", "pétrole", "gaz naturel",
     ]
 
     fiscal_keywords = [
         "budget", "fiscal", "deficit", "debt", "appropriations", "tax",
-        "taxation", "vat", "customs revenue", "financial framework",
-        "multiannual financial framework", "mff", "recovery facility",
-        "own resources", "economic governance", "monetary", "inflation",
-        "koltsegvetes", "költségvetés", "fiskalis", "fiskális", "adossag", "adósság",
-        "budgetaire", "budgétaire", "fiscalité",
+        "taxation", "vat", "financial framework", "multiannual financial framework",
+        "mff", "recovery facility", "own resources", "economic governance",
+        "monetary", "inflation", "public finances",
+        "koltsegvetes", "költségvetés", "fiskalis", "fiskális",
+        "adossag", "adósság", "budgétaire", "fiscalité",
     ]
 
     rule_of_law_keywords = [
         "rule of law", "judicial", "judiciary", "court", "courts",
         "fundamental rights", "civil liberties", "democracy", "corruption",
-        "anti-corruption", "media freedom", "press freedom", "detention",
-        "political prisoners", "political prisoner", "human rights",
-        "election integrity", "constitutional", "independent institutions",
+        "anti corruption", "anti-corruption", "media freedom", "press freedom",
+        "detention", "political prisoners", "political prisoner",
+        "human rights", "constitutional", "election integrity",
+        "independent institutions", "civil society",
         "jogallam", "jogállam", "igazsagszolgaltatas", "igazságszolgáltatás",
         "alapjog", "korrupcio", "korrupció",
         "etat de droit", "état de droit", "droits fondamentaux",
@@ -279,15 +286,16 @@ def classify_topic(title):
     trade_keywords = [
         "trade", "tariff", "customs", "import", "export", "market access",
         "single market", "competition policy", "competition", "industry",
-        "industrial", "state aid", "supply chain", "commerce", "consumer protection",
+        "industrial", "state aid", "supply chain", "consumer protection",
         "digital market", "data act", "chips act", "agriculture", "fisheries",
         "transport", "aviation", "rail", "maritime", "road transport",
-        "public procurement", "housing", "telecom", "telecommunications",
-        "keresk", "vám", "piac", "ipar", "fogyaszto", "fogyasztó", "lakhatás",
-        "commerce", "marché", "industrie", "transport",
+        "public procurement", "telecom", "telecommunications",
+        "housing", "internal market", "commerce", "market regulation",
+        "keresk", "vám", "piac", "ipar", "fogyaszto", "fogyasztó",
+        "lakhatás", "industrie", "transport", "marché",
     ]
 
-    # prioritásos sorrend: ami leggyakrabban félremegy, menjen előrébb
+    # prioritás: geopolitikai és normatív témák előbb
     if contains_any(t, ukraine_russia_keywords):
         return "ukraine_russia"
 
@@ -303,16 +311,15 @@ def classify_topic(title):
     if contains_any(t, energy_keywords):
         return "energy"
 
-    if contains_any(t, fiscal_keywords):
-        return "fiscal"
-
     if contains_any(t, rule_of_law_keywords):
         return "rule_of_law"
+
+    if contains_any(t, fiscal_keywords):
+        return "fiscal"
 
     if contains_any(t, trade_keywords):
         return "trade"
 
-    # fallback a kompatibilitás miatt
     return "trade"
 
 
