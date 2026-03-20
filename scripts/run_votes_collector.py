@@ -3,6 +3,7 @@
 import io
 import gzip
 import json
+import re
 from collections import defaultdict
 from pathlib import Path
 
@@ -72,11 +73,14 @@ GROUP_MAP = {
     "RENEW": "Renew",
     "VERTS/ALE": "Greens/EFA",
     "GREENS/EFA": "Greens/EFA",
+    "GREEN_EFA": "Greens/EFA",
     "ECR": "ECR",
     "ID": "ID",
     "PFE": "PfE",
+    "PFE.": "PfE",
     "THE LEFT": "The Left",
     "GUE/NGL": "The Left",
+    "GUE_NGL": "The Left",
     "LEFT": "The Left",
     "ESN": "ESN",
     "NI": "NI",
@@ -168,27 +172,6 @@ def majority_vote(d):
     return items[0][0]
 
 
-def classify_topic(title):
-    t = (title or "").lower()
-
-    if "russia" in t or "ukraine" in t or "russian" in t:
-        return "ukraine_russia"
-    if "migration" in t or "asylum" in t or "border" in t or "refugee" in t:
-        return "migration"
-    if "energy" in t or "gas" in t or "electricity" in t:
-        return "energy"
-    if "defence" in t or "defense" in t or "military" in t:
-        return "defence"
-    if "budget" in t or "fiscal" in t:
-        return "fiscal"
-    if "rule of law" in t or "judicial" in t:
-        return "rule_of_law"
-    if "enlargement" in t or "accession" in t:
-        return "enlargement"
-
-    return "trade"
-
-
 def build_vote_title(row) -> str:
     display_title = str(row.get("display_title", "") or "").strip()
     reference = str(row.get("reference", "") or "").strip()
@@ -203,6 +186,134 @@ def build_vote_title(row) -> str:
         return procedure_title
 
     return f"EP vote {row.get('id')}"
+
+
+def normalize_topic_text(text: str) -> str:
+    text = (text or "").lower()
+    text = text.replace("’", "'").replace("–", " ").replace("—", " ")
+    text = re.sub(r"[_/]", " ", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return text
+
+
+def contains_any(text: str, keywords) -> bool:
+    return any(k in text for k in keywords)
+
+
+def classify_topic(title):
+    """
+    Megtartja a korábbi topic készletet:
+    migration, ukraine_russia, enlargement, defence, energy,
+    fiscal, rule_of_law, trade
+
+    A besorolás prioritásos. A trade csak végső fallback legyen,
+    ne gyűjtsön be mindent automatikusan.
+    """
+    t = normalize_topic_text(title)
+
+    if not t:
+        return "trade"
+
+    ukraine_russia_keywords = [
+        "ukraine", "ukrainian", "russia", "russian", "moscow", "kremlin",
+        "crimea", "donbas", "donetsk", "luhansk", "zelensky", "putin",
+        "sanctions on russia", "war of aggression", "aggression against ukraine",
+        "ukrajna", "orosz", "oroszorszag", "szankcio", "szankció",
+        "russie", "ukraine", "agression russe",
+    ]
+
+    migration_keywords = [
+        "migration", "migrant", "migrants", "asylum", "asylum seekers",
+        "border control", "external borders", "schengen", "refugee", "refugees",
+        "return policy", "relocation", "resettlement", "visa policy",
+        "human trafficking", "trafficking in human beings",
+        "menekult", "menekült", "migracio", "migráció", "hatar", "határ",
+        "asile", "migratoire", "réfugié", "refugie",
+    ]
+
+    enlargement_keywords = [
+        "enlargement", "accession", "candidate country", "candidate status",
+        "membership application", "pre-accession", "western balkans",
+        "albania", "serbia", "montenegro", "north macedonia", "bosnia",
+        "kosovo", "moldova", "georgia", "türkiye", "turkey accession",
+        "bovites", "bővítés", "csatlakozas", "csatlakozás", "tagjelolt", "tagjelölt",
+        "élargissement", "adhesion",
+    ]
+
+    defence_keywords = [
+        "defence", "defense", "military", "armed forces", "security assistance",
+        "weapon", "weapons", "ammunition", "missile", "air defence", "air defense",
+        "nato", "cyber defence", "cyber defense", "troops", "battlefield",
+        "vedel", "védel", "katonai", "hadero", "haderő",
+        "défense", "militaire",
+    ]
+
+    energy_keywords = [
+        "energy", "gas", "oil", "electricity", "power market", "renewable",
+        "nuclear", "hydrogen", "grid", "pipeline", "lng", "emissions trading",
+        "climate neutrality", "fit for 55", "carbon market",
+        "energia", "gaz", "gáz", "villamos", "atomenergia",
+        "énergie", "gaz naturel", "pétrole",
+    ]
+
+    fiscal_keywords = [
+        "budget", "fiscal", "deficit", "debt", "appropriations", "tax",
+        "taxation", "vat", "customs revenue", "financial framework",
+        "multiannual financial framework", "mff", "recovery facility",
+        "own resources", "economic governance", "monetary", "inflation",
+        "koltsegvetes", "költségvetés", "fiskalis", "fiskális", "adossag", "adósság",
+        "budgetaire", "budgétaire", "fiscalité",
+    ]
+
+    rule_of_law_keywords = [
+        "rule of law", "judicial", "judiciary", "court", "courts",
+        "fundamental rights", "civil liberties", "democracy", "corruption",
+        "anti-corruption", "media freedom", "press freedom", "detention",
+        "political prisoners", "political prisoner", "human rights",
+        "election integrity", "constitutional", "independent institutions",
+        "jogallam", "jogállam", "igazsagszolgaltatas", "igazságszolgáltatás",
+        "alapjog", "korrupcio", "korrupció",
+        "etat de droit", "état de droit", "droits fondamentaux",
+    ]
+
+    trade_keywords = [
+        "trade", "tariff", "customs", "import", "export", "market access",
+        "single market", "competition policy", "competition", "industry",
+        "industrial", "state aid", "supply chain", "commerce", "consumer protection",
+        "digital market", "data act", "chips act", "agriculture", "fisheries",
+        "transport", "aviation", "rail", "maritime", "road transport",
+        "public procurement", "housing", "telecom", "telecommunications",
+        "keresk", "vám", "piac", "ipar", "fogyaszto", "fogyasztó", "lakhatás",
+        "commerce", "marché", "industrie", "transport",
+    ]
+
+    # prioritásos sorrend: ami leggyakrabban félremegy, menjen előrébb
+    if contains_any(t, ukraine_russia_keywords):
+        return "ukraine_russia"
+
+    if contains_any(t, migration_keywords):
+        return "migration"
+
+    if contains_any(t, enlargement_keywords):
+        return "enlargement"
+
+    if contains_any(t, defence_keywords):
+        return "defence"
+
+    if contains_any(t, energy_keywords):
+        return "energy"
+
+    if contains_any(t, fiscal_keywords):
+        return "fiscal"
+
+    if contains_any(t, rule_of_law_keywords):
+        return "rule_of_law"
+
+    if contains_any(t, trade_keywords):
+        return "trade"
+
+    # fallback a kompatibilitás miatt
+    return "trade"
 
 
 def merge_records(existing, new_records):
@@ -315,7 +426,7 @@ def main():
         records.append(record)
 
         if len(records) <= 10:
-            print("SAVED RECORD:", date, len(countries), title[:80])
+            print("SAVED RECORD:", date, len(countries), record["topic"], title[:80])
 
         if len(records) % 1000 == 0:
             print("Built records:", len(records))
@@ -340,6 +451,10 @@ def main():
         if records else 0.0
     )
 
+    topic_counts = defaultdict(int)
+    for r in records:
+        topic_counts[r.get("topic", "unknown")] += 1
+
     summary = {
         "new_records": len(records),
         "total_saved_records": len(merged),
@@ -348,6 +463,7 @@ def main():
         "average_countries_per_record": avg_countries,
         "output_file": str(OUTPUT_FILE),
         "output_size_mb": round(size_mb, 2),
+        "topic_counts": dict(sorted(topic_counts.items())),
     }
     save_debug_json(summary, DEBUG_SUMMARY_FILE)
 
