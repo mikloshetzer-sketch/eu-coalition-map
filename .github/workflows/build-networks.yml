@@ -30,15 +30,9 @@ jobs:
         run: |
           python scripts/build_mep_reference.py
 
-      - name: Inspect HowTheyVote member votes export
+      - name: DEBUG votes names
         run: |
-          python scripts/inspect_howtheyvote_export.py
-
-      - name: Upload HowTheyVote schema artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: howtheyvote-member-votes-schema
-          path: data/debug/howtheyvote_member_votes_schema.json
+          python scripts/debug_votes_names.py
 
       - name: Run votes collector
         run: |
@@ -62,6 +56,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Auto update networks, MEP reference, HowTheyVote debug and votes data"
+            git commit -m "Auto update networks, votes, debug and MEP reference"
             git push
           fi
