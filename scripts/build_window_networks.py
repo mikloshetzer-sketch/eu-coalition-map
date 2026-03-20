@@ -60,14 +60,12 @@ PAIR_SCORE = {
     ("against", "for"): 0.0,
 }
 
-# Votes layer tuning
 MIN_CONFLICT_WEIGHT = 0.15
 MIN_EDGE_COUNT = 5
 MIN_EDGE_WEIGHT = 0.60
 MIN_SIMILARITY_EDGE = 0.20
 DIVISIVE_VOTE_MIN_UNIQUE_POSITIONS = 2
 
-# ÚJ: topic heatmap irányozott súlyok
 VOTE_TOPIC_SCORE = {
     "for": 1.0,
     "abstain": 0.25,
@@ -676,6 +674,122 @@ def build_votes_similarity(votes, mode="all"):
     }
 
 
+def build_votes_summary(votes, mode="all"):
+    """
+    Dashboardhoz külön aggregált votes summary.
+
+    A 'for / against / abstain' itt abszolút, súlyozott összegek:
+    - a szavazás megosztottsági súlyával súlyozunk
+    - országonként, témánként és ország+téma bontásban is összesítünk
+    """
+    if mode == "external":
+        return {
+            "event_count": len(votes),
+            "mode": mode,
+            "totals": {"for": 0.0, "against": 0.0, "abstain": 0.0},
+            "by_country": [],
+            "by_topic": [],
+            "by_country_topic": [],
+        }
+
+    totals = {"for": 0.0, "against": 0.0, "abstain": 0.0}
+    by_country = defaultdict(lambda: {"for": 0.0, "against": 0.0, "abstain": 0.0})
+    by_topic = defaultdict(lambda: {"for": 0.0, "against": 0.0, "abstain": 0.0})
+    by_country_topic = defaultdict(lambda: {"for": 0.0, "against": 0.0, "abstain": 0.0})
+
+    kept_event_count = 0
+
+    for vote in votes:
+        if not is_divisive_vote(vote):
+            continue
+
+        topic = vote.get("topic")
+        if topic not in TOPICS:
+            continue
+
+        countries = vote_record_countries(vote)
+        selected_countries = countries_for_votes_mode(vote, mode)
+        conflict_weight = vote_conflict_weight(vote)
+
+        if conflict_weight < MIN_CONFLICT_WEIGHT:
+            continue
+
+        valid_selected = [
+            c for c in selected_countries
+            if countries.get(c) in VALID_VOTES
+        ]
+        if not valid_selected:
+            continue
+
+        kept_event_count += 1
+
+        for c in valid_selected:
+            vote_value = countries.get(c)
+            if vote_value not in VALID_VOTES:
+                continue
+
+            totals[vote_value] += conflict_weight
+            by_country[c][vote_value] += conflict_weight
+            by_topic[topic][vote_value] += conflict_weight
+            by_country_topic[(c, topic)][vote_value] += conflict_weight
+
+    by_country_list = []
+    for country in sorted(by_country.keys()):
+        rec = {
+            "country": country,
+            "for": round(by_country[country]["for"], 3),
+            "against": round(by_country[country]["against"], 3),
+            "abstain": round(by_country[country]["abstain"], 3),
+        }
+        rec["total"] = round(rec["for"] + rec["against"] + rec["abstain"], 3)
+        by_country_list.append(rec)
+
+    by_country_list.sort(key=lambda x: (-x["total"], x["country"]))
+
+    by_topic_list = []
+    for topic in TOPICS:
+        vals = by_topic.get(topic)
+        if not vals:
+            continue
+        rec = {
+            "topic": topic,
+            "for": round(vals["for"], 3),
+            "against": round(vals["against"], 3),
+            "abstain": round(vals["abstain"], 3),
+        }
+        rec["total"] = round(rec["for"] + rec["against"] + rec["abstain"], 3)
+        by_topic_list.append(rec)
+
+    by_topic_list.sort(key=lambda x: (-x["total"], x["topic"]))
+
+    by_country_topic_list = []
+    for (country, topic), vals in by_country_topic.items():
+        rec = {
+            "country": country,
+            "topic": topic,
+            "for": round(vals["for"], 3),
+            "against": round(vals["against"], 3),
+            "abstain": round(vals["abstain"], 3),
+        }
+        rec["total"] = round(rec["for"] + rec["against"] + rec["abstain"], 3)
+        by_country_topic_list.append(rec)
+
+    by_country_topic_list.sort(key=lambda x: (-x["total"], x["country"], x["topic"]))
+
+    return {
+        "event_count": kept_event_count,
+        "mode": mode,
+        "totals": {
+            "for": round(totals["for"], 3),
+            "against": round(totals["against"], 3),
+            "abstain": round(totals["abstain"], 3),
+        },
+        "by_country": by_country_list,
+        "by_topic": by_topic_list,
+        "by_country_topic": by_country_topic_list,
+    }
+
+
 # -----------------------------
 # SAVE
 # -----------------------------
@@ -722,6 +836,7 @@ def main():
                     save_json(layer, f"{window_name}_heatmap{suffix}.json", build_votes_heatmap(filtered, mode=mode, normalized=False))
                     save_json(layer, f"{window_name}_heatmap_norm{suffix}.json", build_votes_heatmap(filtered, mode=mode, normalized=True))
                     save_json(layer, f"{window_name}_similarity{suffix}.json", build_votes_similarity(filtered, mode=mode))
+                    save_json(layer, f"{window_name}_vote_summary{suffix}.json", build_votes_summary(filtered, mode=mode))
                 else:
                     save_json(layer, f"{window_name}{suffix}.json", build_graph(filtered, mode=mode))
                     save_json(layer, f"{window_name}_heatmap{suffix}.json", build_heatmap(filtered, mode=mode, normalized=False))
