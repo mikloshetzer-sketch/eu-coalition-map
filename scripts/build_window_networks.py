@@ -65,9 +65,14 @@ MIN_CONFLICT_WEIGHT = 0.15
 MIN_EDGE_COUNT = 5
 MIN_EDGE_WEIGHT = 0.60
 MIN_SIMILARITY_EDGE = 0.20
-
-# csak a valóban osztott vote-ok számítsanak igazán
 DIVISIVE_VOTE_MIN_UNIQUE_POSITIONS = 2
+
+# ÚJ: topic heatmap irányozott súlyok
+VOTE_TOPIC_SCORE = {
+    "for": 1.0,
+    "abstain": 0.25,
+    "against": -1.0,
+}
 
 
 # -----------------------------
@@ -112,7 +117,6 @@ def load_events(layer: str):
             for f in sorted(rss_dir.glob("*.jsonl")):
                 events += parse_jsonl(f)
 
-        # legacy RSS location
         for f in sorted(EVENTS_DIR.glob("*.jsonl")):
             events += parse_jsonl(f)
 
@@ -274,16 +278,17 @@ def normalize_heatmap_rows(rows):
     norm_rows = []
 
     for row in rows:
-        total = row.get("total", 0.0)
-        new_row = {"country": row["country"]}
+        vals = [abs(row[t]) for t in TOPICS]
+        total = sum(vals)
 
+        new_row = {"country": row["country"]}
         for t in TOPICS:
             if total > 0:
                 new_row[t] = round(row[t] / total, 6)
             else:
                 new_row[t] = 0.0
 
-        new_row["total"] = 1.0 if total > 0 else 0.0
+        new_row["total"] = round(total, 6)
         norm_rows.append(new_row)
 
     return norm_rows
@@ -444,13 +449,6 @@ def vote_record_countries(vote):
     return {}
 
 
-def vote_record_country_counts(vote):
-    counts = vote.get("country_vote_counts", {}) or {}
-    if isinstance(counts, dict):
-        return counts
-    return {}
-
-
 def countries_for_votes_mode(vote, mode="all"):
     countries = vote_record_countries(vote).keys()
 
@@ -461,7 +459,6 @@ def countries_for_votes_mode(vote, mode="all"):
         return sorted([c for c in countries if c in EU_CODES])
 
     if mode == "external":
-        # votes layer csak EU-tagállamokra épül
         return []
 
     return sorted([c for c in countries if c in EU_CODES])
@@ -481,10 +478,6 @@ def is_divisive_vote(vote):
 
 
 def vote_conflict_weight(vote):
-    """
-    0.0 = teljes konszenzus
-    1.0 = erősen megosztó szavazás
-    """
     countries = vote_record_countries(vote)
     valid = [v for v in countries.values() if v in VALID_VOTES]
 
@@ -623,7 +616,8 @@ def build_votes_heatmap(votes, mode="all", normalized=False):
         for c in selected_countries:
             val = countries.get(c)
             if val in VALID_VOTES:
-                country_topic[c][topic] += conflict_weight
+                signed_score = VOTE_TOPIC_SCORE.get(val, 0.0) * conflict_weight
+                country_topic[c][topic] += signed_score
 
     rows = []
     for country in sorted(country_topic.keys()):
@@ -633,7 +627,7 @@ def build_votes_heatmap(votes, mode="all", normalized=False):
         for t in TOPICS:
             value = country_topic[country].get(t, 0.0)
             row[t] = round(value, 3)
-            total += value
+            total += abs(value)
 
         row["total"] = round(total, 3)
         rows.append(row)
@@ -656,7 +650,7 @@ def build_votes_similarity(votes, mode="all"):
 
     nodes = []
     for r in rows:
-        strength = sum(r[t] for t in TOPICS)
+        strength = math.sqrt(sum((r[t] or 0) ** 2 for t in TOPICS))
         nodes.append({
             "id": r["country"],
             "weight": round(strength, 3),
