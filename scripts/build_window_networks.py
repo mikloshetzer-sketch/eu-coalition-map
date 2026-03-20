@@ -47,6 +47,7 @@ EU_CODES = {
 NOW = datetime.now(timezone.utc)
 
 VALID_VOTES = {"for", "against", "abstain"}
+
 PAIR_SCORE = {
     ("for", "for"): 1.0,
     ("against", "against"): 1.0,
@@ -59,12 +60,19 @@ PAIR_SCORE = {
     ("against", "for"): 0.0,
 }
 
-# Votes-layer finomhangolás
+# Votes layer tuning
 MIN_CONFLICT_WEIGHT = 0.15
 MIN_EDGE_COUNT = 5
 MIN_EDGE_WEIGHT = 0.60
 MIN_SIMILARITY_EDGE = 0.20
 
+# csak a valóban osztott vote-ok számítsanak igazán
+DIVISIVE_VOTE_MIN_UNIQUE_POSITIONS = 2
+
+
+# -----------------------------
+# IO HELPERS
+# -----------------------------
 
 def parse_jsonl(path: Path):
     items = []
@@ -137,6 +145,10 @@ def load_events(layer: str):
     return events
 
 
+# -----------------------------
+# DATE HELPERS
+# -----------------------------
+
 def parse_event_datetime(value):
     if not value:
         return None
@@ -171,8 +183,7 @@ def parse_event_datetime(value):
 
     try:
         dt = datetime.strptime(text, "%Y-%m-%d")
-        dt = dt.replace(tzinfo=timezone.utc)
-        return dt
+        return dt.replace(tzinfo=timezone.utc)
     except Exception:
         pass
 
@@ -199,6 +210,10 @@ def filter_window(events, days):
     cutoff = NOW - timedelta(days=days)
     return [e for e in events if get_event_date(e) >= cutoff]
 
+
+# -----------------------------
+# COMMON HELPERS
+# -----------------------------
 
 def compute_weight(event):
     meta = event.get("metadata", {}) or {}
@@ -253,6 +268,36 @@ def filter_pair_by_mode(a: str, b: str, mode: str) -> bool:
         return relation == "external"
 
     return False
+
+
+def normalize_heatmap_rows(rows):
+    norm_rows = []
+
+    for row in rows:
+        total = row.get("total", 0.0)
+        new_row = {"country": row["country"]}
+
+        for t in TOPICS:
+            if total > 0:
+                new_row[t] = round(row[t] / total, 6)
+            else:
+                new_row[t] = 0.0
+
+        new_row["total"] = 1.0 if total > 0 else 0.0
+        norm_rows.append(new_row)
+
+    return norm_rows
+
+
+def cosine_similarity(row_a, row_b):
+    dot = sum((row_a[t] or 0) * (row_b[t] or 0) for t in TOPICS)
+    norm_a = math.sqrt(sum((row_a[t] or 0) ** 2 for t in TOPICS))
+    norm_b = math.sqrt(sum((row_b[t] or 0) ** 2 for t in TOPICS))
+
+    if norm_a == 0 or norm_b == 0:
+        return 0.0
+
+    return dot / (norm_a * norm_b)
 
 
 # -----------------------------
@@ -362,17 +407,6 @@ def build_heatmap(events, mode="all", normalized=False):
     }
 
 
-def cosine_similarity(row_a, row_b):
-    dot = sum((row_a[t] or 0) * (row_b[t] or 0) for t in TOPICS)
-    norm_a = math.sqrt(sum((row_a[t] or 0) ** 2 for t in TOPICS))
-    norm_b = math.sqrt(sum((row_b[t] or 0) ** 2 for t in TOPICS))
-
-    if norm_a == 0 or norm_b == 0:
-        return 0.0
-
-    return dot / (norm_a * norm_b)
-
-
 def build_similarity(events, mode="all"):
     heatmap = build_heatmap(events, mode=mode, normalized=True)
     rows = heatmap["rows"]
@@ -427,10 +461,23 @@ def countries_for_votes_mode(vote, mode="all"):
         return sorted([c for c in countries if c in EU_CODES])
 
     if mode == "external":
-        # Votes layer is EU-member-state based, so external slice stays empty.
+        # votes layer csak EU-tagállamokra épül
         return []
 
     return sorted([c for c in countries if c in EU_CODES])
+
+
+def is_divisive_vote(vote):
+    countries = vote_record_countries(vote)
+    values = [v for v in countries.values() if v in VALID_VOTES]
+
+    if len(values) < 2:
+        return False
+
+    if len(set(values)) < DIVISIVE_VOTE_MIN_UNIQUE_POSITIONS:
+        return False
+
+    return True
 
 
 def vote_conflict_weight(vote):
@@ -477,6 +524,9 @@ def build_votes_graph(votes, mode="all"):
     pair_event_count = defaultdict(int)
 
     for vote in votes:
+        if not is_divisive_vote(vote):
+            continue
+
         countries = vote_record_countries(vote)
         filtered = {
             c: val for c, val in countries.items()
@@ -490,8 +540,6 @@ def build_votes_graph(votes, mode="all"):
             continue
 
         conflict_weight = vote_conflict_weight(vote)
-
-        # közel teljes konszenzusos vote-ok ne domináljanak
         if conflict_weight < MIN_CONFLICT_WEIGHT:
             continue
 
@@ -531,8 +579,6 @@ def build_votes_graph(votes, mode="all"):
                 "count": count,
             })
 
-    # A node weight itt már ne csak jelenlét legyen,
-    # hanem a kapcsolati erősségek összege.
     node_strength = defaultdict(float)
     for edge in edges:
         node_strength[edge["source"]] += edge["weight"]
@@ -560,6 +606,9 @@ def build_votes_heatmap(votes, mode="all", normalized=False):
     country_topic = defaultdict(lambda: defaultdict(float))
 
     for vote in votes:
+        if not is_divisive_vote(vote):
+            continue
+
         topic = vote.get("topic")
         if topic not in TOPICS:
             continue
@@ -601,31 +650,10 @@ def build_votes_heatmap(votes, mode="all", normalized=False):
     }
 
 
-def normalize_heatmap_rows(rows):
-    norm_rows = []
-
-    for row in rows:
-        total = row.get("total", 0.0)
-        new_row = {"country": row["country"]}
-
-        for t in TOPICS:
-            if total > 0:
-                new_row[t] = round(row[t] / total, 6)
-            else:
-                new_row[t] = 0.0
-
-        new_row["total"] = 1.0 if total > 0 else 0.0
-        norm_rows.append(new_row)
-
-    return norm_rows
-
-
 def build_votes_similarity(votes, mode="all"):
     heatmap = build_votes_heatmap(votes, mode=mode, normalized=True)
     rows = heatmap["rows"]
 
-    # Itt is legyen informatívabb node weight:
-    # a normalizált topic-vektor teljes ereje.
     nodes = []
     for r in rows:
         strength = sum(r[t] for t in TOPICS)
