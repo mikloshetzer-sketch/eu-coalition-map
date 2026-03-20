@@ -6,32 +6,70 @@
   <title>EU Coalition Map</title>
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <style>
+    :root {
+      --eu-blue-950: #0b1f4d;
+      --eu-blue-900: #123b8f;
+      --eu-blue-800: #1d4ed8;
+      --eu-blue-700: #2563eb;
+      --eu-blue-600: #3b82f6;
+      --eu-blue-500: #60a5fa;
+      --eu-blue-400: #93c5fd;
+      --eu-blue-300: #bfdbfe;
+      --eu-blue-200: #dbeafe;
+      --eu-blue-100: #eff6ff;
+      --eu-bg: #edf4ff;
+      --eu-panel: #f8fbff;
+      --eu-border: #c9daf8;
+      --eu-text: #0f172a;
+      --eu-text-soft: #334155;
+      --eu-muted: #64748b;
+      --eu-white: #ffffff;
+      --eu-danger: #b91c1c;
+      --eu-success: #0f766e;
+      --eu-warning: #b45309;
+      --shadow-soft: 0 8px 24px rgba(15, 23, 42, 0.08);
+      --shadow-card: 0 10px 28px rgba(18, 59, 143, 0.08);
+      --radius-lg: 14px;
+      --radius-md: 10px;
+      --radius-sm: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      color: #111827;
+      background:
+        linear-gradient(180deg, rgba(191,219,254,0.45) 0%, rgba(237,244,255,0.9) 30%, rgba(237,244,255,1) 100%);
+      color: var(--eu-text);
     }
 
     header {
-      background: #0f172a;
-      color: white;
+      background: linear-gradient(135deg, var(--eu-blue-950), var(--eu-blue-900));
+      color: var(--eu-white);
       padding: 18px 20px;
+      box-shadow: var(--shadow-soft);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
     }
 
     header h1 {
       margin: 0;
       font-size: 22px;
+      letter-spacing: 0.2px;
     }
 
     .controls {
-      padding: 12px 16px;
-      background: white;
-      border-bottom: 1px solid #ddd;
+      padding: 14px 16px;
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--eu-border);
       display: flex;
       flex-wrap: wrap;
       gap: 12px 18px;
       align-items: center;
+      box-shadow: 0 6px 18px rgba(18, 59, 143, 0.05);
     }
 
     .group {
@@ -43,45 +81,51 @@
 
     .group-label {
       font-weight: bold;
-      font-size: 14px;
+      font-size: 13px;
       margin-right: 2px;
+      color: var(--eu-blue-950);
     }
 
     button, select {
-      padding: 7px 12px;
-      border: none;
-      border-radius: 6px;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
       font-size: 13px;
+      transition: 0.2s ease;
     }
 
     button {
       cursor: pointer;
-      background: #2563eb;
-      color: white;
+      border: 1px solid transparent;
+      background: var(--eu-blue-700);
+      color: var(--eu-white);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.18);
     }
 
     button:hover {
-      background: #1d4ed8;
+      background: var(--eu-blue-800);
+      transform: translateY(-1px);
     }
 
     button.active {
-      background: #0f172a;
+      background: var(--eu-blue-950);
+      color: var(--eu-white);
     }
 
     select {
-      border: 1px solid #cbd5e1;
-      background: white;
-      color: #111827;
+      border: 1px solid var(--eu-border);
+      background: var(--eu-white);
+      color: var(--eu-text);
+      box-shadow: 0 2px 8px rgba(18, 59, 143, 0.05);
     }
 
     .layout {
       display: grid;
-      grid-template-columns: 1fr 290px;
-      min-height: calc(100vh - 126px);
+      grid-template-columns: 1fr 310px;
+      min-height: calc(100vh - 128px);
     }
 
     .main-panel {
-      background: white;
+      background: transparent;
       position: relative;
       overflow: auto;
       padding: 14px;
@@ -89,8 +133,8 @@
 
     .viz-layout {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 340px;
-      gap: 12px;
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap: 14px;
       align-items: start;
     }
 
@@ -98,169 +142,185 @@
       width: 100%;
       height: 78vh;
       display: block;
-      background: white;
-      border: 1px solid #e5e7eb;
-      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(244,248,255,0.98));
+      border: 1px solid var(--eu-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
     }
 
     #dashboard {
-      min-height: 430px;
+      min-height: 440px;
     }
 
     #dashboard-charts {
       width: 100%;
-      height: 430px;
+      height: 440px;
       display: block;
     }
 
     .analysis-panel {
-      margin-top: 12px;
+      margin-top: 14px;
       display: grid;
       grid-template-columns: 1fr;
-      gap: 12px;
+      gap: 14px;
     }
 
     .sidebar {
-      background: #fafafa;
-      border-left: 1px solid #ddd;
+      background: rgba(248, 251, 255, 0.9);
+      border-left: 1px solid var(--eu-border);
       padding: 12px;
       overflow: auto;
     }
 
     .panel {
       margin-bottom: 14px;
-      background: white;
-      border: 1px solid #e5e7eb;
-      border-radius: 10px;
-      padding: 10px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(248,251,255,0.98));
+      border: 1px solid var(--eu-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
     }
 
     .panel h3 {
-      margin: 0 0 8px 0;
-      font-size: 15px;
+      margin: 0;
+      font-size: 14px;
+      padding: 10px 12px;
+      background: linear-gradient(135deg, var(--eu-blue-950), var(--eu-blue-900));
+      color: var(--eu-white);
+      letter-spacing: 0.2px;
+    }
+
+    .panel > :not(h3) {
+      padding: 10px 12px 12px 12px;
     }
 
     .status {
       font-size: 12px;
-      color: #475569;
+      color: var(--eu-text-soft);
       line-height: 1.45;
       white-space: pre-wrap;
     }
 
     .error {
-      color: #b91c1c;
+      color: var(--eu-danger);
       white-space: pre-wrap;
       font-size: 12px;
       line-height: 1.45;
     }
 
     .node {
-      stroke: white;
-      stroke-width: 1.5px;
+      stroke: rgba(255,255,255,0.9);
+      stroke-width: 1.8px;
       cursor: pointer;
     }
 
     .node.selected {
-      stroke: #111827;
+      stroke: var(--eu-blue-950);
       stroke-width: 3px;
     }
 
     .link {
-      stroke: #94a3b8;
+      stroke: #7da2df;
       stroke-opacity: 0.8;
     }
 
     .label {
       font-size: 12px;
-      fill: #111827;
+      fill: var(--eu-text);
       pointer-events: none;
       font-weight: bold;
     }
 
     .hint {
       font-size: 12px;
-      color: #475569;
-      line-height: 1.6;
+      color: var(--eu-text-soft);
+      line-height: 1.65;
     }
 
     .kv {
       font-size: 13px;
       margin: 6px 0;
-      line-height: 1.55;
+      line-height: 1.6;
+      color: var(--eu-text-soft);
+    }
+
+    .kv strong {
+      color: var(--eu-text);
     }
 
     .eval-block {
       margin: 10px 0 12px 0;
       padding: 10px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
+      background: linear-gradient(180deg, var(--eu-blue-100), rgba(255,255,255,0.9));
+      border: 1px solid var(--eu-border);
+      border-radius: var(--radius-md);
     }
 
     .eval-title {
       font-weight: bold;
       font-size: 13px;
-      color: #0f172a;
+      color: var(--eu-blue-950);
       margin-bottom: 6px;
     }
 
     .eval-muted {
-      color: #64748b;
+      color: var(--eu-muted);
     }
 
     .role-badge {
       display: inline-block;
       padding: 4px 8px;
       border-radius: 999px;
-      background: #dbeafe;
-      color: #1d4ed8;
+      background: var(--eu-blue-200);
+      color: var(--eu-blue-950);
       font-weight: bold;
       font-size: 12px;
       margin: 4px 0 8px 0;
+      border: 1px solid var(--eu-blue-300);
     }
 
     .empty {
-      color: #64748b;
+      color: var(--eu-muted);
       font-style: italic;
     }
 
     .heatmap-cell {
-      stroke: #ffffff;
+      stroke: rgba(255,255,255,0.95);
       stroke-width: 1px;
       cursor: pointer;
     }
 
     .heatmap-cell.selected {
-      stroke: #111827;
+      stroke: var(--eu-blue-950);
       stroke-width: 3px;
     }
 
     .heatmap-row-label {
       font-size: 13px;
-      fill: #111827;
+      fill: var(--eu-text);
       font-weight: bold;
     }
 
     .heatmap-col-label {
       font-size: 12px;
-      fill: #111827;
+      fill: var(--eu-text);
       cursor: pointer;
     }
 
     .heatmap-col-label.selected {
-      fill: #b91c1c;
+      fill: var(--eu-blue-950);
       font-weight: bold;
     }
 
     .legend-label {
       font-size: 12px;
-      fill: #334155;
+      fill: var(--eu-text-soft);
     }
 
     .tooltip {
       position: absolute;
       display: none;
-      background: rgba(15, 23, 42, 0.95);
+      background: rgba(11, 31, 77, 0.96);
       color: white;
       padding: 8px 10px;
       border-radius: 8px;
@@ -268,7 +328,8 @@
       line-height: 1.4;
       pointer-events: none;
       z-index: 50;
-      max-width: 260px;
+      max-width: 280px;
+      box-shadow: 0 10px 24px rgba(15,23,42,0.2);
     }
 
     .hidden {
@@ -280,7 +341,7 @@
       padding-left: 16px;
       font-size: 12px;
       line-height: 1.5;
-      color: #334155;
+      color: var(--eu-text-soft);
     }
 
     .list li {
@@ -308,7 +369,7 @@
 
       .sidebar {
         border-left: none;
-        border-top: 1px solid #ddd;
+        border-top: 1px solid var(--eu-border);
       }
 
       #network {
@@ -363,14 +424,14 @@
       <select id="sort-select">
         <option value="total">Total</option>
         <option value="alphabetical">Alphabetical</option>
-        <option value="migration">migration</option>
-        <option value="ukraine_russia">ukraine_russia</option>
-        <option value="enlargement">enlargement</option>
-        <option value="defence">defence</option>
-        <option value="energy">energy</option>
-        <option value="fiscal">fiscal</option>
-        <option value="rule_of_law">rule_of_law</option>
-        <option value="trade">trade</option>
+        <option value="migration">Migration</option>
+        <option value="ukraine_russia">Ukraine / Russia</option>
+        <option value="enlargement">Enlargement</option>
+        <option value="defence">Defence</option>
+        <option value="energy">Energy</option>
+        <option value="fiscal">Fiscal</option>
+        <option value="rule_of_law">Rule of law</option>
+        <option value="trade">Economic / Internal Market</option>
       </select>
     </div>
 
@@ -385,14 +446,14 @@
       <span class="group-label">Téma</span>
       <select id="topic-select">
         <option value="all">Összes</option>
-        <option value="migration">migration</option>
-        <option value="ukraine_russia">ukraine_russia</option>
-        <option value="enlargement">enlargement</option>
-        <option value="defence">defence</option>
-        <option value="energy">energy</option>
-        <option value="fiscal">fiscal</option>
-        <option value="rule_of_law">rule_of_law</option>
-        <option value="trade">trade</option>
+        <option value="migration">Migration</option>
+        <option value="ukraine_russia">Ukraine / Russia</option>
+        <option value="enlargement">Enlargement</option>
+        <option value="defence">Defence</option>
+        <option value="energy">Energy</option>
+        <option value="fiscal">Fiscal</option>
+        <option value="rule_of_law">Rule of law</option>
+        <option value="trade">Economic / Internal Market</option>
       </select>
     </div>
 
@@ -408,7 +469,7 @@
 
         <div id="dashboard" class="panel hidden">
           <h3>Ország dashboard</h3>
-          <svg id="dashboard-charts" width="100%" height="430"></svg>
+          <svg id="dashboard-charts" width="100%" height="440"></svg>
         </div>
       </div>
 
@@ -482,6 +543,30 @@
     let currentCountry = "";
     let currentTopic = "all";
 
+    const TOPIC_LABELS = {
+      migration: "Migration",
+      ukraine_russia: "Ukraine / Russia",
+      enlargement: "Enlargement",
+      defence: "Defence",
+      energy: "Energy",
+      fiscal: "Fiscal",
+      rule_of_law: "Rule of law",
+      trade: "Economic / Internal Market"
+    };
+
+    const SOURCE_LABELS = {
+      combined: "Combined",
+      rss: "RSS",
+      gdelt: "GDELT",
+      votes: "Votes"
+    };
+
+    const TYPE_LABELS = {
+      all: "All",
+      internal: "EU Internal",
+      external: "EU External"
+    };
+
     const svg = d3.select("#network");
     const infoEl = document.getElementById("info");
     const countryInfoEl = document.getElementById("country-info");
@@ -510,6 +595,18 @@
     let heatmapAbsData = null;
     let heatmapNormData = null;
     let similarityData = null;
+
+    function topicLabel(topic) {
+      return TOPIC_LABELS[topic] || topic;
+    }
+
+    function sourceLabel(source) {
+      return SOURCE_LABELS[source] || source;
+    }
+
+    function typeLabel(type) {
+      return TYPE_LABELS[type] || type;
+    }
 
     function updateSize() {
       const el = document.getElementById("network");
@@ -580,21 +677,21 @@
         if (currentView === "graph") {
           viewAnalysisEl.innerHTML = `
             <div class="kv"><strong>Votes / Graph:</strong> országok közötti együttszavazási mintázat.</div>
-            <div class="kv">A vastagabb él magasabb együttszavazási arányt jelent.</div>
+            <div class="kv">A vastagabb él magasabb együttszavazási arányt jelent a releváns, megosztóbb szavazások alapján.</div>
             <div class="kv">Ez intézményi döntési közelséget mutat, nem médiamegjelenési együttmozgást.</div>
           `;
         } else if (currentView === "heatmap") {
           viewAnalysisEl.innerHTML = `
-            <div class="kv"><strong>Votes / Heatmap:</strong> ország–téma szavazási aktivitás.</div>
-            <div class="kv"><strong>Absolute:</strong> az adott témában rögzített szavazási jelenlét mennyiségét mutatja.</div>
-            <div class="kv"><strong>Normalized:</strong> azt mutatja, hogy az ország szavazási profilján belül mely témák dominálnak.</div>
-            <div class="kv">Ez a nézet döntéshozatali mintázatot mutat.</div>
+            <div class="kv"><strong>Votes / Heatmap:</strong> ország–téma szavazási profil.</div>
+            <div class="kv"><strong>Absolute:</strong> az ország témánkénti, irányozott szavazási profilját mutatja.</div>
+            <div class="kv"><strong>Normalized:</strong> az ország saját belső profilján belüli arányokat mutatja.</div>
+            <div class="kv">A pozitív érték inkább támogató, a negatív inkább ellenirányú vagy eltérő viselkedést jelez az adott témában.</div>
           `;
         } else {
           viewAnalysisEl.innerHTML = `
             <div class="kv"><strong>Votes / Similarity:</strong> szavazási profil-hasonlóság.</div>
-            <div class="kv">A kapcsolat azt jelzi, hogy két ország milyen mértékben szavaz hasonló szerkezetben az egyes témákban.</div>
-            <div class="kv">Ez nem közvetlen szövetséget, hanem döntéshozatali közelséget jelez.</div>
+            <div class="kv">A kapcsolat azt jelzi, hogy két ország mennyire hasonló témaszerkezetben és irányban szavazott.</div>
+            <div class="kv">Ez nem közvetlen politikai szövetséget, hanem döntéshozatali közelséget jelez.</div>
           `;
         }
         return;
@@ -611,13 +708,11 @@
           <div class="kv"><strong>Heatmap:</strong> ország–téma aktivitás.</div>
           <div class="kv"><strong>Absolute:</strong> az ország teljes aktivitását mutatja témánként.</div>
           <div class="kv"><strong>Normalized:</strong> azt mutatja, hogy az adott országon belül mely témák dominálnak.</div>
-          <div class="kv">Zöld = erősebb jelenlét, piros = gyengébb jelenlét.</div>
         `;
       } else {
         viewAnalysisEl.innerHTML = `
           <div class="kv"><strong>Similarity:</strong> tematikus hasonlóságot mutat.</div>
           <div class="kv">Nem közvetlen országkapcsolat, hanem azt jelzi, hogy két ország hasonló témákban és hasonló arányban jelenik meg.</div>
-          <div class="kv">A vastagabb él erősebb hasonlóságot jelent.</div>
         `;
       }
     }
@@ -731,15 +826,9 @@
     function allCountriesFromLoadedData() {
       const set = new Set();
 
-      if (graphData?.nodes) {
-        graphData.nodes.forEach(n => set.add(typeof n === "string" ? n : n.id));
-      }
-      if (heatmapAbsData?.rows) {
-        heatmapAbsData.rows.forEach(r => set.add(r.country));
-      }
-      if (similarityData?.nodes) {
-        similarityData.nodes.forEach(n => set.add(typeof n === "string" ? n : n.id));
-      }
+      if (graphData?.nodes) graphData.nodes.forEach(n => set.add(typeof n === "string" ? n : n.id));
+      if (heatmapAbsData?.rows) heatmapAbsData.rows.forEach(r => set.add(r.country));
+      if (similarityData?.nodes) similarityData.nodes.forEach(n => set.add(typeof n === "string" ? n : n.id));
 
       return Array.from(set).filter(Boolean).sort();
     }
@@ -767,7 +856,6 @@
     }
 
     function filterGraphEdgesByTopic(edges) {
-      if (currentTopic === "all") return edges;
       return edges;
     }
 
@@ -804,7 +892,7 @@
 
       return topics
         .map(t => ({ topic: t, value: row[t] || 0 }))
-        .sort((a, b) => b.value - a.value)
+        .sort((a, b) => Math.abs(b.value) - Math.abs(a.value))
         .slice(0, limit);
     }
 
@@ -822,20 +910,22 @@
 
       const graphNode = graphData?.nodes?.find(n => (typeof n === "string" ? n : n.id) === currentCountry);
       const graphWeight = graphNode ? (typeof graphNode === "string" ? 1 : graphNode.weight || 0) : 0;
+      const graphCount = graphNode && typeof graphNode !== "string" ? graphNode.count : null;
 
       countryInfoEl.classList.remove("empty");
       countryInfoEl.innerHTML = `
         <div class="kv"><strong>Ország:</strong> ${currentCountry}</div>
-        <div class="kv"><strong>Kapcsolati súly:</strong> ${Number(graphWeight).toFixed(2)}</div>
+        <div class="kv"><strong>Kapcsolati súly:</strong> ${Number(graphWeight).toFixed(3)}</div>
+        ${graphCount !== null ? `<div class="kv"><strong>Releváns esetek száma:</strong> ${graphCount}</div>` : ""}
 
         <div class="kv"><strong>Legerősebb partnerek</strong></div>
-        ${graphPartners.length ? `<ul class="list">${graphPartners.map(p => `<li>${p.partner}: ${Number(p.weight).toFixed(2)}</li>`).join("")}</ul>` : `<div class="status">Nincs adat.</div>`}
+        ${graphPartners.length ? `<ul class="list">${graphPartners.map(p => `<li>${p.partner}: ${Number(p.weight).toFixed(3)}</li>`).join("")}</ul>` : `<div class="status">Nincs adat.</div>`}
 
         <div class="kv"><strong>Legfontosabb témák (Absolute)</strong></div>
-        ${absTopics.length ? `<ul class="list">${absTopics.map(t => `<li>${t.topic}: ${Number(t.value).toFixed(2)}</li>`).join("")}</ul>` : `<div class="status">Nincs adat.</div>`}
+        ${absTopics.length ? `<ul class="list">${absTopics.map(t => `<li>${topicLabel(t.topic)}: ${Number(t.value).toFixed(3)}</li>`).join("")}</ul>` : `<div class="status">Nincs adat.</div>`}
 
         <div class="kv"><strong>Tematikus profil (Normalized)</strong></div>
-        ${normTopics.length ? `<ul class="list">${normTopics.map(t => `<li>${t.topic}: ${Number(t.value).toFixed(3)}</li>`).join("")}</ul>` : `<div class="status">Nincs adat.</div>`}
+        ${normTopics.length ? `<ul class="list">${normTopics.map(t => `<li>${topicLabel(t.topic)}: ${Number(t.value).toFixed(3)}</li>`).join("")}</ul>` : `<div class="status">Nincs adat.</div>`}
 
         <div class="kv"><strong>Leghasonlóbb országok</strong></div>
         ${simPartners.length ? `<ul class="list">${simPartners.map(p => `<li>${p.partner}: ${Number(p.weight).toFixed(3)}</li>`).join("")}</ul>` : `<div class="status">Nincs adat.</div>`}
@@ -857,7 +947,7 @@
         return;
       }
 
-      const topTopicText = topics.map(t => t.topic).join(", ");
+      const topTopicText = topics.map(t => topicLabel(t.topic)).join(", ");
       const partnerText = partners.map(p => p.partner).join(", ");
       const similarText = similar.map(s => s.partner).join(", ");
 
@@ -914,7 +1004,7 @@
       if (!items.length) return "nincs elegendő adat";
       return items
         .map(item => {
-          const name = item.partner || item.topic || item.name || "-";
+          const name = item.partner || topicLabel(item.topic) || item.name || "-";
           const value = item.weight ?? item.value ?? 0;
           return `${name} (${Number(value).toFixed(decimals)})`;
         })
@@ -924,8 +1014,8 @@
     function classifyConcentration(normTopics) {
       if (!normTopics.length) return "nem azonosítható egyértelmű tematikus fókusz";
 
-      const first = normTopics[0]?.value || 0;
-      const second = normTopics[1]?.value || 0;
+      const first = Math.abs(normTopics[0]?.value || 0);
+      const second = Math.abs(normTopics[1]?.value || 0);
 
       if (first >= 0.45) return "erősen koncentrált";
       if (first >= 0.30 && (first - second) >= 0.08) return "jól körülhatárolt";
@@ -953,40 +1043,27 @@
 
     function describeTypeContext() {
       if (currentSource === "votes" && currentType === "external") {
-        return "A votes forrásnál az external nézet jellemzően üres vagy korlátozott, mert a tanácsi szavazási adatok alapvetően tagállami szintűek.";
+        return "A votes forrásnál az external nézet jellemzően üres vagy korlátozott, mert a szavazási adatok alapvetően tagállami szintűek.";
       }
-
-      if (currentType === "internal") {
-        return "Ez a nézet kifejezetten az EU-n belüli kapcsolati és tematikus mintázatokat emeli ki.";
-      }
-      if (currentType === "external") {
-        return "Ez a nézet inkább az EU külső kapcsolódásait és külső témaköreit hangsúlyozza.";
-      }
+      if (currentType === "internal") return "Ez a nézet kifejezetten az EU-n belüli mintázatokat emeli ki.";
+      if (currentType === "external") return "Ez a nézet az EU külső kapcsolódásait hangsúlyozza.";
       return "Ez az összesített nézet a belső és külső mintázatokat együtt jeleníti meg.";
     }
 
     function describeViewContext() {
       if (currentSource === "votes") {
-        if (currentView === "graph") {
-          return "A jelenlegi értelmezésben a hangsúly az együttszavazási mintázaton van.";
-        }
-        if (currentView === "heatmap") {
-          return "A jelenlegi értelmezésben a hangsúly az ország szavazási aktivitásának tematikus szerkezetén van.";
-        }
+        if (currentView === "graph") return "A jelenlegi értelmezésben a hangsúly az együttszavazási mintázaton van.";
+        if (currentView === "heatmap") return "A jelenlegi értelmezésben a hangsúly az ország szavazási profiljának tematikus szerkezetén van.";
         return "A jelenlegi értelmezésben a hangsúly a szavazási profilok hasonlóságán van.";
       }
 
-      if (currentView === "graph") {
-        return "A jelenlegi értelmezésben a hangsúly a közvetlen kapcsolati együttmozgáson van.";
-      }
-      if (currentView === "heatmap") {
-        return "A jelenlegi értelmezésben a hangsúly az ország tematikus aktivitásának szerkezetén van.";
-      }
+      if (currentView === "graph") return "A jelenlegi értelmezésben a hangsúly a közvetlen kapcsolati együttmozgáson van.";
+      if (currentView === "heatmap") return "A jelenlegi értelmezésben a hangsúly az ország tematikus aktivitásának szerkezetén van.";
       return "A jelenlegi értelmezésben a hangsúly a tematikus hasonlóságon van.";
     }
 
     function sumValues(items, key) {
-      return items.reduce((acc, item) => acc + (item[key] || 0), 0);
+      return items.reduce((acc, item) => acc + Math.abs(item[key] || 0), 0);
     }
 
     function classifyCountryRole(partners, topicsAbs, topicsNorm, similar) {
@@ -994,10 +1071,10 @@
       const partnerTotal = sumValues(partners, "weight");
       const similarTop = similar[0]?.weight || 0;
       const similarTotal = sumValues(similar, "weight");
-      const absTop = topicsAbs[0]?.value || 0;
-      const absSecond = topicsAbs[1]?.value || 0;
-      const normTop = topicsNorm[0]?.value || 0;
-      const normSecond = topicsNorm[1]?.value || 0;
+      const absTop = Math.abs(topicsAbs[0]?.value || 0);
+      const absSecond = Math.abs(topicsAbs[1]?.value || 0);
+      const normTop = Math.abs(topicsNorm[0]?.value || 0);
+      const normSecond = Math.abs(topicsNorm[1]?.value || 0);
 
       const strongNetwork = partnerTotal >= 4 || partnerTop >= 1.5;
       const strongSimilarity = similarTotal >= 1.2 || similarTop >= 0.4;
@@ -1071,8 +1148,8 @@
       const networkPosition = classifyNetworkPosition(partners, similar);
       const role = classifyCountryRole(partners, topicsAbs, topicsNorm, similar);
 
-      const dominantAbsTopics = topicsAbs.slice(0, 3).map(t => t.topic);
-      const dominantNormTopics = topicsNorm.slice(0, 3).map(t => t.topic);
+      const dominantAbsTopics = topicsAbs.slice(0, 3).map(t => topicLabel(t.topic));
+      const dominantNormTopics = topicsNorm.slice(0, 3).map(t => topicLabel(t.topic));
       const strongestPartners = partners.slice(0, 3).map(p => p.partner);
       const closestCountries = similar.slice(0, 3).map(s => s.partner);
 
@@ -1165,24 +1242,16 @@
       let metricBlock = `
         <div class="eval-block">
           <div class="eval-title">Kulcsmutatók</div>
-          <div class="kv"><strong>Legerősebb partnerek:</strong> ${formatTopList(partners, 2)}</div>
-          <div class="kv"><strong>Legfontosabb témák (Absolute):</strong> ${formatTopList(topicsAbs, 2)}</div>
+          <div class="kv"><strong>Legerősebb partnerek:</strong> ${formatTopList(partners, 3)}</div>
+          <div class="kv"><strong>Legfontosabb témák (Absolute):</strong> ${formatTopList(topicsAbs, 3)}</div>
           <div class="kv"><strong>Tematikus profil (Normalized):</strong> ${formatTopList(topicsNorm, 3)}</div>
           <div class="kv"><strong>Leghasonlóbb országok:</strong> ${formatTopList(similar, 3)}</div>
         </div>
       `;
 
       let sourceSpecificNote = currentSource === "votes"
-        ? `
-          <div class="kv eval-muted">
-            A votes forrás esetén az értelmezés a döntéshozatali és együttszavazási mintázatokra épül.
-          </div>
-        `
-        : `
-          <div class="kv eval-muted">
-            A médiás források esetén az értelmezés médiamegjelenési és tematikus mintázatokra épül.
-          </div>
-        `;
+        ? `<div class="kv eval-muted">A votes forrás esetén az értelmezés a döntéshozatali és együttszavazási mintázatokra épül.</div>`
+        : `<div class="kv eval-muted">A médiás források esetén az értelmezés médiamegjelenési és tematikus mintázatokra épül.</div>`;
 
       let synthesisBlock = `
         <div class="eval-block">
@@ -1218,7 +1287,8 @@
 
       autoEvaluationEl.innerHTML = contextualSummary + roleBlock + synthesisBlock + metricBlock + conclusionText;
     }
-        function drawDashboard() {
+
+    function drawDashboard() {
       const dash = document.getElementById("dashboard");
       const svgDash = d3.select("#dashboard-charts");
 
@@ -1230,17 +1300,14 @@
 
       dash.classList.remove("hidden");
 
-      const dashWidth = document.getElementById("dashboard-charts").clientWidth || 320;
-      const sectionHeight = 120;
-      const sectionGap = 20;
+      const dashWidth = document.getElementById("dashboard-charts").clientWidth || 340;
+      const sectionHeight = 122;
+      const sectionGap = 22;
       const topPadding = 10;
       const bottomPadding = 12;
       const totalHeight = topPadding + (sectionHeight * 3) + (sectionGap * 2) + bottomPadding;
 
-      svgDash
-        .attr("width", dashWidth)
-        .attr("height", totalHeight);
-
+      svgDash.attr("width", dashWidth).attr("height", totalHeight);
       svgDash.selectAll("*").remove();
 
       const partners = topPartnersFromGraph(currentCountry, graphData, 5);
@@ -1250,17 +1317,17 @@
       const sections = [
         {
           title: "Legerősebb partnerek",
-          color: currentSource === "votes" ? "#0f766e" : "#2563eb",
+          color: currentSource === "votes" ? "#123b8f" : "#2563eb",
           data: partners.map(d => ({ name: d.partner, value: d.weight }))
         },
         {
           title: "Legfontosabb témák",
-          color: "#16a34a",
-          data: topics.map(d => ({ name: d.topic, value: d.value }))
+          color: "#1d4ed8",
+          data: topics.map(d => ({ name: topicLabel(d.topic), value: Math.abs(d.value) }))
         },
         {
           title: "Leghasonlóbb országok",
-          color: currentSource === "votes" ? "#b45309" : "#7c3aed",
+          color: currentSource === "votes" ? "#0f766e" : "#3b82f6",
           data: similar.map(d => ({ name: d.partner, value: d.weight }))
         }
       ];
@@ -1269,8 +1336,7 @@
         const yOffset = topPadding + index * (sectionHeight + sectionGap);
         const sectionData = section.data.length ? section.data : [{ name: "-", value: 0 }];
 
-        const group = svgDash.append("g")
-          .attr("transform", `translate(10,${yOffset})`);
+        const group = svgDash.append("g").attr("transform", `translate(10,${yOffset})`);
 
         const chartTop = 24;
         const chartBottom = sectionHeight - 28;
@@ -1291,7 +1357,7 @@
           .text(section.title)
           .style("font-size", "12px")
           .style("font-weight", "bold")
-          .style("fill", "#111827");
+          .style("fill", "#0b1f4d");
 
         group.selectAll("rect")
           .data(sectionData)
@@ -1301,11 +1367,11 @@
           .attr("y", d => y(d.value))
           .attr("width", x.bandwidth())
           .attr("height", d => Math.max(0, chartBottom - y(d.value)))
-          .attr("rx", 3)
+          .attr("rx", 4)
           .attr("fill", section.color)
           .on("mousemove", (event, d) => {
             showTooltip(
-              `<strong>${section.title}</strong><br>${d.name}: ${Number(d.value).toFixed(2)}`,
+              `<strong>${section.title}</strong><br>${d.name}: ${Number(d.value).toFixed(3)}`,
               event.pageX,
               event.pageY
             );
@@ -1320,7 +1386,7 @@
           .attr("x", d => x(d.name) + x.bandwidth() / 2)
           .attr("y", d => y(d.value) - 4)
           .attr("text-anchor", "middle")
-          .text(d => d.value > 0 ? Number(d.value).toFixed(1) : "")
+          .text(d => d.value > 0 ? Number(d.value).toFixed(2) : "")
           .style("font-size", "9px")
           .style("fill", "#334155");
 
@@ -1338,9 +1404,7 @@
           .each(function() {
             const txt = d3.select(this);
             const original = txt.text();
-            if (original.length > 14) {
-              txt.text(original.slice(0, 14) + "…");
-            }
+            if (original.length > 14) txt.text(original.slice(0, 14) + "…");
           });
 
         group.append("line")
@@ -1348,7 +1412,7 @@
           .attr("x2", chartWidth)
           .attr("y1", chartBottom)
           .attr("y2", chartBottom)
-          .attr("stroke", "#cbd5e1")
+          .attr("stroke", "#bfd2f7")
           .attr("stroke-width", 1);
       });
     }
@@ -1384,11 +1448,11 @@
 
       const nodeRadius = d3.scaleSqrt()
         .domain([nodeWeightExtent[0] || 1, nodeWeightExtent[1] || 1])
-        .range([8, 26]);
+        .range([9, 28]);
 
       const edgeWidth = d3.scaleLinear()
         .domain([edgeWeightExtent[0] || 0.2, edgeWeightExtent[1] || 1])
-        .range([1.2, 8]);
+        .range([1.4, 8]);
 
       simulation = d3.forceSimulation(currentNodes)
         .force("link", d3.forceLink(currentLinks).id(d => d.id).distance(135))
@@ -1402,10 +1466,12 @@
         .enter()
         .append("line")
         .attr("class", "link")
+        .attr("stroke", currentSource === "votes" ? "#5f8ddd" : "#7da2df")
         .attr("stroke-width", d => edgeWidth(d.weight || 1))
         .on("mousemove", (event, d) => {
+          const countText = d.count !== undefined ? `<br>Count: ${d.count}` : "";
           showTooltip(
-            `<strong>${d.source.id || d.source} – ${d.target.id || d.target}</strong><br>Súly: ${d.weight}`,
+            `<strong>${d.source.id || d.source} – ${d.target.id || d.target}</strong><br>Súly: ${Number(d.weight).toFixed(3)}${countText}`,
             event.pageX,
             event.pageY
           );
@@ -1435,7 +1501,8 @@
           renderCurrentView();
         })
         .on("mousemove", (event, d) => {
-          showTooltip(`<strong>${d.id}</strong>`, event.pageX, event.pageY);
+          const countText = d.count !== undefined ? `<br>Count: ${d.count}` : "";
+          showTooltip(`<strong>${d.id}</strong><br>Weight: ${Number(d.weight || 0).toFixed(3)}${countText}`, event.pageX, event.pageY);
         })
         .on("mouseleave", hideTooltip);
 
@@ -1483,10 +1550,10 @@
       infoEl.classList.remove("empty");
       infoEl.innerHTML = `
         <div class="kv"><strong>Nézet:</strong> ${infoTitle}</div>
-        <div class="kv"><strong>Source:</strong> ${currentSource}</div>
+        <div class="kv"><strong>Source:</strong> ${sourceLabel(currentSource)}</div>
         <div class="kv"><strong>Window:</strong> ${currentWindow}</div>
-        <div class="kv"><strong>Type:</strong> ${currentType}</div>
-        <div class="kv"><strong>Téma:</strong> ${currentTopic}</div>
+        <div class="kv"><strong>Type:</strong> ${typeLabel(currentType)}</div>
+        <div class="kv"><strong>Téma:</strong> ${currentTopic === "all" ? "Összes" : topicLabel(currentTopic)}</div>
         <div class="kv"><strong>Nodes:</strong> ${currentNodes.length}</div>
         <div class="kv"><strong>Edges:</strong> ${currentLinks.length}</div>
         ${data.event_count !== undefined ? `<div class="kv"><strong>Events:</strong> ${data.event_count}</div>` : ""}
@@ -1504,7 +1571,7 @@
       }
 
       if (topics.includes(currentSort)) {
-        out.sort((a, b) => (b[currentSort] || 0) - (a[currentSort] || 0));
+        out.sort((a, b) => Math.abs(b[currentSort] || 0) - Math.abs(a[currentSort] || 0));
         return out;
       }
 
@@ -1521,7 +1588,7 @@
 
       const rows = sortRows(data.rows || [], topics);
 
-      const margin = { top: 80, right: 30, bottom: 170, left: 170 };
+      const margin = { top: 88, right: 30, bottom: 170, left: 190 };
       const cellSize = 34;
 
       const countries = rows.map(r => r.country);
@@ -1529,15 +1596,29 @@
       const gridHeight = topics.length * cellSize;
 
       const svgWidth = Math.max(width, margin.left + gridWidth + margin.right + 60);
-      const svgHeight = Math.max(height, margin.top + gridHeight + margin.bottom + 80);
+      const svgHeight = Math.max(height, margin.top + gridHeight + margin.bottom + 90);
 
       svg.attr("width", svgWidth).attr("height", svgHeight);
 
-      const maxVal = d3.max(rows, r => d3.max(topics, t => r[t] || 0)) || 1;
+      let color;
+      let legendLeftLabel = "Alacsony";
+      let legendRightLabel = "Magas";
+      let maxAbs = 1;
 
-      const color = d3.scaleSequential()
-        .domain([0, maxVal])
-        .interpolator(d3.interpolateRdYlGn);
+      if (currentSource === "votes") {
+        maxAbs = d3.max(rows, r => d3.max(topics, t => Math.abs(r[t] || 0))) || 1;
+        color = d3.scaleDiverging()
+          .domain([-maxAbs, 0, maxAbs])
+          .interpolator(t => d3.interpolateRdBu(1 - t));
+        legendLeftLabel = "Ellentétes / negatív";
+        legendRightLabel = "Támogató / pozitív";
+      } else {
+        const maxVal = d3.max(rows, r => d3.max(topics, t => r[t] || 0)) || 1;
+        maxAbs = maxVal;
+        color = d3.scaleSequential()
+          .domain([0, maxVal])
+          .interpolator(d3.interpolateBlues);
+      }
 
       const group = svg.append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
@@ -1563,7 +1644,7 @@
             })
             .on("mousemove", (event) => {
               showTooltip(
-                `<strong>${row.country}</strong><br>${topic}: ${Number(value).toFixed(3)}`,
+                `<strong>${row.country}</strong><br>${topicLabel(topic)}: ${Number(value).toFixed(3)}`,
                 event.pageX,
                 event.pageY
               );
@@ -1578,7 +1659,7 @@
           .attr("x", margin.left - 12)
           .attr("y", margin.top + i * cellSize + cellSize / 2 + 5)
           .attr("text-anchor", "end")
-          .text(topic);
+          .text(topicLabel(topic));
       });
 
       countries.forEach((country, i) => {
@@ -1600,23 +1681,31 @@
           });
       });
 
-      const legendWidth = 320;
+      const legendWidth = 360;
       const legendHeight = 18;
       const legendX = margin.left;
-      const legendY = 20;
+      const legendY = 22;
 
       const defs = svg.append("defs");
+      const gradientId = "heatmap-gradient";
       const gradient = defs.append("linearGradient")
-        .attr("id", "heatmap-gradient")
+        .attr("id", gradientId)
         .attr("x1", "0%")
         .attr("x2", "100%")
         .attr("y1", "0%")
         .attr("y2", "0%");
 
-      for (let i = 0; i <= 10; i++) {
+      for (let i = 0; i <= 20; i++) {
+        const ratio = i / 20;
+        let value;
+        if (currentSource === "votes") {
+          value = -maxAbs + ratio * maxAbs * 2;
+        } else {
+          value = ratio * maxAbs;
+        }
         gradient.append("stop")
-          .attr("offset", `${i * 10}%`)
-          .attr("stop-color", color((maxVal / 10) * i));
+          .attr("offset", `${ratio * 100}%`)
+          .attr("stop-color", color(value));
       }
 
       svg.append("rect")
@@ -1624,30 +1713,38 @@
         .attr("y", legendY)
         .attr("width", legendWidth)
         .attr("height", legendHeight)
-        .attr("fill", "url(#heatmap-gradient)")
-        .attr("stroke", "#cbd5e1");
+        .attr("fill", `url(#${gradientId})`)
+        .attr("stroke", "#bfd2f7");
 
       svg.append("text")
         .attr("class", "legend-label")
         .attr("x", legendX)
         .attr("y", legendY - 8)
-        .text("Alacsony");
+        .text(legendLeftLabel);
 
       svg.append("text")
         .attr("class", "legend-label")
-        .attr("x", legendX + legendWidth - 28)
+        .attr("x", legendX + legendWidth - 95)
         .attr("y", legendY - 8)
-        .text("Magas");
+        .text(legendRightLabel);
+
+      if (currentSource === "votes") {
+        svg.append("text")
+          .attr("class", "legend-label")
+          .attr("x", legendX + legendWidth / 2 - 18)
+          .attr("y", legendY - 8)
+          .text("Semleges");
+      }
 
       infoEl.classList.remove("empty");
       infoEl.innerHTML = `
         <div class="kv"><strong>Nézet:</strong> Heatmap</div>
-        <div class="kv"><strong>Source:</strong> ${currentSource}</div>
+        <div class="kv"><strong>Source:</strong> ${sourceLabel(currentSource)}</div>
         <div class="kv"><strong>Window:</strong> ${currentWindow}</div>
-        <div class="kv"><strong>Type:</strong> ${currentType}</div>
+        <div class="kv"><strong>Type:</strong> ${typeLabel(currentType)}</div>
         <div class="kv"><strong>Mode:</strong> ${currentHeatmapMode}</div>
-        <div class="kv"><strong>Sort:</strong> ${currentSort}</div>
-        <div class="kv"><strong>Téma:</strong> ${currentTopic}</div>
+        <div class="kv"><strong>Sort:</strong> ${currentSort === "trade" ? topicLabel("trade") : currentSort}</div>
+        <div class="kv"><strong>Téma:</strong> ${currentTopic === "all" ? "Összes" : topicLabel(currentTopic)}</div>
         <div class="kv"><strong>Countries:</strong> ${rows.length}</div>
         <div class="kv"><strong>Topics:</strong> ${topics.length}</div>
         <div class="kv"><strong>Events:</strong> ${data.event_count ?? 0}</div>
@@ -1709,15 +1806,10 @@ similarity: ${similarityFilePath()}`;
       updateViewAnalysis();
 
       if (currentView === "graph" && graphData) {
-        let graphColor = "#7c3aed";
-
-        if (currentSource === "votes") {
-          graphColor = "#0f766e";
-        } else if (currentType === "external") {
-          graphColor = "#d97706";
-        } else if (currentType === "internal") {
-          graphColor = "#2563eb";
-        }
+        let graphColor = "#2563eb";
+        if (currentSource === "votes") graphColor = "#123b8f";
+        else if (currentType === "external") graphColor = "#3b82f6";
+        else if (currentType === "internal") graphColor = "#1d4ed8";
 
         drawForceGraph(graphData, "Graph", graphColor);
       } else if (currentView === "heatmap") {
@@ -1727,7 +1819,7 @@ similarity: ${similarityFilePath()}`;
         drawForceGraph(
           similarityData,
           "Similarity",
-          currentSource === "votes" ? "#b45309" : "#059669"
+          currentSource === "votes" ? "#0f766e" : "#1d4ed8"
         );
       }
 
