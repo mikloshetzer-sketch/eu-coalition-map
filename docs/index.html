@@ -404,6 +404,70 @@
       color: #334155;
     }
 
+    .analysis-rich {
+      display: grid;
+      gap: 10px;
+    }
+
+    .analysis-card {
+      border: 1px solid var(--eu-border);
+      border-radius: 10px;
+      padding: 10px;
+      background: linear-gradient(180deg, #ffffff, #f8fbff);
+    }
+
+    .analysis-card-title {
+      font-size: 12px;
+      font-weight: bold;
+      color: var(--eu-blue-950);
+      margin-bottom: 6px;
+    }
+
+    .analysis-lead {
+      font-size: 13px;
+      line-height: 1.65;
+      color: var(--eu-text-soft);
+    }
+
+    .analysis-note {
+      font-size: 12px;
+      line-height: 1.55;
+      color: var(--eu-muted);
+    }
+
+    .change-charts {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .change-chart-box {
+      border: 1px solid var(--eu-border);
+      border-radius: 10px;
+      background: linear-gradient(180deg, #ffffff, #f8fbff);
+      padding: 10px;
+    }
+
+    .change-chart-title {
+      font-size: 12px;
+      font-weight: bold;
+      color: var(--eu-blue-950);
+      margin-bottom: 8px;
+    }
+
+    .change-svg {
+      width: 100%;
+      height: 220px;
+      display: block;
+    }
+
+    .mini-compare-svg {
+      width: 100%;
+      height: 240px;
+      display: block;
+    }
+
     @media (max-width: 1200px) {
       .viz-layout {
         grid-template-columns: 1fr;
@@ -537,6 +601,23 @@
         <div id="change-panel" class="panel hidden">
           <h3>Változás az előző időszakhoz képest</h3>
           <div id="change-content"></div>
+
+          <div class="change-charts">
+            <div class="change-chart-box">
+              <div class="change-chart-title">Partner gain / loss</div>
+              <svg id="change-partner-chart" class="change-svg"></svg>
+            </div>
+
+            <div class="change-chart-box">
+              <div class="change-chart-title">Topic delta</div>
+              <svg id="change-topic-chart" class="change-svg"></svg>
+            </div>
+
+            <div class="change-chart-box">
+              <div class="change-chart-title">Most vs korábban</div>
+              <svg id="change-compare-chart" class="mini-compare-svg"></svg>
+            </div>
+          </div>
         </div>
 
         <div class="panel">
@@ -745,6 +826,7 @@
         viewAnalysisEl.innerHTML = `
           <div class="kv"><strong>Change:</strong> az aktuális időablakot az azt megelőző, azonos hosszúságú időszakkal hasonlítja össze.</div>
           <div class="kv">Itt látszik, hogy mely partnerek jelentek meg újonnan, melyek estek ki, és mely témákban változott a legerősebben az ország profilja.</div>
+          <div class="kv">A vizuális blokkok egyszerre mutatják a partnerstruktúra változását, a témák delta-értékeit és a most vs korábban összevetést.</div>
         `;
         return;
       }
@@ -754,12 +836,14 @@
           viewAnalysisEl.innerHTML = `
             <div class="kv"><strong>Votes / Graph:</strong> országok közötti együttszavazási mintázat.</div>
             <div class="kv">A vastagabb él magasabb együttszavazási arányt jelent a releváns, megosztóbb szavazások alapján.</div>
+            <div class="kv">Ez intézményi döntési közelséget mutat, nem médiamegjelenési együttmozgást.</div>
           `;
         } else if (currentView === "heatmap") {
           viewAnalysisEl.innerHTML = `
             <div class="kv"><strong>Votes / Heatmap:</strong> ország–téma szavazási profil.</div>
             <div class="kv"><strong>Absolute:</strong> irányozott, témánkénti mintát mutat.</div>
             <div class="kv"><strong>Normalized:</strong> az ország saját belső arányait mutatja.</div>
+            <div class="kv">A heatmap teljes szélességet kap, hogy a címkék és a cellák jobban olvashatók legyenek.</div>
           `;
         } else {
           viewAnalysisEl.innerHTML = `
@@ -771,11 +855,21 @@
       }
 
       if (currentView === "graph") {
-        viewAnalysisEl.innerHTML = `<div class="kv"><strong>Graph:</strong> országok közötti közvetlen kapcsolati együttmozgás.</div>`;
+        viewAnalysisEl.innerHTML = `
+          <div class="kv"><strong>Graph:</strong> országok közötti közvetlen kapcsolati együttmozgás.</div>
+          <div class="kv">A vastagabb él erősebb kapcsolatot jelent.</div>
+        `;
       } else if (currentView === "heatmap") {
-        viewAnalysisEl.innerHTML = `<div class="kv"><strong>Heatmap:</strong> ország–téma aktivitás.</div>`;
+        viewAnalysisEl.innerHTML = `
+          <div class="kv"><strong>Heatmap:</strong> ország–téma aktivitás.</div>
+          <div class="kv"><strong>Absolute:</strong> az ország teljes aktivitását mutatja témánként.</div>
+          <div class="kv"><strong>Normalized:</strong> azt mutatja, hogy az adott országon belül mely témák dominálnak.</div>
+        `;
       } else {
-        viewAnalysisEl.innerHTML = `<div class="kv"><strong>Similarity:</strong> tematikus hasonlóságot mutat.</div>`;
+        viewAnalysisEl.innerHTML = `
+          <div class="kv"><strong>Similarity:</strong> tematikus hasonlóságot mutat.</div>
+          <div class="kv">Nem közvetlen országkapcsolat, hanem azt jelzi, hogy két ország hasonló témákban és hasonló arányban jelenik meg.</div>
+        `;
       }
     }
 
@@ -912,10 +1006,6 @@
       }
     }
 
-    function filterGraphEdgesByTopic(edges) {
-      return edges;
-    }
-
     function filterHeatmapTopics(topics) {
       if (currentTopic === "all") return topics;
       return topics.filter(t => t === currentTopic);
@@ -982,30 +1072,149 @@
         return;
       }
 
-      const topics = topTopicsFromHeatmap(currentCountry, heatmapAbsData, 3);
-      const partners = topPartnersFromGraph(currentCountry, graphData, 3);
+      const topics = topTopicsFromHeatmap(currentCountry, heatmapAbsData, 4);
+      const normTopics = topTopicsFromHeatmap(currentCountry, heatmapNormData, 4);
+      const partners = topPartnersFromGraph(currentCountry, graphData, 4);
+      const similar = topPartnersFromGraph(currentCountry, similarityData, 4);
 
       const topTopicText = topics.map(t => topicLabel(t.topic)).join(", ");
+      const normTopicText = normTopics.map(t => topicLabel(t.topic)).join(", ");
       const partnerText = partners.map(p => p.partner).join(", ");
+      const similarText = similar.map(s => s.partner).join(", ");
 
       if (currentView === "change" && changeData) {
         const row = changeData.by_country?.find(r => r.country === currentCountry);
         if (!row) {
-          countryAnalysisEl.innerHTML = "Nincs változásadat.";
+          countryAnalysisEl.innerHTML = "Nincs change adat.";
           return;
         }
 
+        const strongestTopicChanges = (row.top_topic_changes || [])
+          .slice(0, 3)
+          .map(t => `${topicLabel(t.topic)} (${Number(t.delta).toFixed(3)})`)
+          .join(", ");
+
+        const gainedText = row.gained_partners?.join(", ") || "nincs új partner";
+        const lostText = row.lost_partners?.join(", ") || "nincs elveszett partner";
+        const keptText = row.kept_partners?.slice(0, 5).join(", ") || "nincs stabil partner";
+
         countryAnalysisEl.innerHTML = `
-          <div class="kv"><strong>${currentCountry}</strong> partnerhálója ${row.partner_count_previous} → ${row.partner_count_current} értékre változott.</div>
-          <div class="kv">Új partnerek: <strong>${row.gained_partners.join(", ") || "—"}</strong></div>
-          <div class="kv">Elveszett partnerek: <strong>${row.lost_partners.join(", ") || "—"}</strong></div>
+          <div class="analysis-rich">
+            <div class="analysis-card">
+              <div class="analysis-card-title">Időbeli értelmezés</div>
+              <div class="analysis-lead">
+                <strong>${currentCountry}</strong> kapcsolati mintázata az előző, azonos hosszúságú időszakhoz képest
+                <strong>${row.partner_count_previous}</strong> partnerből
+                <strong>${row.partner_count_current}</strong> partnerre változott.
+                Ez összesen
+                <strong>${row.partner_delta > 0 ? "+" : ""}${row.partner_delta}</strong>
+                partnereltolódást jelent.
+              </div>
+            </div>
+
+            <div class="analysis-card">
+              <div class="analysis-card-title">Partneri szerkezet</div>
+              <div class="kv">
+                Újonnan megjelent partnerek:
+                <strong>${gainedText}</strong>.
+              </div>
+              <div class="kv">
+                Kieső partnerek:
+                <strong>${lostText}</strong>.
+              </div>
+              <div class="kv">
+                Stabilan megmaradó kapcsolatok:
+                <strong>${keptText}</strong>.
+              </div>
+            </div>
+
+            <div class="analysis-card">
+              <div class="analysis-card-title">Tematikus elmozdulás</div>
+              <div class="kv">
+                A legerősebb témaváltozások:
+                <strong>${strongestTopicChanges || "nincs számottevő elmozdulás"}</strong>.
+              </div>
+              <div class="analysis-note">
+                Ez azt mutatja meg, hogy az ország szavazási profilja mely ügykörökben módosult a legerősebben
+                az előző időszakhoz képest, nem pusztán azt, hogy most éppen mi a legerősebb témája.
+              </div>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      if (currentSource === "votes") {
+        countryAnalysisEl.innerHTML = `
+          <div class="analysis-rich">
+            <div class="analysis-card">
+              <div class="analysis-card-title">Szavazási profil</div>
+              <div class="analysis-lead">
+                <strong>${currentCountry}</strong> a vizsgált időablakban leginkább
+                <strong>${topTopicText || "nem rajzol ki egyetlen domináns témát"}</strong>
+                ügyek körül mutat erősebb aktivitást vagy markánsabb állásfoglalási mintát.
+              </div>
+            </div>
+
+            <div class="analysis-card">
+              <div class="analysis-card-title">Kapcsolati értelmezés</div>
+              <div class="kv">
+                Együttszavazási mintázata alapján legerősebben
+                <strong>${partnerText || "nincs egyértelmű partneri koncentráció"}</strong>
+                országokhoz kapcsolódik.
+              </div>
+              <div class="kv">
+                A teljes szerkezetet nézve leginkább
+                <strong>${similarText || "nincs erős hasonlósági csoport"}</strong>
+                országok mutatnak hozzá közel álló profilt.
+              </div>
+            </div>
+
+            <div class="analysis-card">
+              <div class="analysis-card-title">Mélységi olvasat</div>
+              <div class="analysis-note">
+                A jelenlegi kép nem hivatalos politikai szövetséget jelez, hanem azt, hogy az ország
+                mely szereplőkkel szavaz hasonló mintázatban, és mely témákban válik különösen láthatóvá
+                a parlamenti döntéshozatalban.
+              </div>
+            </div>
+          </div>
         `;
         return;
       }
 
       countryAnalysisEl.innerHTML = `
-        <div class="kv"><strong>${currentCountry}</strong> fő témái: <strong>${topTopicText || "nincs domináns téma"}</strong>.</div>
-        <div class="kv">Legközelebbi partnerei: <strong>${partnerText || "nincs adat"}</strong>.</div>
+        <div class="analysis-rich">
+          <div class="analysis-card">
+            <div class="analysis-card-title">Tematikus fókusz</div>
+            <div class="analysis-lead">
+              <strong>${currentCountry}</strong> profilja a vizsgált időszakban főként
+              <strong>${topTopicText || "nem koncentrálódik egyetlen domináns témára"}</strong>
+              ügyek köré rendeződik.
+            </div>
+          </div>
+
+          <div class="analysis-card">
+            <div class="analysis-card-title">Kapcsolati mintázat</div>
+            <div class="kv">
+              Legerősebb kapcsolatai:
+              <strong>${partnerText || "nincs jól kirajzolódó partneri kör"}</strong>.
+            </div>
+            <div class="kv">
+              Tematikus hasonlóság alapján közel áll:
+              <strong>${similarText || "nincs egyértelmű közeli csoport"}</strong>.
+            </div>
+          </div>
+
+          <div class="analysis-card">
+            <div class="analysis-card-title">Belső szerkezet</div>
+            <div class="analysis-note">
+              A normalizált nézet alapján az ország belső profilját leginkább
+              <strong>${normTopicText || "kiegyensúlyozottabb tematika"}</strong>
+              határozza meg, vagyis ezek az ügykörök adják a legnagyobb arányú jelenlétét a teljes mintán belül.
+            </div>
+          </div>
+        </div>
       `;
     }
 
@@ -1022,27 +1231,87 @@
           return;
         }
 
-        const topicLines = (row.top_topic_changes || []).map(
-          t => `<li>${topicLabel(t.topic)}: ${Number(t.previous).toFixed(3)} → ${Number(t.current).toFixed(3)} (Δ ${Number(t.delta).toFixed(3)})</li>`
-        ).join("");
+        const increases = (row.all_topic_changes || [])
+          .filter(t => t.delta > 0)
+          .sort((a, b) => b.delta - a.delta)
+          .slice(0, 3);
+
+        const decreases = (row.all_topic_changes || [])
+          .filter(t => t.delta < 0)
+          .sort((a, b) => a.delta - b.delta)
+          .slice(0, 3);
 
         autoEvaluationEl.innerHTML = `
-          <div class="kv"><strong>Partnerdelta:</strong> ${row.partner_delta > 0 ? "+" : ""}${row.partner_delta}</div>
-          <div class="kv"><strong>Megmaradt partnerek:</strong> ${row.kept_partners.join(", ") || "—"}</div>
-          <div class="kv"><strong>Legnagyobb témaváltozások:</strong></div>
-          <ul class="list">${topicLines || "<li>—</li>"}</ul>
+          <div class="analysis-rich">
+            <div class="analysis-card">
+              <div class="analysis-card-title">Automatikus összkép</div>
+              <div class="analysis-lead">
+                <strong>${currentCountry}</strong> időbeli mintázata alapján
+                ${row.partner_delta > 0
+                  ? `kapcsolatilag nyitottabbá vált, mivel nőtt az együttmozgásban megjelenő partnerek száma.`
+                  : row.partner_delta < 0
+                    ? `szűkebb partneri kör felé mozdult el, vagyis az együttmozgása koncentráltabb lett.`
+                    : `partneri hálója összességében stabil maradt az előző időszakhoz képest.`}
+              </div>
+            </div>
+
+            <div class="analysis-card">
+              <div class="analysis-card-title">Erősödő témák</div>
+              <div class="kv">
+                ${increases.length
+                  ? increases.map(t => `${topicLabel(t.topic)} (${Number(t.delta).toFixed(3)})`).join(", ")
+                  : "nincs markáns pozitív elmozdulás"}
+              </div>
+            </div>
+
+            <div class="analysis-card">
+              <div class="analysis-card-title">Gyengülő témák</div>
+              <div class="kv">
+                ${decreases.length
+                  ? decreases.map(t => `${topicLabel(t.topic)} (${Number(t.delta).toFixed(3)})`).join(", ")
+                  : "nincs markáns negatív elmozdulás"}
+              </div>
+            </div>
+
+            <div class="analysis-card">
+              <div class="analysis-card-title">Értelmező megjegyzés</div>
+              <div class="analysis-note">
+                A változásnézet nem abszolút erőt mér, hanem két egymást követő időszak szerkezeti különbségét.
+                Ezért itt az eltolódás és az újrarendeződés fontosabb, mint az egyszerű aktuális súly.
+              </div>
+            </div>
+          </div>
         `;
         return;
       }
 
       const partners = topPartnersFromGraph(currentCountry, graphData, 5);
       const topicsAbs = topTopicsFromHeatmap(currentCountry, heatmapAbsData, 5);
+      const topicsNorm = topTopicsFromHeatmap(currentCountry, heatmapNormData, 5);
       const similar = topPartnersFromGraph(currentCountry, similarityData, 5);
 
       autoEvaluationEl.innerHTML = `
-        <div class="kv"><strong>Legerősebb partnerek:</strong> ${partners.map(p => `${p.partner} (${Number(p.weight).toFixed(3)})`).join(", ") || "—"}</div>
-        <div class="kv"><strong>Legfontosabb témák:</strong> ${topicsAbs.map(t => `${topicLabel(t.topic)} (${Number(t.value).toFixed(3)})`).join(", ") || "—"}</div>
-        <div class="kv"><strong>Leghasonlóbb országok:</strong> ${similar.map(p => `${p.partner} (${Number(p.weight).toFixed(3)})`).join(", ") || "—"}</div>
+        <div class="analysis-rich">
+          <div class="analysis-card">
+            <div class="analysis-card-title">Kapcsolati profil</div>
+            <div class="kv"><strong>Legerősebb partnerek:</strong> ${partners.map(p => `${p.partner} (${Number(p.weight).toFixed(3)})`).join(", ") || "—"}</div>
+            <div class="kv"><strong>Leghasonlóbb országok:</strong> ${similar.map(p => `${p.partner} (${Number(p.weight).toFixed(3)})`).join(", ") || "—"}</div>
+          </div>
+
+          <div class="analysis-card">
+            <div class="analysis-card-title">Tematikus profil</div>
+            <div class="kv"><strong>Absolute:</strong> ${topicsAbs.map(t => `${topicLabel(t.topic)} (${Number(t.value).toFixed(3)})`).join(", ") || "—"}</div>
+            <div class="kv"><strong>Normalized:</strong> ${topicsNorm.map(t => `${topicLabel(t.topic)} (${Number(t.value).toFixed(3)})`).join(", ") || "—"}</div>
+          </div>
+
+          <div class="analysis-card">
+            <div class="analysis-card-title">Szoftikált értelmezés</div>
+            <div class="analysis-note">
+              Az abszolút és normalizált értékek együttes olvasata segít elkülöníteni, hogy egy ország pusztán sok ügyben jelenik-e meg,
+              vagy valóban egy szűkebb, markánsabb prioritási szerkezetet követ.
+            </div>
+          </div>
+        </div>
       `;
     }
 
@@ -1131,6 +1400,201 @@
       }).join("");
     }
 
+    function clearChangeCharts() {
+      d3.select("#change-partner-chart").selectAll("*").remove();
+      d3.select("#change-topic-chart").selectAll("*").remove();
+      d3.select("#change-compare-chart").selectAll("*").remove();
+    }
+
+    function drawChangePartnerChart(row) {
+      const svg = d3.select("#change-partner-chart");
+      svg.selectAll("*").remove();
+
+      const width = document.getElementById("change-partner-chart").clientWidth || 600;
+      const height = 220;
+      svg.attr("width", width).attr("height", height);
+
+      const data = [
+        { label: "Előző", value: row.partner_count_previous || 0 },
+        { label: "Most", value: row.partner_count_current || 0 },
+        { label: "Új", value: (row.gained_partners || []).length },
+        { label: "Elveszett", value: (row.lost_partners || []).length }
+      ];
+
+      const margin = { top: 20, right: 20, bottom: 40, left: 50 };
+      const w = width - margin.left - margin.right;
+      const h = height - margin.top - margin.bottom;
+
+      const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+      const x = d3.scaleBand().domain(data.map(d => d.label)).range([0, w]).padding(0.25);
+      const y = d3.scaleLinear().domain([0, d3.max(data, d => d.value) || 1]).nice().range([h, 0]);
+
+      g.selectAll("rect")
+        .data(data)
+        .enter()
+        .append("rect")
+        .attr("x", d => x(d.label))
+        .attr("y", d => y(d.value))
+        .attr("width", x.bandwidth())
+        .attr("height", d => h - y(d.value))
+        .attr("rx", 4)
+        .attr("fill", d => {
+          if (d.label === "Új") return "#0f766e";
+          if (d.label === "Elveszett") return "#b91c1c";
+          return "#123b8f";
+        });
+
+      g.selectAll("text.bar")
+        .data(data)
+        .enter()
+        .append("text")
+        .attr("x", d => x(d.label) + x.bandwidth() / 2)
+        .attr("y", d => y(d.value) - 6)
+        .attr("text-anchor", "middle")
+        .style("font-size", "11px")
+        .style("fill", "#334155")
+        .text(d => d.value);
+
+      g.append("g")
+        .attr("transform", `translate(0,${h})`)
+        .call(d3.axisBottom(x));
+
+      g.append("g")
+        .call(d3.axisLeft(y).ticks(5));
+    }
+
+    function drawChangeTopicChart(row) {
+      const svg = d3.select("#change-topic-chart");
+      svg.selectAll("*").remove();
+
+      const width = document.getElementById("change-topic-chart").clientWidth || 600;
+      const height = 220;
+      svg.attr("width", width).attr("height", height);
+
+      const data = (row.all_topic_changes || [])
+        .slice()
+        .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta))
+        .slice(0, 6);
+
+      const margin = { top: 20, right: 20, bottom: 70, left: 50 };
+      const w = width - margin.left - margin.right;
+      const h = height - margin.top - margin.bottom;
+
+      const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+      const maxAbs = d3.max(data, d => Math.abs(d.delta)) || 1;
+      const x = d3.scaleBand().domain(data.map(d => topicLabel(d.topic))).range([0, w]).padding(0.25);
+      const y = d3.scaleLinear().domain([-maxAbs, maxAbs]).nice().range([h, 0]);
+
+      g.append("line")
+        .attr("x1", 0)
+        .attr("x2", w)
+        .attr("y1", y(0))
+        .attr("y2", y(0))
+        .attr("stroke", "#94a3b8");
+
+      g.selectAll("rect")
+        .data(data)
+        .enter()
+        .append("rect")
+        .attr("x", d => x(topicLabel(d.topic)))
+        .attr("y", d => d.delta >= 0 ? y(d.delta) : y(0))
+        .attr("width", x.bandwidth())
+        .attr("height", d => Math.abs(y(d.delta) - y(0)))
+        .attr("rx", 4)
+        .attr("fill", d => d.delta >= 0 ? "#0f766e" : "#b91c1c");
+
+      g.append("g")
+        .attr("transform", `translate(0,${h})`)
+        .call(d3.axisBottom(x))
+        .selectAll("text")
+        .attr("transform", "rotate(35)")
+        .style("text-anchor", "start")
+        .style("font-size", "10px");
+
+      g.append("g").call(d3.axisLeft(y).ticks(5));
+    }
+
+    function drawChangeCompareChart(row) {
+      const svg = d3.select("#change-compare-chart");
+      svg.selectAll("*").remove();
+
+      const width = document.getElementById("change-compare-chart").clientWidth || 600;
+      const height = 240;
+      svg.attr("width", width).attr("height", height);
+
+      const data = (row.all_topic_changes || []).slice(0, 6);
+
+      const margin = { top: 20, right: 20, bottom: 70, left: 50 };
+      const w = width - margin.left - margin.right;
+      const h = height - margin.top - margin.bottom;
+
+      const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+      const maxVal = d3.max(data.flatMap(d => [Math.abs(d.current), Math.abs(d.previous)])) || 1;
+      const x0 = d3.scaleBand().domain(data.map(d => topicLabel(d.topic))).range([0, w]).padding(0.25);
+      const x1 = d3.scaleBand().domain(["Korábban", "Most"]).range([0, x0.bandwidth()]).padding(0.15);
+      const y = d3.scaleLinear().domain([0, maxVal]).nice().range([h, 0]);
+
+      g.selectAll("g.topic")
+        .data(data)
+        .enter()
+        .append("g")
+        .attr("transform", d => `translate(${x0(topicLabel(d.topic))},0)`)
+        .each(function(d) {
+          const group = d3.select(this);
+          const bars = [
+            { name: "Korábban", value: Math.abs(d.previous) },
+            { name: "Most", value: Math.abs(d.current) }
+          ];
+
+          group.selectAll("rect")
+            .data(bars)
+            .enter()
+            .append("rect")
+            .attr("x", b => x1(b.name))
+            .attr("y", b => y(b.value))
+            .attr("width", x1.bandwidth())
+            .attr("height", b => h - y(b.value))
+            .attr("rx", 4)
+            .attr("fill", b => b.name === "Most" ? "#123b8f" : "#93c5fd");
+        });
+
+      g.append("g")
+        .attr("transform", `translate(0,${h})`)
+        .call(d3.axisBottom(x0))
+        .selectAll("text")
+        .attr("transform", "rotate(35)")
+        .style("text-anchor", "start")
+        .style("font-size", "10px");
+
+      g.append("g").call(d3.axisLeft(y).ticks(5));
+
+      const legend = svg.append("g").attr("transform", `translate(${width - 170},20)`);
+      legend.append("rect").attr("x", 0).attr("y", 0).attr("width", 12).attr("height", 12).attr("fill", "#93c5fd");
+      legend.append("text").attr("x", 18).attr("y", 10).style("font-size", "11px").style("fill", "#334155").text("Korábban");
+      legend.append("rect").attr("x", 80).attr("y", 0).attr("width", 12).attr("height", 12).attr("fill", "#123b8f");
+      legend.append("text").attr("x", 98).attr("y", 10).style("font-size", "11px").style("fill", "#334155").text("Most");
+    }
+
+    function renderChangeCharts() {
+      if (currentSource !== "votes" || currentView !== "change" || !changeData || !currentCountry) {
+        clearChangeCharts();
+        return;
+      }
+
+      const row = changeData.by_country?.find(r => r.country === currentCountry);
+      if (!row) {
+        clearChangeCharts();
+        return;
+      }
+
+      drawChangePartnerChart(row);
+      drawChangeTopicChart(row);
+      drawChangeCompareChart(row);
+    }
+
     function buildChangePanel() {
       if (currentSource !== "votes" || !changeData || currentView !== "change") {
         changePanel.classList.add("hidden");
@@ -1142,12 +1606,14 @@
 
       if (!currentCountry) {
         changeContent.innerHTML = `<div class="status">Válassz országot a change elemzéshez.</div>`;
+        renderChangeCharts();
         return;
       }
 
       const row = changeData.by_country?.find(r => r.country === currentCountry);
       if (!row) {
         changeContent.innerHTML = `<div class="status">Nincs change adat ehhez az országhoz.</div>`;
+        renderChangeCharts();
         return;
       }
 
@@ -1195,6 +1661,8 @@
           <ul class="list">${topicItems || "<li>—</li>"}</ul>
         </div>
       `;
+
+      renderChangeCharts();
     }
 
     function drawDashboard() {
@@ -1663,6 +2131,7 @@ change: ${changeFilePath()}` : ""}`;
         changePanel.classList.add("hidden");
         votesSummaryContent.innerHTML = "";
         changeContent.innerHTML = "";
+        clearChangeCharts();
         errorEl.textContent = "Nem sikerült betölteni.\n" + e.message;
         console.error(e);
       }
@@ -1673,6 +2142,7 @@ change: ${changeFilePath()}` : ""}`;
       updateControlVisibility();
       buildVotesSummary();
       buildChangePanel();
+      renderChangeCharts();
 
       if (currentView === "graph" && graphData) {
         let graphColor = "#2563eb";
