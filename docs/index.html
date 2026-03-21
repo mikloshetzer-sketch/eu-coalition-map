@@ -25,11 +25,8 @@
       --eu-muted: #64748b;
       --eu-white: #ffffff;
       --eu-danger: #b91c1c;
-      --eu-danger-soft: #fecaca;
       --eu-success: #0f766e;
-      --eu-success-soft: #ccfbf1;
       --eu-warning: #b45309;
-      --eu-warning-soft: #fed7aa;
       --shadow-soft: 0 8px 24px rgba(15, 23, 42, 0.08);
       --shadow-card: 0 10px 28px rgba(18, 59, 143, 0.08);
       --radius-lg: 14px;
@@ -37,9 +34,7 @@
       --radius-sm: 8px;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -53,13 +48,11 @@
       color: var(--eu-white);
       padding: 18px 20px;
       box-shadow: var(--shadow-soft);
-      border-bottom: 1px solid rgba(255,255,255,0.08);
     }
 
     header h1 {
       margin: 0;
       font-size: 22px;
-      letter-spacing: 0.2px;
     }
 
     .controls {
@@ -71,7 +64,6 @@
       flex-wrap: wrap;
       gap: 12px 18px;
       align-items: center;
-      box-shadow: 0 6px 18px rgba(18, 59, 143, 0.05);
     }
 
     .group {
@@ -84,7 +76,6 @@
     .group-label {
       font-weight: bold;
       font-size: 13px;
-      margin-right: 2px;
       color: var(--eu-blue-950);
     }
 
@@ -100,12 +91,10 @@
       border: 1px solid transparent;
       background: var(--eu-blue-700);
       color: var(--eu-white);
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.18);
     }
 
     button:hover {
       background: var(--eu-blue-800);
-      transform: translateY(-1px);
     }
 
     button.active {
@@ -117,20 +106,17 @@
       border: 1px solid var(--eu-border);
       background: var(--eu-white);
       color: var(--eu-text);
-      box-shadow: 0 2px 8px rgba(18, 59, 143, 0.05);
     }
 
     .layout {
       display: grid;
-      grid-template-columns: 1fr 310px;
+      grid-template-columns: 1fr 320px;
       min-height: calc(100vh - 128px);
     }
 
     .main-panel {
-      background: transparent;
-      position: relative;
-      overflow: auto;
       padding: 14px;
+      overflow: auto;
     }
 
     .viz-layout {
@@ -152,23 +138,6 @@
       border: 1px solid var(--eu-border);
       border-radius: var(--radius-lg);
       box-shadow: var(--shadow-card);
-    }
-
-    #dashboard {
-      min-height: 440px;
-    }
-
-    #dashboard-charts {
-      width: 100%;
-      height: 440px;
-      display: block;
-    }
-
-    .analysis-panel {
-      margin-top: 14px;
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 14px;
     }
 
     .sidebar {
@@ -193,29 +162,34 @@
       padding: 10px 12px;
       background: linear-gradient(135deg, var(--eu-blue-950), var(--eu-blue-900));
       color: var(--eu-white);
-      letter-spacing: 0.2px;
     }
 
     .panel > :not(h3) {
       padding: 10px 12px 12px 12px;
     }
 
-    .status {
+    .status, .hint, .kv {
       font-size: 12px;
       color: var(--eu-text-soft);
-      line-height: 1.45;
-      white-space: pre-wrap;
+      line-height: 1.55;
     }
+
+    .kv { margin: 6px 0; font-size: 13px; }
+    .kv strong { color: var(--eu-text); }
 
     .error {
       color: var(--eu-danger);
       white-space: pre-wrap;
       font-size: 12px;
-      line-height: 1.45;
+    }
+
+    .empty {
+      color: var(--eu-muted);
+      font-style: italic;
     }
 
     .node {
-      stroke: rgba(255,255,255,0.9);
+      stroke: rgba(255,255,255,0.95);
       stroke-width: 1.8px;
       cursor: pointer;
     }
@@ -227,7 +201,7 @@
 
     .link {
       stroke: #7da2df;
-      stroke-opacity: 0.8;
+      stroke-opacity: 0.82;
     }
 
     .label {
@@ -235,59 +209,6 @@
       fill: var(--eu-text);
       pointer-events: none;
       font-weight: bold;
-    }
-
-    .hint {
-      font-size: 12px;
-      color: var(--eu-text-soft);
-      line-height: 1.65;
-    }
-
-    .kv {
-      font-size: 13px;
-      margin: 6px 0;
-      line-height: 1.6;
-      color: var(--eu-text-soft);
-    }
-
-    .kv strong {
-      color: var(--eu-text);
-    }
-
-    .eval-block {
-      margin: 10px 0 12px 0;
-      padding: 10px;
-      background: linear-gradient(180deg, var(--eu-blue-100), rgba(255,255,255,0.9));
-      border: 1px solid var(--eu-border);
-      border-radius: var(--radius-md);
-    }
-
-    .eval-title {
-      font-weight: bold;
-      font-size: 13px;
-      color: var(--eu-blue-950);
-      margin-bottom: 6px;
-    }
-
-    .eval-muted {
-      color: var(--eu-muted);
-    }
-
-    .role-badge {
-      display: inline-block;
-      padding: 4px 8px;
-      border-radius: 999px;
-      background: var(--eu-blue-200);
-      color: var(--eu-blue-950);
-      font-weight: bold;
-      font-size: 12px;
-      margin: 4px 0 8px 0;
-      border: 1px solid var(--eu-blue-300);
-    }
-
-    .empty {
-      color: var(--eu-muted);
-      font-style: italic;
     }
 
     .heatmap-cell {
@@ -335,12 +256,9 @@
       pointer-events: none;
       z-index: 50;
       max-width: 280px;
-      box-shadow: 0 10px 24px rgba(15,23,42,0.2);
     }
 
-    .hidden {
-      display: none !important;
-    }
+    .hidden { display: none !important; }
 
     .list {
       margin: 0;
@@ -350,12 +268,12 @@
       color: var(--eu-text-soft);
     }
 
-    .list li {
-      margin: 4px 0;
-    }
+    .list li { margin: 4px 0; }
 
-    .country-select {
-      min-width: 140px;
+    #dashboard-charts {
+      width: 100%;
+      height: 440px;
+      display: block;
     }
 
     .vote-summary-grid {
@@ -369,23 +287,12 @@
       border-radius: 10px;
       padding: 10px;
       border: 1px solid var(--eu-border);
-      background: linear-gradient(180deg, #ffffff, #f8fbff);
+      background: #fff;
     }
 
-    .vote-stat.for {
-      background: linear-gradient(180deg, #f0fdf4, #ecfeff);
-      border-color: #a7f3d0;
-    }
-
-    .vote-stat.against {
-      background: linear-gradient(180deg, #fef2f2, #fff7ed);
-      border-color: #fecaca;
-    }
-
-    .vote-stat.abstain {
-      background: linear-gradient(180deg, #fff7ed, #fffbeb);
-      border-color: #fed7aa;
-    }
+    .vote-stat.for { background: #f0fdf4; }
+    .vote-stat.against { background: #fef2f2; }
+    .vote-stat.abstain { background: #fff7ed; }
 
     .vote-stat-label {
       font-size: 12px;
@@ -434,17 +341,9 @@
       height: 100%;
     }
 
-    .vote-bar-fill.for {
-      background: var(--eu-success);
-    }
-
-    .vote-bar-fill.against {
-      background: var(--eu-danger);
-    }
-
-    .vote-bar-fill.abstain {
-      background: var(--eu-warning);
-    }
+    .vote-bar-fill.for { background: var(--eu-success); }
+    .vote-bar-fill.against { background: var(--eu-danger); }
+    .vote-bar-fill.abstain { background: var(--eu-warning); }
 
     .vote-bar-value {
       text-align: right;
@@ -452,20 +351,62 @@
       font-weight: bold;
     }
 
-    .vote-summary-note {
+    .change-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .change-box {
+      border: 1px solid var(--eu-border);
+      border-radius: 10px;
+      padding: 10px;
+      background: #fff;
+    }
+
+    .change-title {
       font-size: 12px;
-      color: var(--eu-muted);
-      line-height: 1.5;
-      margin-top: 10px;
+      font-weight: bold;
+      color: var(--eu-blue-950);
+      margin-bottom: 8px;
+    }
+
+    .pill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .pill {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: var(--eu-blue-100);
+      color: var(--eu-blue-950);
+      border: 1px solid var(--eu-blue-300);
+    }
+
+    .pill.gained {
+      background: #ecfdf5;
+      border-color: #a7f3d0;
+      color: #065f46;
+    }
+
+    .pill.lost {
+      background: #fef2f2;
+      border-color: #fecaca;
+      color: #991b1b;
+    }
+
+    .pill.neutral {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+      color: #334155;
     }
 
     @media (max-width: 1200px) {
       .viz-layout {
         grid-template-columns: 1fr;
-      }
-
-      #dashboard {
-        order: 2;
       }
     }
 
@@ -482,6 +423,10 @@
       #network {
         height: 70vh;
       }
+
+      .change-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -496,6 +441,7 @@
       <button class="view-btn active" data-view="graph">Graph</button>
       <button class="view-btn" data-view="heatmap">Heatmap</button>
       <button class="view-btn" data-view="similarity">Similarity</button>
+      <button class="view-btn" data-view="change">Change</button>
     </div>
 
     <div class="group">
@@ -544,7 +490,7 @@
 
     <div class="group">
       <span class="group-label">Ország</span>
-      <select id="country-select" class="country-select">
+      <select id="country-select">
         <option value="">— válassz —</option>
       </select>
     </div>
@@ -588,6 +534,11 @@
           <div id="votes-summary-content"></div>
         </div>
 
+        <div id="change-panel" class="panel hidden">
+          <h3>Változás az előző időszakhoz képest</h3>
+          <div id="change-content"></div>
+        </div>
+
         <div class="panel">
           <h3>Nézet értelmezése</h3>
           <div id="view-analysis" class="hint"></div>
@@ -604,23 +555,6 @@
           <h3>Szöveges értékelés</h3>
           <div id="auto-evaluation" class="hint">
             Válassz országot az automatikus értékeléshez.
-          </div>
-        </div>
-
-        <div class="panel">
-          <h3>Rendszer magyarázat</h3>
-          <div class="hint">
-            <b>Adatforrások:</b><br>
-            • <b>RSS:</b> válogatott hírforrások, szerkesztett tartalom.<br>
-            • <b>GDELT:</b> globális automatizált médiamonitoring rendszer, nagy mennyiségű nyers adat.<br>
-            • <b>Votes:</b> hivatalos intézményi szavazási adatok, amelyek azt mutatják, hogy a tagállamok hogyan viselkednek konkrét döntéshozatali helyzetekben.<br><br>
-
-            <b>Nézetek:</b><br>
-            • <b>Graph:</b> országok közötti kapcsolatok vagy együttszavazási mintázat<br>
-            • <b>Heatmap:</b> ország–téma aktivitás vagy szavazási profil<br>
-            • <b>Similarity:</b> tematikus vagy szavazási hasonlóság<br><br>
-
-            A rendszer médiamegjelenési vagy intézményi mintázatokat mutat, nem hivatalos politikai álláspont-összegzést.
           </div>
         </div>
       </div>
@@ -696,6 +630,8 @@
     const autoEvaluationEl = document.getElementById("auto-evaluation");
     const votesSummaryPanel = document.getElementById("votes-summary-panel");
     const votesSummaryContent = document.getElementById("votes-summary-content");
+    const changePanel = document.getElementById("change-panel");
+    const changeContent = document.getElementById("change-content");
     const vizLayout = document.getElementById("viz-layout");
 
     let width = 0;
@@ -711,6 +647,7 @@
     let heatmapNormData = null;
     let similarityData = null;
     let voteSummaryData = null;
+    let changeData = null;
 
     function topicLabel(topic) {
       return TOPIC_LABELS[topic] || topic;
@@ -783,6 +720,13 @@
       return `${basePath()}/data/networks/${currentSource}/${currentWindow}_vote_summary${suffix}.json`;
     }
 
+    function changeFilePath() {
+      let suffix = "";
+      if (currentType === "internal") suffix = "_internal";
+      if (currentType === "external") suffix = "_external";
+      return `${basePath()}/data/networks/${currentSource}/${currentWindow}_change${suffix}.json`;
+    }
+
     function setActive(selector, value, attr) {
       document.querySelectorAll(selector).forEach(b => {
         b.classList.toggle("active", b.dataset[attr] === value);
@@ -797,19 +741,25 @@
     }
 
     function updateViewAnalysis() {
+      if (currentView === "change") {
+        viewAnalysisEl.innerHTML = `
+          <div class="kv"><strong>Change:</strong> az aktuális időablakot az azt megelőző, azonos hosszúságú időszakkal hasonlítja össze.</div>
+          <div class="kv">Itt látszik, hogy mely partnerek jelentek meg újonnan, melyek estek ki, és mely témákban változott a legerősebben az ország profilja.</div>
+        `;
+        return;
+      }
+
       if (currentSource === "votes") {
         if (currentView === "graph") {
           viewAnalysisEl.innerHTML = `
             <div class="kv"><strong>Votes / Graph:</strong> országok közötti együttszavazási mintázat.</div>
             <div class="kv">A vastagabb él magasabb együttszavazási arányt jelent a releváns, megosztóbb szavazások alapján.</div>
-            <div class="kv">A szavazási összesítő diagramok külön a vote_summary adatokból készülnek.</div>
           `;
         } else if (currentView === "heatmap") {
           viewAnalysisEl.innerHTML = `
             <div class="kv"><strong>Votes / Heatmap:</strong> ország–téma szavazási profil.</div>
-            <div class="kv"><strong>Absolute:</strong> az ország témánkénti, irányozott szavazási profilját mutatja.</div>
-            <div class="kv"><strong>Normalized:</strong> az ország saját belső profilján belüli arányokat mutatja.</div>
-            <div class="kv">A heatmap most teljes szélességet kap, hogy a címkék és a cellák jobban olvashatók legyenek.</div>
+            <div class="kv"><strong>Absolute:</strong> irányozott, témánkénti mintát mutat.</div>
+            <div class="kv"><strong>Normalized:</strong> az ország saját belső arányait mutatja.</div>
           `;
         } else {
           viewAnalysisEl.innerHTML = `
@@ -821,21 +771,11 @@
       }
 
       if (currentView === "graph") {
-        viewAnalysisEl.innerHTML = `
-          <div class="kv"><strong>Graph:</strong> országok közötti közvetlen kapcsolati együttmozgás.</div>
-          <div class="kv">A vastagabb él erősebb kapcsolatot jelent.</div>
-        `;
+        viewAnalysisEl.innerHTML = `<div class="kv"><strong>Graph:</strong> országok közötti közvetlen kapcsolati együttmozgás.</div>`;
       } else if (currentView === "heatmap") {
-        viewAnalysisEl.innerHTML = `
-          <div class="kv"><strong>Heatmap:</strong> ország–téma aktivitás.</div>
-          <div class="kv"><strong>Absolute:</strong> az ország teljes aktivitását mutatja témánként.</div>
-          <div class="kv"><strong>Normalized:</strong> azt mutatja, hogy az adott országon belül mely témák dominálnak.</div>
-        `;
+        viewAnalysisEl.innerHTML = `<div class="kv"><strong>Heatmap:</strong> ország–téma aktivitás.</div>`;
       } else {
-        viewAnalysisEl.innerHTML = `
-          <div class="kv"><strong>Similarity:</strong> tematikus hasonlóságot mutat.</div>
-          <div class="kv">Nem közvetlen országkapcsolat, hanem azt jelzi, hogy két ország hasonló témákban és hasonló arányban jelenik meg.</div>
-        `;
+        viewAnalysisEl.innerHTML = `<div class="kv"><strong>Similarity:</strong> tematikus hasonlóságot mutat.</div>`;
       }
     }
 
@@ -928,21 +868,14 @@
       const graphWidth = Math.max(maxX - minX, 1);
       const graphHeight = Math.max(maxY - minY, 1);
 
-      const scale = Math.min(
-        width / (graphWidth + 120),
-        height / (graphHeight + 120),
-        1.7
-      );
-
+      const scale = Math.min(width / (graphWidth + 120), height / (graphHeight + 120), 1.7);
       const tx = width / 2 - scale * (minX + graphWidth / 2);
       const ty = height / 2 - scale * (minY + graphHeight / 2);
 
-      svg.transition()
-        .duration(500)
-        .call(
-          zoom.transform,
-          d3.zoomIdentity.translate(tx, ty).scale(scale)
-        );
+      svg.transition().duration(500).call(
+        zoom.transform,
+        d3.zoomIdentity.translate(tx, ty).scale(scale)
+      );
     }
 
     function allCountriesFromLoadedData() {
@@ -952,6 +885,7 @@
       if (heatmapAbsData?.rows) heatmapAbsData.rows.forEach(r => set.add(r.country));
       if (similarityData?.nodes) similarityData.nodes.forEach(n => set.add(typeof n === "string" ? n : n.id));
       if (voteSummaryData?.by_country) voteSummaryData.by_country.forEach(r => set.add(r.country));
+      if (changeData?.by_country) changeData.by_country.forEach(r => set.add(r.country));
 
       return Array.from(set).filter(Boolean).sort();
     }
@@ -990,9 +924,7 @@
     function topPartnersFromGraph(country, data, limit = 5) {
       if (!country || !data?.edges) return [];
 
-      const filteredEdges = filterGraphEdgesByTopic(data.edges);
-
-      return filteredEdges
+      return data.edges
         .filter(e => (e.source === country || e.target === country || e.source?.id === country || e.target?.id === country))
         .map(e => {
           const source = e.source?.id || e.source;
@@ -1029,28 +961,17 @@
       const graphPartners = topPartnersFromGraph(currentCountry, graphData, 5);
       const simPartners = topPartnersFromGraph(currentCountry, similarityData, 5);
       const absTopics = topTopicsFromHeatmap(currentCountry, heatmapAbsData, 5);
-      const normTopics = topTopicsFromHeatmap(currentCountry, heatmapNormData, 5);
-
-      const graphNode = graphData?.nodes?.find(n => (typeof n === "string" ? n : n.id) === currentCountry);
-      const graphWeight = graphNode ? (typeof graphNode === "string" ? 1 : graphNode.weight || 0) : 0;
-      const graphCount = graphNode && typeof graphNode !== "string" ? graphNode.count : null;
 
       countryInfoEl.classList.remove("empty");
       countryInfoEl.innerHTML = `
         <div class="kv"><strong>Ország:</strong> ${currentCountry}</div>
-        <div class="kv"><strong>Kapcsolati súly:</strong> ${Number(graphWeight).toFixed(3)}</div>
-        ${graphCount !== null ? `<div class="kv"><strong>Releváns esetek száma:</strong> ${graphCount}</div>` : ""}
-
-        <div class="kv"><strong>Legerősebb partnerek</strong></div>
+        <div class="kv"><strong>Partnerek:</strong></div>
         ${graphPartners.length ? `<ul class="list">${graphPartners.map(p => `<li>${p.partner}: ${Number(p.weight).toFixed(3)}</li>`).join("")}</ul>` : `<div class="status">Nincs adat.</div>`}
 
-        <div class="kv"><strong>Legfontosabb témák (Absolute)</strong></div>
+        <div class="kv"><strong>Témák:</strong></div>
         ${absTopics.length ? `<ul class="list">${absTopics.map(t => `<li>${topicLabel(t.topic)}: ${Number(t.value).toFixed(3)}</li>`).join("")}</ul>` : `<div class="status">Nincs adat.</div>`}
 
-        <div class="kv"><strong>Tematikus profil (Normalized)</strong></div>
-        ${normTopics.length ? `<ul class="list">${normTopics.map(t => `<li>${topicLabel(t.topic)}: ${Number(t.value).toFixed(3)}</li>`).join("")}</ul>` : `<div class="status">Nincs adat.</div>`}
-
-        <div class="kv"><strong>Leghasonlóbb országok</strong></div>
+        <div class="kv"><strong>Hasonló országok:</strong></div>
         ${simPartners.length ? `<ul class="list">${simPartners.map(p => `<li>${p.partner}: ${Number(p.weight).toFixed(3)}</li>`).join("")}</ul>` : `<div class="status">Nincs adat.</div>`}
       `;
     }
@@ -1063,150 +984,29 @@
 
       const topics = topTopicsFromHeatmap(currentCountry, heatmapAbsData, 3);
       const partners = topPartnersFromGraph(currentCountry, graphData, 3);
-      const similar = topPartnersFromGraph(currentCountry, similarityData, 3);
-
-      if (!topics.length && !partners.length) {
-        countryAnalysisEl.innerHTML = "Nincs elegendő adat.";
-        return;
-      }
 
       const topTopicText = topics.map(t => topicLabel(t.topic)).join(", ");
       const partnerText = partners.map(p => p.partner).join(", ");
-      const similarText = similar.map(s => s.partner).join(", ");
 
-      if (currentSource === "votes") {
+      if (currentView === "change" && changeData) {
+        const row = changeData.by_country?.find(r => r.country === currentCountry);
+        if (!row) {
+          countryAnalysisEl.innerHTML = "Nincs változásadat.";
+          return;
+        }
+
         countryAnalysisEl.innerHTML = `
-          <div class="kv">
-            <strong>${currentCountry}</strong> szavazási profilja a vizsgált időszakban főként
-            <strong>${topTopicText || "nincs domináns téma"}</strong> ügyek köré rendeződik.
-          </div>
-          <div class="kv">
-            Együttszavazási mintázata alapján legerősebben
-            <strong>${partnerText || "nincs adat"}</strong>
-            országokkal mutat közelséget.
-          </div>
-          <div class="kv">
-            A teljes témaszerkezet alapján leginkább
-            <strong>${similarText || "nincs adat"}</strong>
-            országokhoz áll közel.
-          </div>
+          <div class="kv"><strong>${currentCountry}</strong> partnerhálója ${row.partner_count_previous} → ${row.partner_count_current} értékre változott.</div>
+          <div class="kv">Új partnerek: <strong>${row.gained_partners.join(", ") || "—"}</strong></div>
+          <div class="kv">Elveszett partnerek: <strong>${row.lost_partners.join(", ") || "—"}</strong></div>
         `;
         return;
       }
 
       countryAnalysisEl.innerHTML = `
-        <div class="kv">
-          <strong>${currentCountry}</strong> profilja a vizsgált időszakban főként
-          <strong>${topTopicText || "nincs domináns téma"}</strong> témákra koncentrál.
-        </div>
-        <div class="kv">
-          Legerősebb kapcsolatai:
-          <strong>${partnerText || "nincs adat"}</strong>.
-        </div>
-        <div class="kv">
-          Tematikus hasonlóság alapján közel áll:
-          <strong>${similarText || "nincs adat"}</strong> országokhoz.
-        </div>
+        <div class="kv"><strong>${currentCountry}</strong> fő témái: <strong>${topTopicText || "nincs domináns téma"}</strong>.</div>
+        <div class="kv">Legközelebbi partnerei: <strong>${partnerText || "nincs adat"}</strong>.</div>
       `;
-    }
-
-    function formatTopList(items, decimals = 2) {
-      if (!items.length) return "nincs elegendő adat";
-      return items
-        .map(item => {
-          const name = item.partner || topicLabel(item.topic) || item.name || "-";
-          const value = item.weight ?? item.value ?? 0;
-          return `${name} (${Number(value).toFixed(decimals)})`;
-        })
-        .join(", ");
-    }
-
-    function classifyConcentration(normTopics) {
-      if (!normTopics.length) return "nem azonosítható egyértelmű tematikus fókusz";
-
-      const first = Math.abs(normTopics[0]?.value || 0);
-      const second = Math.abs(normTopics[1]?.value || 0);
-
-      if (first >= 0.45) return "erősen koncentrált";
-      if (first >= 0.30 && (first - second) >= 0.08) return "jól körülhatárolt";
-      if (first >= 0.22) return "mérsékelten koncentrált";
-      return "inkább diverzifikált";
-    }
-
-    function classifyNetworkPosition(partners, similar) {
-      const partnerTop = partners[0]?.weight || 0;
-      const similarTop = similar[0]?.weight || 0;
-      const partnerCount = partners.length;
-      const similarCount = similar.length;
-
-      if (partnerTop > 0 && similarTop > 0 && partnerCount >= 3 && similarCount >= 3) return "viszonylag jól beágyazott";
-      if (partnerTop > 0 && similarTop > 0) return "azonosítható, de nem teljesen kiterjedt";
-      if (partnerTop > 0 || similarTop > 0) return "részlegesen kirajzolódó";
-      return "gyengén látható";
-    }
-
-    function describeTypeContext() {
-      if (currentSource === "votes" && currentType === "external") {
-        return "A votes forrásnál az external nézet jellemzően üres vagy korlátozott, mert a szavazási adatok alapvetően tagállami szintűek.";
-      }
-      if (currentType === "internal") return "Ez a nézet kifejezetten az EU-n belüli mintázatokat emeli ki.";
-      if (currentType === "external") return "Ez a nézet az EU külső kapcsolódásait hangsúlyozza.";
-      return "Ez az összesített nézet a belső és külső mintázatokat együtt jeleníti meg.";
-    }
-
-    function describeViewContext() {
-      if (currentSource === "votes") {
-        if (currentView === "graph") return "A jelenlegi értelmezésben a hangsúly az együttszavazási mintázaton van.";
-        if (currentView === "heatmap") return "A jelenlegi értelmezésben a hangsúly az ország szavazási profiljának tematikus szerkezetén van.";
-        return "A jelenlegi értelmezésben a hangsúly a szavazási profilok hasonlóságán van.";
-      }
-      if (currentView === "graph") return "A jelenlegi értelmezésben a hangsúly a közvetlen kapcsolati együttmozgáson van.";
-      if (currentView === "heatmap") return "A jelenlegi értelmezésben a hangsúly az ország tematikus aktivitásának szerkezetén van.";
-      return "A jelenlegi értelmezésben a hangsúly a tematikus hasonlóságon van.";
-    }
-
-    function sumValues(items, key) {
-      return items.reduce((acc, item) => acc + Math.abs(item[key] || 0), 0);
-    }
-
-    function classifyCountryRole(partners, topicsAbs, topicsNorm, similar) {
-      const partnerTop = partners[0]?.weight || 0;
-      const partnerTotal = sumValues(partners, "weight");
-      const similarTop = similar[0]?.weight || 0;
-      const similarTotal = sumValues(similar, "weight");
-      const absTop = Math.abs(topicsAbs[0]?.value || 0);
-      const absSecond = Math.abs(topicsAbs[1]?.value || 0);
-      const normTop = Math.abs(topicsNorm[0]?.value || 0);
-      const normSecond = Math.abs(topicsNorm[1]?.value || 0);
-
-      const strongNetwork = partnerTotal >= 4 || partnerTop >= 1.5;
-      const strongSimilarity = similarTotal >= 1.2 || similarTop >= 0.4;
-      const focusedTheme = normTop >= 0.40 || (normTop >= 0.30 && (normTop - normSecond) >= 0.10);
-      const balancedTheme = normTop > 0 && normTop < 0.24;
-      const weakNetwork = partnerTotal < 1 && similarTotal < 0.4;
-      const bridgePattern = strongSimilarity && !strongNetwork;
-      const noisyNetwork = strongNetwork && !focusedTheme && normTop < 0.28;
-      const dominantAbsolute = absTop > 0 && absTop >= (absSecond * 1.6 || 0);
-
-      if (weakNetwork && normTop < 0.20) {
-        return { label: "periférikus megjelenés", description: "Az ország jelenléte jelenleg kevésbé rajzol ki erős kapcsolati vagy tematikus központot." };
-      }
-      if (strongNetwork && strongSimilarity && !focusedTheme && partnerTotal >= 5) {
-        return { label: "központi koordinátor", description: "Az ország egyszerre erős kapcsolati és hasonlósági beágyazottságot mutat, miközben több irányban is látható együttmozgás kapcsolódik hozzá." };
-      }
-      if (focusedTheme && (dominantAbsolute || normTop >= 0.45)) {
-        return { label: "tematikusan specializált szereplő", description: "Az ország médiaképe vagy szavazási profilja markánsan egy vagy néhány ügykör köré rendeződik." };
-      }
-      if (bridgePattern) {
-        return { label: "hasonlósági hídpozíció", description: "Az ország kevésbé a közvetlen kapcsolatokban, inkább a teljes mintázatokon keresztül kapcsolódik más szereplőkhöz." };
-      }
-      if (noisyNetwork) {
-        return { label: "kapcsolatilag aktív, de tematikusan szórt szereplő", description: "Az ország több irányban is kapcsolódik, de a tematikus fókusza kevésbé koncentrált." };
-      }
-      if (balancedTheme && (strongNetwork || strongSimilarity)) {
-        return { label: "kiegyensúlyozott profilú ország", description: "Az ország több témában is megjelenik, miközben kapcsolati és hasonlósági mintázata is viszonylag stabil." };
-      }
-      return { label: "közepesen tagolt profilú szereplő", description: "Az ország pozíciója értelmezhető, de nem egyetlen domináns mintázat határozza meg." };
     }
 
     function generateAutoEvaluation() {
@@ -1215,58 +1015,34 @@
         return;
       }
 
-      const partners = topPartnersFromGraph(currentCountry, graphData, 5);
-      const topicsAbs = topTopicsFromHeatmap(currentCountry, heatmapAbsData, 5);
-      const topicsNorm = topTopicsFromHeatmap(currentCountry, heatmapNormData, 5);
-      const similar = topPartnersFromGraph(currentCountry, similarityData, 5);
+      if (currentView === "change" && changeData) {
+        const row = changeData.by_country?.find(r => r.country === currentCountry);
+        if (!row) {
+          autoEvaluationEl.innerHTML = "Nincs change adat.";
+          return;
+        }
 
-      const concentration = classifyConcentration(topicsNorm);
-      const networkPosition = classifyNetworkPosition(partners, similar);
-      const role = classifyCountryRole(partners, topicsAbs, topicsNorm, similar);
+        const topicLines = (row.top_topic_changes || []).map(
+          t => `<li>${topicLabel(t.topic)}: ${Number(t.previous).toFixed(3)} → ${Number(t.current).toFixed(3)} (Δ ${Number(t.delta).toFixed(3)})</li>`
+        ).join("");
 
-      const dominantAbsTopics = topicsAbs.slice(0, 3).map(t => topicLabel(t.topic));
-      const dominantNormTopics = topicsNorm.slice(0, 3).map(t => topicLabel(t.topic));
-      const strongestPartners = partners.slice(0, 3).map(p => p.partner);
-      const closestCountries = similar.slice(0, 3).map(s => s.partner);
-
-      const hasEnoughData = partners.length || topicsAbs.length || topicsNorm.length || similar.length;
-
-      if (!hasEnoughData) {
         autoEvaluationEl.innerHTML = `
-          <div class="eval-block">
-            <div class="eval-title">Automatikus értékelés</div>
-            <div class="kv">A kiválasztott országra a jelenlegi szűrés mellett nem áll rendelkezésre elegendő adat részletes értelmezéshez.</div>
-          </div>
+          <div class="kv"><strong>Partnerdelta:</strong> ${row.partner_delta > 0 ? "+" : ""}${row.partner_delta}</div>
+          <div class="kv"><strong>Megmaradt partnerek:</strong> ${row.kept_partners.join(", ") || "—"}</div>
+          <div class="kv"><strong>Legnagyobb témaváltozások:</strong></div>
+          <ul class="list">${topicLines || "<li>—</li>"}</ul>
         `;
         return;
       }
 
+      const partners = topPartnersFromGraph(currentCountry, graphData, 5);
+      const topicsAbs = topTopicsFromHeatmap(currentCountry, heatmapAbsData, 5);
+      const similar = topPartnersFromGraph(currentCountry, similarityData, 5);
+
       autoEvaluationEl.innerHTML = `
-        <div class="kv">${describeTypeContext()}</div>
-        <div class="kv">${describeViewContext()}</div>
-
-        <div class="eval-block">
-          <div class="eval-title">Automatikus kategorizálás</div>
-          <div class="role-badge">${role.label}</div>
-          <div class="kv">${role.description}</div>
-        </div>
-
-        <div class="eval-block">
-          <div class="eval-title">Értelmező összegzés</div>
-          <div class="kv"><strong>${currentCountry}</strong> a jelenlegi adatkivágatban elsősorban <strong>${dominantAbsTopics.join(", ") || "nincs domináns téma"}</strong> témák mentén látható.</div>
-          <div class="kv">Kapcsolati szempontból leginkább <strong>${strongestPartners.join(", ") || "nincs adat"}</strong> felé mutat közelséget.</div>
-          <div class="kv">Teljes mintázata alapján legközelebb <strong>${closestCountries.join(", ") || "nincs adat"}</strong> országokhoz áll.</div>
-          <div class="kv">A normalizált profil alapján az ország tematikus fókusza <strong>${concentration}</strong>, főként <strong>${dominantNormTopics.join(", ") || "nincs adat"}</strong> ügykörök mentén.</div>
-          <div class="kv">A hálózati pozíció összességében <strong>${networkPosition}</strong>.</div>
-        </div>
-
-        <div class="eval-block">
-          <div class="eval-title">Kulcsmutatók</div>
-          <div class="kv"><strong>Legerősebb partnerek:</strong> ${formatTopList(partners, 3)}</div>
-          <div class="kv"><strong>Legfontosabb témák (Absolute):</strong> ${formatTopList(topicsAbs, 3)}</div>
-          <div class="kv"><strong>Tematikus profil (Normalized):</strong> ${formatTopList(topicsNorm, 3)}</div>
-          <div class="kv"><strong>Leghasonlóbb országok:</strong> ${formatTopList(similar, 3)}</div>
-        </div>
+        <div class="kv"><strong>Legerősebb partnerek:</strong> ${partners.map(p => `${p.partner} (${Number(p.weight).toFixed(3)})`).join(", ") || "—"}</div>
+        <div class="kv"><strong>Legfontosabb témák:</strong> ${topicsAbs.map(t => `${topicLabel(t.topic)} (${Number(t.value).toFixed(3)})`).join(", ") || "—"}</div>
+        <div class="kv"><strong>Leghasonlóbb országok:</strong> ${similar.map(p => `${p.partner} (${Number(p.weight).toFixed(3)})`).join(", ") || "—"}</div>
       `;
     }
 
@@ -1296,14 +1072,10 @@
       }
 
       const topCountries = (currentTopic === "all" ? byCountry : byCountryTopic)
-        .slice()
-        .sort((a, b) => (b.total || 0) - (a.total || 0))
-        .slice(0, 6);
+        .slice().sort((a, b) => (b.total || 0) - (a.total || 0)).slice(0, 6);
 
       const topTopics = (currentCountry ? byCountryTopic : byTopic)
-        .slice()
-        .sort((a, b) => (b.total || 0) - (a.total || 0))
-        .slice(0, 6);
+        .slice().sort((a, b) => (b.total || 0) - (a.total || 0)).slice(0, 6);
 
       votesSummaryContent.innerHTML = `
         <div class="vote-summary-grid">
@@ -1322,19 +1094,10 @@
         </div>
 
         <div class="kv"><strong>Ország szerinti megoszlás</strong></div>
-        <div class="vote-bars">
-          ${renderStackedBars(topCountries, "country")}
-        </div>
+        <div class="vote-bars">${renderStackedBars(topCountries, "country")}</div>
 
         <div class="kv" style="margin-top:12px;"><strong>Téma szerinti megoszlás</strong></div>
-        <div class="vote-bars">
-          ${renderStackedBars(topTopics, currentCountry ? "country_topic" : "topic")}
-        </div>
-
-        <div class="vote-summary-note">
-          A diagramok a <code>vote_summary.json</code> aggregált adataiból készülnek.
-          Jelenlegi szűrés: Window = ${currentWindow}, Type = ${typeLabel(currentType)}, Téma = ${currentTopic === "all" ? "Összes" : topicLabel(currentTopic)}${currentCountry ? `, Ország = ${currentCountry}` : ""}.
-        </div>
+        <div class="vote-bars">${renderStackedBars(topTopics, currentCountry ? "country_topic" : "topic")}</div>
       `;
     }
 
@@ -1368,11 +1131,77 @@
       }).join("");
     }
 
+    function buildChangePanel() {
+      if (currentSource !== "votes" || !changeData || currentView !== "change") {
+        changePanel.classList.add("hidden");
+        changeContent.innerHTML = "";
+        return;
+      }
+
+      changePanel.classList.remove("hidden");
+
+      if (!currentCountry) {
+        changeContent.innerHTML = `<div class="status">Válassz országot a change elemzéshez.</div>`;
+        return;
+      }
+
+      const row = changeData.by_country?.find(r => r.country === currentCountry);
+      if (!row) {
+        changeContent.innerHTML = `<div class="status">Nincs change adat ehhez az országhoz.</div>`;
+        return;
+      }
+
+      const topicItems = (row.top_topic_changes || []).map(item => `
+        <li>${topicLabel(item.topic)}: ${Number(item.previous).toFixed(3)} → ${Number(item.current).toFixed(3)} (Δ ${Number(item.delta).toFixed(3)})</li>
+      `).join("");
+
+      changeContent.innerHTML = `
+        <div class="change-grid">
+          <div class="change-box">
+            <div class="change-title">Partnerháló változása</div>
+            <div class="kv"><strong>Előző időszak:</strong> ${row.partner_count_previous}</div>
+            <div class="kv"><strong>Most:</strong> ${row.partner_count_current}</div>
+            <div class="kv"><strong>Delta:</strong> ${row.partner_delta > 0 ? "+" : ""}${row.partner_delta}</div>
+          </div>
+
+          <div class="change-box">
+            <div class="change-title">Partnerek</div>
+
+            <div class="kv"><strong>Új partnerek</strong></div>
+            <div class="pill-list">
+              ${(row.gained_partners || []).length
+                ? row.gained_partners.map(x => `<span class="pill gained">${x}</span>`).join("")
+                : `<span class="pill neutral">—</span>`}
+            </div>
+
+            <div class="kv" style="margin-top:10px;"><strong>Elveszett partnerek</strong></div>
+            <div class="pill-list">
+              ${(row.lost_partners || []).length
+                ? row.lost_partners.map(x => `<span class="pill lost">${x}</span>`).join("")
+                : `<span class="pill neutral">—</span>`}
+            </div>
+
+            <div class="kv" style="margin-top:10px;"><strong>Megmaradt partnerek</strong></div>
+            <div class="pill-list">
+              ${(row.kept_partners || []).length
+                ? row.kept_partners.map(x => `<span class="pill neutral">${x}</span>`).join("")
+                : `<span class="pill neutral">—</span>`}
+            </div>
+          </div>
+        </div>
+
+        <div class="change-box" style="margin-top:12px;">
+          <div class="change-title">Témaváltozás</div>
+          <ul class="list">${topicItems || "<li>—</li>"}</ul>
+        </div>
+      `;
+    }
+
     function drawDashboard() {
       const dash = document.getElementById("dashboard");
       const svgDash = d3.select("#dashboard-charts");
 
-      if (!currentCountry || currentView === "heatmap") {
+      if (!currentCountry || currentView === "heatmap" || currentView === "change") {
         dash.classList.add("hidden");
         svgDash.selectAll("*").remove();
         return;
@@ -1450,50 +1279,9 @@
           .attr("rx", 4)
           .attr("fill", section.color)
           .on("mousemove", (event, d) => {
-            showTooltip(
-              `<strong>${section.title}</strong><br>${d.name}: ${Number(d.value).toFixed(3)}`,
-              event.pageX,
-              event.pageY
-            );
+            showTooltip(`<strong>${section.title}</strong><br>${d.name}: ${Number(d.value).toFixed(3)}`, event.pageX, event.pageY);
           })
           .on("mouseleave", hideTooltip);
-
-        group.selectAll("text.value")
-          .data(sectionData)
-          .enter()
-          .append("text")
-          .attr("class", "value")
-          .attr("x", d => x(d.name) + x.bandwidth() / 2)
-          .attr("y", d => y(d.value) - 4)
-          .attr("text-anchor", "middle")
-          .text(d => d.value > 0 ? Number(d.value).toFixed(2) : "")
-          .style("font-size", "9px")
-          .style("fill", "#334155");
-
-        group.selectAll("text.bar")
-          .data(sectionData)
-          .enter()
-          .append("text")
-          .attr("class", "bar")
-          .attr("x", d => x(d.name) + x.bandwidth() / 2)
-          .attr("y", sectionHeight - 8)
-          .attr("text-anchor", "middle")
-          .text(d => d.name)
-          .style("font-size", "9px")
-          .style("fill", "#334155")
-          .each(function() {
-            const txt = d3.select(this);
-            const original = txt.text();
-            if (original.length > 14) txt.text(original.slice(0, 14) + "…");
-          });
-
-        group.append("line")
-          .attr("x1", 0)
-          .attr("x2", chartWidth)
-          .attr("y1", chartBottom)
-          .attr("y2", chartBottom)
-          .attr("stroke", "#bfd2f7")
-          .attr("stroke-width", 1);
       });
     }
 
@@ -1504,7 +1292,7 @@
       currentNodes = (data.nodes || []).map(d =>
         typeof d === "string" ? { id: d, weight: 1 } : { ...d }
       );
-      currentLinks = filterGraphEdgesByTopic((data.edges || []).map(d => ({ ...d })));
+      currentLinks = (data.edges || []).map(d => ({ ...d }));
 
       zoom = d3.zoom()
         .scaleExtent([0.3, 4])
@@ -1512,16 +1300,6 @@
 
       svg.call(zoom);
       g = svg.append("g");
-
-      const nodeIdsInEdges = new Set();
-      currentLinks.forEach(e => {
-        nodeIdsInEdges.add(e.source?.id || e.source);
-        nodeIdsInEdges.add(e.target?.id || e.target);
-      });
-
-      if (currentTopic !== "all" && currentLinks.length) {
-        currentNodes = currentNodes.filter(n => nodeIdsInEdges.has(n.id));
-      }
 
       const nodeWeightExtent = d3.extent(currentNodes, d => d.weight || 1);
       const edgeWeightExtent = d3.extent(currentLinks, d => d.weight || 1);
@@ -1549,12 +1327,9 @@
         .attr("stroke", currentSource === "votes" ? "#5f8ddd" : "#7da2df")
         .attr("stroke-width", d => edgeWidth(d.weight || 1))
         .on("mousemove", (event, d) => {
-          const countText = d.count !== undefined ? `<br>Count: ${d.count}` : "";
-          showTooltip(
-            `<strong>${d.source.id || d.source} – ${d.target.id || d.target}</strong><br>Súly: ${Number(d.weight).toFixed(3)}${countText}`,
-            event.pageX,
-            event.pageY
-          );
+          const source = d.source?.id || d.source;
+          const target = d.target?.id || d.target;
+          showTooltip(`<strong>${source} – ${target}</strong><br>Súly: ${Number(d.weight).toFixed(3)}`, event.pageX, event.pageY);
         })
         .on("mouseleave", hideTooltip);
 
@@ -1581,8 +1356,7 @@
           renderCurrentView();
         })
         .on("mousemove", (event, d) => {
-          const countText = d.count !== undefined ? `<br>Count: ${d.count}` : "";
-          showTooltip(`<strong>${d.id}</strong><br>Weight: ${Number(d.weight || 0).toFixed(3)}${countText}`, event.pageX, event.pageY);
+          showTooltip(`<strong>${d.id}</strong><br>Weight: ${Number(d.weight || 0).toFixed(3)}`, event.pageX, event.pageY);
         })
         .on("mouseleave", hideTooltip);
 
@@ -1723,11 +1497,7 @@
               renderCurrentView();
             })
             .on("mousemove", (event) => {
-              showTooltip(
-                `<strong>${row.country}</strong><br>${topicLabel(topic)}: ${Number(value).toFixed(3)}`,
-                event.pageX,
-                event.pageY
-              );
+              showTooltip(`<strong>${row.country}</strong><br>${topicLabel(topic)}: ${Number(value).toFixed(3)}`, event.pageX, event.pageY);
             })
             .on("mouseleave", hideTooltip);
         });
@@ -1778,11 +1548,9 @@
       for (let i = 0; i <= 20; i++) {
         const ratio = i / 20;
         let value;
-        if (currentSource === "votes") {
-          value = -maxAbs + ratio * maxAbs * 2;
-        } else {
-          value = ratio * maxAbs;
-        }
+        if (currentSource === "votes") value = -maxAbs + ratio * maxAbs * 2;
+        else value = ratio * maxAbs;
+
         gradient.append("stop")
           .attr("offset", `${ratio * 100}%`)
           .attr("stop-color", color(value));
@@ -1823,7 +1591,6 @@
         <div class="kv"><strong>Window:</strong> ${currentWindow}</div>
         <div class="kv"><strong>Type:</strong> ${typeLabel(currentType)}</div>
         <div class="kv"><strong>Mode:</strong> ${currentHeatmapMode}</div>
-        <div class="kv"><strong>Sort:</strong> ${currentSort === "trade" ? topicLabel("trade") : currentSort}</div>
         <div class="kv"><strong>Téma:</strong> ${currentTopic === "all" ? "Összes" : topicLabel(currentTopic)}</div>
         <div class="kv"><strong>Countries:</strong> ${rows.length}</div>
         <div class="kv"><strong>Topics:</strong> ${topics.length}</div>
@@ -1851,6 +1618,7 @@
 
         if (currentSource === "votes") {
           requests.push(fetchJson(voteSummaryFilePath()));
+          requests.push(fetchJson(changeFilePath()));
         }
 
         const results = await Promise.all(requests);
@@ -1860,12 +1628,14 @@
         heatmapNormData = results[2];
         similarityData = results[3];
         voteSummaryData = currentSource === "votes" ? results[4] : null;
+        changeData = currentSource === "votes" ? results[5] : null;
 
         updateCountrySelect();
         updateCountryInfo();
         generateCountryAnalysis();
         generateAutoEvaluation();
         buildVotesSummary();
+        buildChangePanel();
         renderCurrentView();
 
         statusEl.textContent = `Betöltve:
@@ -1873,7 +1643,8 @@ graph: ${graphFilePath()}
 heatmap: ${heatmapAbsFilePath()}
 heatmap_norm: ${heatmapNormFilePath()}
 similarity: ${similarityFilePath()}
-${currentSource === "votes" ? `vote_summary: ${voteSummaryFilePath()}` : ""}`;
+${currentSource === "votes" ? `vote_summary: ${voteSummaryFilePath()}
+change: ${changeFilePath()}` : ""}`;
       } catch (e) {
         clear();
         graphData = null;
@@ -1881,6 +1652,7 @@ ${currentSource === "votes" ? `vote_summary: ${voteSummaryFilePath()}` : ""}`;
         heatmapNormData = null;
         similarityData = null;
         voteSummaryData = null;
+        changeData = null;
         infoEl.classList.add("empty");
         infoEl.textContent = "Nincs betöltött nézet.";
         countryInfoEl.classList.add("empty");
@@ -1888,7 +1660,9 @@ ${currentSource === "votes" ? `vote_summary: ${voteSummaryFilePath()}` : ""}`;
         countryAnalysisEl.textContent = "Nem érhető el szöveges értelmezés.";
         autoEvaluationEl.textContent = "Nem érhető el automatikus értékelés.";
         votesSummaryPanel.classList.add("hidden");
+        changePanel.classList.add("hidden");
         votesSummaryContent.innerHTML = "";
+        changeContent.innerHTML = "";
         errorEl.textContent = "Nem sikerült betölteni.\n" + e.message;
         console.error(e);
       }
@@ -1898,23 +1672,19 @@ ${currentSource === "votes" ? `vote_summary: ${voteSummaryFilePath()}` : ""}`;
       updateViewAnalysis();
       updateControlVisibility();
       buildVotesSummary();
+      buildChangePanel();
 
       if (currentView === "graph" && graphData) {
         let graphColor = "#2563eb";
         if (currentSource === "votes") graphColor = "#123b8f";
-        else if (currentType === "external") graphColor = "#3b82f6";
-        else if (currentType === "internal") graphColor = "#1d4ed8";
-
         drawForceGraph(graphData, "Graph", graphColor);
       } else if (currentView === "heatmap") {
         const data = currentHeatmapMode === "normalized" ? heatmapNormData : heatmapAbsData;
         if (data) drawHeatmap(data);
       } else if (currentView === "similarity" && similarityData) {
-        drawForceGraph(
-          similarityData,
-          "Similarity",
-          currentSource === "votes" ? "#0f766e" : "#1d4ed8"
-        );
+        drawForceGraph(similarityData, "Similarity", currentSource === "votes" ? "#0f766e" : "#1d4ed8");
+      } else if (currentView === "change" && currentSource === "votes" && changeData) {
+        drawForceGraph(changeData.current.graph, "Change / Current graph", "#123b8f");
       }
 
       generateCountryAnalysis();
@@ -1923,7 +1693,7 @@ ${currentSource === "votes" ? `vote_summary: ${voteSummaryFilePath()}` : ""}`;
     }
 
     fitBtn.onclick = () => {
-      if (currentView === "graph" || currentView === "similarity") {
+      if (currentView === "graph" || currentView === "similarity" || currentView === "change") {
         fitGraph();
       }
     };
