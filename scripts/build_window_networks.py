@@ -213,6 +213,26 @@ def filter_window(events, days):
     return [e for e in events if get_event_date(e) >= cutoff]
 
 
+def split_periods(events, days):
+    current_start = NOW - timedelta(days=days)
+    previous_start = NOW - timedelta(days=days * 2)
+
+    current = []
+    previous = []
+
+    for e in events:
+        dt = get_event_date(e)
+        if not dt:
+            continue
+
+        if dt >= current_start:
+            current.append(e)
+        elif dt >= previous_start:
+            previous.append(e)
+
+    return current, previous
+
+
 # -----------------------------
 # COMMON HELPERS
 # -----------------------------
@@ -675,13 +695,6 @@ def build_votes_similarity(votes, mode="all"):
 
 
 def build_votes_summary(votes, mode="all"):
-    """
-    Dashboardhoz külön aggregált votes summary.
-
-    A 'for / against / abstain' itt abszolút, súlyozott összegek:
-    - a szavazás megosztottsági súlyával súlyozunk
-    - országonként, témánként és ország+téma bontásban is összesítünk
-    """
     if mode == "external":
         return {
             "event_count": len(votes),
@@ -790,6 +803,105 @@ def build_votes_summary(votes, mode="all"):
     }
 
 
+def index_edges_by_country(graph):
+    result = defaultdict(dict)
+    for edge in graph.get("edges", []):
+        a = edge.get("source")
+        b = edge.get("target")
+        if not a or not b:
+            continue
+
+        result[a][b] = edge
+        result[b][a] = edge
+    return result
+
+
+def build_votes_change(votes, days=90, mode="all"):
+    current_votes, previous_votes = split_periods(votes, days)
+
+    current_graph = build_votes_graph(current_votes, mode=mode)
+    previous_graph = build_votes_graph(previous_votes, mode=mode)
+
+    current_heatmap = build_votes_heatmap(current_votes, mode=mode, normalized=False)
+    previous_heatmap = build_votes_heatmap(previous_votes, mode=mode, normalized=False)
+
+    current_summary = build_votes_summary(current_votes, mode=mode)
+    previous_summary = build_votes_summary(previous_votes, mode=mode)
+
+    current_edges = index_edges_by_country(current_graph)
+    previous_edges = index_edges_by_country(previous_graph)
+
+    countries = sorted(set(
+        list(current_edges.keys()) +
+        list(previous_edges.keys()) +
+        [r["country"] for r in current_heatmap.get("rows", [])] +
+        [r["country"] for r in previous_heatmap.get("rows", [])]
+    ))
+
+    current_heat_rows = {r["country"]: r for r in current_heatmap.get("rows", [])}
+    previous_heat_rows = {r["country"]: r for r in previous_heatmap.get("rows", [])}
+
+    by_country = []
+
+    for country in countries:
+        curr_partners = set(current_edges.get(country, {}).keys())
+        prev_partners = set(previous_edges.get(country, {}).keys())
+
+        gained_partners = sorted(curr_partners - prev_partners)
+        lost_partners = sorted(prev_partners - curr_partners)
+        kept_partners = sorted(curr_partners & prev_partners)
+
+        curr_row = current_heat_rows.get(country, {})
+        prev_row = previous_heat_rows.get(country, {})
+
+        topic_deltas = []
+        for topic in TOPICS:
+            curr_val = float(curr_row.get(topic, 0.0) or 0.0)
+            prev_val = float(prev_row.get(topic, 0.0) or 0.0)
+            delta = round(curr_val - prev_val, 3)
+            topic_deltas.append({
+                "topic": topic,
+                "current": round(curr_val, 3),
+                "previous": round(prev_val, 3),
+                "delta": delta,
+                "abs_delta": round(abs(delta), 3),
+            })
+
+        topic_deltas.sort(key=lambda x: (-x["abs_delta"], x["topic"]))
+
+        by_country.append({
+            "country": country,
+            "gained_partners": gained_partners,
+            "lost_partners": lost_partners,
+            "kept_partners": kept_partners,
+            "partner_count_current": len(curr_partners),
+            "partner_count_previous": len(prev_partners),
+            "partner_delta": len(curr_partners) - len(prev_partners),
+            "top_topic_changes": topic_deltas[:5],
+            "all_topic_changes": topic_deltas,
+        })
+
+    by_country.sort(key=lambda x: (-abs(x["partner_delta"]), x["country"]))
+
+    return {
+        "window_days": days,
+        "mode": mode,
+        "current": {
+            "event_count": len(current_votes),
+            "graph": current_graph,
+            "heatmap": current_heatmap,
+            "summary": current_summary,
+        },
+        "previous": {
+            "event_count": len(previous_votes),
+            "graph": previous_graph,
+            "heatmap": previous_heatmap,
+            "summary": previous_summary,
+        },
+        "by_country": by_country,
+    }
+
+
 # -----------------------------
 # SAVE
 # -----------------------------
@@ -837,6 +949,7 @@ def main():
                     save_json(layer, f"{window_name}_heatmap_norm{suffix}.json", build_votes_heatmap(filtered, mode=mode, normalized=True))
                     save_json(layer, f"{window_name}_similarity{suffix}.json", build_votes_similarity(filtered, mode=mode))
                     save_json(layer, f"{window_name}_vote_summary{suffix}.json", build_votes_summary(filtered, mode=mode))
+                    save_json(layer, f"{window_name}_change{suffix}.json", build_votes_change(filtered, days=days, mode=mode))
                 else:
                     save_json(layer, f"{window_name}{suffix}.json", build_graph(filtered, mode=mode))
                     save_json(layer, f"{window_name}_heatmap{suffix}.json", build_heatmap(filtered, mode=mode, normalized=False))
