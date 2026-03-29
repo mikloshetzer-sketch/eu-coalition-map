@@ -2,7 +2,7 @@
   "nodes": [
     {
       "id": "BE",
-      "weight": 7.0
+      "weight": 16.02
     },
     {
       "id": "BG",
@@ -26,11 +26,11 @@
     },
     {
       "id": "FR",
-      "weight": 57.45
+      "weight": 80.09
     },
     {
       "id": "GB",
-      "weight": 90.95
+      "weight": 76.91
     },
     {
       "id": "GR",
@@ -38,7 +38,7 @@
     },
     {
       "id": "IE",
-      "weight": 70.5
+      "weight": 43.2
     },
     {
       "id": "IT",
@@ -62,10 +62,15 @@
     },
     {
       "id": "US",
-      "weight": 98.65
+      "weight": 117.05
     }
   ],
   "edges": [
+    {
+      "source": "BE",
+      "target": "GB",
+      "weight": 9.02
+    },
     {
       "source": "BE",
       "target": "RU",
@@ -124,7 +129,7 @@
     {
       "source": "FR",
       "target": "GB",
-      "weight": 17.32
+      "weight": 21.56
     },
     {
       "source": "FR",
@@ -144,12 +149,7 @@
     {
       "source": "FR",
       "target": "US",
-      "weight": 19.54
-    },
-    {
-      "source": "GB",
-      "target": "IE",
-      "weight": 27.3
+      "weight": 37.94
     },
     {
       "source": "GB",
@@ -177,6 +177,6 @@
       "weight": 1.6
     }
   ],
-  "event_count": 103,
+  "event_count": 109,
   "mode": "external"
 }
