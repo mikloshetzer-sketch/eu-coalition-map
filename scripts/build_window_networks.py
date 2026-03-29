@@ -72,6 +72,18 @@ VOTE_TOPIC_SCORE = {
     "against": -1.0,
 }
 
+RELATIONSHIP_MIN_SCORE = 5
+RELATIONSHIP_WEIGHTS_DEFAULT = {
+    "direct": 0.50,
+    "similarity": 0.30,
+    "topic": 0.20,
+}
+RELATIONSHIP_WEIGHTS_VOTES = {
+    "direct": 0.45,
+    "similarity": 0.35,
+    "topic": 0.20,
+}
+
 
 # -----------------------------
 # IO HELPERS
@@ -321,6 +333,80 @@ def cosine_similarity(row_a, row_b):
         return 0.0
 
     return dot / (norm_a * norm_b)
+
+
+def clamp(value, min_value=0.0, max_value=100.0):
+    return max(min_value, min(max_value, value))
+
+
+def index_rows_by_country(rows):
+    return {row["country"]: row for row in rows if row.get("country")}
+
+
+def graph_countries(graph):
+    countries = set()
+    for node in graph.get("nodes", []):
+        if node.get("id"):
+            countries.add(node["id"])
+    for edge in graph.get("edges", []):
+        if edge.get("source"):
+            countries.add(edge["source"])
+        if edge.get("target"):
+            countries.add(edge["target"])
+    return countries
+
+
+def edge_weight_between(graph, a, b):
+    if not a or not b or a == b:
+        return 0.0
+
+    for edge in graph.get("edges", []):
+        source = edge.get("source")
+        target = edge.get("target")
+        if (source == a and target == b) or (source == b and target == a):
+            return float(edge.get("weight", 0.0) or 0.0)
+
+    return 0.0
+
+
+def max_edge_weight(graph):
+    weights = [float(edge.get("weight", 0.0) or 0.0) for edge in graph.get("edges", [])]
+    if not weights:
+        return 1.0
+    return max(weights) or 1.0
+
+
+def topic_profile_closeness(row_a, row_b):
+    if not row_a or not row_b:
+        return 0.0
+
+    vals_a = [abs(float(row_a.get(t, 0.0) or 0.0)) for t in TOPICS]
+    vals_b = [abs(float(row_b.get(t, 0.0) or 0.0)) for t in TOPICS]
+
+    total_a = sum(vals_a)
+    total_b = sum(vals_b)
+
+    if total_a == 0 and total_b == 0:
+        return 0.0
+
+    norm_a = [(v / total_a) if total_a > 0 else 0.0 for v in vals_a]
+    norm_b = [(v / total_b) if total_b > 0 else 0.0 for v in vals_b]
+
+    distance = sum(abs(norm_a[i] - norm_b[i]) for i in range(len(TOPICS))) / 2.0
+    closeness = 1.0 - distance
+    return max(0.0, closeness)
+
+
+def relationship_band(score):
+    if score >= 80:
+        return "very_high"
+    if score >= 60:
+        return "high"
+    if score >= 40:
+        return "medium"
+    if score >= 20:
+        return "low"
+    return "very_low"
 
 
 # -----------------------------
@@ -903,6 +989,319 @@ def build_votes_change(votes, days=90, mode="all"):
 
 
 # -----------------------------
+# RELATIONSHIP INDEX
+# -----------------------------
+
+def build_relationship_index_from_components(graph, heatmap_norm, similarity, layer, mode, window_days):
+    row_index = index_rows_by_country(heatmap_norm.get("rows", []))
+    countries = sorted(set(
+        graph_countries(graph) |
+        graph_countries(similarity) |
+        set(row_index.keys())
+    ))
+
+    direct_max = max_edge_weight(graph)
+    similarity_max = max_edge_weight(similarity)
+
+    if layer == "votes":
+        weights = RELATIONSHIP_WEIGHTS_VOTES
+    else:
+        weights = RELATIONSHIP_WEIGHTS_DEFAULT
+
+    pairs = []
+    by_country = defaultdict(list)
+
+    for a, b in combinations(countries, 2):
+        if not filter_pair_by_mode(a, b, mode):
+            continue
+
+        direct_weight = edge_weight_between(graph, a, b)
+        similarity_weight = edge_weight_between(similarity, a, b)
+
+        direct_score = clamp((direct_weight / direct_max) * 100.0 if direct_max > 0 else 0.0)
+        similarity_score = clamp((similarity_weight / similarity_max) * 100.0 if similarity_max > 0 else 0.0)
+        topic_score = clamp(topic_profile_closeness(row_index.get(a), row_index.get(b)) * 100.0)
+
+        score = (
+            direct_score * weights["direct"] +
+            similarity_score * weights["similarity"] +
+            topic_score * weights["topic"]
+        )
+        score = round(clamp(score), 2)
+
+        if score < RELATIONSHIP_MIN_SCORE:
+            continue
+
+        rec = {
+            "source": a,
+            "target": b,
+            "score": score,
+            "band": relationship_band(score),
+            "direct_score": round(direct_score, 2),
+            "similarity_score": round(similarity_score, 2),
+            "topic_score": round(topic_score, 2),
+            "direct_weight": round(direct_weight, 6),
+            "similarity_weight": round(similarity_weight, 6),
+        }
+        pairs.append(rec)
+        by_country[a].append(rec)
+        by_country[b].append(rec)
+
+    pairs.sort(key=lambda x: (-x["score"], x["source"], x["target"]))
+
+    by_country_list = []
+    for country in countries:
+        rels = by_country.get(country, [])
+        top_pairs = sorted(
+            rels,
+            key=lambda x: (-x["score"], x["source"], x["target"])
+        )[:10]
+
+        partners = []
+        for item in top_pairs:
+            partner = item["target"] if item["source"] == country else item["source"]
+            partners.append({
+                "partner": partner,
+                "score": item["score"],
+                "band": item["band"],
+                "direct_score": item["direct_score"],
+                "similarity_score": item["similarity_score"],
+                "topic_score": item["topic_score"],
+            })
+
+        avg_score = round(sum(x["score"] for x in rels) / len(rels), 2) if rels else 0.0
+        strongest = partners[0] if partners else None
+
+        by_country_list.append({
+            "country": country,
+            "relationship_count": len(rels),
+            "average_score": avg_score,
+            "strongest_partner": strongest["partner"] if strongest else None,
+            "strongest_score": strongest["score"] if strongest else None,
+            "top_partners": partners,
+        })
+
+    by_country_list.sort(key=lambda x: (-x["average_score"], x["country"]))
+
+    return {
+        "layer": layer,
+        "mode": mode,
+        "window_days": window_days,
+        "pair_count": len(pairs),
+        "country_count": len(countries),
+        "weights": weights,
+        "pairs": pairs,
+        "by_country": by_country_list,
+    }
+
+
+def build_relationship_index(events, layer, days=90, mode="all"):
+    current_events = filter_window(events, days)
+
+    if layer == "votes":
+        graph = build_votes_graph(current_events, mode=mode)
+        heatmap_norm = build_votes_heatmap(current_events, mode=mode, normalized=True)
+        similarity = build_votes_similarity(current_events, mode=mode)
+    else:
+        graph = build_graph(current_events, mode=mode)
+        heatmap_norm = build_heatmap(current_events, mode=mode, normalized=True)
+        similarity = build_similarity(current_events, mode=mode)
+
+    payload = build_relationship_index_from_components(
+        graph=graph,
+        heatmap_norm=heatmap_norm,
+        similarity=similarity,
+        layer=layer,
+        mode=mode,
+        window_days=days,
+    )
+
+    payload["current"] = {
+        "event_count": len(current_events),
+        "graph_event_count": graph.get("event_count", 0),
+    }
+
+    return payload
+
+
+def build_relationship_change(events, layer, days=90, mode="all"):
+    current_events, previous_events = split_periods(events, days)
+
+    if layer == "votes":
+        current_graph = build_votes_graph(current_events, mode=mode)
+        current_heatmap_norm = build_votes_heatmap(current_events, mode=mode, normalized=True)
+        current_similarity = build_votes_similarity(current_events, mode=mode)
+
+        previous_graph = build_votes_graph(previous_events, mode=mode)
+        previous_heatmap_norm = build_votes_heatmap(previous_events, mode=mode, normalized=True)
+        previous_similarity = build_votes_similarity(previous_events, mode=mode)
+    else:
+        current_graph = build_graph(current_events, mode=mode)
+        current_heatmap_norm = build_heatmap(current_events, mode=mode, normalized=True)
+        current_similarity = build_similarity(current_events, mode=mode)
+
+        previous_graph = build_graph(previous_events, mode=mode)
+        previous_heatmap_norm = build_heatmap(previous_events, mode=mode, normalized=True)
+        previous_similarity = build_similarity(previous_events, mode=mode)
+
+    current_rel = build_relationship_index_from_components(
+        graph=current_graph,
+        heatmap_norm=current_heatmap_norm,
+        similarity=current_similarity,
+        layer=layer,
+        mode=mode,
+        window_days=days,
+    )
+    previous_rel = build_relationship_index_from_components(
+        graph=previous_graph,
+        heatmap_norm=previous_heatmap_norm,
+        similarity=previous_similarity,
+        layer=layer,
+        mode=mode,
+        window_days=days,
+    )
+
+    current_pairs = {
+        (item["source"], item["target"]): item
+        for item in current_rel.get("pairs", [])
+    }
+    previous_pairs = {
+        (item["source"], item["target"]): item
+        for item in previous_rel.get("pairs", [])
+    }
+
+    pair_keys = sorted(set(current_pairs.keys()) | set(previous_pairs.keys()))
+    pair_changes = []
+
+    country_changes_map = defaultdict(lambda: {
+        "gained": [],
+        "lost": [],
+        "improved": [],
+        "declined": [],
+        "all_changes": [],
+    })
+
+    for key in pair_keys:
+        curr = current_pairs.get(key)
+        prev = previous_pairs.get(key)
+
+        curr_score = float(curr["score"]) if curr else 0.0
+        prev_score = float(prev["score"]) if prev else 0.0
+        delta = round(curr_score - prev_score, 2)
+
+        source, target = key
+        status = "stable"
+        if prev is None and curr is not None:
+            status = "gained"
+        elif curr is None and prev is not None:
+            status = "lost"
+        elif delta > 0:
+            status = "improved"
+        elif delta < 0:
+            status = "declined"
+
+        rec = {
+            "source": source,
+            "target": target,
+            "current_score": round(curr_score, 2),
+            "previous_score": round(prev_score, 2),
+            "delta": delta,
+            "status": status,
+            "current_band": curr["band"] if curr else None,
+            "previous_band": prev["band"] if prev else None,
+        }
+        pair_changes.append(rec)
+
+        for country, partner in [(source, target), (target, source)]:
+            entry = {
+                "partner": partner,
+                "current_score": rec["current_score"],
+                "previous_score": rec["previous_score"],
+                "delta": rec["delta"],
+                "status": status,
+            }
+            country_changes_map[country]["all_changes"].append(entry)
+
+            if status == "gained":
+                country_changes_map[country]["gained"].append(entry)
+            elif status == "lost":
+                country_changes_map[country]["lost"].append(entry)
+            elif status == "improved":
+                country_changes_map[country]["improved"].append(entry)
+            elif status == "declined":
+                country_changes_map[country]["declined"].append(entry)
+
+    pair_changes.sort(key=lambda x: (-abs(x["delta"]), x["source"], x["target"]))
+
+    by_country = []
+    all_countries = sorted(set(country_changes_map.keys()) | set(graph_countries(current_graph)) | set(graph_countries(previous_graph)))
+
+    for country in all_countries:
+        changes = country_changes_map.get(country, {
+            "gained": [],
+            "lost": [],
+            "improved": [],
+            "declined": [],
+            "all_changes": [],
+        })
+
+        all_changes = sorted(changes["all_changes"], key=lambda x: (-abs(x["delta"]), x["partner"]))
+        gained = sorted(changes["gained"], key=lambda x: (-x["current_score"], x["partner"]))
+        lost = sorted(changes["lost"], key=lambda x: (-x["previous_score"], x["partner"]))
+        improved = sorted(changes["improved"], key=lambda x: (-x["delta"], x["partner"]))
+        declined = sorted(changes["declined"], key=lambda x: (x["delta"], x["partner"]))
+
+        current_country_summary = next(
+            (x for x in current_rel.get("by_country", []) if x["country"] == country),
+            None
+        )
+        previous_country_summary = next(
+            (x for x in previous_rel.get("by_country", []) if x["country"] == country),
+            None
+        )
+
+        current_avg = float(current_country_summary["average_score"]) if current_country_summary else 0.0
+        previous_avg = float(previous_country_summary["average_score"]) if previous_country_summary else 0.0
+
+        by_country.append({
+            "country": country,
+            "relationship_count_current": int(current_country_summary["relationship_count"]) if current_country_summary else 0,
+            "relationship_count_previous": int(previous_country_summary["relationship_count"]) if previous_country_summary else 0,
+            "relationship_count_delta": (
+                int(current_country_summary["relationship_count"]) - int(previous_country_summary["relationship_count"])
+            ) if current_country_summary and previous_country_summary else (
+                int(current_country_summary["relationship_count"]) if current_country_summary else -int(previous_country_summary["relationship_count"]) if previous_country_summary else 0
+            ),
+            "average_score_current": round(current_avg, 2),
+            "average_score_previous": round(previous_avg, 2),
+            "average_score_delta": round(current_avg - previous_avg, 2),
+            "gained_relationships": gained[:10],
+            "lost_relationships": lost[:10],
+            "improved_relationships": improved[:10],
+            "declined_relationships": declined[:10],
+            "top_changes": all_changes[:12],
+        })
+
+    by_country.sort(key=lambda x: (-abs(x["average_score_delta"]), x["country"]))
+
+    return {
+        "layer": layer,
+        "mode": mode,
+        "window_days": days,
+        "current": {
+            "event_count": len(current_events),
+            "relationship_index": current_rel,
+        },
+        "previous": {
+            "event_count": len(previous_events),
+            "relationship_index": previous_rel,
+        },
+        "pair_changes": pair_changes,
+        "by_country": by_country,
+    }
+
+
+# -----------------------------
 # SAVE
 # -----------------------------
 
@@ -949,12 +1348,16 @@ def main():
                     save_json(layer, f"{window_name}_heatmap_norm{suffix}.json", build_votes_heatmap(filtered, mode=mode, normalized=True))
                     save_json(layer, f"{window_name}_similarity{suffix}.json", build_votes_similarity(filtered, mode=mode))
                     save_json(layer, f"{window_name}_vote_summary{suffix}.json", build_votes_summary(filtered, mode=mode))
-                    save_json(layer, f"{window_name}_change{suffix}.json", build_votes_change(filtered, days=days, mode=mode))
+                    save_json(layer, f"{window_name}_change{suffix}.json", build_votes_change(events, days=days, mode=mode))
+                    save_json(layer, f"{window_name}_relationship{suffix}.json", build_relationship_index(events, layer=layer, days=days, mode=mode))
+                    save_json(layer, f"{window_name}_relationship_change{suffix}.json", build_relationship_change(events, layer=layer, days=days, mode=mode))
                 else:
                     save_json(layer, f"{window_name}{suffix}.json", build_graph(filtered, mode=mode))
                     save_json(layer, f"{window_name}_heatmap{suffix}.json", build_heatmap(filtered, mode=mode, normalized=False))
                     save_json(layer, f"{window_name}_heatmap_norm{suffix}.json", build_heatmap(filtered, mode=mode, normalized=True))
                     save_json(layer, f"{window_name}_similarity{suffix}.json", build_similarity(filtered, mode=mode))
+                    save_json(layer, f"{window_name}_relationship{suffix}.json", build_relationship_index(events, layer=layer, days=days, mode=mode))
+                    save_json(layer, f"{window_name}_relationship_change{suffix}.json", build_relationship_change(events, layer=layer, days=days, mode=mode))
 
 
 if __name__ == "__main__":
