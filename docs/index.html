@@ -106,6 +106,7 @@
       border: 1px solid var(--eu-border);
       background: var(--eu-white);
       color: var(--eu-text);
+      min-width: 140px;
     }
 
     .layout {
@@ -468,6 +469,123 @@
       display: block;
     }
 
+    .relationship-score-grid {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .relationship-score-circle {
+      width: 108px;
+      height: 108px;
+      border-radius: 999px;
+      border: 6px solid var(--eu-blue-200);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, #ffffff, #eff6ff);
+      box-shadow: inset 0 0 0 1px rgba(18,59,143,0.06);
+    }
+
+    .relationship-score-value {
+      font-size: 28px;
+      font-weight: bold;
+      color: var(--eu-blue-950);
+      line-height: 1;
+    }
+
+    .relationship-score-caption {
+      font-size: 11px;
+      color: var(--eu-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .metric-bars {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .metric-row {
+      display: grid;
+      grid-template-columns: 140px 1fr 52px;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .metric-label {
+      font-size: 12px;
+      color: var(--eu-text-soft);
+      font-weight: bold;
+    }
+
+    .metric-track {
+      height: 10px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      overflow: hidden;
+    }
+
+    .metric-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--eu-blue-500), var(--eu-blue-900));
+    }
+
+    .metric-value {
+      text-align: right;
+      font-size: 12px;
+      color: var(--eu-text-soft);
+      font-weight: bold;
+    }
+
+    .relationship-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+      border: 1px solid var(--eu-border);
+      background: #fff;
+      color: var(--eu-blue-950);
+      margin-top: 2px;
+    }
+
+    .relationship-badge.very-high {
+      background: #dcfce7;
+      border-color: #86efac;
+      color: #166534;
+    }
+
+    .relationship-badge.high {
+      background: #dbeafe;
+      border-color: #93c5fd;
+      color: #1d4ed8;
+    }
+
+    .relationship-badge.medium {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+      color: #334155;
+    }
+
+    .relationship-badge.low {
+      background: #fff7ed;
+      border-color: #fdba74;
+      color: #c2410c;
+    }
+
+    .relationship-badge.very-low {
+      background: #fef2f2;
+      border-color: #fca5a5;
+      color: #b91c1c;
+    }
+
     @media (max-width: 1200px) {
       .viz-layout {
         grid-template-columns: 1fr;
@@ -489,6 +607,10 @@
       }
 
       .change-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .relationship-score-grid {
         grid-template-columns: 1fr;
       }
     }
@@ -560,6 +682,13 @@
     </div>
 
     <div class="group">
+      <span class="group-label">Partnerország</span>
+      <select id="compare-country-select">
+        <option value="">— válassz —</option>
+      </select>
+    </div>
+
+    <div class="group">
       <span class="group-label">Téma</span>
       <select id="topic-select">
         <option value="all">Összes</option>
@@ -593,6 +722,11 @@
       <div id="tooltip" class="tooltip"></div>
 
       <div class="analysis-panel">
+        <div id="relationship-panel" class="panel">
+          <h3>Kapcsolati index</h3>
+          <div id="relationship-content" class="hint">Válassz két országot a kapcsolatérték kiszámításához.</div>
+        </div>
+
         <div id="votes-summary-panel" class="panel hidden">
           <h3>Szavazási összesítő</h3>
           <div id="votes-summary-content"></div>
@@ -668,6 +802,7 @@
     let currentHeatmapMode = "absolute";
     let currentSort = "total";
     let currentCountry = "";
+    let currentCompareCountry = "";
     let currentTopic = "all";
 
     const TOPIC_LABELS = {
@@ -705,10 +840,12 @@
     const heatmapModeGroup = document.getElementById("heatmap-mode-group");
     const sortGroup = document.getElementById("sort-group");
     const countrySelect = document.getElementById("country-select");
+    const compareCountrySelect = document.getElementById("compare-country-select");
     const topicSelect = document.getElementById("topic-select");
     const viewAnalysisEl = document.getElementById("view-analysis");
     const countryAnalysisEl = document.getElementById("country-analysis");
     const autoEvaluationEl = document.getElementById("auto-evaluation");
+    const relationshipContentEl = document.getElementById("relationship-content");
     const votesSummaryPanel = document.getElementById("votes-summary-panel");
     const votesSummaryContent = document.getElementById("votes-summary-content");
     const changePanel = document.getElementById("change-panel");
@@ -740,6 +877,10 @@
 
     function typeLabel(type) {
       return TYPE_LABELS[type] || type;
+    }
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
     }
 
     function updateSize() {
@@ -922,9 +1063,17 @@
 
     countrySelect.addEventListener("change", () => {
       currentCountry = countrySelect.value;
+      ensureValidCompareCountry();
       updateCountryInfo();
       generateCountryAnalysis();
       generateAutoEvaluation();
+      buildRelationshipPanel();
+      renderCurrentView();
+    });
+
+    compareCountrySelect.addEventListener("change", () => {
+      currentCompareCountry = compareCountrySelect.value;
+      buildRelationshipPanel();
       renderCurrentView();
     });
 
@@ -933,6 +1082,7 @@
       updateCountryInfo();
       generateCountryAnalysis();
       generateAutoEvaluation();
+      buildRelationshipPanel();
       renderCurrentView();
     });
 
@@ -1006,6 +1156,47 @@
       }
     }
 
+    function updateCompareCountrySelect() {
+      const countries = allCountriesFromLoadedData().filter(c => c !== currentCountry);
+      const previous = currentCompareCountry;
+
+      compareCountrySelect.innerHTML = `<option value="">— válassz —</option>`;
+
+      countries.forEach(c => {
+        const opt = document.createElement("option");
+        opt.value = c;
+        opt.textContent = c;
+        compareCountrySelect.appendChild(opt);
+      });
+
+      if (previous && countries.includes(previous)) {
+        currentCompareCountry = previous;
+        compareCountrySelect.value = previous;
+      } else {
+        currentCompareCountry = "";
+        compareCountrySelect.value = "";
+      }
+
+      if (!currentCompareCountry && currentCountry) {
+        const suggested = suggestCompareCountry(currentCountry);
+        if (suggested && suggested !== currentCountry) {
+          currentCompareCountry = suggested;
+          compareCountrySelect.value = suggested;
+        }
+      }
+    }
+
+    function ensureValidCompareCountry() {
+      if (!currentCompareCountry) {
+        updateCompareCountrySelect();
+        return;
+      }
+      if (currentCompareCountry === currentCountry) {
+        currentCompareCountry = "";
+      }
+      updateCompareCountrySelect();
+    }
+
     function filterHeatmapTopics(topics) {
       if (currentTopic === "all") return topics;
       return topics.filter(t => t === currentTopic);
@@ -1041,6 +1232,211 @@
         .slice(0, limit);
     }
 
+    function getEdgeWeightBetween(countryA, countryB, data) {
+      if (!countryA || !countryB || !data?.edges) return 0;
+
+      const match = data.edges.find(e => {
+        const source = e.source?.id || e.source;
+        const target = e.target?.id || e.target;
+        return (
+          (source === countryA && target === countryB) ||
+          (source === countryB && target === countryA)
+        );
+      });
+
+      return match?.weight || 0;
+    }
+
+    function getMaxEdgeWeight(data) {
+      if (!data?.edges?.length) return 1;
+      return d3.max(data.edges, d => d.weight || 0) || 1;
+    }
+
+    function getCountryHeatmapRow(country, data) {
+      if (!country || !data?.rows) return null;
+      return data.rows.find(r => r.country === country) || null;
+    }
+
+    function computeTopicCloseness(countryA, countryB) {
+      if (!countryA || !countryB || !heatmapNormData?.topics?.length) return { score: 0, comparedTopics: 0 };
+
+      const rowA = getCountryHeatmapRow(countryA, heatmapNormData);
+      const rowB = getCountryHeatmapRow(countryB, heatmapNormData);
+      if (!rowA || !rowB) return { score: 0, comparedTopics: 0 };
+
+      const topics = filterHeatmapTopics(heatmapNormData.topics);
+      if (!topics.length) return { score: 0, comparedTopics: 0 };
+
+      const valuesA = topics.map(t => Math.abs(Number(rowA[t] || 0)));
+      const valuesB = topics.map(t => Math.abs(Number(rowB[t] || 0)));
+
+      const totalA = valuesA.reduce((sum, v) => sum + v, 0);
+      const totalB = valuesB.reduce((sum, v) => sum + v, 0);
+
+      if (totalA === 0 && totalB === 0) return { score: 0, comparedTopics: topics.length };
+
+      const normalizedA = valuesA.map(v => totalA > 0 ? v / totalA : 0);
+      const normalizedB = valuesB.map(v => totalB > 0 ? v / totalB : 0);
+
+      const distance = normalizedA.reduce((sum, v, i) => sum + Math.abs(v - normalizedB[i]), 0) / 2;
+      const closeness = clamp(1 - distance, 0, 1);
+
+      return {
+        score: closeness * 100,
+        comparedTopics: topics.length
+      };
+    }
+
+    function computeRelationshipScore(countryA, countryB) {
+      if (!countryA || !countryB) return null;
+
+      const directWeight = getEdgeWeightBetween(countryA, countryB, graphData);
+      const directMax = getMaxEdgeWeight(graphData);
+      const directScore = directMax > 0 ? clamp((directWeight / directMax) * 100, 0, 100) : 0;
+
+      const similarityWeight = getEdgeWeightBetween(countryA, countryB, similarityData);
+      const similarityMax = getMaxEdgeWeight(similarityData);
+      const similarityScore = similarityMax > 0 ? clamp((similarityWeight / similarityMax) * 100, 0, 100) : 0;
+
+      const topicCloseness = computeTopicCloseness(countryA, countryB);
+      const topicScore = clamp(topicCloseness.score, 0, 100);
+
+      let voteScore = 0;
+      if (currentSource === "votes" && voteSummaryData?.by_country_topic?.length) {
+        voteScore = topicScore;
+      }
+
+      const score =
+        currentSource === "votes"
+          ? (directScore * 0.45) + (similarityScore * 0.35) + (voteScore * 0.20)
+          : (directScore * 0.50) + (similarityScore * 0.30) + (topicScore * 0.20);
+
+      return {
+        score: Math.round(score),
+        directScore: Math.round(directScore),
+        similarityScore: Math.round(similarityScore),
+        topicScore: Math.round(topicScore),
+        directWeight,
+        similarityWeight,
+        comparedTopics: topicCloseness.comparedTopics
+      };
+    }
+
+    function relationshipBand(score) {
+      if (score >= 80) return { label: "Nagyon szoros", className: "very-high" };
+      if (score >= 60) return { label: "Erős", className: "high" };
+      if (score >= 40) return { label: "Vegyes / közepes", className: "medium" };
+      if (score >= 20) return { label: "Gyenge", className: "low" };
+      return { label: "Nagyon gyenge", className: "very-low" };
+    }
+
+    function suggestCompareCountry(country) {
+      if (!country) return "";
+      const strongest = topPartnersFromGraph(country, graphData, 1)[0];
+      if (strongest?.partner) return strongest.partner;
+
+      const similar = topPartnersFromGraph(country, similarityData, 1)[0];
+      if (similar?.partner) return similar.partner;
+
+      return "";
+    }
+
+    function buildRelationshipNarrative(countryA, countryB, rel) {
+      const parts = [];
+
+      if (rel.directScore >= 70) {
+        parts.push("a közvetlen kapcsolati él erős");
+      } else if (rel.directScore >= 40) {
+        parts.push("a közvetlen kapcsolati él közepes");
+      } else {
+        parts.push("a közvetlen kapcsolati él gyenge vagy ritka");
+      }
+
+      if (rel.similarityScore >= 70) {
+        parts.push("a strukturális hasonlóság magas");
+      } else if (rel.similarityScore >= 40) {
+        parts.push("a strukturális hasonlóság részleges");
+      } else {
+        parts.push("a strukturális hasonlóság alacsony");
+      }
+
+      if (rel.topicScore >= 70) {
+        parts.push("a tematikus prioritások közel állnak egymáshoz");
+      } else if (rel.topicScore >= 40) {
+        parts.push("a tematikus profil részben közelít");
+      } else {
+        parts.push("a tematikus profil inkább eltér");
+      }
+
+      return `${countryA} és ${countryB} között ${parts.join(", ")}, ezért az összesített kapcsolatindex ${rel.score}.`;
+    }
+
+    function buildRelationshipPanel() {
+      if (!currentCountry || !currentCompareCountry) {
+        relationshipContentEl.innerHTML = "Válassz két országot a kapcsolatérték kiszámításához.";
+        return;
+      }
+
+      const rel = computeRelationshipScore(currentCountry, currentCompareCountry);
+      if (!rel) {
+        relationshipContentEl.innerHTML = "Nincs elegendő adat a kapcsolatindexhez.";
+        return;
+      }
+
+      const band = relationshipBand(rel.score);
+      const narrative = buildRelationshipNarrative(currentCountry, currentCompareCountry, rel);
+
+      relationshipContentEl.innerHTML = `
+        <div class="relationship-score-grid">
+          <div class="relationship-score-circle">
+            <div style="text-align:center;">
+              <div class="relationship-score-value">${rel.score}</div>
+              <div class="relationship-score-caption">/ 100</div>
+            </div>
+          </div>
+
+          <div>
+            <div class="kv"><strong>${currentCountry}</strong> ↔ <strong>${currentCompareCountry}</strong></div>
+            <div class="relationship-badge ${band.className}">${band.label}</div>
+            <div class="analysis-note" style="margin-top:8px;">
+              Ez egy összetett, frontend-alapú közelítő mutató, amely a közvetlen kapcsolatot,
+              a hasonlósági hálót és a tematikus közelséget egyesíti.
+            </div>
+          </div>
+        </div>
+
+        <div class="metric-bars">
+          <div class="metric-row">
+            <div class="metric-label">Közvetlen kapcsolat</div>
+            <div class="metric-track"><div class="metric-fill" style="width:${rel.directScore}%"></div></div>
+            <div class="metric-value">${rel.directScore}</div>
+          </div>
+
+          <div class="metric-row">
+            <div class="metric-label">Hasonlóság</div>
+            <div class="metric-track"><div class="metric-fill" style="width:${rel.similarityScore}%"></div></div>
+            <div class="metric-value">${rel.similarityScore}</div>
+          </div>
+
+          <div class="metric-row">
+            <div class="metric-label">Tematikus közelség</div>
+            <div class="metric-track"><div class="metric-fill" style="width:${rel.topicScore}%"></div></div>
+            <div class="metric-value">${rel.topicScore}</div>
+          </div>
+        </div>
+
+        <div class="analysis-card" style="margin-top:12px;">
+          <div class="analysis-card-title">Értelmezés</div>
+          <div class="analysis-lead">${narrative}</div>
+          <div class="analysis-note" style="margin-top:8px;">
+            Vizsgált témák száma: <strong>${rel.comparedTopics}</strong>.
+            Közvetlen él súlya: <strong>${Number(rel.directWeight).toFixed(3)}</strong>.
+            Hasonlósági él súlya: <strong>${Number(rel.similarityWeight).toFixed(3)}</strong>.
+          </div>
+        </div>
+      `;
+    }
+
     function updateCountryInfo() {
       if (!currentCountry) {
         countryInfoEl.classList.add("empty");
@@ -1055,6 +1451,7 @@
       countryInfoEl.classList.remove("empty");
       countryInfoEl.innerHTML = `
         <div class="kv"><strong>Ország:</strong> ${currentCountry}</div>
+        <div class="kv"><strong>Összevetett partner:</strong> ${currentCompareCountry || "—"}</div>
         <div class="kv"><strong>Partnerek:</strong></div>
         ${graphPartners.length ? `<ul class="list">${graphPartners.map(p => `<li>${p.partner}: ${Number(p.weight).toFixed(3)}</li>`).join("")}</ul>` : `<div class="status">Nincs adat.</div>`}
 
@@ -1290,8 +1687,26 @@
       const topicsNorm = topTopicsFromHeatmap(currentCountry, heatmapNormData, 5);
       const similar = topPartnersFromGraph(currentCountry, similarityData, 5);
 
+      let relationshipSummary = "";
+      if (currentCountry && currentCompareCountry) {
+        const rel = computeRelationshipScore(currentCountry, currentCompareCountry);
+        if (rel) {
+          relationshipSummary = `
+            <div class="analysis-card">
+              <div class="analysis-card-title">Kapcsolat a kiválasztott partnerrel</div>
+              <div class="kv">
+                <strong>${currentCountry}</strong> és <strong>${currentCompareCountry}</strong> között az aktuális összesített kapcsolatindex
+                <strong>${rel.score}</strong>.
+              </div>
+            </div>
+          `;
+        }
+      }
+
       autoEvaluationEl.innerHTML = `
         <div class="analysis-rich">
+          ${relationshipSummary}
+
           <div class="analysis-card">
             <div class="analysis-card-title">Kapcsolati profil</div>
             <div class="kv"><strong>Legerősebb partnerek:</strong> ${partners.map(p => `${p.partner} (${Number(p.weight).toFixed(3)})`).join(", ") || "—"}</div>
@@ -1794,10 +2209,24 @@
         .attr("class", "link")
         .attr("stroke", currentSource === "votes" ? "#5f8ddd" : "#7da2df")
         .attr("stroke-width", d => edgeWidth(d.weight || 1))
+        .on("click", (event, d) => {
+          const source = d.source?.id || d.source;
+          const target = d.target?.id || d.target;
+          currentCountry = source;
+          currentCompareCountry = target;
+          countrySelect.value = source;
+          updateCompareCountrySelect();
+          compareCountrySelect.value = target;
+          updateCountryInfo();
+          generateCountryAnalysis();
+          generateAutoEvaluation();
+          buildRelationshipPanel();
+          renderCurrentView();
+        })
         .on("mousemove", (event, d) => {
           const source = d.source?.id || d.source;
           const target = d.target?.id || d.target;
-          showTooltip(`<strong>${source} – ${target}</strong><br>Súly: ${Number(d.weight).toFixed(3)}`, event.pageX, event.pageY);
+          showTooltip(`<strong>${source} – ${target}</strong><br>Súly: ${Number(d.weight).toFixed(3)}<br><em>Kattints az országpár kiválasztásához</em>`, event.pageX, event.pageY);
         })
         .on("mouseleave", hideTooltip);
 
@@ -1806,9 +2235,9 @@
         .data(currentNodes)
         .enter()
         .append("circle")
-        .attr("class", d => `node${d.id === currentCountry ? " selected" : ""}`)
+        .attr("class", d => `node${d.id === currentCountry || d.id === currentCompareCountry ? " selected" : ""}`)
         .attr("r", d => nodeRadius(d.weight || 1))
-        .attr("fill", fillColor)
+        .attr("fill", d => d.id === currentCompareCountry ? "#0f766e" : fillColor)
         .call(
           d3.drag()
             .on("start", dragstart)
@@ -1816,11 +2245,23 @@
             .on("end", dragend)
         )
         .on("click", (event, d) => {
-          currentCountry = d.id;
-          countrySelect.value = d.id;
+          if (!currentCountry || currentCountry === d.id) {
+            currentCountry = d.id;
+            countrySelect.value = d.id;
+            ensureValidCompareCountry();
+          } else if (!currentCompareCountry || currentCompareCountry === d.id) {
+            currentCompareCountry = d.id;
+            compareCountrySelect.value = d.id;
+          } else {
+            currentCountry = d.id;
+            countrySelect.value = d.id;
+            ensureValidCompareCountry();
+          }
+
           updateCountryInfo();
           generateCountryAnalysis();
           generateAutoEvaluation();
+          buildRelationshipPanel();
           renderCurrentView();
         })
         .on("mousemove", (event, d) => {
@@ -1876,6 +2317,7 @@
         <div class="kv"><strong>Window:</strong> ${currentWindow}</div>
         <div class="kv"><strong>Type:</strong> ${typeLabel(currentType)}</div>
         <div class="kv"><strong>Téma:</strong> ${currentTopic === "all" ? "Összes" : topicLabel(currentTopic)}</div>
+        <div class="kv"><strong>Összevetés:</strong> ${currentCountry && currentCompareCountry ? `${currentCountry} ↔ ${currentCompareCountry}` : "—"}</div>
         <div class="kv"><strong>Nodes:</strong> ${currentNodes.length}</div>
         <div class="kv"><strong>Edges:</strong> ${currentLinks.length}</div>
         ${data.event_count !== undefined ? `<div class="kv"><strong>Events:</strong> ${data.event_count}</div>` : ""}
@@ -1948,20 +2390,29 @@
       topics.forEach((topic, i) => {
         rows.forEach((row, j) => {
           const value = row[topic] || 0;
+          const isSelected = row.country === currentCountry || row.country === currentCompareCountry;
 
           group.append("rect")
-            .attr("class", `heatmap-cell${row.country === currentCountry ? " selected" : ""}`)
+            .attr("class", `heatmap-cell${isSelected ? " selected" : ""}`)
             .attr("x", j * cellSize)
             .attr("y", i * cellSize)
             .attr("width", cellSize)
             .attr("height", cellSize)
             .attr("fill", color(value))
             .on("click", () => {
-              currentCountry = row.country;
-              countrySelect.value = row.country;
+              if (!currentCountry || currentCountry === row.country) {
+                currentCountry = row.country;
+                countrySelect.value = row.country;
+                ensureValidCompareCountry();
+              } else {
+                currentCompareCountry = row.country;
+                compareCountrySelect.value = row.country;
+              }
+
               updateCountryInfo();
               generateCountryAnalysis();
               generateAutoEvaluation();
+              buildRelationshipPanel();
               renderCurrentView();
             })
             .on("mousemove", (event) => {
@@ -1983,18 +2434,27 @@
       countries.forEach((country, i) => {
         const x = margin.left + i * cellSize + cellSize / 2;
         const y = margin.top + gridHeight + 18;
+        const isSelected = country === currentCountry || country === currentCompareCountry;
 
         svg.append("text")
-          .attr("class", `heatmap-col-label${country === currentCountry ? " selected" : ""}`)
+          .attr("class", `heatmap-col-label${isSelected ? " selected" : ""}`)
           .attr("text-anchor", "start")
           .attr("transform", `translate(${x},${y}) rotate(45)`)
           .text(country)
           .on("click", () => {
-            currentCountry = country;
-            countrySelect.value = country;
+            if (!currentCountry || currentCountry === country) {
+              currentCountry = country;
+              countrySelect.value = country;
+              ensureValidCompareCountry();
+            } else {
+              currentCompareCountry = country;
+              compareCountrySelect.value = country;
+            }
+
             updateCountryInfo();
             generateCountryAnalysis();
             generateAutoEvaluation();
+            buildRelationshipPanel();
             renderCurrentView();
           });
       });
@@ -2060,6 +2520,7 @@
         <div class="kv"><strong>Type:</strong> ${typeLabel(currentType)}</div>
         <div class="kv"><strong>Mode:</strong> ${currentHeatmapMode}</div>
         <div class="kv"><strong>Téma:</strong> ${currentTopic === "all" ? "Összes" : topicLabel(currentTopic)}</div>
+        <div class="kv"><strong>Összevetés:</strong> ${currentCountry && currentCompareCountry ? `${currentCountry} ↔ ${currentCompareCountry}` : "—"}</div>
         <div class="kv"><strong>Countries:</strong> ${rows.length}</div>
         <div class="kv"><strong>Topics:</strong> ${topics.length}</div>
         <div class="kv"><strong>Events:</strong> ${data.event_count ?? 0}</div>
@@ -2099,7 +2560,9 @@
         changeData = currentSource === "votes" ? results[5] : null;
 
         updateCountrySelect();
+        updateCompareCountrySelect();
         updateCountryInfo();
+        buildRelationshipPanel();
         generateCountryAnalysis();
         generateAutoEvaluation();
         buildVotesSummary();
@@ -2125,6 +2588,7 @@ change: ${changeFilePath()}` : ""}`;
         infoEl.textContent = "Nincs betöltött nézet.";
         countryInfoEl.classList.add("empty");
         countryInfoEl.textContent = "Nem érhető el országprofil.";
+        relationshipContentEl.textContent = "Nem érhető el kapcsolatindex.";
         countryAnalysisEl.textContent = "Nem érhető el szöveges értelmezés.";
         autoEvaluationEl.textContent = "Nem érhető el automatikus értékelés.";
         votesSummaryPanel.classList.add("hidden");
@@ -2140,6 +2604,7 @@ change: ${changeFilePath()}` : ""}`;
     function renderCurrentView() {
       updateViewAnalysis();
       updateControlVisibility();
+      buildRelationshipPanel();
       buildVotesSummary();
       buildChangePanel();
       renderChangeCharts();
