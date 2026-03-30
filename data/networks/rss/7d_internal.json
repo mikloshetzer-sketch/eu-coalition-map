@@ -2,7 +2,11 @@
   "nodes": [
     {
       "id": "AT",
-      "weight": 2.0
+      "weight": 3.0
+    },
+    {
+      "id": "BG",
+      "weight": 4.0
     },
     {
       "id": "CZ",
@@ -18,11 +22,11 @@
     },
     {
       "id": "EE",
-      "weight": 3.0
+      "weight": 4.0
     },
     {
       "id": "ES",
-      "weight": 4.0
+      "weight": 5.0
     },
     {
       "id": "FR",
@@ -33,16 +37,20 @@
       "weight": 2.0
     },
     {
+      "id": "HR",
+      "weight": 4.0
+    },
+    {
       "id": "HU",
-      "weight": 10.0
+      "weight": 14.0
     },
     {
       "id": "IT",
-      "weight": 5.0
+      "weight": 9.0
     },
     {
       "id": "LV",
-      "weight": 3.0
+      "weight": 4.0
     },
     {
       "id": "NL",
@@ -54,14 +62,34 @@
     },
     {
       "id": "SK",
-      "weight": 3.0
+      "weight": 7.0
     }
   ],
   "edges": [
     {
       "source": "AT",
       "target": "ES",
-      "weight": 2.0
+      "weight": 3.0
+    },
+    {
+      "source": "BG",
+      "target": "HR",
+      "weight": 1.0
+    },
+    {
+      "source": "BG",
+      "target": "HU",
+      "weight": 1.0
+    },
+    {
+      "source": "BG",
+      "target": "IT",
+      "weight": 1.0
+    },
+    {
+      "source": "BG",
+      "target": "SK",
+      "weight": 1.0
     },
     {
       "source": "CZ",
@@ -81,7 +109,7 @@
     {
       "source": "EE",
       "target": "LV",
-      "weight": 3.0
+      "weight": 4.0
     },
     {
       "source": "ES",
@@ -99,16 +127,36 @@
       "weight": 2.0
     },
     {
-      "source": "HU",
+      "source": "HR",
+      "target": "HU",
+      "weight": 1.0
+    },
+    {
+      "source": "HR",
       "target": "IT",
       "weight": 1.0
     },
     {
+      "source": "HR",
+      "target": "SK",
+      "weight": 1.0
+    },
+    {
+      "source": "HU",
+      "target": "IT",
+      "weight": 2.0
+    },
+    {
       "source": "HU",
       "target": "SK",
-      "weight": 3.0
+      "weight": 4.0
+    },
+    {
+      "source": "IT",
+      "target": "SK",
+      "weight": 1.0
     }
   ],
-  "event_count": 225,
+  "event_count": 269,
   "mode": "internal"
 }
