@@ -24,6 +24,22 @@ def signed(value: float) -> str:
     return f"+{value:.2f}" if value > 0 else f"{value:.2f}"
 
 
+def relation_label(score: float) -> str:
+    if score >= 70:
+        return "erős"
+    if score >= 40:
+        return "közepes"
+    return "gyenge"
+
+
+def trend_label(delta: float) -> str:
+    if delta > 5:
+        return "javuló"
+    if delta < -5:
+        return "romló"
+    return "stabil"
+
+
 def main():
     if not REPORT_PATH.exists():
         raise FileNotFoundError(f"Hiányzik a riportfájl: {REPORT_PATH}")
@@ -35,19 +51,21 @@ def main():
     pair_items = sections.get("pair_movements", {}).get("items", []) or []
     topic_items = sections.get("topic_shifts", {}).get("items", []) or []
 
-    # --- Általános heti blokk ---
     top_country = country_items[0] if country_items else {}
     top_pair = pair_items[0] if pair_items else {}
     top_topic = topic_items[0] if topic_items else {}
 
+    # --- EU összkép ---
     country_text = "nincs adat"
     if top_country:
         country = top_country.get("country", "ismeretlen")
         delta = safe_float(top_country.get("average_score_delta"))
         current = safe_float(top_country.get("average_score_current"))
+        trend = trend_label(delta)
         country_text = (
-            f"{country}: átlagos kapcsolatindex-változás {signed(delta)}, "
-            f"aktuális szint {current:.2f}"
+            f"{country} mutatta a legerősebb országos elmozdulást: "
+            f"{trend} irányú változás ({signed(delta)}), "
+            f"aktuális átlagos kapcsolati szint {current:.2f}."
         )
 
     pair_text = "nincs adat"
@@ -56,16 +74,22 @@ def main():
         target = top_pair.get("target", "?")
         delta = safe_float(top_pair.get("delta"))
         current = safe_float(top_pair.get("current_score"))
+        rel = relation_label(current)
+        trend = trend_label(delta)
         pair_text = (
-            f"{source}–{target}: kapcsolatindex-változás {signed(delta)}, "
-            f"aktuális érték {current:.2f}"
+            f"A legjelentősebb országpármozgás {source} és {target} között látható: "
+            f"{rel} kapcsolat, {trend} trenddel ({signed(delta)}), "
+            f"aktuális index {current:.2f}."
         )
 
     topic_text = "nincs adat"
     if top_topic:
         topic_label = top_topic.get("topic_label") or top_topic.get("topic") or "ismeretlen téma"
         total = safe_float(top_topic.get("absolute_delta_total"))
-        topic_text = f"{topic_label}: összesített abszolút elmozdulás {total:.2f}"
+        topic_text = (
+            f"A legerősebb tematikus elmozdulás a(z) {topic_label} területén jelent meg, "
+            f"{total:.2f} összesített változással."
+        )
 
     # --- HU fókusz ---
     hu_pairs = [
@@ -75,9 +99,10 @@ def main():
 
     hu_top = hu_pairs[0] if hu_pairs else {}
 
-    hu_relation = "nincs adat"
     hu_partner = "nincs adat"
+    hu_relation = "nincs adat"
     hu_trend = "nincs adat"
+    hu_summary = "nincs adat"
 
     if hu_top:
         source = hu_top.get("source", "?")
@@ -86,17 +111,28 @@ def main():
         current = safe_float(hu_top.get("current_score"))
 
         partner = target if source == "HU" else source
+        rel = relation_label(current)
+        trend = trend_label(delta)
+
         hu_partner = partner
-        hu_relation = f"HU–{partner}: aktuális kapcsolatindex {current:.2f}"
+        hu_relation = (
+            f"Magyarország és {partner} között jelenleg {rel} kapcsolat látható, "
+            f"{current:.2f} indexértékkel."
+        )
 
-        if delta > 5:
-            hu_trend = f"javuló kapcsolat ({signed(delta)})"
-        elif delta < -5:
-            hu_trend = f"romló kapcsolat ({signed(delta)})"
+        if trend == "javuló":
+            hu_trend = f"A heti változás alapján a kapcsolat javuló képet mutat ({signed(delta)})."
+        elif trend == "romló":
+            hu_trend = f"A heti változás alapján a kapcsolat romló képet mutat ({signed(delta)})."
         else:
-            hu_trend = f"nagyjából stabil kapcsolat ({signed(delta)})"
+            hu_trend = f"A kapcsolat a héten összességében stabil maradt ({signed(delta)})."
 
-    # --- Mi változott a héten ---
+        hu_summary = (
+            f"Magyarország fókuszában most {partner} áll: a kapcsolat {rel}, "
+            f"miközben a heti irány {trend}."
+        )
+
+    # --- Heti változások ---
     positive_pairs = sorted(
         [p for p in pair_items if safe_float(p.get("delta")) > 0],
         key=lambda x: safe_float(x.get("delta")),
@@ -113,23 +149,32 @@ def main():
 
     gainer_text = "nincs adat"
     if top_gainer:
+        s = top_gainer.get("source", "?")
+        t = top_gainer.get("target", "?")
+        d = safe_float(top_gainer.get("delta"))
         gainer_text = (
-            f"{top_gainer.get('source', '?')}–{top_gainer.get('target', '?')}: "
-            f"{signed(safe_float(top_gainer.get('delta')))}"
+            f"A legerősebb közeledés {s} és {t} között jelent meg, "
+            f"{signed(d)} változással."
         )
 
     loser_text = "nincs adat"
     if top_loser:
+        s = top_loser.get("source", "?")
+        t = top_loser.get("target", "?")
+        d = safe_float(top_loser.get("delta"))
         loser_text = (
-            f"{top_loser.get('source', '?')}–{top_loser.get('target', '?')}: "
-            f"{signed(safe_float(top_loser.get('delta')))}"
+            f"A legnagyobb eltávolodás {s} és {t} között látható, "
+            f"{signed(d)} változással."
         )
 
     weekly_topic_text = "nincs adat"
     if top_topic:
         weekly_topic_label = top_topic.get("topic_label") or top_topic.get("topic") or "ismeretlen téma"
         weekly_topic_total = safe_float(top_topic.get("absolute_delta_total"))
-        weekly_topic_text = f"{weekly_topic_label}: {weekly_topic_total:.2f}"
+        weekly_topic_text = (
+            f"A heti mozgások közül a(z) {weekly_topic_label} téma emelkedett ki "
+            f"{weekly_topic_total:.2f} összesített elmozdulással."
+        )
 
     payload = {
         "updated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
@@ -144,7 +189,8 @@ def main():
         "hu_focus": {
             "main_partner": hu_partner,
             "relation": hu_relation,
-            "trend": hu_trend
+            "trend": hu_trend,
+            "summary": hu_summary
         },
         "weekly_changes": {
             "top_gainer": gainer_text,
