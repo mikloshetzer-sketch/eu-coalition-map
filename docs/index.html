@@ -256,7 +256,7 @@
       line-height: 1.4;
       pointer-events: none;
       z-index: 50;
-      max-width: 280px;
+      max-width: 320px;
     }
 
     .hidden { display: none !important; }
@@ -273,7 +273,7 @@
 
     #dashboard-charts {
       width: 100%;
-      height: 440px;
+      height: 520px;
       display: block;
     }
 
@@ -426,13 +426,13 @@
 
     .analysis-lead {
       font-size: 13px;
-      line-height: 1.65;
+      line-height: 1.7;
       color: var(--eu-text-soft);
     }
 
     .analysis-note {
       font-size: 12px;
-      line-height: 1.55;
+      line-height: 1.6;
       color: var(--eu-muted);
     }
 
@@ -642,6 +642,45 @@
       font-weight: bold;
     }
 
+    .weekly-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .weekly-item {
+      border: 1px solid var(--eu-border);
+      border-radius: 8px;
+      padding: 8px 10px;
+      background: #fff;
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--eu-text-soft);
+    }
+
+    .weekly-item strong {
+      color: var(--eu-text);
+    }
+
+    .weekly-method {
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--eu-muted);
+      margin-top: 6px;
+    }
+
+    .dashboard-section-label {
+      font-size: 11px;
+      fill: var(--eu-text-soft);
+      font-weight: bold;
+    }
+
+    .dashboard-value-label {
+      font-size: 10px;
+      fill: var(--eu-text);
+      font-weight: bold;
+    }
+
     @media (max-width: 1200px) {
       .viz-layout {
         grid-template-columns: 1fr;
@@ -771,13 +810,18 @@
 
         <div id="dashboard" class="panel hidden">
           <h3>Ország dashboard</h3>
-          <svg id="dashboard-charts" width="100%" height="440"></svg>
+          <svg id="dashboard-charts" width="100%" height="520"></svg>
         </div>
       </div>
 
       <div id="tooltip" class="tooltip"></div>
 
       <div class="analysis-panel">
+        <div id="weekly-panel" class="panel">
+          <h3>Weekly Insight</h3>
+          <div id="weekly-content" class="hint">A heti riport betöltése folyamatban.</div>
+        </div>
+
         <div id="relationship-panel" class="panel">
           <h3>Kapcsolati index</h3>
           <div id="relationship-content" class="hint">Válassz két országot a kapcsolatérték kiszámításához.</div>
@@ -893,6 +937,14 @@
       very_low: "Nagyon gyenge"
     };
 
+    const DASHBOARD_COLORS = [
+      "#1d4ed8",
+      "#0f766e",
+      "#b45309",
+      "#7c3aed",
+      "#dc2626"
+    ];
+
     const svg = d3.select("#network");
     const infoEl = document.getElementById("info");
     const countryInfoEl = document.getElementById("country-info");
@@ -915,6 +967,7 @@
     const changePanel = document.getElementById("change-panel");
     const changeContent = document.getElementById("change-content");
     const vizLayout = document.getElementById("viz-layout");
+    const weeklyContentEl = document.getElementById("weekly-content");
 
     let width = 0;
     let height = 0;
@@ -932,6 +985,7 @@
     let changeData = null;
     let relationshipData = null;
     let relationshipChangeData = null;
+    let weeklyReportData = null;
 
     function topicLabel(topic) {
       return TOPIC_LABELS[topic] || topic;
@@ -1031,6 +1085,13 @@
       if (currentType === "internal") suffix = "_internal";
       if (currentType === "external") suffix = "_external";
       return `${basePath()}/data/networks/${currentSource}/${currentWindow}_relationship_change${suffix}.json`;
+    }
+
+    function weeklyReportFilePath() {
+      let suffix = "";
+      if (currentType === "internal") suffix = "_internal";
+      if (currentType === "external") suffix = "_external";
+      return `${basePath()}/data/reports/${currentSource}_${currentWindow}_weekly_report${suffix}.json`;
     }
 
     function setActive(selector, value, attr) {
@@ -1519,6 +1580,60 @@
           renderCurrentView();
         });
       });
+    }
+
+    function buildWeeklyInsightPanel() {
+      if (!weeklyReportData) {
+        weeklyContentEl.innerHTML = "Ehhez a nézethez jelenleg nem érhető el heti riport.";
+        return;
+      }
+
+      const executive = weeklyReportData.executive_summary || "Nincs executive summary.";
+      const methodNote = weeklyReportData.method_note || "";
+      const countryNarratives = weeklyReportData.sections?.country_movements?.narratives || [];
+      const pairNarratives = weeklyReportData.sections?.pair_movements?.narratives || [];
+      const topicNarratives = weeklyReportData.sections?.topic_shifts?.narratives || [];
+
+      weeklyContentEl.innerHTML = `
+        <div class="analysis-rich">
+          <div class="analysis-card">
+            <div class="analysis-card-title">Executive summary</div>
+            <div class="analysis-lead">${executive}</div>
+          </div>
+
+          <div class="analysis-card">
+            <div class="analysis-card-title">Fő országmozgások</div>
+            <div class="weekly-list">
+              ${countryNarratives.length
+                ? countryNarratives.slice(0, 3).map(item => `<div class="weekly-item">${item.text}</div>`).join("")
+                : `<div class="weekly-item">Nincs kiemelhető országszintű elmozdulás.</div>`}
+            </div>
+          </div>
+
+          <div class="analysis-card">
+            <div class="analysis-card-title">Kapcsolati átrendeződések</div>
+            <div class="weekly-list">
+              ${pairNarratives.length
+                ? pairNarratives.slice(0, 3).map(item => `<div class="weekly-item">${item.text}</div>`).join("")
+                : `<div class="weekly-item">Nincs kiemelhető országpár-szintű elmozdulás.</div>`}
+            </div>
+          </div>
+
+          <div class="analysis-card">
+            <div class="analysis-card-title">Tematikus eltolódások</div>
+            <div class="weekly-list">
+              ${topicNarratives.length
+                ? topicNarratives.slice(0, 3).map(item => `<div class="weekly-item">${item.text}</div>`).join("")
+                : `<div class="weekly-item">Ehhez a forráshoz jelenleg nincs külön tematikus heti kiemelés.</div>`}
+            </div>
+          </div>
+
+          <div class="analysis-card">
+            <div class="analysis-card-title">Módszertani megjegyzés</div>
+            <div class="weekly-method">${methodNote}</div>
+          </div>
+        </div>
+      `;
     }
 
     function buildRelationshipPanel() {
@@ -2321,6 +2436,67 @@
       renderChangeCharts();
     }
 
+    function drawDashboardSection(svgDash, section, index, dashWidth, yOffset, sectionHeight) {
+      const sectionData = section.data.length ? section.data : [{ name: "-", value: 0 }];
+      const group = svgDash.append("g").attr("transform", `translate(10,${yOffset})`);
+
+      const chartTop = 28;
+      const chartBottom = sectionHeight - 44;
+      const chartWidth = dashWidth - 24;
+
+      const x = d3.scaleBand()
+        .domain(sectionData.map(d => d.name))
+        .range([0, chartWidth])
+        .padding(0.22);
+
+      const y = d3.scaleLinear()
+        .domain([0, d3.max(sectionData, d => d.value) || 1])
+        .range([chartBottom, chartTop]);
+
+      group.append("text")
+        .attr("x", 0)
+        .attr("y", 12)
+        .text(section.title)
+        .style("font-size", "12px")
+        .style("font-weight", "bold")
+        .style("fill", "#0b1f4d");
+
+      group.selectAll("rect")
+        .data(sectionData)
+        .enter()
+        .append("rect")
+        .attr("x", d => x(d.name))
+        .attr("y", d => y(d.value))
+        .attr("width", x.bandwidth())
+        .attr("height", d => Math.max(0, chartBottom - y(d.value)))
+        .attr("rx", 4)
+        .attr("fill", (d, i) => DASHBOARD_COLORS[i % DASHBOARD_COLORS.length])
+        .on("mousemove", (event, d) => {
+          showTooltip(`<strong>${section.title}</strong><br>${d.name}: ${Number(d.value).toFixed(3)}`, event.pageX, event.pageY);
+        })
+        .on("mouseleave", hideTooltip);
+
+      group.selectAll("text.value")
+        .data(sectionData)
+        .enter()
+        .append("text")
+        .attr("class", "dashboard-value-label")
+        .attr("x", d => x(d.name) + x.bandwidth() / 2)
+        .attr("y", d => y(d.value) - 6)
+        .attr("text-anchor", "middle")
+        .text(d => Number(d.value).toFixed(2));
+
+      group.selectAll("text.name")
+        .data(sectionData)
+        .enter()
+        .append("text")
+        .attr("class", "dashboard-section-label")
+        .attr("x", d => x(d.name) + x.bandwidth() / 2)
+        .attr("y", chartBottom + 14)
+        .attr("text-anchor", "middle")
+        .text(d => d.name.length > 10 ? `${d.name.slice(0, 9)}…` : d.name);
+    }
+
     function drawDashboard() {
       const dash = document.getElementById("dashboard");
       const svgDash = d3.select("#dashboard-charts");
@@ -2334,78 +2510,37 @@
       dash.classList.remove("hidden");
 
       const dashWidth = document.getElementById("dashboard-charts").clientWidth || 340;
-      const sectionHeight = 122;
-      const sectionGap = 22;
+      const sectionHeight = 145;
+      const sectionGap = 18;
       const topPadding = 10;
-      const bottomPadding = 12;
+      const bottomPadding = 14;
       const totalHeight = topPadding + (sectionHeight * 3) + (sectionGap * 2) + bottomPadding;
 
       svgDash.attr("width", dashWidth).attr("height", totalHeight);
       svgDash.selectAll("*").remove();
 
-      const partners = topPartnersFromGraph(currentCountry, graphData, 5);
-      const topics = topTopicsFromHeatmap(currentCountry, heatmapAbsData, 5);
-      const similar = topPartnersFromGraph(currentCountry, similarityData, 5);
+      const partners = topPartnersFromGraph(currentCountry, graphData, 4);
+      const topics = topTopicsFromHeatmap(currentCountry, heatmapAbsData, 4);
+      const similar = topPartnersFromGraph(currentCountry, similarityData, 4);
 
       const sections = [
         {
           title: "Legerősebb partnerek",
-          color: currentSource === "votes" ? "#123b8f" : "#2563eb",
           data: partners.map(d => ({ name: d.partner, value: d.weight }))
         },
         {
           title: "Legfontosabb témák",
-          color: "#1d4ed8",
           data: topics.map(d => ({ name: topicLabel(d.topic), value: Math.abs(d.value) }))
         },
         {
           title: "Leghasonlóbb országok",
-          color: currentSource === "votes" ? "#0f766e" : "#3b82f6",
           data: similar.map(d => ({ name: d.partner, value: d.weight }))
         }
       ];
 
       sections.forEach((section, index) => {
         const yOffset = topPadding + index * (sectionHeight + sectionGap);
-        const sectionData = section.data.length ? section.data : [{ name: "-", value: 0 }];
-
-        const group = svgDash.append("g").attr("transform", `translate(10,${yOffset})`);
-
-        const chartTop = 24;
-        const chartBottom = sectionHeight - 28;
-        const chartWidth = dashWidth - 24;
-
-        const x = d3.scaleBand()
-          .domain(sectionData.map(d => d.name))
-          .range([0, chartWidth])
-          .padding(0.22);
-
-        const y = d3.scaleLinear()
-          .domain([0, d3.max(sectionData, d => d.value) || 1])
-          .range([chartBottom, chartTop]);
-
-        group.append("text")
-          .attr("x", 0)
-          .attr("y", 12)
-          .text(section.title)
-          .style("font-size", "12px")
-          .style("font-weight", "bold")
-          .style("fill", "#0b1f4d");
-
-        group.selectAll("rect")
-          .data(sectionData)
-          .enter()
-          .append("rect")
-          .attr("x", d => x(d.name))
-          .attr("y", d => y(d.value))
-          .attr("width", x.bandwidth())
-          .attr("height", d => Math.max(0, chartBottom - y(d.value)))
-          .attr("rx", 4)
-          .attr("fill", section.color)
-          .on("mousemove", (event, d) => {
-            showTooltip(`<strong>${section.title}</strong><br>${d.name}: ${Number(d.value).toFixed(3)}`, event.pageX, event.pageY);
-          })
-          .on("mouseleave", hideTooltip);
+        drawDashboardSection(svgDash, section, index, dashWidth, yOffset, sectionHeight);
       });
     }
 
@@ -2566,10 +2701,9 @@
         <div class="kv"><strong>Nodes:</strong> ${currentNodes.length}</div>
         <div class="kv"><strong>Edges:</strong> ${currentLinks.length}</div>
         ${relationshipData ? `<div class="kv"><strong>Kapcsolatindex párok:</strong> ${relationshipData.pair_count ?? "—"}</div>` : ""}
+        ${weeklyReportData ? `<div class="kv"><strong>Weekly report:</strong> betöltve</div>` : ""}
         ${data.event_count !== undefined ? `<div class="kv"><strong>Events:</strong> ${data.event_count}</div>` : ""}
       `;
-
-      setTimeout(() => fitGraph(), 350);
     }
 
     function sortRows(rows, topics) {
@@ -2772,6 +2906,7 @@
         <div class="kv"><strong>Countries:</strong> ${rows.length}</div>
         <div class="kv"><strong>Topics:</strong> ${topics.length}</div>
         ${relationshipData ? `<div class="kv"><strong>Kapcsolatindex párok:</strong> ${relationshipData.pair_count ?? "—"}</div>` : ""}
+        ${weeklyReportData ? `<div class="kv"><strong>Weekly report:</strong> betöltve</div>` : ""}
         <div class="kv"><strong>Events:</strong> ${data.event_count ?? 0}</div>
       `;
     }
@@ -2803,7 +2938,8 @@
           fetchJson(heatmapNormFilePath()),
           fetchJson(similarityFilePath()),
           fetchJsonOptional(relationshipFilePath()),
-          fetchJsonOptional(relationshipChangeFilePath())
+          fetchJsonOptional(relationshipChangeFilePath()),
+          fetchJsonOptional(weeklyReportFilePath())
         ];
 
         if (currentSource === "votes") {
@@ -2819,12 +2955,14 @@
         similarityData = results[3];
         relationshipData = results[4];
         relationshipChangeData = results[5];
-        voteSummaryData = currentSource === "votes" ? results[6] : null;
-        changeData = currentSource === "votes" ? results[7] : null;
+        weeklyReportData = results[6];
+        voteSummaryData = currentSource === "votes" ? results[7] : null;
+        changeData = currentSource === "votes" ? results[8] : null;
 
         updateCountrySelect();
         updateCompareCountrySelect();
         updateCountryInfo();
+        buildWeeklyInsightPanel();
         buildRelationshipPanel();
         generateCountryAnalysis();
         generateAutoEvaluation();
@@ -2839,6 +2977,7 @@ heatmap_norm: ${heatmapNormFilePath()}
 similarity: ${similarityFilePath()}
 relationship: ${relationshipFilePath()}
 relationship_change: ${relationshipChangeFilePath()}
+weekly_report: ${weeklyReportFilePath()}
 ${currentSource === "votes" ? `vote_summary: ${voteSummaryFilePath()}
 change: ${changeFilePath()}` : ""}`;
       } catch (e) {
@@ -2851,11 +2990,13 @@ change: ${changeFilePath()}` : ""}`;
         changeData = null;
         relationshipData = null;
         relationshipChangeData = null;
+        weeklyReportData = null;
         infoEl.classList.add("empty");
         infoEl.textContent = "Nincs betöltött nézet.";
         countryInfoEl.classList.add("empty");
         countryInfoEl.textContent = "Nem érhető el országprofil.";
         relationshipContentEl.textContent = "Nem érhető el kapcsolatindex.";
+        weeklyContentEl.textContent = "Nem érhető el heti riport.";
         countryAnalysisEl.textContent = "Nem érhető el szöveges értelmezés.";
         autoEvaluationEl.textContent = "Nem érhető el automatikus értékelés.";
         votesSummaryPanel.classList.add("hidden");
@@ -2871,6 +3012,7 @@ change: ${changeFilePath()}` : ""}`;
     function renderCurrentView() {
       updateViewAnalysis();
       updateControlVisibility();
+      buildWeeklyInsightPanel();
       buildRelationshipPanel();
       buildVotesSummary();
       buildChangePanel();
