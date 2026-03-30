@@ -40,6 +40,12 @@ def trend_label(delta: float) -> str:
     return "stabil"
 
 
+def get_partner_for_hu(pair: dict) -> str:
+    source = pair.get("source", "?")
+    target = pair.get("target", "?")
+    return target if source == "HU" else source
+
+
 def main():
     if not REPORT_PATH.exists():
         raise FileNotFoundError(f"Hiányzik a riportfájl: {REPORT_PATH}")
@@ -91,7 +97,7 @@ def main():
             f"{total:.2f} összesített változással."
         )
 
-    # --- HU fókusz: elsődlegesen pair_movements, fallback country_movements ---
+    # --- HU fókusz: 2 partner logika ---
     hu_pairs = [
         p for p in pair_items
         if p.get("source") == "HU" or p.get("target") == "HU"
@@ -102,7 +108,8 @@ def main():
         None
     )
 
-    hu_partner = "nincs kiemelt partner"
+    hu_main_partner = "nincs kiemelt partner"
+    hu_dynamic_partner = "nincs kiemelt változás"
     hu_relation = "A vizsgált heti országpár-változások között most nem jelent meg kiemelt HU-fókuszú kapcsolat."
     hu_trend = "Magyarország heti kapcsolatmintája külön országpárként ezen a listán nem emelkedett ki."
     hu_summary = (
@@ -111,41 +118,47 @@ def main():
     )
 
     if hu_pairs:
-        hu_top = hu_pairs[0]
-        source = hu_top.get("source", "?")
-        target = hu_top.get("target", "?")
-        delta = safe_float(hu_top.get("delta"))
-        current = safe_float(hu_top.get("current_score"))
+        # Legnagyobb változás
+        hu_dynamic = max(hu_pairs, key=lambda x: abs(safe_float(x.get("delta"))))
 
-        partner = target if source == "HU" else source
-        rel = relation_label(current)
-        trend = trend_label(delta)
+        # Legerősebb kapcsolat
+        hu_strongest = max(hu_pairs, key=lambda x: safe_float(x.get("current_score")))
 
-        hu_partner = partner
+        dyn_partner = get_partner_for_hu(hu_dynamic)
+        dyn_delta = safe_float(hu_dynamic.get("delta"))
+        dyn_trend = trend_label(dyn_delta)
+
+        str_partner = get_partner_for_hu(hu_strongest)
+        str_score = safe_float(hu_strongest.get("current_score"))
+        str_rel = relation_label(str_score)
+
+        hu_dynamic_partner = f"{dyn_partner} ({signed(dyn_delta)})"
+        hu_main_partner = f"{str_partner} ({str_score:.2f})"
+
         hu_relation = (
-            f"Magyarország kapcsolati szintje jelenleg {current:.2f}, "
-            f"ami inkább {rel} pozíciót jelez az EU-n belül."
+            f"A legerősebb kapcsolata jelenleg {str_partner} felé látható, "
+            f"{str_score:.2f} értékkel, ami {str_rel} szintnek felel meg."
         )
 
-        if trend == "javuló":
+        if dyn_trend == "javuló":
             hu_trend = (
-                f"A heti adatok alapján Magyarország és {partner} viszonya erősödött "
-                f"({signed(delta)}), ami nagyobb együttmozgásra utal."
+                f"A legnagyobb heti változás {dyn_partner} irányába történt, "
+                f"javuló mintával ({signed(dyn_delta)})."
             )
-        elif trend == "romló":
+        elif dyn_trend == "romló":
             hu_trend = (
-                f"A heti adatok alapján Magyarország és {partner} viszonya gyengült "
-                f"({signed(delta)}), ami az együttmozgás csökkenésére utal."
+                f"A legnagyobb heti változás {dyn_partner} irányába történt, "
+                f"romló mintával ({signed(dyn_delta)})."
             )
         else:
             hu_trend = (
-                f"A heti adatok alapján Magyarország és {partner} viszonya lényegében stabil maradt "
-                f"({signed(delta)})."
+                f"A legnagyobb heti változás {dyn_partner} irányába történt, "
+                f"de összességében stabil maradt ({signed(dyn_delta)})."
             )
 
         hu_summary = (
-            f"Magyarország fókuszában most {partner} áll: a kapcsolat {rel}, "
-            f"miközben a heti irány {trend}."
+            f"Magyarország kapcsolati képe kettős: legerősebb partnere {str_partner}, "
+            f"miközben a legnagyobb elmozdulás {dyn_partner} irányában történt."
         )
 
     elif hu_country_item:
@@ -155,29 +168,15 @@ def main():
         trend = trend_label(delta)
 
         hu_relation = (
-            f"Magyarország kapcsolati szintje jelenleg {current:.2f}, "
-            f"ami inkább {rel} pozíciót jelez az EU-n belül."
+            f"Magyarország kapcsolati szintje {current:.2f}, ami inkább {rel} pozíció."
         )
 
-        if trend == "javuló":
-            hu_trend = (
-                f"A heti adatok alapján Magyarország kapcsolati pozíciója erősödött "
-                f"({signed(delta)}), ami szélesebb együttmozgásra utal."
-            )
-        elif trend == "romló":
-            hu_trend = (
-                f"A heti adatok alapján Magyarország kapcsolati pozíciója gyengült "
-                f"({signed(delta)}), ami az együttmozgás csökkenésére utal."
-            )
-        else:
-            hu_trend = (
-                f"A heti adatok alapján Magyarország kapcsolati pozíciója lényegében stabil maradt "
-                f"({signed(delta)})."
-            )
+        hu_trend = (
+            f"Az országos minta alapján a pozíció {trend} irányba mozdult ({signed(delta)})."
+        )
 
         hu_summary = (
-            "A heti mintázatban Magyarország nem egyetlen domináns partnerhez kötődik, "
-            "hanem inkább általános szerkezeti elmozdulás figyelhető meg."
+            "Nem jelent meg kiemelt HU-országpár, így az országos trend a meghatározó."
         )
 
     # --- Heti változások ---
@@ -235,7 +234,8 @@ def main():
             "method_note": report.get("method_note", "nincs adat")
         },
         "hu_focus": {
-            "main_partner": hu_partner,
+            "main_partner": hu_main_partner,
+            "dynamic_partner": hu_dynamic_partner,
             "relation": hu_relation,
             "trend": hu_trend,
             "summary": hu_summary
