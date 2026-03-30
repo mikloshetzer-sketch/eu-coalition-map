@@ -1,189 +1,60 @@
-name: Build data and reports
+name: Build data pipeline
 
 on:
-  workflow_dispatch:
   schedule:
-    - cron: "20 5 * * *"
-    - cron: "35 6 * * 1"
-
-permissions:
-  contents: write
-
-concurrency:
-  group: build-data-${{ github.ref }}
-  cancel-in-progress: false
+    - cron: "0 5 * * *"     # napi futás
+    - cron: "0 6 * * 1"     # heti riport (hétfő)
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Cache pip
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
       - name: Install dependencies
-        shell: bash
         run: |
-          python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then
-            pip install -r requirements.txt
-          fi
+          pip install -r requirements.txt || true
 
-      - name: Show repository structure
-        shell: bash
+      # 🔹 1. HÁLÓZATOK ÉPÍTÉSE (MEGLÉVŐ)
+      - name: Build network data
         run: |
-          echo "Repository root:"
-          ls -la
-          echo
-          echo "Scripts:"
-          ls -la scripts || true
-          echo
-          echo "Workflows:"
-          ls -la .github/workflows || true
-
-      - name: Prepare logs directory
-        shell: bash
-        run: |
-          mkdir -p .github/tmp-logs
-
-      - name: Refresh external data with fallback
-        shell: bash
-        run: |
-          set +e
-
-          run_fetch_script () {
-            SCRIPT_PATH="$1"
-            SCRIPT_NAME="$(basename "$SCRIPT_PATH")"
-
-            echo "----------------------------------------"
-            echo "Running external fetch: $SCRIPT_NAME"
-            echo "----------------------------------------"
-
-            ATTEMPT=1
-            MAX_ATTEMPTS=3
-
-            while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
-              echo "Attempt $ATTEMPT / $MAX_ATTEMPTS for $SCRIPT_NAME"
-              python "$SCRIPT_PATH" > ".github/tmp-logs/${SCRIPT_NAME}.log" 2>&1
-              EXIT_CODE=$?
-
-              if [ $EXIT_CODE -eq 0 ]; then
-                echo "Fetch succeeded: $SCRIPT_NAME"
-                cat ".github/tmp-logs/${SCRIPT_NAME}.log"
-                return 0
-              fi
-
-              echo "Fetch failed with exit code $EXIT_CODE: $SCRIPT_NAME"
-              cat ".github/tmp-logs/${SCRIPT_NAME}.log"
-
-              if [ $ATTEMPT -lt $MAX_ATTEMPTS ]; then
-                SLEEP_SECONDS=$((ATTEMPT * 20))
-                echo "Retrying in ${SLEEP_SECONDS} seconds..."
-                sleep $SLEEP_SECONDS
-              fi
-
-              ATTEMPT=$((ATTEMPT + 1))
-            done
-
-            echo "External fetch failed after retries: $SCRIPT_NAME"
-            return 1
-          }
-
-          FETCH_FAILED=0
-
-          if [ -f scripts/fetch_votes.py ]; then
-            run_fetch_script "scripts/fetch_votes.py" || FETCH_FAILED=1
-          elif [ -f scripts/update_votes.py ]; then
-            run_fetch_script "scripts/update_votes.py" || FETCH_FAILED=1
-          elif [ -f scripts/fetch_events.py ]; then
-            run_fetch_script "scripts/fetch_events.py" || FETCH_FAILED=1
-          elif [ -f scripts/refresh_events.py ]; then
-            run_fetch_script "scripts/refresh_events.py" || FETCH_FAILED=1
+          if [ -f scripts/build_networks.py ]; then
+            python scripts/build_networks.py
           else
-            echo "No external fetch script found, skipping fetch step."
+            echo "No network builder script found, skipping."
           fi
 
-          if [ $FETCH_FAILED -ne 0 ]; then
-            echo "External fetch step had errors, continuing with existing local data."
-          fi
-
-          exit 0
-
-      - name: Run network build
-        shell: bash
-        run: |
-          python scripts/build_window_networks.py
-
-      - name: Run weekly report build
-        shell: bash
+      # 🔹 2. HETI RIPORT (MEGLÉVŐ)
+      - name: Build weekly report
         run: |
           if [ -f scripts/build_weekly_report.py ]; then
             python scripts/build_weekly_report.py
           else
-            echo "No weekly report builder found, skipping."
+            echo "No weekly report script found, skipping."
           fi
 
-      - name: Verify output directories
-        shell: bash
+      # 🔥 3. BLOG JSON GENERÁLÁS (ÚJ)
+      - name: Generate blog insight JSON
         run: |
-          echo "data/networks:"
-          find data/networks -maxdepth 2 -type f | sort | head -200 || true
-          echo
-          echo "docs/data/networks:"
-          find docs/data/networks -maxdepth 2 -type f | sort | head -200 || true
-          echo
-          echo "data/reports:"
-          find data/reports -maxdepth 2 -type f | sort | head -200 || true
-          echo
-          echo "docs/data/reports:"
-          find docs/data/reports -maxdepth 2 -type f | sort | head -200 || true
-
-      - name: Upload logs as artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-data-logs
-          path: .github/tmp-logs
-          if-no-files-found: ignore
-
-      - name: Check for changes
-        id: changes
-        shell: bash
-        run: |
-          if git diff --quiet -- data docs/data; then
-            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+          if [ -f scripts/generate_blog_insight.py ]; then
+            python scripts/generate_blog_insight.py
           else
-            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+            echo "No blog insight generator found, skipping."
           fi
 
-      - name: Commit and push updated data
-        if: steps.changes.outputs.has_changes == 'true'
-        shell: bash
+      # 🔹 4. COMMIT (MEGLÉVŐ LOGIKA)
+      - name: Commit changes
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data docs/data .github/workflows/build-data.yml
-          git commit -m "Automated data build and weekly report update"
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add data docs/data
+          git diff --cached --quiet || git commit -m "Update data pipeline outputs"
           git push
-
-      - name: No changes
-        if: steps.changes.outputs.has_changes != 'true'
-        shell: bash
-        run: |
-          echo "No data changes to commit."
