@@ -1,0 +1,69 @@
+name: Build data and reports
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "15 5 * * 1"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+
+      - name: Run network build
+        run: |
+          python scripts/build_window_networks.py
+
+      - name: Run weekly report build
+        run: |
+          python scripts/build_weekly_report.py
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet -- data docs/data; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and push updated data
+        if: steps.changes.outputs.has_changes == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data docs/data .github/workflows/build-data.yml
+          git commit -m "Automated data build and weekly report update"
+          git push
+
+      - name: No changes
+        if: steps.changes.outputs.has_changes != 'true'
+        run: echo "No data changes to commit."
