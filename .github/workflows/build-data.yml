@@ -3,14 +3,20 @@ name: Build data and reports
 on:
   workflow_dispatch:
   schedule:
-    - cron: "15 5 * * 1"
+    - cron: "20 5 * * *"
+    - cron: "35 6 * * 1"
 
 permissions:
   contents: write
 
+concurrency:
+  group: build-data-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 40
 
     steps:
       - name: Checkout repository
@@ -32,22 +38,133 @@ jobs:
             ${{ runner.os }}-pip-
 
       - name: Install dependencies
+        shell: bash
         run: |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then
             pip install -r requirements.txt
           fi
 
+      - name: Show repository structure
+        shell: bash
+        run: |
+          echo "Repository root:"
+          ls -la
+          echo
+          echo "Scripts:"
+          ls -la scripts || true
+          echo
+          echo "Workflows:"
+          ls -la .github/workflows || true
+
+      - name: Prepare logs directory
+        shell: bash
+        run: |
+          mkdir -p .github/tmp-logs
+
+      - name: Refresh external data with fallback
+        shell: bash
+        run: |
+          set +e
+
+          run_fetch_script () {
+            SCRIPT_PATH="$1"
+            SCRIPT_NAME="$(basename "$SCRIPT_PATH")"
+
+            echo "----------------------------------------"
+            echo "Running external fetch: $SCRIPT_NAME"
+            echo "----------------------------------------"
+
+            ATTEMPT=1
+            MAX_ATTEMPTS=3
+
+            while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
+              echo "Attempt $ATTEMPT / $MAX_ATTEMPTS for $SCRIPT_NAME"
+              python "$SCRIPT_PATH" > ".github/tmp-logs/${SCRIPT_NAME}.log" 2>&1
+              EXIT_CODE=$?
+
+              if [ $EXIT_CODE -eq 0 ]; then
+                echo "Fetch succeeded: $SCRIPT_NAME"
+                cat ".github/tmp-logs/${SCRIPT_NAME}.log"
+                return 0
+              fi
+
+              echo "Fetch failed with exit code $EXIT_CODE: $SCRIPT_NAME"
+              cat ".github/tmp-logs/${SCRIPT_NAME}.log"
+
+              if [ $ATTEMPT -lt $MAX_ATTEMPTS ]; then
+                SLEEP_SECONDS=$((ATTEMPT * 20))
+                echo "Retrying in ${SLEEP_SECONDS} seconds..."
+                sleep $SLEEP_SECONDS
+              fi
+
+              ATTEMPT=$((ATTEMPT + 1))
+            done
+
+            echo "External fetch failed after retries: $SCRIPT_NAME"
+            return 1
+          }
+
+          FETCH_FAILED=0
+
+          if [ -f scripts/fetch_votes.py ]; then
+            run_fetch_script "scripts/fetch_votes.py" || FETCH_FAILED=1
+          elif [ -f scripts/update_votes.py ]; then
+            run_fetch_script "scripts/update_votes.py" || FETCH_FAILED=1
+          elif [ -f scripts/fetch_events.py ]; then
+            run_fetch_script "scripts/fetch_events.py" || FETCH_FAILED=1
+          elif [ -f scripts/refresh_events.py ]; then
+            run_fetch_script "scripts/refresh_events.py" || FETCH_FAILED=1
+          else
+            echo "No external fetch script found, skipping fetch step."
+          fi
+
+          if [ $FETCH_FAILED -ne 0 ]; then
+            echo "External fetch step had errors, continuing with existing local data."
+          fi
+
+          exit 0
+
       - name: Run network build
+        shell: bash
         run: |
           python scripts/build_window_networks.py
 
       - name: Run weekly report build
+        shell: bash
         run: |
-          python scripts/build_weekly_report.py
+          if [ -f scripts/build_weekly_report.py ]; then
+            python scripts/build_weekly_report.py
+          else
+            echo "No weekly report builder found, skipping."
+          fi
+
+      - name: Verify output directories
+        shell: bash
+        run: |
+          echo "data/networks:"
+          find data/networks -maxdepth 2 -type f | sort | head -200 || true
+          echo
+          echo "docs/data/networks:"
+          find docs/data/networks -maxdepth 2 -type f | sort | head -200 || true
+          echo
+          echo "data/reports:"
+          find data/reports -maxdepth 2 -type f | sort | head -200 || true
+          echo
+          echo "docs/data/reports:"
+          find docs/data/reports -maxdepth 2 -type f | sort | head -200 || true
+
+      - name: Upload logs as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-data-logs
+          path: .github/tmp-logs
+          if-no-files-found: ignore
 
       - name: Check for changes
         id: changes
+        shell: bash
         run: |
           if git diff --quiet -- data docs/data; then
             echo "has_changes=false" >> "$GITHUB_OUTPUT"
@@ -57,6 +174,7 @@ jobs:
 
       - name: Commit and push updated data
         if: steps.changes.outputs.has_changes == 'true'
+        shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -66,4 +184,6 @@ jobs:
 
       - name: No changes
         if: steps.changes.outputs.has_changes != 'true'
-        run: echo "No data changes to commit."
+        shell: bash
+        run: |
+          echo "No data changes to commit."
