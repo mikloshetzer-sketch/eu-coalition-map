@@ -35,6 +35,7 @@ def main():
     pair_items = sections.get("pair_movements", {}).get("items", []) or []
     topic_items = sections.get("topic_shifts", {}).get("items", []) or []
 
+    # --- Általános heti blokk ---
     top_country = country_items[0] if country_items else {}
     top_pair = pair_items[0] if pair_items else {}
     top_topic = topic_items[0] if topic_items else {}
@@ -66,6 +67,70 @@ def main():
         total = safe_float(top_topic.get("absolute_delta_total"))
         topic_text = f"{topic_label}: összesített abszolút elmozdulás {total:.2f}"
 
+    # --- HU fókusz ---
+    hu_pairs = [
+        p for p in pair_items
+        if p.get("source") == "HU" or p.get("target") == "HU"
+    ]
+
+    hu_top = hu_pairs[0] if hu_pairs else {}
+
+    hu_relation = "nincs adat"
+    hu_partner = "nincs adat"
+    hu_trend = "nincs adat"
+
+    if hu_top:
+        source = hu_top.get("source", "?")
+        target = hu_top.get("target", "?")
+        delta = safe_float(hu_top.get("delta"))
+        current = safe_float(hu_top.get("current_score"))
+
+        partner = target if source == "HU" else source
+        hu_partner = partner
+        hu_relation = f"HU–{partner}: aktuális kapcsolatindex {current:.2f}"
+
+        if delta > 5:
+            hu_trend = f"javuló kapcsolat ({signed(delta)})"
+        elif delta < -5:
+            hu_trend = f"romló kapcsolat ({signed(delta)})"
+        else:
+            hu_trend = f"nagyjából stabil kapcsolat ({signed(delta)})"
+
+    # --- Mi változott a héten ---
+    positive_pairs = sorted(
+        [p for p in pair_items if safe_float(p.get("delta")) > 0],
+        key=lambda x: safe_float(x.get("delta")),
+        reverse=True
+    )
+
+    negative_pairs = sorted(
+        [p for p in pair_items if safe_float(p.get("delta")) < 0],
+        key=lambda x: safe_float(x.get("delta"))
+    )
+
+    top_gainer = positive_pairs[0] if positive_pairs else None
+    top_loser = negative_pairs[0] if negative_pairs else None
+
+    gainer_text = "nincs adat"
+    if top_gainer:
+        gainer_text = (
+            f"{top_gainer.get('source', '?')}–{top_gainer.get('target', '?')}: "
+            f"{signed(safe_float(top_gainer.get('delta')))}"
+        )
+
+    loser_text = "nincs adat"
+    if top_loser:
+        loser_text = (
+            f"{top_loser.get('source', '?')}–{top_loser.get('target', '?')}: "
+            f"{signed(safe_float(top_loser.get('delta')))}"
+        )
+
+    weekly_topic_text = "nincs adat"
+    if top_topic:
+        weekly_topic_label = top_topic.get("topic_label") or top_topic.get("topic") or "ismeretlen téma"
+        weekly_topic_total = safe_float(top_topic.get("absolute_delta_total"))
+        weekly_topic_text = f"{weekly_topic_label}: {weekly_topic_total:.2f}"
+
     payload = {
         "updated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
         "source_report": "votes_30d_weekly_report.json",
@@ -75,6 +140,16 @@ def main():
             "top_pair_move": pair_text,
             "top_topic_shift": topic_text,
             "method_note": report.get("method_note", "nincs adat")
+        },
+        "hu_focus": {
+            "main_partner": hu_partner,
+            "relation": hu_relation,
+            "trend": hu_trend
+        },
+        "weekly_changes": {
+            "top_gainer": gainer_text,
+            "top_loser": loser_text,
+            "top_topic": weekly_topic_text
         }
     }
 
