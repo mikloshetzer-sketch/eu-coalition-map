@@ -376,12 +376,14 @@ def max_edge_weight(graph):
     return max(weights) or 1.0
 
 
-def topic_profile_closeness(row_a, row_b):
+def topic_profile_closeness(row_a, row_b, topics=None):
     if not row_a or not row_b:
         return 0.0
 
-    vals_a = [abs(float(row_a.get(t, 0.0) or 0.0)) for t in TOPICS]
-    vals_b = [abs(float(row_b.get(t, 0.0) or 0.0)) for t in TOPICS]
+    use_topics = topics or TOPICS
+
+    vals_a = [abs(float(row_a.get(t, 0.0) or 0.0)) for t in use_topics]
+    vals_b = [abs(float(row_b.get(t, 0.0) or 0.0)) for t in use_topics]
 
     total_a = sum(vals_a)
     total_b = sum(vals_b)
@@ -392,7 +394,7 @@ def topic_profile_closeness(row_a, row_b):
     norm_a = [(v / total_a) if total_a > 0 else 0.0 for v in vals_a]
     norm_b = [(v / total_b) if total_b > 0 else 0.0 for v in vals_b]
 
-    distance = sum(abs(norm_a[i] - norm_b[i]) for i in range(len(TOPICS))) / 2.0
+    distance = sum(abs(norm_a[i] - norm_b[i]) for i in range(len(use_topics))) / 2.0
     closeness = 1.0 - distance
     return max(0.0, closeness)
 
@@ -407,6 +409,38 @@ def relationship_band(score):
     if score >= 20:
         return "low"
     return "very_low"
+
+
+def relationship_label_from_scores(layer, score, direct_score, similarity_score, topic_score):
+    # Votes esetén engedjük az "ellentétes" minősítést.
+    if layer == "votes":
+        if score >= 60 and topic_score >= 55 and similarity_score >= 45:
+            return "cooperative", "együttműködő"
+        if score <= 25 and similarity_score <= 25 and topic_score <= 30:
+            return "opposed", "ellentétes"
+        return "neutral", "közömbös"
+
+    # Egyéb forrásoknál óvatosabb logika.
+    if score >= 60 and (similarity_score >= 45 or topic_score >= 50):
+        return "cooperative", "együttműködő"
+
+    if score <= 25 and direct_score < 10 and similarity_score < 20 and topic_score < 25:
+        return "neutral", "közömbös"
+
+    return "neutral", "közömbös"
+
+
+def topic_label_from_score(layer, score):
+    if layer == "votes":
+        if score >= 60:
+            return "cooperative", "együttműködő"
+        if score <= 25:
+            return "opposed", "ellentétes"
+        return "neutral", "közömbös"
+
+    if score >= 60:
+        return "cooperative", "együttműködő"
+    return "neutral", "közömbös"
 
 
 # -----------------------------
@@ -992,6 +1026,52 @@ def build_votes_change(votes, days=90, mode="all"):
 # RELATIONSHIP INDEX
 # -----------------------------
 
+def build_topic_relationships_for_pair(layer, country_a, country_b, row_index):
+    row_a = row_index.get(country_a)
+    row_b = row_index.get(country_b)
+
+    topic_relationships = []
+    if not row_a or not row_b:
+        return topic_relationships, []
+
+    for topic in TOPICS:
+        va = float(row_a.get(topic, 0.0) or 0.0)
+        vb = float(row_b.get(topic, 0.0) or 0.0)
+
+        if layer == "votes":
+            mag = min(abs(va), abs(vb))
+            same_sign = (va == 0 and vb == 0) or (va >= 0 and vb >= 0) or (va <= 0 and vb <= 0)
+
+            if abs(va) < 1e-9 and abs(vb) < 1e-9:
+                score = 50.0
+            elif same_sign:
+                score = clamp(50.0 + mag * 50.0, 0.0, 100.0)
+            else:
+                score = clamp(50.0 - mag * 50.0, 0.0, 100.0)
+        else:
+            max_v = max(abs(va), abs(vb), 1e-9)
+            gap = abs(abs(va) - abs(vb)) / max_v
+            score = clamp((1.0 - gap) * 100.0, 0.0, 100.0)
+
+        label, label_hu = topic_label_from_score(layer, score)
+
+        relevance = abs(va) + abs(vb)
+        topic_relationships.append({
+            "topic": topic,
+            "score": round(score, 2),
+            "label": label,
+            "label_hu": label_hu,
+            "value_a": round(va, 3),
+            "value_b": round(vb, 3),
+            "relevance": round(relevance, 3),
+        })
+
+    topic_relationships.sort(key=lambda x: (-x["relevance"], -x["score"], x["topic"]))
+
+    dominant_topics = [x["topic"] for x in topic_relationships[:3]]
+    return topic_relationships, dominant_topics
+
+
 def build_relationship_index_from_components(graph, heatmap_norm, similarity, layer, mode, window_days):
     row_index = index_rows_by_country(heatmap_norm.get("rows", []))
     countries = sorted(set(
@@ -1032,16 +1112,46 @@ def build_relationship_index_from_components(graph, heatmap_norm, similarity, la
         if score < RELATIONSHIP_MIN_SCORE:
             continue
 
+        rel_label, rel_label_hu = relationship_label_from_scores(
+            layer=layer,
+            score=score,
+            direct_score=direct_score,
+            similarity_score=similarity_score,
+            topic_score=topic_score,
+        )
+
+        topic_relationships, dominant_topics = build_topic_relationships_for_pair(
+            layer=layer,
+            country_a=a,
+            country_b=b,
+            row_index=row_index,
+        )
+
+        dominant_cooperative_topic = next(
+            (x["topic"] for x in topic_relationships if x["label"] == "cooperative"),
+            None
+        )
+        dominant_opposed_topic = next(
+            (x["topic"] for x in topic_relationships if x["label"] == "opposed"),
+            None
+        )
+
         rec = {
             "source": a,
             "target": b,
             "score": score,
             "band": relationship_band(score),
+            "relationship_label": rel_label,
+            "relationship_label_hu": rel_label_hu,
             "direct_score": round(direct_score, 2),
             "similarity_score": round(similarity_score, 2),
             "topic_score": round(topic_score, 2),
             "direct_weight": round(direct_weight, 6),
             "similarity_weight": round(similarity_weight, 6),
+            "dominant_topics": dominant_topics,
+            "dominant_cooperative_topic": dominant_cooperative_topic,
+            "dominant_opposed_topic": dominant_opposed_topic,
+            "topic_relationships": topic_relationships,
         }
         pairs.append(rec)
         by_country[a].append(rec)
@@ -1064,13 +1174,33 @@ def build_relationship_index_from_components(graph, heatmap_norm, similarity, la
                 "partner": partner,
                 "score": item["score"],
                 "band": item["band"],
+                "relationship_label": item["relationship_label"],
+                "relationship_label_hu": item["relationship_label_hu"],
                 "direct_score": item["direct_score"],
                 "similarity_score": item["similarity_score"],
                 "topic_score": item["topic_score"],
+                "dominant_topics": item["dominant_topics"],
+                "dominant_cooperative_topic": item["dominant_cooperative_topic"],
+                "dominant_opposed_topic": item["dominant_opposed_topic"],
             })
 
         avg_score = round(sum(x["score"] for x in rels) / len(rels), 2) if rels else 0.0
         strongest = partners[0] if partners else None
+
+        label_counts = defaultdict(int)
+        for rel in rels:
+            label_counts[rel["relationship_label"]] += 1
+
+        dominant_relationship_label = None
+        dominant_relationship_label_hu = None
+        if label_counts:
+            dominant_relationship_label = sorted(label_counts.items(), key=lambda x: (-x[1], x[0]))[0][0]
+            if dominant_relationship_label == "cooperative":
+                dominant_relationship_label_hu = "együttműködő"
+            elif dominant_relationship_label == "opposed":
+                dominant_relationship_label_hu = "ellentétes"
+            else:
+                dominant_relationship_label_hu = "közömbös"
 
         by_country_list.append({
             "country": country,
@@ -1078,6 +1208,8 @@ def build_relationship_index_from_components(graph, heatmap_norm, similarity, la
             "average_score": avg_score,
             "strongest_partner": strongest["partner"] if strongest else None,
             "strongest_score": strongest["score"] if strongest else None,
+            "dominant_relationship_label": dominant_relationship_label,
+            "dominant_relationship_label_hu": dominant_relationship_label_hu,
             "top_partners": partners,
         })
 
@@ -1209,6 +1341,12 @@ def build_relationship_change(events, layer, days=90, mode="all"):
             "status": status,
             "current_band": curr["band"] if curr else None,
             "previous_band": prev["band"] if prev else None,
+            "relationship_label": curr.get("relationship_label") if curr else prev.get("relationship_label") if prev else None,
+            "relationship_label_hu": curr.get("relationship_label_hu") if curr else prev.get("relationship_label_hu") if prev else None,
+            "dominant_topics": curr.get("dominant_topics") if curr else prev.get("dominant_topics") if prev else [],
+            "dominant_cooperative_topic": curr.get("dominant_cooperative_topic") if curr else prev.get("dominant_cooperative_topic") if prev else None,
+            "dominant_opposed_topic": curr.get("dominant_opposed_topic") if curr else prev.get("dominant_opposed_topic") if prev else None,
+            "topic_relationships": curr.get("topic_relationships") if curr else prev.get("topic_relationships") if prev else [],
         }
         pair_changes.append(rec)
 
@@ -1219,6 +1357,11 @@ def build_relationship_change(events, layer, days=90, mode="all"):
                 "previous_score": rec["previous_score"],
                 "delta": rec["delta"],
                 "status": status,
+                "relationship_label": rec["relationship_label"],
+                "relationship_label_hu": rec["relationship_label_hu"],
+                "dominant_topics": rec["dominant_topics"],
+                "dominant_cooperative_topic": rec["dominant_cooperative_topic"],
+                "dominant_opposed_topic": rec["dominant_opposed_topic"],
             }
             country_changes_map[country]["all_changes"].append(entry)
 
@@ -1275,6 +1418,8 @@ def build_relationship_change(events, layer, days=90, mode="all"):
             "average_score_current": round(current_avg, 2),
             "average_score_previous": round(previous_avg, 2),
             "average_score_delta": round(current_avg - previous_avg, 2),
+            "dominant_relationship_label": current_country_summary.get("dominant_relationship_label") if current_country_summary else None,
+            "dominant_relationship_label_hu": current_country_summary.get("dominant_relationship_label_hu") if current_country_summary else None,
             "gained_relationships": gained[:10],
             "lost_relationships": lost[:10],
             "improved_relationships": improved[:10],
