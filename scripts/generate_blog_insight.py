@@ -105,7 +105,10 @@ def main():
     hu_partner = "nincs kiemelt partner"
     hu_relation = "A vizsgált heti országpár-változások között most nem jelent meg kiemelt HU-fókuszú kapcsolat."
     hu_trend = "Magyarország heti kapcsolatmintája külön országpárként ezen a listán nem emelkedett ki."
-    hu_summary = "A heti riport alapján Magyarország inkább országos profilváltozásként értelmezhető, nem kiemelt országpár-mozgásként."
+    hu_summary = (
+        "A heti mintázatban Magyarország nem egyetlen domináns partnerhez kötődik, "
+        "hanem inkább általános szerkezeti elmozdulás figyelhető meg."
+    )
 
     if hu_pairs:
         hu_top = hu_pairs[0]
@@ -120,16 +123,25 @@ def main():
 
         hu_partner = partner
         hu_relation = (
-            f"Magyarország és {partner} között jelenleg {rel} kapcsolat látható, "
-            f"{current:.2f} indexértékkel."
+            f"Magyarország kapcsolati szintje jelenleg {current:.2f}, "
+            f"ami inkább {rel} pozíciót jelez az EU-n belül."
         )
 
         if trend == "javuló":
-            hu_trend = f"A heti változás alapján a kapcsolat javuló képet mutat ({signed(delta)})."
+            hu_trend = (
+                f"A heti adatok alapján Magyarország és {partner} viszonya erősödött "
+                f"({signed(delta)}), ami nagyobb együttmozgásra utal."
+            )
         elif trend == "romló":
-            hu_trend = f"A heti változás alapján a kapcsolat romló képet mutat ({signed(delta)})."
+            hu_trend = (
+                f"A heti adatok alapján Magyarország és {partner} viszonya gyengült "
+                f"({signed(delta)}), ami az együttmozgás csökkenésére utal."
+            )
         else:
-            hu_trend = f"A kapcsolat a héten összességében stabil maradt ({signed(delta)})."
+            hu_trend = (
+                f"A heti adatok alapján Magyarország és {partner} viszonya lényegében stabil maradt "
+                f"({signed(delta)})."
+            )
 
         hu_summary = (
             f"Magyarország fókuszában most {partner} áll: a kapcsolat {rel}, "
@@ -139,22 +151,33 @@ def main():
     elif hu_country_item:
         delta = safe_float(hu_country_item.get("average_score_delta"))
         current = safe_float(hu_country_item.get("average_score_current"))
+        rel = relation_label(current)
         trend = trend_label(delta)
 
         hu_relation = (
-            f"Magyarország átlagos kapcsolati profilja jelenleg {current:.2f} ponton áll."
+            f"Magyarország kapcsolati szintje jelenleg {current:.2f}, "
+            f"ami inkább {rel} pozíciót jelez az EU-n belül."
         )
 
         if trend == "javuló":
-            hu_trend = f"Az országos mintázat alapján Magyarország pozíciója javuló irányba mozdult ({signed(delta)})."
+            hu_trend = (
+                f"A heti adatok alapján Magyarország kapcsolati pozíciója erősödött "
+                f"({signed(delta)}), ami szélesebb együttmozgásra utal."
+            )
         elif trend == "romló":
-            hu_trend = f"Az országos mintázat alapján Magyarország pozíciója romló irányba mozdult ({signed(delta)})."
+            hu_trend = (
+                f"A heti adatok alapján Magyarország kapcsolati pozíciója gyengült "
+                f"({signed(delta)}), ami az együttmozgás csökkenésére utal."
+            )
         else:
-            hu_trend = f"Az országos mintázat alapján Magyarország pozíciója nagyjából stabil maradt ({signed(delta)})."
+            hu_trend = (
+                f"A heti adatok alapján Magyarország kapcsolati pozíciója lényegében stabil maradt "
+                f"({signed(delta)})."
+            )
 
         hu_summary = (
-            "A heti országpár-listában nem jelent meg kiemelt HU-kapcsolat, "
-            "de az országos profil alapján Magyarország mozgása így is követhető."
+            "A heti mintázatban Magyarország nem egyetlen domináns partnerhez kötődik, "
+            "hanem inkább általános szerkezeti elmozdulás figyelhető meg."
         )
 
     # --- Heti változások ---
