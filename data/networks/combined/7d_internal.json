@@ -2,7 +2,7 @@
   "nodes": [
     {
       "id": "AT",
-      "weight": 10.6
+      "weight": 11.6
     },
     {
       "id": "BE",
@@ -18,7 +18,7 @@
     },
     {
       "id": "DE",
-      "weight": 31.14
+      "weight": 33.14
     },
     {
       "id": "DK",
@@ -38,7 +38,7 @@
     },
     {
       "id": "FR",
-      "weight": 6.4
+      "weight": 9.4
     },
     {
       "id": "GR",
@@ -50,7 +50,7 @@
     },
     {
       "id": "HU",
-      "weight": 23.04
+      "weight": 22.04
     },
     {
       "id": "IE",
@@ -58,7 +58,7 @@
     },
     {
       "id": "IT",
-      "weight": 12.5
+      "weight": 14.5
     },
     {
       "id": "LT",
@@ -78,18 +78,18 @@
     },
     {
       "id": "PT",
-      "weight": 3.27
+      "weight": 1.27
     },
     {
       "id": "SK",
-      "weight": 11.52
+      "weight": 10.52
     }
   ],
   "edges": [
     {
       "source": "AT",
       "target": "ES",
-      "weight": 3.0
+      "weight": 4.0
     },
     {
       "source": "AT",
@@ -143,8 +143,23 @@
     },
     {
       "source": "DE",
+      "target": "ES",
+      "weight": 1.0
+    },
+    {
+      "source": "DE",
+      "target": "FR",
+      "weight": 1.0
+    },
+    {
+      "source": "DE",
       "target": "HU",
-      "weight": 6.0
+      "weight": 5.0
+    },
+    {
+      "source": "DE",
+      "target": "IT",
+      "weight": 1.0
     },
     {
       "source": "DE",
@@ -169,12 +184,22 @@
     {
       "source": "ES",
       "target": "PT",
-      "weight": 3.27
+      "weight": 1.27
+    },
+    {
+      "source": "FR",
+      "target": "HU",
+      "weight": 1.0
     },
     {
       "source": "FR",
       "target": "IE",
       "weight": 4.4
+    },
+    {
+      "source": "FR",
+      "target": "IT",
+      "weight": 1.0
     },
     {
       "source": "FR",
@@ -209,7 +234,7 @@
     {
       "source": "HU",
       "target": "SK",
-      "weight": 8.52
+      "weight": 7.52
     },
     {
       "source": "IE",
@@ -222,6 +247,6 @@
       "weight": 1.0
     }
   ],
-  "event_count": 376,
+  "event_count": 382,
   "mode": "internal"
 }
