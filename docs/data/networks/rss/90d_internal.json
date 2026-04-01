@@ -22,11 +22,11 @@
     },
     {
       "id": "DE",
-      "weight": 47.0
+      "weight": 51.0
     },
     {
       "id": "DK",
-      "weight": 2.0
+      "weight": 5.0
     },
     {
       "id": "EE",
@@ -34,7 +34,7 @@
     },
     {
       "id": "ES",
-      "weight": 38.0
+      "weight": 39.0
     },
     {
       "id": "FI",
@@ -42,7 +42,7 @@
     },
     {
       "id": "FR",
-      "weight": 64.0
+      "weight": 69.0
     },
     {
       "id": "GR",
@@ -54,7 +54,11 @@
     },
     {
       "id": "HU",
-      "weight": 44.0
+      "weight": 50.0
+    },
+    {
+      "id": "IE",
+      "weight": 2.0
     },
     {
       "id": "IT",
@@ -90,7 +94,7 @@
     },
     {
       "id": "SK",
-      "weight": 27.0
+      "weight": 28.0
     }
   ],
   "edges": [
@@ -151,18 +155,23 @@
     },
     {
       "source": "DE",
+      "target": "DK",
+      "weight": 1.0
+    },
+    {
+      "source": "DE",
       "target": "ES",
-      "weight": 8.0
+      "weight": 9.0
     },
     {
       "source": "DE",
       "target": "FR",
-      "weight": 13.0
+      "weight": 14.0
     },
     {
       "source": "DE",
       "target": "HU",
-      "weight": 9.0
+      "weight": 10.0
     },
     {
       "source": "DE",
@@ -172,6 +181,16 @@
     {
       "source": "DE",
       "target": "SK",
+      "weight": 1.0
+    },
+    {
+      "source": "DK",
+      "target": "FR",
+      "weight": 1.0
+    },
+    {
+      "source": "DK",
+      "target": "HU",
       "weight": 1.0
     },
     {
@@ -217,7 +236,12 @@
     {
       "source": "FR",
       "target": "HU",
-      "weight": 3.0
+      "weight": 5.0
+    },
+    {
+      "source": "FR",
+      "target": "IE",
+      "weight": 1.0
     },
     {
       "source": "FR",
@@ -256,6 +280,11 @@
     },
     {
       "source": "HU",
+      "target": "IE",
+      "weight": 1.0
+    },
+    {
+      "source": "HU",
       "target": "IT",
       "weight": 3.0
     },
@@ -267,7 +296,7 @@
     {
       "source": "HU",
       "target": "SK",
-      "weight": 17.0
+      "weight": 18.0
     },
     {
       "source": "IT",
@@ -290,6 +319,6 @@
       "weight": 2.0
     }
   ],
-  "event_count": 1336,
+  "event_count": 1389,
   "mode": "internal"
 }

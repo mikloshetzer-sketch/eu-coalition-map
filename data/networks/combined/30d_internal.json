@@ -22,11 +22,11 @@
     },
     {
       "id": "DE",
-      "weight": 494.37
+      "weight": 498.37
     },
     {
       "id": "DK",
-      "weight": 5.5
+      "weight": 8.5
     },
     {
       "id": "EE",
@@ -34,7 +34,7 @@
     },
     {
       "id": "ES",
-      "weight": 418.52
+      "weight": 419.52
     },
     {
       "id": "FI",
@@ -42,7 +42,7 @@
     },
     {
       "id": "FR",
-      "weight": 517.8
+      "weight": 522.8
     },
     {
       "id": "GR",
@@ -54,11 +54,11 @@
     },
     {
       "id": "HU",
-      "weight": 83.44
+      "weight": 89.44
     },
     {
       "id": "IE",
-      "weight": 132.75
+      "weight": 134.75
     },
     {
       "id": "IT",
@@ -102,7 +102,7 @@
     },
     {
       "id": "SK",
-      "weight": 47.82
+      "weight": 48.82
     }
   ],
   "edges": [
@@ -228,13 +228,18 @@
     },
     {
       "source": "DE",
+      "target": "DK",
+      "weight": 1.0
+    },
+    {
+      "source": "DE",
       "target": "ES",
-      "weight": 103.86
+      "weight": 104.86
     },
     {
       "source": "DE",
       "target": "FR",
-      "weight": 193.35
+      "weight": 194.35
     },
     {
       "source": "DE",
@@ -244,7 +249,7 @@
     {
       "source": "DE",
       "target": "HU",
-      "weight": 9.0
+      "weight": 10.0
     },
     {
       "source": "DE",
@@ -280,6 +285,16 @@
       "source": "DK",
       "target": "FI",
       "weight": 3.5
+    },
+    {
+      "source": "DK",
+      "target": "FR",
+      "weight": 1.0
+    },
+    {
+      "source": "DK",
+      "target": "HU",
+      "weight": 1.0
     },
     {
       "source": "DK",
@@ -369,12 +384,12 @@
     {
       "source": "FR",
       "target": "HU",
-      "weight": 3.0
+      "weight": 5.0
     },
     {
       "source": "FR",
       "target": "IE",
-      "weight": 36.8
+      "weight": 37.8
     },
     {
       "source": "FR",
@@ -433,6 +448,11 @@
     },
     {
       "source": "HU",
+      "target": "IE",
+      "weight": 1.0
+    },
+    {
+      "source": "HU",
       "target": "IT",
       "weight": 3.0
     },
@@ -444,7 +464,7 @@
     {
       "source": "HU",
       "target": "SK",
-      "weight": 27.42
+      "weight": 28.42
     },
     {
       "source": "IE",
@@ -482,6 +502,6 @@
       "weight": 3.9
     }
   ],
-  "event_count": 2392,
+  "event_count": 2442,
   "mode": "internal"
 }

@@ -18,11 +18,11 @@
     },
     {
       "id": "DE",
-      "weight": 19.1
+      "weight": 22.1
     },
     {
       "id": "DK",
-      "weight": 5.5
+      "weight": 8.5
     },
     {
       "id": "EE",
@@ -30,7 +30,7 @@
     },
     {
       "id": "ES",
-      "weight": 6.27
+      "weight": 7.27
     },
     {
       "id": "FI",
@@ -38,7 +38,7 @@
     },
     {
       "id": "FR",
-      "weight": 9.4
+      "weight": 14.4
     },
     {
       "id": "GR",
@@ -50,11 +50,11 @@
     },
     {
       "id": "HU",
-      "weight": 13.0
+      "weight": 18.0
     },
     {
       "id": "IE",
-      "weight": 4.4
+      "weight": 6.4
     },
     {
       "id": "IT",
@@ -82,7 +82,7 @@
     },
     {
       "id": "SK",
-      "weight": 6.0
+      "weight": 7.0
     }
   ],
   "edges": [
@@ -133,13 +133,18 @@
     },
     {
       "source": "DE",
-      "target": "ES",
+      "target": "DK",
       "weight": 1.0
     },
     {
       "source": "DE",
+      "target": "ES",
+      "weight": 2.0
+    },
+    {
+      "source": "DE",
       "target": "FR",
-      "weight": 1.0
+      "weight": 2.0
     },
     {
       "source": "DE",
@@ -163,6 +168,16 @@
     },
     {
       "source": "DK",
+      "target": "FR",
+      "weight": 1.0
+    },
+    {
+      "source": "DK",
+      "target": "HU",
+      "weight": 1.0
+    },
+    {
+      "source": "DK",
       "target": "IT",
       "weight": 2.0
     },
@@ -179,12 +194,12 @@
     {
       "source": "FR",
       "target": "HU",
-      "weight": 1.0
+      "weight": 3.0
     },
     {
       "source": "FR",
       "target": "IE",
-      "weight": 4.4
+      "weight": 5.4
     },
     {
       "source": "FR",
@@ -218,13 +233,18 @@
     },
     {
       "source": "HU",
+      "target": "IE",
+      "weight": 1.0
+    },
+    {
+      "source": "HU",
       "target": "IT",
       "weight": 2.0
     },
     {
       "source": "HU",
       "target": "SK",
-      "weight": 3.0
+      "weight": 4.0
     },
     {
       "source": "IT",
@@ -232,6 +252,6 @@
       "weight": 1.0
     }
   ],
-  "event_count": 386,
+  "event_count": 397,
   "mode": "internal"
 }
