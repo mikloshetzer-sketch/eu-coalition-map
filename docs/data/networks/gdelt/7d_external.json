@@ -1,24 +1,28 @@
 {
   "nodes": [
     {
+      "id": "BE",
+      "weight": 3.82
+    },
+    {
       "id": "BG",
       "weight": 1.27
     },
     {
       "id": "CN",
-      "weight": 16.43
+      "weight": 12.61
     },
     {
       "id": "CY",
-      "weight": 20.0
+      "weight": 13.0
     },
     {
       "id": "DE",
-      "weight": 78.62
+      "weight": 80.82
     },
     {
       "id": "ES",
-      "weight": 21.8
+      "weight": 16.2
     },
     {
       "id": "FI",
@@ -26,15 +30,15 @@
     },
     {
       "id": "FR",
-      "weight": 158.4
+      "weight": 145.8
     },
     {
       "id": "GB",
-      "weight": 138.89
+      "weight": 139.21
     },
     {
       "id": "GR",
-      "weight": 19.41
+      "weight": 11.0
     },
     {
       "id": "IE",
@@ -46,15 +50,11 @@
     },
     {
       "id": "NL",
-      "weight": 46.05
+      "weight": 42.32
     },
     {
       "id": "PL",
       "weight": 9.3
-    },
-    {
-      "id": "PT",
-      "weight": 3.82
     },
     {
       "id": "RO",
@@ -62,7 +62,7 @@
     },
     {
       "id": "RU",
-      "weight": 46.3
+      "weight": 48.5
     },
     {
       "id": "SE",
@@ -78,10 +78,15 @@
     },
     {
       "id": "US",
-      "weight": 233.41
+      "weight": 199.57
     }
   ],
   "edges": [
+    {
+      "source": "BE",
+      "target": "GB",
+      "weight": 3.82
+    },
     {
       "source": "BG",
       "target": "US",
@@ -93,14 +98,9 @@
       "weight": 12.61
     },
     {
-      "source": "CN",
-      "target": "PT",
-      "weight": 3.82
-    },
-    {
       "source": "CY",
       "target": "GB",
-      "weight": 20.0
+      "weight": 13.0
     },
     {
       "source": "DE",
@@ -110,7 +110,7 @@
     {
       "source": "DE",
       "target": "RU",
-      "weight": 9.4
+      "weight": 11.6
     },
     {
       "source": "DE",
@@ -135,7 +135,7 @@
     {
       "source": "ES",
       "target": "US",
-      "weight": 16.7
+      "weight": 11.1
     },
     {
       "source": "FI",
@@ -155,12 +155,12 @@
     {
       "source": "FR",
       "target": "GB",
-      "weight": 61.11
+      "weight": 64.61
     },
     {
       "source": "FR",
       "target": "US",
-      "weight": 84.68
+      "weight": 68.58
     },
     {
       "source": "GB",
@@ -185,7 +185,7 @@
     {
       "source": "GR",
       "target": "US",
-      "weight": 17.81
+      "weight": 9.4
     },
     {
       "source": "IT",
@@ -195,7 +195,7 @@
     {
       "source": "NL",
       "target": "US",
-      "weight": 46.05
+      "weight": 42.32
     },
     {
       "source": "PL",
@@ -213,6 +213,6 @@
       "weight": 35.57
     }
   ],
-  "event_count": 162,
+  "event_count": 155,
   "mode": "external"
 }
