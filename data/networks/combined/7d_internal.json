@@ -1,6 +1,10 @@
 {
   "nodes": [
     {
+      "id": "AT",
+      "weight": 3.0
+    },
+    {
       "id": "BE",
       "weight": 21.22
     },
@@ -14,7 +18,7 @@
     },
     {
       "id": "DE",
-      "weight": 68.3
+      "weight": 67.3
     },
     {
       "id": "DK",
@@ -26,7 +30,7 @@
     },
     {
       "id": "FR",
-      "weight": 123.14
+      "weight": 126.14
     },
     {
       "id": "GR",
@@ -38,7 +42,7 @@
     },
     {
       "id": "HU",
-      "weight": 87.82
+      "weight": 88.82
     },
     {
       "id": "IE",
@@ -46,7 +50,7 @@
     },
     {
       "id": "IT",
-      "weight": 74.82
+      "weight": 77.82
     },
     {
       "id": "LU",
@@ -70,7 +74,7 @@
     },
     {
       "id": "SE",
-      "weight": 5.8
+      "weight": 2.8
     },
     {
       "id": "SK",
@@ -78,6 +82,21 @@
     }
   ],
   "edges": [
+    {
+      "source": "AT",
+      "target": "FR",
+      "weight": 1.0
+    },
+    {
+      "source": "AT",
+      "target": "HU",
+      "weight": 1.0
+    },
+    {
+      "source": "AT",
+      "target": "IT",
+      "weight": 1.0
+    },
     {
       "source": "BE",
       "target": "CY",
@@ -126,7 +145,7 @@
     {
       "source": "DE",
       "target": "SE",
-      "weight": 3.8
+      "weight": 2.8
     },
     {
       "source": "DK",
@@ -151,7 +170,7 @@
     {
       "source": "FR",
       "target": "HU",
-      "weight": 21.11
+      "weight": 22.11
     },
     {
       "source": "FR",
@@ -161,7 +180,7 @@
     {
       "source": "FR",
       "target": "IT",
-      "weight": 14.6
+      "weight": 15.6
     },
     {
       "source": "FR",
@@ -191,17 +210,12 @@
     {
       "source": "HU",
       "target": "IT",
-      "weight": 6.94
+      "weight": 7.94
     },
     {
       "source": "HU",
       "target": "PL",
       "weight": 15.41
-    },
-    {
-      "source": "HU",
-      "target": "SE",
-      "weight": 2.0
     },
     {
       "source": "HU",
@@ -229,6 +243,6 @@
       "weight": 3.0
     }
   ],
-  "event_count": 461,
+  "event_count": 471,
   "mode": "internal"
 }
