@@ -7,7 +7,7 @@ ROOT = Path(__file__).resolve().parent.parent
 
 REPORT_PATH = ROOT / "data" / "reports" / "votes_30d_weekly_report.json"
 
-# Meglévő outputok - EZEKET VÁLTOZATLANUL MEGTARTJUK
+# Meglévő outputok
 OUTPUT_PATH = ROOT / "data" / "eu-weekly-insight.json"
 DOCS_OUTPUT_PATH = ROOT / "docs" / "data" / "eu-weekly-insight.json"
 
@@ -126,10 +126,7 @@ def forecast_next_days(values: List[float], days: int = 3) -> List[float]:
 
 def build_weekly_insight_payload(report: Dict[str, Any]) -> Dict[str, Any]:
     """
-    FONTOS:
-    Ez a rész a régi script logikáját tartja meg.
-    Az output szerkezete és a fő szövegek kompatibilisek maradnak
-    a jelenlegi blog-megjelenítéssel.
+    Ez a rész kompatibilis marad a meglévő blog JSON szerkezettel.
     """
     sections = report.get("sections", {})
 
@@ -141,7 +138,6 @@ def build_weekly_insight_payload(report: Dict[str, Any]) -> Dict[str, Any]:
     top_pair = pair_items[0] if pair_items else {}
     top_topic = topic_items[0] if topic_items else {}
 
-    # --- EU összkép ---
     country_text = "nincs adat"
     if top_country:
         country = top_country.get("country", "ismeretlen")
@@ -177,7 +173,6 @@ def build_weekly_insight_payload(report: Dict[str, Any]) -> Dict[str, Any]:
             f"{total:.2f} összesített változással."
         )
 
-    # --- HU fókusz: 2 partner logika ---
     hu_pairs = [
         p for p in pair_items
         if p.get("source") == "HU" or p.get("target") == "HU"
@@ -247,16 +242,13 @@ def build_weekly_insight_payload(report: Dict[str, Any]) -> Dict[str, Any]:
         hu_relation = (
             f"Magyarország kapcsolati szintje {current:.2f}, ami inkább {rel} pozíció."
         )
-
         hu_trend = (
             f"Az országos minta alapján a pozíció {trend} irányba mozdult ({signed(delta)})."
         )
-
         hu_summary = (
             "Nem jelent meg kiemelt HU-országpár, így az országos trend a meghatározó."
         )
 
-    # --- Heti változások ---
     positive_pairs = sorted(
         [p for p in pair_items if safe_float(p.get("delta")) > 0],
         key=lambda x: safe_float(x.get("delta")),
@@ -300,7 +292,7 @@ def build_weekly_insight_payload(report: Dict[str, Any]) -> Dict[str, Any]:
             f"{weekly_topic_total:.2f} összesített elmozdulással."
         )
 
-    payload = {
+    return {
         "updated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
         "source_report": "votes_30d_weekly_report.json",
         "summary": {
@@ -323,8 +315,6 @@ def build_weekly_insight_payload(report: Dict[str, Any]) -> Dict[str, Any]:
             "top_topic": weekly_topic_text
         }
     }
-
-    return payload
 
 
 def build_hu_history_entry(
@@ -368,7 +358,6 @@ def build_hu_history_entry(
         dynamic_partner = get_partner_for_hu(hu_dynamic)
         dynamic_partner_delta = round(safe_float(hu_dynamic.get("delta")), 2)
 
-        # Fallback: ha nincs country item, legyen mégis score/delta
         if score is None:
             score = main_partner_score
         if delta is None:
@@ -395,11 +384,65 @@ def build_hu_history_entry(
     }
 
 
+def normalize_history_item(item: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """
+    Régi vagy hiányos history elemeket is elfogadunk, ha van date.
+    """
+    date_key = item.get("date")
+    if not date_key:
+        return None
+
+    score = round(safe_float(item.get("score")), 2)
+    delta = round(safe_float(item.get("delta")), 2)
+
+    normalized = {
+        "date": date_key,
+        "updated_at": item.get("updated_at"),
+        "source_report": item.get("source_report", "votes_30d_weekly_report.json"),
+        "score": score,
+        "delta": delta,
+        "relation_label": item.get("relation_label") or relation_label(score),
+        "trend_label": item.get("trend_label") or trend_label(delta),
+        "main_partner": item.get("main_partner"),
+        "main_partner_score": item.get("main_partner_score"),
+        "dynamic_partner": item.get("dynamic_partner"),
+        "dynamic_partner_delta": item.get("dynamic_partner_delta"),
+        "method_note": item.get("method_note", "nincs adat")
+    }
+    return normalized
+
+
 def load_existing_history() -> List[Dict[str, Any]]:
+    """
+    Elsőként a history fájlt próbáljuk beolvasni.
+    Ha az nincs, fallback a chart_data.series.
+    """
     history = load_json(HU_HISTORY_PATH, default=[])
-    if not isinstance(history, list):
-        return []
-    return history
+
+    result: List[Dict[str, Any]] = []
+    if isinstance(history, list):
+        for item in history:
+            if isinstance(item, dict):
+                normalized = normalize_history_item(item)
+                if normalized:
+                    result.append(normalized)
+
+    if result:
+        result.sort(key=lambda x: x.get("date", ""))
+        return result
+
+    chart_payload = load_json(HU_CHART_PATH, default={})
+    series = chart_payload.get("series", []) if isinstance(chart_payload, dict) else []
+
+    fallback_result: List[Dict[str, Any]] = []
+    for item in series:
+        if isinstance(item, dict):
+            normalized = normalize_history_item(item)
+            if normalized:
+                fallback_result.append(normalized)
+
+    fallback_result.sort(key=lambda x: x.get("date", ""))
+    return fallback_result
 
 
 def upsert_history(history: List[Dict[str, Any]], new_entry: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -486,7 +529,7 @@ def build_chart_payload(history: List[Dict[str, Any]]) -> Dict[str, Any]:
     }
 
 
-def main():
+def main() -> None:
     if not REPORT_PATH.exists():
         raise FileNotFoundError(f"Hiányzik a riportfájl: {REPORT_PATH}")
 
@@ -496,13 +539,12 @@ def main():
     country_items = sections.get("country_movements", {}).get("items", []) or []
     pair_items = sections.get("pair_movements", {}).get("items", []) or []
 
-    # 1) Meglévő weekly insight payload - kompatibilis marad
+    # 1) Meglévő weekly insight payload
     payload = build_weekly_insight_payload(report)
-
     save_json(OUTPUT_PATH, payload)
     save_json(DOCS_OUTPUT_PATH, payload)
 
-    # 2) Új HU history
+    # 2) History betöltés + mai adat hozzáadása / frissítése
     history = load_existing_history()
     new_entry = build_hu_history_entry(report, country_items, pair_items)
     history = upsert_history(history, new_entry)
@@ -511,9 +553,8 @@ def main():
     save_json(HU_HISTORY_PATH, history)
     save_json(DOCS_HU_HISTORY_PATH, history)
 
-    # 3) Új HU chart data
+    # 3) Chart payload history alapján
     chart_payload = build_chart_payload(history)
-
     save_json(HU_CHART_PATH, chart_payload)
     save_json(DOCS_HU_CHART_PATH, chart_payload)
 
