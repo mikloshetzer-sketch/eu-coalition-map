@@ -9,16 +9,20 @@
       "weight": 7.0
     },
     {
+      "id": "BG",
+      "weight": 2.0
+    },
+    {
       "id": "DE",
-      "weight": 13.0
+      "weight": 16.0
     },
     {
       "id": "ES",
-      "weight": 12.0
+      "weight": 9.0
     },
     {
       "id": "FR",
-      "weight": 24.0
+      "weight": 18.0
     },
     {
       "id": "GR",
@@ -26,11 +30,11 @@
     },
     {
       "id": "HU",
-      "weight": 15.0
+      "weight": 13.0
     },
     {
       "id": "IE",
-      "weight": 1.0
+      "weight": 2.0
     },
     {
       "id": "IT",
@@ -38,7 +42,7 @@
     },
     {
       "id": "LU",
-      "weight": 1.0
+      "weight": 2.0
     },
     {
       "id": "NL",
@@ -49,12 +53,8 @@
       "weight": 6.0
     },
     {
-      "id": "PT",
-      "weight": 3.0
-    },
-    {
-      "id": "RO",
-      "weight": 3.0
+      "id": "SI",
+      "weight": 2.0
     }
   ],
   "edges": [
@@ -99,6 +99,16 @@
       "weight": 1.0
     },
     {
+      "source": "BG",
+      "target": "DE",
+      "weight": 1.0
+    },
+    {
+      "source": "BG",
+      "target": "SI",
+      "weight": 1.0
+    },
+    {
       "source": "DE",
       "target": "ES",
       "weight": 2.0
@@ -120,6 +130,11 @@
     },
     {
       "source": "DE",
+      "target": "IE",
+      "weight": 1.0
+    },
+    {
+      "source": "DE",
       "target": "IT",
       "weight": 3.0
     },
@@ -134,9 +149,14 @@
       "weight": 1.0
     },
     {
+      "source": "DE",
+      "target": "SI",
+      "weight": 1.0
+    },
+    {
       "source": "ES",
       "target": "FR",
-      "weight": 4.0
+      "weight": 1.0
     },
     {
       "source": "ES",
@@ -166,7 +186,7 @@
     {
       "source": "FR",
       "target": "HU",
-      "weight": 6.0
+      "weight": 3.0
     },
     {
       "source": "FR",
@@ -196,7 +216,7 @@
     {
       "source": "HU",
       "target": "LU",
-      "weight": 1.0
+      "weight": 2.0
     },
     {
       "source": "HU",
@@ -217,13 +237,8 @@
       "source": "NL",
       "target": "PL",
       "weight": 1.0
-    },
-    {
-      "source": "PT",
-      "target": "RO",
-      "weight": 3.0
     }
   ],
-  "event_count": 278,
+  "event_count": 264,
   "mode": "internal"
 }
