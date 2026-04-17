@@ -139,33 +139,55 @@ def extract_hu_pairs(pair_items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     ]
 
 
-def pair_for_partner(pair_items: List[Dict[str, Any]], partner_code: str) -> Optional[Dict[str, Any]]:
-    for p in pair_items:
-        s = p.get("source")
-        t = p.get("target")
-        if (s == "HU" and t == partner_code) or (s == partner_code and t == "HU"):
-            return p
-    return None
+def get_hu_partner_map(hu_country_item: Optional[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
+    """
+    A HU országblokk különböző listáiból (improved / declined / top_changes / gained / lost)
+    összerak egy partner -> adat térképet.
+    """
+    partner_map: Dict[str, Dict[str, Any]] = {}
+
+    if not hu_country_item:
+        return partner_map
+
+    source_lists = [
+        hu_country_item.get("improved_relationships", []) or [],
+        hu_country_item.get("declined_relationships", []) or [],
+        hu_country_item.get("top_changes", []) or [],
+        hu_country_item.get("gained_relationships", []) or [],
+        hu_country_item.get("lost_relationships", []) or [],
+    ]
+
+    for rel_list in source_lists:
+        for item in rel_list:
+            partner = item.get("partner")
+            if not partner:
+                continue
+
+            partner_map[partner] = {
+                "current": round(safe_float(item.get("current_score")), 2),
+                "delta": round(safe_float(item.get("delta")), 2),
+                "status": item.get("status")
+            }
+
+    return partner_map
 
 
-def build_v4_focus(pair_items: List[Dict[str, Any]]) -> Dict[str, Any]:
+def build_v4_focus(hu_country_item: Optional[Dict[str, Any]]) -> Dict[str, Any]:
     partners = ["PL", "CZ", "SK"]
+    partner_map = get_hu_partner_map(hu_country_item)
+
     values: Dict[str, Dict[str, Any]] = {}
     current_scores: List[float] = []
     deltas: List[float] = []
 
     for code in partners:
-        pair = pair_for_partner(pair_items, code)
-        if pair:
-            current = round(safe_float(pair.get("current_score")), 2)
-            delta = round(safe_float(pair.get("delta")), 2)
-            values[code] = {
-                "current": current,
-                "delta": delta,
-                "status": pair.get("status")
-            }
-            current_scores.append(current)
-            deltas.append(delta)
+        item = partner_map.get(code)
+        if item:
+            values[code] = item
+            if item.get("current") is not None:
+                current_scores.append(item["current"])
+            if item.get("delta") is not None:
+                deltas.append(item["delta"])
         else:
             values[code] = {
                 "current": None,
@@ -248,7 +270,11 @@ def load_ukraine_focus() -> Dict[str, Any]:
     }
 
 
-def build_hu_quick_view(hu_country_item: Optional[Dict[str, Any]], v4_focus: Dict[str, Any], ukraine_focus: Dict[str, Any]) -> str:
+def build_hu_quick_view(
+    hu_country_item: Optional[Dict[str, Any]],
+    v4_focus: Dict[str, Any],
+    ukraine_focus: Dict[str, Any]
+) -> str:
     if hu_country_item:
         current = round(safe_float(hu_country_item.get("average_score_current")), 2)
         delta = round(safe_float(hu_country_item.get("average_score_delta")), 2)
@@ -271,7 +297,7 @@ def build_hu_quick_view(hu_country_item: Optional[Dict[str, Any]], v4_focus: Dic
 
 def build_hu_focus_payload(country_items: List[Dict[str, Any]], pair_items: List[Dict[str, Any]]) -> Dict[str, Any]:
     hu_country_item = extract_hu_country_item(country_items)
-    v4_focus = build_v4_focus(pair_items)
+    v4_focus = build_v4_focus(hu_country_item)
     ukraine_focus = load_ukraine_focus()
 
     relation_text = "Magyarország kapcsolati helyzetéhez nincs elég adat."
