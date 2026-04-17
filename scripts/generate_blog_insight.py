@@ -7,11 +7,15 @@ ROOT = Path(__file__).resolve().parent.parent
 
 REPORT_PATH = ROOT / "data" / "reports" / "votes_30d_weekly_report.json"
 
+# Opcionális külön adatforrás Ukrajnához.
+# Ha még nincs ilyen fájlod, a script akkor is működni fog.
+UKRAINE_PATH = ROOT / "data" / "external" / "hu_ukraine_relation.json"
+
 # Meglévő outputok
 OUTPUT_PATH = ROOT / "data" / "eu-weekly-insight.json"
 DOCS_OUTPUT_PATH = ROOT / "docs" / "data" / "eu-weekly-insight.json"
 
-# Új history/chart outputok
+# History/chart outputok
 HU_HISTORY_PATH = ROOT / "data" / "history" / "hu_daily_status.json"
 DOCS_HU_HISTORY_PATH = ROOT / "docs" / "data" / "history" / "hu_daily_status.json"
 
@@ -124,9 +128,203 @@ def forecast_next_days(values: List[float], days: int = 3) -> List[float]:
     return [round(regression_value_at(values, n + i), 2) for i in range(days)]
 
 
+def extract_hu_country_item(country_items: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+    return next((c for c in country_items if c.get("country") == "HU"), None)
+
+
+def extract_hu_pairs(pair_items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    return [
+        p for p in pair_items
+        if p.get("source") == "HU" or p.get("target") == "HU"
+    ]
+
+
+def pair_for_partner(pair_items: List[Dict[str, Any]], partner_code: str) -> Optional[Dict[str, Any]]:
+    for p in pair_items:
+        s = p.get("source")
+        t = p.get("target")
+        if (s == "HU" and t == partner_code) or (s == partner_code and t == "HU"):
+            return p
+    return None
+
+
+def build_v4_focus(pair_items: List[Dict[str, Any]]) -> Dict[str, Any]:
+    partners = ["PL", "CZ", "SK"]
+    values: Dict[str, Dict[str, Any]] = {}
+    current_scores: List[float] = []
+    deltas: List[float] = []
+
+    for code in partners:
+        pair = pair_for_partner(pair_items, code)
+        if pair:
+            current = round(safe_float(pair.get("current_score")), 2)
+            delta = round(safe_float(pair.get("delta")), 2)
+            values[code] = {
+                "current": current,
+                "delta": delta,
+                "status": pair.get("status")
+            }
+            current_scores.append(current)
+            deltas.append(delta)
+        else:
+            values[code] = {
+                "current": None,
+                "delta": None,
+                "status": "missing"
+            }
+
+    average_current = round(sum(current_scores) / len(current_scores), 2) if current_scores else None
+    average_delta = round(sum(deltas) / len(deltas), 2) if deltas else None
+
+    narrative_parts = []
+    for code in partners:
+        current = values[code]["current"]
+        delta = values[code]["delta"]
+        if current is not None and delta is not None:
+            narrative_parts.append(f"{code}: {current:.2f} ({signed(delta)})")
+
+    narrative = (
+        "A V4-en belüli együttmozgás: " + ", ".join(narrative_parts) + "."
+        if narrative_parts else
+        "A V4-kapcsolatokhoz nem áll rendelkezésre elég adat."
+    )
+
+    return {
+        "average_current": average_current,
+        "average_delta": average_delta,
+        "members": values,
+        "narrative": narrative
+    }
+
+
+def load_ukraine_focus() -> Dict[str, Any]:
+    """
+    Opcionális külső forrás HU–Ukrajna kapcsolathoz.
+
+    Elvárt minimális forma például:
+    {
+      "available": true,
+      "value": 42.10,
+      "delta": 3.20,
+      "trend": "javuló",
+      "source_note": "külön adatforrás"
+    }
+
+    vagy
+    {
+      "value": 42.10,
+      "delta": 3.20
+    }
+    """
+    raw = load_json(UKRAINE_PATH, default={})
+    if not isinstance(raw, dict) or not raw:
+        return {
+            "available": False,
+            "value": None,
+            "delta": None,
+            "trend": None,
+            "source_note": "Ukrajnához jelenleg nincs bekötött külön adatforrás."
+        }
+
+    value = raw.get("value")
+    delta = raw.get("delta")
+
+    parsed_value = None if value is None else round(safe_float(value), 2)
+    parsed_delta = None if delta is None else round(safe_float(delta), 2)
+
+    if raw.get("trend"):
+        parsed_trend = raw.get("trend")
+    elif parsed_delta is not None:
+        parsed_trend = trend_label(parsed_delta)
+    else:
+        parsed_trend = None
+
+    return {
+        "available": bool(raw.get("available", parsed_value is not None)),
+        "value": parsed_value,
+        "delta": parsed_delta,
+        "trend": parsed_trend,
+        "source_note": raw.get("source_note", "külön adatforrás")
+    }
+
+
+def build_hu_quick_view(hu_country_item: Optional[Dict[str, Any]], v4_focus: Dict[str, Any], ukraine_focus: Dict[str, Any]) -> str:
+    if hu_country_item:
+        current = round(safe_float(hu_country_item.get("average_score_current")), 2)
+        delta = round(safe_float(hu_country_item.get("average_score_delta")), 2)
+        rel = relation_label(current)
+        tr = trend_label(delta)
+
+        extra = ""
+        if v4_focus.get("average_current") is not None:
+            extra += f" A V4-átlag jelenleg {v4_focus['average_current']:.2f}."
+        if ukraine_focus.get("available") and ukraine_focus.get("value") is not None:
+            extra += f" Az Ukrajnához kapcsolt külön indikátor értéke {ukraine_focus['value']:.2f}."
+
+        return (
+            f"Magyarország rövid távon {tr} pályán van: az aktuális kapcsolati szint "
+            f"{current:.2f}, ami {rel} pozíciónak felel meg.{extra}"
+        )
+
+    return "Magyarországhoz nem áll rendelkezésre országos összegző adat."
+
+
+def build_hu_focus_payload(country_items: List[Dict[str, Any]], pair_items: List[Dict[str, Any]]) -> Dict[str, Any]:
+    hu_country_item = extract_hu_country_item(country_items)
+    v4_focus = build_v4_focus(pair_items)
+    ukraine_focus = load_ukraine_focus()
+
+    relation_text = "Magyarország kapcsolati helyzetéhez nincs elég adat."
+    trend_text = "Magyarország heti irányához nincs elég adat."
+
+    if hu_country_item:
+        current = round(safe_float(hu_country_item.get("average_score_current")), 2)
+        previous = round(safe_float(hu_country_item.get("average_score_previous")), 2)
+        delta = round(safe_float(hu_country_item.get("average_score_delta")), 2)
+        rel = relation_label(current)
+        tr = trend_label(delta)
+
+        relation_text = (
+            f"Magyarország aktuális kapcsolati szintje {current:.2f}, az előző "
+            f"összevetési szint {previous:.2f}; ez összességében {rel} pozíciót jelez."
+        )
+        trend_text = (
+            f"Az országos minta alapján a heti irány {tr}, a változás mértéke {signed(delta)}."
+        )
+
+    regional_summary_parts = []
+
+    if v4_focus.get("average_current") is not None:
+        regional_summary_parts.append(
+            f"A V4-átlag {v4_focus['average_current']:.2f}"
+        )
+
+    if ukraine_focus.get("available") and ukraine_focus.get("value") is not None:
+        ukr_text = f"Ukrajna külön indikátora {ukraine_focus['value']:.2f}"
+        if ukraine_focus.get("delta") is not None:
+            ukr_text += f" ({signed(ukraine_focus['delta'])})"
+        regional_summary_parts.append(ukr_text)
+    else:
+        regional_summary_parts.append("Ukrajnához nincs bekötött külön érték")
+
+    regional_summary = "; ".join(regional_summary_parts) + "."
+
+    return {
+        "quick_view": build_hu_quick_view(hu_country_item, v4_focus, ukraine_focus),
+        "relation": relation_text,
+        "trend": trend_text,
+        "regional_summary": regional_summary,
+        "v4_average": v4_focus.get("average_current"),
+        "v4_average_delta": v4_focus.get("average_delta"),
+        "v4": v4_focus.get("members"),
+        "v4_narrative": v4_focus.get("narrative"),
+        "ukraine": ukraine_focus
+    }
+
+
 def build_weekly_insight_payload(report: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Ez a rész kompatibilis marad a meglévő blog JSON szerkezettel.
+    Kompatibilis marad a meglévő szerkezettel, de a HU blokk tartalma javul.
     """
     sections = report.get("sections", {})
 
@@ -173,82 +371,6 @@ def build_weekly_insight_payload(report: Dict[str, Any]) -> Dict[str, Any]:
             f"{total:.2f} összesített változással."
         )
 
-    hu_pairs = [
-        p for p in pair_items
-        if p.get("source") == "HU" or p.get("target") == "HU"
-    ]
-
-    hu_country_item = next(
-        (c for c in country_items if c.get("country") == "HU"),
-        None
-    )
-
-    hu_main_partner = "nincs kiemelt partner"
-    hu_dynamic_partner = "nincs kiemelt változás"
-    hu_relation = "A vizsgált heti országpár-változások között most nem jelent meg kiemelt HU-fókuszú kapcsolat."
-    hu_trend = "Magyarország heti kapcsolatmintája külön országpárként ezen a listán nem emelkedett ki."
-    hu_summary = (
-        "A heti mintázatban Magyarország nem egyetlen domináns partnerhez kötődik, "
-        "hanem inkább általános szerkezeti elmozdulás figyelhető meg."
-    )
-
-    if hu_pairs:
-        hu_dynamic = max(hu_pairs, key=lambda x: abs(safe_float(x.get("delta"))))
-        hu_strongest = max(hu_pairs, key=lambda x: safe_float(x.get("current_score")))
-
-        dyn_partner = get_partner_for_hu(hu_dynamic)
-        dyn_delta = safe_float(hu_dynamic.get("delta"))
-        dyn_trend = trend_label(dyn_delta)
-
-        str_partner = get_partner_for_hu(hu_strongest)
-        str_score = safe_float(hu_strongest.get("current_score"))
-        str_rel = relation_label(str_score)
-
-        hu_dynamic_partner = f"{dyn_partner} ({signed(dyn_delta)})"
-        hu_main_partner = f"{str_partner} ({str_score:.2f})"
-
-        hu_relation = (
-            f"A legerősebb kapcsolata jelenleg {str_partner} felé látható, "
-            f"{str_score:.2f} értékkel, ami {str_rel} szintnek felel meg."
-        )
-
-        if dyn_trend == "javuló":
-            hu_trend = (
-                f"A legnagyobb heti változás {dyn_partner} irányába történt, "
-                f"javuló mintával ({signed(dyn_delta)})."
-            )
-        elif dyn_trend == "romló":
-            hu_trend = (
-                f"A legnagyobb heti változás {dyn_partner} irányába történt, "
-                f"romló mintával ({signed(dyn_delta)})."
-            )
-        else:
-            hu_trend = (
-                f"A legnagyobb heti változás {dyn_partner} irányába történt, "
-                f"de összességében stabil maradt ({signed(dyn_delta)})."
-            )
-
-        hu_summary = (
-            f"Magyarország kapcsolati képe kettős: legerősebb partnere {str_partner}, "
-            f"miközben a legnagyobb elmozdulás {dyn_partner} irányában történt."
-        )
-
-    elif hu_country_item:
-        delta = safe_float(hu_country_item.get("average_score_delta"))
-        current = safe_float(hu_country_item.get("average_score_current"))
-        rel = relation_label(current)
-        trend = trend_label(delta)
-
-        hu_relation = (
-            f"Magyarország kapcsolati szintje {current:.2f}, ami inkább {rel} pozíció."
-        )
-        hu_trend = (
-            f"Az országos minta alapján a pozíció {trend} irányba mozdult ({signed(delta)})."
-        )
-        hu_summary = (
-            "Nem jelent meg kiemelt HU-országpár, így az országos trend a meghatározó."
-        )
-
     positive_pairs = sorted(
         [p for p in pair_items if safe_float(p.get("delta")) > 0],
         key=lambda x: safe_float(x.get("delta")),
@@ -292,6 +414,8 @@ def build_weekly_insight_payload(report: Dict[str, Any]) -> Dict[str, Any]:
             f"{weekly_topic_total:.2f} összesített elmozdulással."
         )
 
+    hu_focus = build_hu_focus_payload(country_items, pair_items)
+
     return {
         "updated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
         "source_report": "votes_30d_weekly_report.json",
@@ -302,17 +426,11 @@ def build_weekly_insight_payload(report: Dict[str, Any]) -> Dict[str, Any]:
             "top_topic_shift": topic_text,
             "method_note": report.get("method_note", "nincs adat")
         },
-        "hu_focus": {
-            "main_partner": hu_main_partner,
-            "dynamic_partner": hu_dynamic_partner,
-            "relation": hu_relation,
-            "trend": hu_trend,
-            "summary": hu_summary
-        },
+        "hu_focus": hu_focus,
         "weekly_changes": {
             "top_gainer": gainer_text,
             "top_loser": loser_text,
-            "top_topic": weekly_topic_text
+            "top_topic": weekly_topic_text,
         }
     }
 
@@ -325,15 +443,8 @@ def build_hu_history_entry(
     today_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     updated_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
-    hu_country_item = next(
-        (c for c in country_items if c.get("country") == "HU"),
-        None
-    )
-
-    hu_pairs = [
-        p for p in pair_items
-        if p.get("source") == "HU" or p.get("target") == "HU"
-    ]
+    hu_country_item = extract_hu_country_item(country_items)
+    hu_pairs = extract_hu_pairs(pair_items)
 
     score: Optional[float] = None
     delta: Optional[float] = None
@@ -385,9 +496,6 @@ def build_hu_history_entry(
 
 
 def normalize_history_item(item: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-    """
-    Régi vagy hiányos history elemeket is elfogadunk, ha van date.
-    """
     date_key = item.get("date")
     if not date_key:
         return None
@@ -395,7 +503,7 @@ def normalize_history_item(item: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     score = round(safe_float(item.get("score")), 2)
     delta = round(safe_float(item.get("delta")), 2)
 
-    normalized = {
+    return {
         "date": date_key,
         "updated_at": item.get("updated_at"),
         "source_report": item.get("source_report", "votes_30d_weekly_report.json"),
@@ -409,14 +517,9 @@ def normalize_history_item(item: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         "dynamic_partner_delta": item.get("dynamic_partner_delta"),
         "method_note": item.get("method_note", "nincs adat")
     }
-    return normalized
 
 
 def load_existing_history() -> List[Dict[str, Any]]:
-    """
-    Elsőként a history fájlt próbáljuk beolvasni.
-    Ha az nincs, fallback a chart_data.series.
-    """
     history = load_json(HU_HISTORY_PATH, default=[])
 
     result: List[Dict[str, Any]] = []
@@ -539,12 +642,12 @@ def main() -> None:
     country_items = sections.get("country_movements", {}).get("items", []) or []
     pair_items = sections.get("pair_movements", {}).get("items", []) or []
 
-    # 1) Meglévő weekly insight payload
+    # 1) Blog insight payload
     payload = build_weekly_insight_payload(report)
     save_json(OUTPUT_PATH, payload)
     save_json(DOCS_OUTPUT_PATH, payload)
 
-    # 2) History betöltés + mai adat hozzáadása / frissítése
+    # 2) History
     history = load_existing_history()
     new_entry = build_hu_history_entry(report, country_items, pair_items)
     history = upsert_history(history, new_entry)
@@ -553,7 +656,7 @@ def main() -> None:
     save_json(HU_HISTORY_PATH, history)
     save_json(DOCS_HU_HISTORY_PATH, history)
 
-    # 3) Chart payload history alapján
+    # 3) Chart payload
     chart_payload = build_chart_payload(history)
     save_json(HU_CHART_PATH, chart_payload)
     save_json(DOCS_HU_CHART_PATH, chart_payload)
