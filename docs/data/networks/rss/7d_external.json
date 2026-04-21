@@ -1,28 +1,20 @@
 {
   "nodes": [
     {
-      "id": "AT",
-      "weight": 4.0
-    },
-    {
       "id": "BE",
       "weight": 2.0
     },
     {
       "id": "BG",
-      "weight": 21.0
-    },
-    {
-      "id": "CN",
-      "weight": 2.0
+      "weight": 27.0
     },
     {
       "id": "CY",
-      "weight": 3.0
+      "weight": 4.0
     },
     {
       "id": "DE",
-      "weight": 34.0
+      "weight": 40.0
     },
     {
       "id": "EE",
@@ -30,27 +22,31 @@
     },
     {
       "id": "ES",
-      "weight": 12.0
+      "weight": 11.0
     },
     {
       "id": "FR",
-      "weight": 17.0
+      "weight": 16.0
     },
     {
       "id": "GB",
-      "weight": 31.0
+      "weight": 25.0
     },
     {
       "id": "HU",
-      "weight": 51.0
+      "weight": 34.0
     },
     {
       "id": "IE",
-      "weight": 3.0
+      "weight": 4.0
     },
     {
       "id": "IT",
-      "weight": 10.0
+      "weight": 6.0
+    },
+    {
+      "id": "LU",
+      "weight": 2.0
     },
     {
       "id": "NL",
@@ -58,7 +54,7 @@
     },
     {
       "id": "PL",
-      "weight": 5.0
+      "weight": 6.0
     },
     {
       "id": "RU",
@@ -66,7 +62,11 @@
     },
     {
       "id": "SE",
-      "weight": 1.0
+      "weight": 2.0
+    },
+    {
+      "id": "SK",
+      "weight": 2.0
     },
     {
       "id": "UA",
@@ -74,20 +74,10 @@
     },
     {
       "id": "US",
-      "weight": 8.0
+      "weight": 9.0
     }
   ],
   "edges": [
-    {
-      "source": "AT",
-      "target": "GB",
-      "weight": 2.0
-    },
-    {
-      "source": "AT",
-      "target": "RU",
-      "weight": 2.0
-    },
     {
       "source": "BE",
       "target": "RU",
@@ -96,22 +86,17 @@
     {
       "source": "BG",
       "target": "RU",
-      "weight": 19.0
+      "weight": 24.0
     },
     {
       "source": "BG",
       "target": "UA",
-      "weight": 2.0
-    },
-    {
-      "source": "CN",
-      "target": "ES",
-      "weight": 2.0
+      "weight": 3.0
     },
     {
       "source": "CY",
       "target": "RU",
-      "weight": 3.0
+      "weight": 4.0
     },
     {
       "source": "DE",
@@ -121,12 +106,12 @@
     {
       "source": "DE",
       "target": "RU",
-      "weight": 14.0
+      "weight": 17.0
     },
     {
       "source": "DE",
       "target": "UA",
-      "weight": 13.0
+      "weight": 16.0
     },
     {
       "source": "DE",
@@ -141,7 +126,7 @@
     {
       "source": "ES",
       "target": "GB",
-      "weight": 7.0
+      "weight": 8.0
     },
     {
       "source": "ES",
@@ -161,32 +146,32 @@
     {
       "source": "FR",
       "target": "GB",
-      "weight": 5.0
+      "weight": 3.0
     },
     {
       "source": "FR",
       "target": "RU",
-      "weight": 9.0
+      "weight": 8.0
     },
     {
       "source": "FR",
       "target": "UA",
-      "weight": 3.0
+      "weight": 5.0
     },
     {
       "source": "GB",
       "target": "HU",
-      "weight": 5.0
+      "weight": 3.0
     },
     {
       "source": "GB",
       "target": "IE",
-      "weight": 1.0
+      "weight": 2.0
     },
     {
       "source": "GB",
       "target": "IT",
-      "weight": 5.0
+      "weight": 3.0
     },
     {
       "source": "GB",
@@ -201,12 +186,12 @@
     {
       "source": "HU",
       "target": "RU",
-      "weight": 24.0
+      "weight": 17.0
     },
     {
       "source": "HU",
       "target": "UA",
-      "weight": 21.0
+      "weight": 13.0
     },
     {
       "source": "HU",
@@ -226,7 +211,7 @@
     {
       "source": "IT",
       "target": "RU",
-      "weight": 3.0
+      "weight": 1.0
     },
     {
       "source": "IT",
@@ -236,6 +221,16 @@
     {
       "source": "IT",
       "target": "US",
+      "weight": 1.0
+    },
+    {
+      "source": "LU",
+      "target": "RU",
+      "weight": 1.0
+    },
+    {
+      "source": "LU",
+      "target": "UA",
       "weight": 1.0
     },
     {
@@ -266,14 +261,24 @@
     {
       "source": "PL",
       "target": "US",
-      "weight": 1.0
+      "weight": 2.0
     },
     {
       "source": "RU",
       "target": "SE",
+      "weight": 2.0
+    },
+    {
+      "source": "RU",
+      "target": "SK",
+      "weight": 1.0
+    },
+    {
+      "source": "SK",
+      "target": "UA",
       "weight": 1.0
     }
   ],
-  "event_count": 287,
+  "event_count": 278,
   "mode": "external"
 }
