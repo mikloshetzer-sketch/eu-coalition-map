@@ -2,23 +2,23 @@
   "nodes": [
     {
       "id": "BE",
-      "weight": 11.4
+      "weight": 24.9
     },
     {
       "id": "BG",
-      "weight": 2.94
+      "weight": 10.69
     },
     {
       "id": "CN",
-      "weight": 25.82
+      "weight": 41.38
     },
     {
       "id": "CY",
-      "weight": 56.57
+      "weight": 53.07
     },
     {
       "id": "DE",
-      "weight": 52.22
+      "weight": 45.16
     },
     {
       "id": "DK",
@@ -30,15 +30,15 @@
     },
     {
       "id": "ES",
-      "weight": 84.06
+      "weight": 123.03
     },
     {
       "id": "FR",
-      "weight": 84.51
+      "weight": 74.74
     },
     {
       "id": "GB",
-      "weight": 153.18
+      "weight": 139.19
     },
     {
       "id": "GR",
@@ -46,31 +46,31 @@
     },
     {
       "id": "HU",
-      "weight": 49.05
+      "weight": 46.21
     },
     {
       "id": "IE",
-      "weight": 35.03
+      "weight": 8.02
     },
     {
-      "id": "LU",
-      "weight": 15.41
+      "id": "IT",
+      "weight": 4.84
     },
     {
       "id": "MT",
-      "weight": 8.56
+      "weight": 20.06
     },
     {
       "id": "NL",
-      "weight": 36.92
+      "weight": 48.04
     },
     {
       "id": "PL",
-      "weight": 24.19
+      "weight": 34.99
     },
     {
       "id": "RU",
-      "weight": 66.75
+      "weight": 78.25
     },
     {
       "id": "SE",
@@ -82,22 +82,32 @@
     },
     {
       "id": "TR",
-      "weight": 11.8
+      "weight": 8.3
     },
     {
       "id": "UA",
-      "weight": 126.98
+      "weight": 98.23
     },
     {
       "id": "US",
-      "weight": 144.2
+      "weight": 196.27
     }
   ],
   "edges": [
     {
       "source": "BE",
+      "target": "CN",
+      "weight": 2.0
+    },
+    {
+      "source": "BE",
       "target": "RU",
-      "weight": 11.4
+      "weight": 22.9
+    },
+    {
+      "source": "BG",
+      "target": "GB",
+      "weight": 7.75
     },
     {
       "source": "BG",
@@ -107,7 +117,12 @@
     {
       "source": "CN",
       "target": "DE",
-      "weight": 17.52
+      "weight": 26.56
+    },
+    {
+      "source": "CN",
+      "target": "ES",
+      "weight": 4.52
     },
     {
       "source": "CN",
@@ -121,18 +136,13 @@
     },
     {
       "source": "CY",
-      "target": "TR",
-      "weight": 3.5
-    },
-    {
-      "source": "CY",
       "target": "UA",
       "weight": 31.07
     },
     {
       "source": "DE",
       "target": "UA",
-      "weight": 23.1
+      "weight": 7.0
     },
     {
       "source": "DE",
@@ -162,12 +172,12 @@
     {
       "source": "ES",
       "target": "US",
-      "weight": 22.7
+      "weight": 57.15
     },
     {
       "source": "FR",
       "target": "GB",
-      "weight": 46.36
+      "weight": 38.31
     },
     {
       "source": "FR",
@@ -182,7 +192,7 @@
     {
       "source": "FR",
       "target": "US",
-      "weight": 30.25
+      "weight": 28.53
     },
     {
       "source": "GB",
@@ -191,13 +201,8 @@
     },
     {
       "source": "GB",
-      "target": "LU",
-      "weight": 15.41
-    },
-    {
-      "source": "GB",
       "target": "NL",
-      "weight": 2.0
+      "weight": 3.72
     },
     {
       "source": "GR",
@@ -217,17 +222,22 @@
     {
       "source": "HU",
       "target": "UA",
-      "weight": 43.45
+      "weight": 20.0
     },
     {
-      "source": "IE",
+      "source": "HU",
       "target": "US",
-      "weight": 27.01
+      "weight": 20.61
+    },
+    {
+      "source": "IT",
+      "target": "US",
+      "weight": 4.84
     },
     {
       "source": "MT",
       "target": "US",
-      "weight": 8.56
+      "weight": 20.06
     },
     {
       "source": "NL",
@@ -237,7 +247,7 @@
     {
       "source": "NL",
       "target": "US",
-      "weight": 21.52
+      "weight": 30.92
     },
     {
       "source": "PL",
@@ -247,7 +257,7 @@
     {
       "source": "PL",
       "target": "UA",
-      "weight": 13.89
+      "weight": 24.69
     },
     {
       "source": "PL",
@@ -265,6 +275,6 @@
       "weight": 10.6
     }
   ],
-  "event_count": 201,
+  "event_count": 206,
   "mode": "external"
 }
