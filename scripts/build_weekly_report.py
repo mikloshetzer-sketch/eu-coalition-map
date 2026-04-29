@@ -22,6 +22,13 @@ LAYERS = [
 WINDOWS = ["7d", "30d", "90d"]
 MODES = ["all", "internal", "external"]
 
+FOCUS_COUNTRIES = ["HU", "PL", "CZ", "SK"]
+FOCUS_PAIRS = [
+    ("HU", "PL"),
+    ("HU", "CZ"),
+    ("HU", "SK"),
+]
+
 TOPIC_LABELS = {
     "migration": "migráció",
     "ukraine_russia": "Ukrajna / Oroszország",
@@ -47,10 +54,6 @@ MODE_LABELS = {
 }
 
 
-# -----------------------------
-# IO
-# -----------------------------
-
 def load_json(path: Path):
     if not path.exists():
         return None
@@ -74,10 +77,6 @@ def save_json(filename: str, payload: dict):
 
     print("saved report", filename)
 
-
-# -----------------------------
-# HELPERS
-# -----------------------------
 
 def suffix_for_mode(mode: str) -> str:
     if mode == "internal":
@@ -127,17 +126,13 @@ def status_hu(status: str) -> str:
     return mapping.get(status, status)
 
 
-def top_n(items, n, keyfunc):
-    return sorted(items, key=keyfunc, reverse=True)[:n]
-
-
 def top_abs(items, n, field):
     return sorted(items, key=lambda x: abs(safe_float(x.get(field))), reverse=True)[:n]
 
 
-# -----------------------------
-# RELATIONSHIP ANALYSIS
-# -----------------------------
+def pair_key(a: str, b: str) -> str:
+    return "-".join(sorted([a, b]))
+
 
 def summarize_pair_changes(relationship_change: dict):
     if not relationship_change:
@@ -154,8 +149,10 @@ def summarize_pair_changes(relationship_change: dict):
     strongest_pair_moves = top_abs(pair_changes, 8, "delta")
     gained_pairs = [x for x in pair_changes if x.get("status") == "gained"][:8]
     lost_pairs = [x for x in pair_changes if x.get("status") == "lost"][:8]
+
     improved_pairs = [x for x in pair_changes if x.get("status") == "improved"]
     improved_pairs = sorted(improved_pairs, key=lambda x: safe_float(x.get("delta")), reverse=True)[:8]
+
     declined_pairs = [x for x in pair_changes if x.get("status") == "declined"]
     declined_pairs = sorted(declined_pairs, key=lambda x: safe_float(x.get("delta")))[:8]
 
@@ -201,9 +198,39 @@ def summarize_country_changes(relationship_change: dict):
     }
 
 
-# -----------------------------
-# TOPIC ANALYSIS
-# -----------------------------
+def build_focus_block(relationship_change: dict):
+    by_country = relationship_change.get("by_country", []) or []
+    pair_changes = relationship_change.get("pair_changes", []) or []
+
+    country_map = {}
+    for item in by_country:
+        code = item.get("country")
+        if code in FOCUS_COUNTRIES:
+            country_map[code] = item
+
+    pair_map = {}
+    for item in pair_changes:
+        source = item.get("source")
+        target = item.get("target")
+        if not source or not target:
+            continue
+
+        key = pair_key(source, target)
+        for a, b in FOCUS_PAIRS:
+            if key == pair_key(a, b):
+                pair_map[f"{a}-{b}"] = item
+
+    return {
+        "countries": {
+            code: country_map.get(code)
+            for code in FOCUS_COUNTRIES
+        },
+        "pairs": {
+            f"{a}-{b}": pair_map.get(f"{a}-{b}")
+            for a, b in FOCUS_PAIRS
+        }
+    }
+
 
 def summarize_topic_moves(votes_change: dict):
     if not votes_change:
@@ -266,10 +293,6 @@ def summarize_topic_moves(votes_change: dict):
         "country_topic_shifts": country_topic_shifts[:12],
     }
 
-
-# -----------------------------
-# NARRATIVE GENERATION
-# -----------------------------
 
 def build_executive_summary(layer: str, window: str, mode: str, rel_country_summary: dict, rel_pair_summary: dict, topic_summary: dict):
     layer_text = LAYER_LABELS.get(layer, layer)
@@ -374,18 +397,18 @@ def build_topic_narratives(topic_summary: dict):
         examples = item.get("examples", [])[:3]
 
         if examples:
-          example_text = ", ".join(
-              f"{ex['country']} ({signed_text(safe_float(ex['delta']), 3)})"
-              for ex in examples
-          )
-          text = (
-              f"A(z) {topic_name} témában jelentkezett az egyik legerősebb szerkezeti elmozdulás; "
-              f"a leginkább érintett országok: {example_text}."
-          )
+            example_text = ", ".join(
+                f"{ex['country']} ({signed_text(safe_float(ex['delta']), 3)})"
+                for ex in examples
+            )
+            text = (
+                f"A(z) {topic_name} témában jelentkezett az egyik legerősebb szerkezeti elmozdulás; "
+                f"a leginkább érintett országok: {example_text}."
+            )
         else:
-          text = (
-              f"A(z) {topic_name} témában érzékelhető volt a legnagyobb relatív profilmozgás."
-          )
+            text = (
+                f"A(z) {topic_name} témában érzékelhető volt a legnagyobb relatív profilmozgás."
+            )
 
         narratives.append({
             "topic": item.get("topic"),
@@ -411,10 +434,6 @@ def build_method_note(layer: str):
         "megfigyelhető politikai és narratív együttmozgást."
     )
 
-
-# -----------------------------
-# REPORT BUILDER
-# -----------------------------
 
 def build_report(layer: str, window: str, mode: str):
     relationship_change = read_relationship_change(layer, window, mode)
@@ -443,6 +462,7 @@ def build_report(layer: str, window: str, mode: str):
     pair_narratives = build_pair_narratives(rel_pair_summary)
     topic_narratives = build_topic_narratives(topic_summary)
     method_note = build_method_note(layer)
+    focus_block = build_focus_block(relationship_change)
 
     report = {
         "layer": layer,
@@ -453,6 +473,8 @@ def build_report(layer: str, window: str, mode: str):
 
         "executive_summary": executive_summary,
         "method_note": method_note,
+
+        "focus": focus_block,
 
         "sections": {
             "country_movements": {
@@ -483,10 +505,6 @@ def build_report(layer: str, window: str, mode: str):
 
     return report
 
-
-# -----------------------------
-# MAIN
-# -----------------------------
 
 def main():
     for layer in LAYERS:
