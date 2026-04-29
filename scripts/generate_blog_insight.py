@@ -6,16 +6,11 @@ from typing import Any, Dict, List, Optional
 ROOT = Path(__file__).resolve().parent.parent
 
 REPORT_PATH = ROOT / "data" / "reports" / "votes_30d_weekly_report.json"
-
-# Opcionális külön adatforrás Ukrajnához.
-# Ha még nincs ilyen fájlod, a script akkor is működni fog.
 UKRAINE_PATH = ROOT / "data" / "external" / "hu_ukraine_relation.json"
 
-# Meglévő outputok
 OUTPUT_PATH = ROOT / "data" / "eu-weekly-insight.json"
 DOCS_OUTPUT_PATH = ROOT / "docs" / "data" / "eu-weekly-insight.json"
 
-# History/chart outputok
 HU_HISTORY_PATH = ROOT / "data" / "history" / "hu_daily_status.json"
 DOCS_HU_HISTORY_PATH = ROOT / "docs" / "data" / "history" / "hu_daily_status.json"
 
@@ -38,6 +33,8 @@ def save_json(path: Path, payload: Any) -> None:
 
 def safe_float(value: Any, default: float = 0.0) -> float:
     try:
+        if value is None:
+            return default
         return float(value)
     except Exception:
         return default
@@ -63,6 +60,10 @@ def trend_label(delta: float) -> str:
     return "stabil"
 
 
+def pair_key(a: str, b: str) -> str:
+    return "-".join(sorted([a, b]))
+
+
 def get_partner_for_hu(pair: Dict[str, Any]) -> str:
     source = pair.get("source", "?")
     target = pair.get("target", "?")
@@ -74,10 +75,7 @@ def moving_average(values: List[float], window: int) -> List[Optional[float]]:
     for i in range(len(values)):
         start = max(0, i - window + 1)
         chunk = values[start:i + 1]
-        if not chunk:
-            result.append(None)
-        else:
-            result.append(round(sum(chunk) / len(chunk), 2))
+        result.append(round(sum(chunk) / len(chunk), 2) if chunk else None)
     return result
 
 
@@ -98,10 +96,7 @@ def linear_regression_slope(values: List[float]) -> float:
         numerator += dx * dy
         denominator += dx * dx
 
-    if denominator == 0:
-        return 0.0
-
-    return numerator / denominator
+    return numerator / denominator if denominator else 0.0
 
 
 def regression_value_at(values: List[float], x: float) -> float:
@@ -124,76 +119,113 @@ def forecast_next_days(values: List[float], days: int = 3) -> List[float]:
         return []
     if n == 1:
         return [round(values[0], 2) for _ in range(days)]
-
     return [round(regression_value_at(values, n + i), 2) for i in range(days)]
 
 
-def extract_hu_country_item(country_items: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
-    return next((c for c in country_items if c.get("country") == "HU"), None)
+def extract_hu_country_item(country_items: List[Dict[str, Any]], report: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    direct = next((c for c in country_items if c.get("country") == "HU"), None)
+    if direct:
+        return direct
+
+    focus_hu = report.get("focus", {}).get("countries", {}).get("HU")
+    if isinstance(focus_hu, dict):
+        return focus_hu
+
+    return None
 
 
-def extract_hu_pairs(pair_items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    return [
+def extract_hu_pairs(pair_items: List[Dict[str, Any]], report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    result = [
         p for p in pair_items
         if p.get("source") == "HU" or p.get("target") == "HU"
     ]
 
+    focus_pairs = report.get("focus", {}).get("pairs", {})
+    if isinstance(focus_pairs, dict):
+        for item in focus_pairs.values():
+            if isinstance(item, dict):
+                if item.get("source") == "HU" or item.get("target") == "HU":
+                    result.append(item)
 
-def get_hu_partner_map(hu_country_item: Optional[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
-    """
-    A HU országblokk különböző listáiból (improved / declined / top_changes / gained / lost)
-    összerak egy partner -> adat térképet.
-    """
-    partner_map: Dict[str, Dict[str, Any]] = {}
+    seen = set()
+    deduped = []
+    for item in result:
+        source = item.get("source")
+        target = item.get("target")
+        if not source or not target:
+            continue
+        key = pair_key(source, target)
+        if key not in seen:
+            seen.add(key)
+            deduped.append(item)
 
-    if not hu_country_item:
-        return partner_map
-
-    source_lists = [
-        hu_country_item.get("improved_relationships", []) or [],
-        hu_country_item.get("declined_relationships", []) or [],
-        hu_country_item.get("top_changes", []) or [],
-        hu_country_item.get("gained_relationships", []) or [],
-        hu_country_item.get("lost_relationships", []) or [],
-    ]
-
-    for rel_list in source_lists:
-        for item in rel_list:
-            partner = item.get("partner")
-            if not partner:
-                continue
-
-            partner_map[partner] = {
-                "current": round(safe_float(item.get("current_score")), 2),
-                "delta": round(safe_float(item.get("delta")), 2),
-                "status": item.get("status")
-            }
-
-    return partner_map
+    return deduped
 
 
-def build_v4_focus(hu_country_item: Optional[Dict[str, Any]]) -> Dict[str, Any]:
+def pair_to_member_item(pair: Optional[Dict[str, Any]]) -> Dict[str, Any]:
+    if not pair:
+        return {
+            "current": None,
+            "delta": None,
+            "status": "missing"
+        }
+
+    return {
+        "current": round(safe_float(pair.get("current_score")), 2),
+        "delta": round(safe_float(pair.get("delta")), 2),
+        "status": pair.get("status")
+    }
+
+
+def build_v4_focus(report: Dict[str, Any], hu_country_item: Optional[Dict[str, Any]]) -> Dict[str, Any]:
     partners = ["PL", "CZ", "SK"]
-    partner_map = get_hu_partner_map(hu_country_item)
-
     values: Dict[str, Dict[str, Any]] = {}
-    current_scores: List[float] = []
-    deltas: List[float] = []
+
+    focus_pairs = report.get("focus", {}).get("pairs", {}) or {}
 
     for code in partners:
-        item = partner_map.get(code)
-        if item:
-            values[code] = item
-            if item.get("current") is not None:
-                current_scores.append(item["current"])
-            if item.get("delta") is not None:
-                deltas.append(item["delta"])
-        else:
-            values[code] = {
-                "current": None,
-                "delta": None,
-                "status": "missing"
-            }
+        key = f"HU-{code}"
+        pair = focus_pairs.get(key)
+
+        if not pair:
+            # fallback: régi HU országblokk listáiból keresés
+            pair = None
+            if hu_country_item:
+                source_lists = [
+                    hu_country_item.get("improved_relationships", []) or [],
+                    hu_country_item.get("declined_relationships", []) or [],
+                    hu_country_item.get("top_changes", []) or [],
+                    hu_country_item.get("gained_relationships", []) or [],
+                    hu_country_item.get("lost_relationships", []) or [],
+                ]
+                for rel_list in source_lists:
+                    for item in rel_list:
+                        if item.get("partner") == code:
+                            pair = {
+                                "source": "HU",
+                                "target": code,
+                                "current_score": item.get("current_score"),
+                                "previous_score": item.get("previous_score"),
+                                "delta": item.get("delta"),
+                                "status": item.get("status")
+                            }
+                            break
+                    if pair:
+                        break
+
+        values[code] = pair_to_member_item(pair)
+
+    current_scores = [
+        item["current"]
+        for item in values.values()
+        if item.get("current") is not None
+    ]
+
+    deltas = [
+        item["delta"]
+        for item in values.values()
+        if item.get("delta") is not None
+    ]
 
     average_current = round(sum(current_scores) / len(current_scores), 2) if current_scores else None
     average_delta = round(sum(deltas) / len(deltas), 2) if deltas else None
@@ -220,25 +252,8 @@ def build_v4_focus(hu_country_item: Optional[Dict[str, Any]]) -> Dict[str, Any]:
 
 
 def load_ukraine_focus() -> Dict[str, Any]:
-    """
-    Opcionális külső forrás HU–Ukrajna kapcsolathoz.
-
-    Elvárt minimális forma például:
-    {
-      "available": true,
-      "value": 42.10,
-      "delta": 3.20,
-      "trend": "javuló",
-      "source_note": "külön adatforrás"
-    }
-
-    vagy
-    {
-      "value": 42.10,
-      "delta": 3.20
-    }
-    """
     raw = load_json(UKRAINE_PATH, default={})
+
     if not isinstance(raw, dict) or not raw:
         return {
             "available": False,
@@ -292,16 +307,26 @@ def build_hu_quick_view(
             f"{current:.2f}, ami {rel} pozíciónak felel meg.{extra}"
         )
 
+    if v4_focus.get("average_current") is not None:
+        return (
+            f"Magyarországhoz külön országos összegző sor nem szerepel a heti TOP-listában, "
+            f"de a V4-kapcsolatok alapján a regionális átlag {v4_focus['average_current']:.2f}."
+        )
+
     return "Magyarországhoz nem áll rendelkezésre országos összegző adat."
 
 
-def build_hu_focus_payload(country_items: List[Dict[str, Any]], pair_items: List[Dict[str, Any]]) -> Dict[str, Any]:
-    hu_country_item = extract_hu_country_item(country_items)
-    v4_focus = build_v4_focus(hu_country_item)
+def build_hu_focus_payload(
+    report: Dict[str, Any],
+    country_items: List[Dict[str, Any]],
+    pair_items: List[Dict[str, Any]]
+) -> Dict[str, Any]:
+    hu_country_item = extract_hu_country_item(country_items, report)
+    v4_focus = build_v4_focus(report, hu_country_item)
     ukraine_focus = load_ukraine_focus()
 
-    relation_text = "Magyarország kapcsolati helyzetéhez nincs elég adat."
-    trend_text = "Magyarország heti irányához nincs elég adat."
+    relation_text = "Magyarország kapcsolati helyzetéhez nincs elég országos adat."
+    trend_text = "Magyarország heti irányához nincs elég országos adat."
 
     if hu_country_item:
         current = round(safe_float(hu_country_item.get("average_score_current")), 2)
@@ -324,6 +349,8 @@ def build_hu_focus_payload(country_items: List[Dict[str, Any]], pair_items: List
         regional_summary_parts.append(
             f"A V4-átlag {v4_focus['average_current']:.2f}"
         )
+    else:
+        regional_summary_parts.append("A V4-átlag nem számolható a jelenlegi bemenetből")
 
     if ukraine_focus.get("available") and ukraine_focus.get("value") is not None:
         ukr_text = f"Ukrajna külön indikátora {ukraine_focus['value']:.2f}"
@@ -349,9 +376,6 @@ def build_hu_focus_payload(country_items: List[Dict[str, Any]], pair_items: List
 
 
 def build_weekly_insight_payload(report: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Kompatibilis marad a meglévő szerkezettel, de a HU blokk tartalma javul.
-    """
     sections = report.get("sections", {})
 
     country_items = sections.get("country_movements", {}).get("items", []) or []
@@ -440,7 +464,7 @@ def build_weekly_insight_payload(report: Dict[str, Any]) -> Dict[str, Any]:
             f"{weekly_topic_total:.2f} összesített elmozdulással."
         )
 
-    hu_focus = build_hu_focus_payload(country_items, pair_items)
+    hu_focus = build_hu_focus_payload(report, country_items, pair_items)
 
     return {
         "updated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
@@ -469,8 +493,8 @@ def build_hu_history_entry(
     today_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     updated_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
-    hu_country_item = extract_hu_country_item(country_items)
-    hu_pairs = extract_hu_pairs(pair_items)
+    hu_country_item = extract_hu_country_item(country_items, report)
+    hu_pairs = extract_hu_pairs(pair_items, report)
 
     score: Optional[float] = None
     delta: Optional[float] = None
@@ -668,12 +692,10 @@ def main() -> None:
     country_items = sections.get("country_movements", {}).get("items", []) or []
     pair_items = sections.get("pair_movements", {}).get("items", []) or []
 
-    # 1) Blog insight payload
     payload = build_weekly_insight_payload(report)
     save_json(OUTPUT_PATH, payload)
     save_json(DOCS_OUTPUT_PATH, payload)
 
-    # 2) History
     history = load_existing_history()
     new_entry = build_hu_history_entry(report, country_items, pair_items)
     history = upsert_history(history, new_entry)
@@ -682,7 +704,6 @@ def main() -> None:
     save_json(HU_HISTORY_PATH, history)
     save_json(DOCS_HU_HISTORY_PATH, history)
 
-    # 3) Chart payload
     chart_payload = build_chart_payload(history)
     save_json(HU_CHART_PATH, chart_payload)
     save_json(DOCS_HU_CHART_PATH, chart_payload)
