@@ -166,14 +166,35 @@ def pair_to_member_item(pair: Optional[Dict[str, Any]]) -> Dict[str, Any]:
     if not pair:
         return {
             "current": None,
+            "previous": None,
             "delta": None,
-            "status": "missing"
+            "status": "missing",
+            "display_value": None,
+            "display_note": "nincs adat"
+        }
+
+    status = pair.get("status")
+    current = round(safe_float(pair.get("current_score")), 2)
+    previous = round(safe_float(pair.get("previous_score")), 2)
+    delta = round(safe_float(pair.get("delta")), 2)
+
+    if status == "lost" and current == 0.0 and previous > 0:
+        return {
+            "current": None,
+            "previous": previous,
+            "delta": delta,
+            "status": status,
+            "display_value": previous,
+            "display_note": "korábbi érték, aktuális mérés nincs"
         }
 
     return {
-        "current": round(safe_float(pair.get("current_score")), 2),
-        "delta": round(safe_float(pair.get("delta")), 2),
-        "status": pair.get("status")
+        "current": current,
+        "previous": previous,
+        "delta": delta,
+        "status": status,
+        "display_value": current,
+        "display_note": "aktuális érték"
     }
 
 
@@ -188,7 +209,6 @@ def build_v4_focus(report: Dict[str, Any], hu_country_item: Optional[Dict[str, A
         pair = focus_pairs.get(key)
 
         if not pair:
-            # fallback: régi HU országblokk listáiból keresés
             pair = None
             if hu_country_item:
                 source_lists = [
@@ -215,10 +235,10 @@ def build_v4_focus(report: Dict[str, Any], hu_country_item: Optional[Dict[str, A
 
         values[code] = pair_to_member_item(pair)
 
-    current_scores = [
-        item["current"]
+    display_scores = [
+        item["display_value"]
         for item in values.values()
-        if item.get("current") is not None
+        if item.get("display_value") is not None
     ]
 
     deltas = [
@@ -227,15 +247,20 @@ def build_v4_focus(report: Dict[str, Any], hu_country_item: Optional[Dict[str, A
         if item.get("delta") is not None
     ]
 
-    average_current = round(sum(current_scores) / len(current_scores), 2) if current_scores else None
+    average_current = round(sum(display_scores) / len(display_scores), 2) if display_scores else None
     average_delta = round(sum(deltas) / len(deltas), 2) if deltas else None
 
     narrative_parts = []
     for code in partners:
-        current = values[code]["current"]
-        delta = values[code]["delta"]
-        if current is not None and delta is not None:
-            narrative_parts.append(f"{code}: {current:.2f} ({signed(delta)})")
+        display_value = values[code].get("display_value")
+        delta = values[code].get("delta")
+        note = values[code].get("display_note")
+
+        if display_value is not None and delta is not None:
+            if note == "korábbi érték, aktuális mérés nincs":
+                narrative_parts.append(f"{code}: korábbi {display_value:.2f} ({signed(delta)})")
+            else:
+                narrative_parts.append(f"{code}: {display_value:.2f} ({signed(delta)})")
 
     narrative = (
         "A V4-en belüli együttmozgás: " + ", ".join(narrative_parts) + "."
@@ -292,25 +317,37 @@ def build_hu_quick_view(
 ) -> str:
     if hu_country_item:
         current = round(safe_float(hu_country_item.get("average_score_current")), 2)
+        previous = round(safe_float(hu_country_item.get("average_score_previous")), 2)
         delta = round(safe_float(hu_country_item.get("average_score_delta")), 2)
-        rel = relation_label(current)
-        tr = trend_label(delta)
+
+        if current == 0.0 and previous > 0:
+            rel = relation_label(previous)
+            tr = trend_label(delta)
+            base = (
+                f"Magyarország esetében az aktuális votes-mérésben nincs mérhető országos kapcsolati érték; "
+                f"a legutóbbi mérhető összevetési szint {previous:.2f}, ami {rel} pozíciónak felel meg. "
+                f"A heti változás jelzése {tr} ({signed(delta)})."
+            )
+        else:
+            rel = relation_label(current)
+            tr = trend_label(delta)
+            base = (
+                f"Magyarország rövid távon {tr} pályán van: az aktuális kapcsolati szint "
+                f"{current:.2f}, ami {rel} pozíciónak felel meg."
+            )
 
         extra = ""
         if v4_focus.get("average_current") is not None:
-            extra += f" A V4-átlag jelenleg {v4_focus['average_current']:.2f}."
+            extra += f" A V4-átlag jelenleg / utolsó mérhető értéken {v4_focus['average_current']:.2f}."
         if ukraine_focus.get("available") and ukraine_focus.get("value") is not None:
             extra += f" Az Ukrajnához kapcsolt külön indikátor értéke {ukraine_focus['value']:.2f}."
 
-        return (
-            f"Magyarország rövid távon {tr} pályán van: az aktuális kapcsolati szint "
-            f"{current:.2f}, ami {rel} pozíciónak felel meg.{extra}"
-        )
+        return base + extra
 
     if v4_focus.get("average_current") is not None:
         return (
             f"Magyarországhoz külön országos összegző sor nem szerepel a heti TOP-listában, "
-            f"de a V4-kapcsolatok alapján a regionális átlag {v4_focus['average_current']:.2f}."
+            f"de a V4-kapcsolatok alapján a regionális átlag / utolsó mérhető érték {v4_focus['average_current']:.2f}."
         )
 
     return "Magyarországhoz nem áll rendelkezésre országos összegző adat."
@@ -332,22 +369,34 @@ def build_hu_focus_payload(
         current = round(safe_float(hu_country_item.get("average_score_current")), 2)
         previous = round(safe_float(hu_country_item.get("average_score_previous")), 2)
         delta = round(safe_float(hu_country_item.get("average_score_delta")), 2)
-        rel = relation_label(current)
-        tr = trend_label(delta)
 
-        relation_text = (
-            f"Magyarország aktuális kapcsolati szintje {current:.2f}, az előző "
-            f"összevetési szint {previous:.2f}; ez összességében {rel} pozíciót jelez."
-        )
-        trend_text = (
-            f"Az országos minta alapján a heti irány {tr}, a változás mértéke {signed(delta)}."
-        )
+        if current == 0.0 and previous > 0:
+            rel = relation_label(previous)
+            tr = trend_label(delta)
+            relation_text = (
+                f"Az aktuális votes-időablakban Magyarországnál nincs mérhető országos kapcsolati érték; "
+                f"a korábbi mérhető összevetési szint {previous:.2f}, ami {rel} pozíciót jelez."
+            )
+            trend_text = (
+                f"A heti változás technikailag {signed(delta)}, de ez főként azt mutatja, "
+                f"hogy az aktuális időablakból kiesett a korábban mérhető kapcsolatmintázat. Irány: {tr}."
+            )
+        else:
+            rel = relation_label(current)
+            tr = trend_label(delta)
+            relation_text = (
+                f"Magyarország aktuális kapcsolati szintje {current:.2f}, az előző "
+                f"összevetési szint {previous:.2f}; ez összességében {rel} pozíciót jelez."
+            )
+            trend_text = (
+                f"Az országos minta alapján a heti irány {tr}, a változás mértéke {signed(delta)}."
+            )
 
     regional_summary_parts = []
 
     if v4_focus.get("average_current") is not None:
         regional_summary_parts.append(
-            f"A V4-átlag {v4_focus['average_current']:.2f}"
+            f"A V4-átlag / utolsó mérhető érték {v4_focus['average_current']:.2f}"
         )
     else:
         regional_summary_parts.append("A V4-átlag nem számolható a jelenlegi bemenetből")
@@ -506,15 +555,33 @@ def build_hu_history_entry(
     dynamic_partner_delta: Optional[float] = None
 
     if hu_country_item:
-        score = round(safe_float(hu_country_item.get("average_score_current")), 2)
-        delta = round(safe_float(hu_country_item.get("average_score_delta")), 2)
+        current = round(safe_float(hu_country_item.get("average_score_current")), 2)
+        previous = round(safe_float(hu_country_item.get("average_score_previous")), 2)
+        raw_delta = round(safe_float(hu_country_item.get("average_score_delta")), 2)
+
+        if current == 0.0 and previous > 0:
+            score = previous
+            delta = raw_delta
+        else:
+            score = current
+            delta = raw_delta
 
     if hu_pairs:
-        hu_strongest = max(hu_pairs, key=lambda x: safe_float(x.get("current_score")))
+        hu_strongest = max(
+            hu_pairs,
+            key=lambda x: safe_float(x.get("previous_score")) if x.get("status") == "lost" else safe_float(x.get("current_score"))
+        )
         hu_dynamic = max(hu_pairs, key=lambda x: abs(safe_float(x.get("delta"))))
 
         main_partner = get_partner_for_hu(hu_strongest)
-        main_partner_score = round(safe_float(hu_strongest.get("current_score")), 2)
+
+        strongest_current = safe_float(hu_strongest.get("current_score"))
+        strongest_previous = safe_float(hu_strongest.get("previous_score"))
+
+        if hu_strongest.get("status") == "lost" and strongest_current == 0.0 and strongest_previous > 0:
+            main_partner_score = round(strongest_previous, 2)
+        else:
+            main_partner_score = round(strongest_current, 2)
 
         dynamic_partner = get_partner_for_hu(hu_dynamic)
         dynamic_partner_delta = round(safe_float(hu_dynamic.get("delta")), 2)
