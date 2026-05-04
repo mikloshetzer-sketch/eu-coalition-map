@@ -2,7 +2,7 @@
   "nodes": [
     {
       "id": "BE",
-      "weight": 49.04
+      "weight": 58.84
     },
     {
       "id": "BG",
@@ -14,7 +14,7 @@
     },
     {
       "id": "DE",
-      "weight": 101.16
+      "weight": 113.32
     },
     {
       "id": "DK",
@@ -26,11 +26,11 @@
     },
     {
       "id": "FI",
-      "weight": 31.7
+      "weight": 35.6
     },
     {
       "id": "FR",
-      "weight": 75.45
+      "weight": 89.41
     },
     {
       "id": "GR",
@@ -42,15 +42,19 @@
     },
     {
       "id": "IE",
-      "weight": 43.0
+      "weight": 47.34
     },
     {
       "id": "IT",
-      "weight": 2.0
+      "weight": 16.04
     },
     {
       "id": "LT",
       "weight": 21.32
+    },
+    {
+      "id": "MT",
+      "weight": 14.04
     },
     {
       "id": "NL",
@@ -58,11 +62,11 @@
     },
     {
       "id": "PL",
-      "weight": 11.71
+      "weight": 15.61
     },
     {
       "id": "PT",
-      "weight": 16.92
+      "weight": 21.26
     },
     {
       "id": "RO",
@@ -84,8 +88,18 @@
   "edges": [
     {
       "source": "BE",
+      "target": "DE",
+      "weight": 4.0
+    },
+    {
+      "source": "BE",
       "target": "ES",
       "weight": 13.0
+    },
+    {
+      "source": "BE",
+      "target": "FR",
+      "weight": 5.8
     },
     {
       "source": "BE",
@@ -125,7 +139,7 @@
     {
       "source": "DE",
       "target": "FR",
-      "weight": 23.82
+      "weight": 31.98
     },
     {
       "source": "DE",
@@ -204,6 +218,11 @@
     },
     {
       "source": "FI",
+      "target": "PL",
+      "weight": 3.9
+    },
+    {
+      "source": "FI",
       "target": "PT",
       "weight": 3.7
     },
@@ -253,6 +272,16 @@
       "weight": 7.0
     },
     {
+      "source": "IE",
+      "target": "PT",
+      "weight": 4.34
+    },
+    {
+      "source": "IT",
+      "target": "MT",
+      "weight": 14.04
+    },
+    {
       "source": "LT",
       "target": "NL",
       "weight": 5.0
@@ -263,6 +292,6 @@
       "weight": 7.3
     }
   ],
-  "event_count": 531,
+  "event_count": 582,
   "mode": "internal"
 }
