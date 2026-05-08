@@ -2,11 +2,11 @@
   "nodes": [
     {
       "id": "BE",
-      "weight": 2.0
+      "weight": 3.0
     },
     {
       "id": "DE",
-      "weight": 19.0
+      "weight": 13.0
     },
     {
       "id": "DK",
@@ -26,11 +26,11 @@
     },
     {
       "id": "FR",
-      "weight": 1.0
+      "weight": 4.0
     },
     {
       "id": "HU",
-      "weight": 5.0
+      "weight": 2.0
     },
     {
       "id": "IT",
@@ -38,7 +38,7 @@
     },
     {
       "id": "LT",
-      "weight": 16.0
+      "weight": 6.0
     },
     {
       "id": "LV",
@@ -46,7 +46,7 @@
     },
     {
       "id": "NL",
-      "weight": 16.0
+      "weight": 6.0
     },
     {
       "id": "PT",
@@ -58,17 +58,22 @@
     },
     {
       "id": "SE",
-      "weight": 6.0
+      "weight": 8.0
     },
     {
       "id": "SK",
-      "weight": 5.0
+      "weight": 2.0
     }
   ],
   "edges": [
     {
       "source": "BE",
       "target": "ES",
+      "weight": 1.0
+    },
+    {
+      "source": "BE",
+      "target": "FR",
       "weight": 1.0
     },
     {
@@ -84,6 +89,11 @@
     {
       "source": "DE",
       "target": "FR",
+      "weight": 2.0
+    },
+    {
+      "source": "DE",
+      "target": "HU",
       "weight": 1.0
     },
     {
@@ -93,13 +103,13 @@
     },
     {
       "source": "DE",
-      "target": "LT",
-      "weight": 5.0
+      "target": "SE",
+      "weight": 1.0
     },
     {
       "source": "DE",
-      "target": "NL",
-      "weight": 5.0
+      "target": "SK",
+      "weight": 1.0
     },
     {
       "source": "DK",
@@ -192,9 +202,14 @@
       "weight": 1.0
     },
     {
+      "source": "FR",
+      "target": "SE",
+      "weight": 1.0
+    },
+    {
       "source": "HU",
       "target": "SK",
-      "weight": 5.0
+      "weight": 1.0
     },
     {
       "source": "IT",
@@ -209,7 +224,7 @@
     {
       "source": "LT",
       "target": "NL",
-      "weight": 6.0
+      "weight": 1.0
     },
     {
       "source": "LT",
@@ -232,6 +247,6 @@
       "weight": 1.0
     }
   ],
-  "event_count": 278,
+  "event_count": 246,
   "mode": "internal"
 }
