@@ -60,6 +60,7 @@ def fetch_text(url: str, xml: bool = False, timeout: int = 45) -> str:
 
 def load_json_list(path: Path):
     if not path.exists():
+        print("WARNING: Missing reference file:", path)
         return []
 
     try:
@@ -154,6 +155,37 @@ def parse_first_valid_xml(xml_urls):
     return None, None
 
 
+def debug_xml_structure(root, max_tags: int = 120):
+    print("\n=== XML TAG DEBUG START ===")
+
+    seen = set()
+    count = 0
+
+    for el in root.iter():
+        tag = strip_ns(el.tag)
+
+        if tag in seen:
+            continue
+
+        seen.add(tag)
+        count += 1
+
+        print("TAG:", tag)
+
+        if el.attrib:
+            print("ATTRS:", el.attrib)
+
+        text = (el.text or "").strip()
+        if text:
+            print("TEXT:", text[:200])
+
+        if count >= max_tags:
+            print("TAG DEBUG LIMIT REACHED:", max_tags)
+            break
+
+    print("=== XML TAG DEBUG END ===\n")
+
+
 def possible_vote_blocks(root):
     blocks = []
 
@@ -192,14 +224,97 @@ def detect_vote_section_tag(tag: str):
     return None
 
 
-def extract_member_vote_candidates(block):
-    """
-    Fontos javítás:
-    Az eredeti verzió az egész result.for / result.against blokk szövegét
-    egyetlen névként olvasta ki az itertext() miatt.
-    Ez a verzió csak tényleges személy-elemekből próbál nevet kiolvasni.
-    """
+def looks_like_single_person_name(text: str) -> bool:
+    if not text:
+        return False
 
+    normalized = normalize_person_name(text)
+    parts = normalized.split()
+
+    if len(parts) < 2:
+        return False
+
+    # Ha túl sok token van, az már valószínűleg nem egy ember neve,
+    # hanem több képviselőből álló blokk.
+    if len(parts) > 8:
+        return False
+
+    if len(normalized) < 5:
+        return False
+
+    return True
+
+
+def extract_names_from_attributes(section, vote):
+    out = []
+
+    name_attrs = [
+        "name",
+        "fullname",
+        "fullName",
+        "mepname",
+        "membername",
+        "persname",
+        "Name",
+        "PersName",
+        "MemberName",
+    ]
+
+    for el in section.iter():
+        if el is section:
+            continue
+
+        raw_name = get_attr_case_insensitive(el, name_attrs)
+
+        if not raw_name:
+            continue
+
+        if not looks_like_single_person_name(raw_name):
+            continue
+
+        out.append({
+            "raw": raw_name,
+            "normalized": normalize_person_name(raw_name),
+            "vote": vote,
+            "tag": strip_ns(el.tag).lower(),
+            "attrs": dict(el.attrib),
+        })
+
+    return out
+
+
+def extract_names_from_leaf_text(section, vote):
+    out = []
+
+    for el in section.iter():
+        if el is section:
+            continue
+
+        # Csak levél-elemek közvetlen szövegét nézzük.
+        # Nem használunk itertext()-et, mert az összefűzi az egész blokkot.
+        if list(el):
+            continue
+
+        raw_name = (el.text or "").strip()
+
+        if not raw_name:
+            continue
+
+        if not looks_like_single_person_name(raw_name):
+            continue
+
+        out.append({
+            "raw": raw_name,
+            "normalized": normalize_person_name(raw_name),
+            "vote": vote,
+            "tag": strip_ns(el.tag).lower(),
+            "attrs": dict(el.attrib),
+        })
+
+    return out
+
+
+def extract_member_vote_candidates(block):
     out = []
 
     for section in block.iter():
@@ -209,57 +324,19 @@ def extract_member_vote_candidates(block):
         if vote not in {"for", "against", "abstain"}:
             continue
 
-        for el in section.iter():
-            tag = strip_ns(el.tag).lower()
-
-            if el is section:
-                continue
-
-            raw_name = get_attr_case_insensitive(
-                el,
-                [
-                    "name",
-                    "fullname",
-                    "fullName",
-                    "mepname",
-                    "membername",
-                    "persname",
-                    "Name",
-                ],
-            )
-
-            if not raw_name:
-                direct_text = (el.text or "").strip()
-
-                # Csak közvetlen szöveget fogadunk el, nem teljes itertext blokkot.
-                # Így nem fog több száz képviselőt egy mezőbe összefűzni.
-                if direct_text and len(direct_text.split()) <= 5:
-                    raw_name = direct_text
-
-            if not raw_name:
-                continue
-
-            normalized = normalize_person_name(raw_name)
-
-            if len(normalized.split()) < 2:
-                continue
-
-            if len(normalized) < 5:
-                continue
-
-            # Kiszűri azokat a hibás eseteket, amikor mégis egy egész lista kerülne be.
-            if len(normalized.split()) > 8:
-                continue
-
-            out.append({
-                "raw": raw_name,
-                "normalized": normalized,
-                "vote": vote,
-                "tag": tag,
-                "attrs": dict(el.attrib),
-            })
+        out.extend(extract_names_from_attributes(section, vote))
+        out.extend(extract_names_from_leaf_text(section, vote))
 
     return out
+
+
+def write_json(results):
+    OUT_FILE.parent.mkdir(parents=True, exist_ok=True)
+
+    with OUT_FILE.open("w", encoding="utf-8") as f:
+        json.dump(results, f, ensure_ascii=False, indent=2)
+
+    print("Mentve:", OUT_FILE)
 
 
 def main():
@@ -273,39 +350,36 @@ def main():
         if key and key not in mep_lookup:
             mep_lookup[key] = item
 
+    print("MEP reference count:", len(mep_lookup))
+
     xml_urls = find_xml_links()
 
     print("XML linkek száma:", len(xml_urls))
 
     if not xml_urls:
         print("Nincs XML link.")
-        OUT_FILE.parent.mkdir(parents=True, exist_ok=True)
-
-        with OUT_FILE.open("w", encoding="utf-8") as f:
-            json.dump([], f, ensure_ascii=False, indent=2)
-
-        print("Üres debug fájl mentve:", OUT_FILE)
+        write_json([])
         return
 
     first_xml, root = parse_first_valid_xml(xml_urls)
 
     if root is None:
         print("Nem sikerült érvényes XML-t feldolgozni.")
-        OUT_FILE.parent.mkdir(parents=True, exist_ok=True)
-
-        with OUT_FILE.open("w", encoding="utf-8") as f:
-            json.dump([], f, ensure_ascii=False, indent=2)
-
-        print("Üres debug fájl mentve:", OUT_FILE)
+        write_json([])
         return
 
     blocks = possible_vote_blocks(root)
+
+    print("Vizsgált XML:", first_xml)
+    print("Vote blokkok száma:", len(blocks))
 
     results = []
     seen = set()
 
     for block_index, block in enumerate(blocks, start=1):
         candidates = extract_member_vote_candidates(block)
+
+        print(f"Block {block_index}: candidates:", len(candidates))
 
         for c in candidates:
             key = (block_index, c["normalized"], c["vote"])
@@ -336,16 +410,20 @@ def main():
         if len(results) >= 200:
             break
 
-    OUT_FILE.parent.mkdir(parents=True, exist_ok=True)
+    if not results:
+        print("WARNING: Nem sikerült egyetlen képviselőnevet sem kinyerni.")
+        print("Most kiírom az XML szerkezetét a pontos parser javításhoz.")
+        debug_xml_structure(root)
 
-    with OUT_FILE.open("w", encoding="utf-8") as f:
-        json.dump(results, f, ensure_ascii=False, indent=2)
+    write_json(results)
 
-    print("Mentve:", OUT_FILE)
-    print("Vizsgált XML:", first_xml)
-    print("Vote blokkok száma:", len(blocks))
     print("Találatok száma:", len(results))
     print("Egyezések száma:", sum(1 for r in results if r["matched"]))
+
+    if results:
+        print("Első 5 találat:")
+        for item in results[:5]:
+            print(json.dumps(item, ensure_ascii=False))
 
 
 if __name__ == "__main__":
