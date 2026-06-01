@@ -2,7 +2,7 @@
   "nodes": [
     {
       "id": "BE",
-      "weight": 9.3
+      "weight": 43.32
     },
     {
       "id": "CY",
@@ -10,7 +10,7 @@
     },
     {
       "id": "DE",
-      "weight": 5.8
+      "weight": 89.8
     },
     {
       "id": "EE",
@@ -18,7 +18,7 @@
     },
     {
       "id": "ES",
-      "weight": 84.11
+      "weight": 96.71
     },
     {
       "id": "FI",
@@ -26,7 +26,7 @@
     },
     {
       "id": "FR",
-      "weight": 16.43
+      "weight": 34.63
     },
     {
       "id": "HU",
@@ -42,7 +42,7 @@
     },
     {
       "id": "LT",
-      "weight": 17.28
+      "weight": 24.28
     },
     {
       "id": "LV",
@@ -50,11 +50,11 @@
     },
     {
       "id": "NL",
-      "weight": 15.52
+      "weight": 45.92
     },
     {
       "id": "PL",
-      "weight": 10.54
+      "weight": 72.96
     },
     {
       "id": "PT",
@@ -63,9 +63,18 @@
     {
       "id": "SE",
       "weight": 6.24
+    },
+    {
+      "id": "SI",
+      "weight": 12.6
     }
   ],
   "edges": [
+    {
+      "source": "BE",
+      "target": "DE",
+      "weight": 15.2
+    },
     {
       "source": "BE",
       "target": "ES",
@@ -77,14 +86,34 @@
       "weight": 6.5
     },
     {
+      "source": "BE",
+      "target": "PL",
+      "weight": 18.82
+    },
+    {
       "source": "CY",
       "target": "NL",
       "weight": 3.8
     },
     {
       "source": "DE",
+      "target": "FR",
+      "weight": 18.2
+    },
+    {
+      "source": "DE",
+      "target": "LT",
+      "weight": 7.0
+    },
+    {
+      "source": "DE",
       "target": "NL",
-      "weight": 5.8
+      "weight": 21.0
+    },
+    {
+      "source": "DE",
+      "target": "PL",
+      "weight": 28.4
     },
     {
       "source": "EE",
@@ -122,6 +151,11 @@
       "weight": 9.4
     },
     {
+      "source": "ES",
+      "target": "SI",
+      "weight": 12.6
+    },
+    {
       "source": "FI",
       "target": "PL",
       "weight": 5.44
@@ -150,8 +184,13 @@
       "source": "LT",
       "target": "LV",
       "weight": 10.04
+    },
+    {
+      "source": "NL",
+      "target": "PL",
+      "weight": 15.2
     }
   ],
-  "event_count": 151,
+  "event_count": 194,
   "mode": "internal"
 }
