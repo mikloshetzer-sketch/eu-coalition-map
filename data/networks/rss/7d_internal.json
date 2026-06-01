@@ -2,7 +2,7 @@
   "nodes": [
     {
       "id": "BE",
-      "weight": 3.0
+      "weight": 4.0
     },
     {
       "id": "CY",
@@ -29,6 +29,10 @@
       "weight": 1.0
     },
     {
+      "id": "IT",
+      "weight": 1.0
+    },
+    {
       "id": "LT",
       "weight": 3.0
     },
@@ -42,7 +46,7 @@
     },
     {
       "id": "PL",
-      "weight": 4.0
+      "weight": 5.0
     },
     {
       "id": "RO",
@@ -50,14 +54,14 @@
     },
     {
       "id": "SE",
-      "weight": 3.0
+      "weight": 2.0
     }
   ],
   "edges": [
     {
       "source": "BE",
       "target": "PL",
-      "weight": 3.0
+      "weight": 4.0
     },
     {
       "source": "CY",
@@ -121,8 +125,13 @@
     },
     {
       "source": "FR",
+      "target": "IT",
+      "weight": 1.0
+    },
+    {
+      "source": "FR",
       "target": "SE",
-      "weight": 2.0
+      "weight": 1.0
     },
     {
       "source": "LT",
@@ -145,6 +154,6 @@
       "weight": 1.0
     }
   ],
-  "event_count": 337,
+  "event_count": 384,
   "mode": "internal"
 }
