@@ -1,8 +1,20 @@
 {
   "nodes": [
     {
+      "id": "AT",
+      "weight": 4.0
+    },
+    {
       "id": "BE",
       "weight": 1.0
+    },
+    {
+      "id": "CN",
+      "weight": 2.0
+    },
+    {
+      "id": "CY",
+      "weight": 4.0
     },
     {
       "id": "CZ",
@@ -10,7 +22,7 @@
     },
     {
       "id": "DE",
-      "weight": 12.0
+      "weight": 18.0
     },
     {
       "id": "DK",
@@ -30,60 +42,118 @@
     },
     {
       "id": "FR",
-      "weight": 11.0
+      "weight": 22.0
     },
     {
       "id": "GB",
-      "weight": 1.0
-    },
-    {
-      "id": "GR",
-      "weight": 1.0
+      "weight": 10.0
     },
     {
       "id": "HU",
-      "weight": 7.0
-    },
-    {
-      "id": "IT",
       "weight": 5.0
     },
     {
+      "id": "IE",
+      "weight": 1.0
+    },
+    {
+      "id": "IT",
+      "weight": 6.0
+    },
+    {
       "id": "NL",
-      "weight": 3.0
+      "weight": 7.0
     },
     {
       "id": "PL",
-      "weight": 11.0
+      "weight": 13.0
+    },
+    {
+      "id": "RO",
+      "weight": 4.0
     },
     {
       "id": "RU",
-      "weight": 25.0
+      "weight": 32.0
     },
     {
       "id": "SE",
-      "weight": 2.0
+      "weight": 1.0
+    },
+    {
+      "id": "SK",
+      "weight": 4.0
     },
     {
       "id": "TR",
-      "weight": 25.0
+      "weight": 23.0
     },
     {
       "id": "UA",
-      "weight": 43.0
+      "weight": 55.0
     },
     {
       "id": "US",
-      "weight": 8.0
+      "weight": 17.0
     }
   ],
   "edges": [
+    {
+      "source": "AT",
+      "target": "GB",
+      "weight": 1.0
+    },
+    {
+      "source": "AT",
+      "target": "RU",
+      "weight": 1.0
+    },
+    {
+      "source": "AT",
+      "target": "UA",
+      "weight": 1.0
+    },
+    {
+      "source": "AT",
+      "target": "US",
+      "weight": 1.0
+    },
     {
       "source": "BE",
       "target": "TR",
       "weight": 1.0
     },
     {
+      "source": "CN",
+      "target": "DE",
+      "weight": 1.0
+    },
+    {
+      "source": "CN",
+      "target": "IT",
+      "weight": 1.0
+    },
+    {
+      "source": "CY",
+      "target": "GB",
+      "weight": 1.0
+    },
+    {
+      "source": "CY",
+      "target": "RU",
+      "weight": 1.0
+    },
+    {
+      "source": "CY",
+      "target": "UA",
+      "weight": 1.0
+    },
+    {
+      "source": "CY",
+      "target": "US",
+      "weight": 1.0
+    },
+    {
       "source": "CZ",
       "target": "TR",
       "weight": 2.0
@@ -95,18 +165,28 @@
     },
     {
       "source": "DE",
+      "target": "GB",
+      "weight": 1.0
+    },
+    {
+      "source": "DE",
+      "target": "RU",
+      "weight": 2.0
+    },
+    {
+      "source": "DE",
       "target": "TR",
       "weight": 2.0
     },
     {
       "source": "DE",
       "target": "UA",
-      "weight": 9.0
+      "weight": 10.0
     },
     {
       "source": "DE",
       "target": "US",
-      "weight": 1.0
+      "weight": 2.0
     },
     {
       "source": "DK",
@@ -160,8 +240,13 @@
     },
     {
       "source": "FI",
+      "target": "GB",
+      "weight": 1.0
+    },
+    {
+      "source": "FI",
       "target": "RU",
-      "weight": 3.0
+      "weight": 1.0
     },
     {
       "source": "FI",
@@ -169,14 +254,19 @@
       "weight": 1.0
     },
     {
-      "source": "FR",
-      "target": "GB",
+      "source": "FI",
+      "target": "US",
       "weight": 1.0
     },
     {
       "source": "FR",
-      "target": "RU",
+      "target": "GB",
       "weight": 2.0
+    },
+    {
+      "source": "FR",
+      "target": "RU",
+      "weight": 7.0
     },
     {
       "source": "FR",
@@ -186,26 +276,31 @@
     {
       "source": "FR",
       "target": "UA",
-      "weight": 6.0
+      "weight": 10.0
     },
     {
       "source": "FR",
       "target": "US",
+      "weight": 2.0
+    },
+    {
+      "source": "GB",
+      "target": "NL",
       "weight": 1.0
     },
     {
-      "source": "GR",
-      "target": "RU",
+      "source": "GB",
+      "target": "PL",
       "weight": 1.0
     },
     {
-      "source": "HU",
-      "target": "RU",
+      "source": "GB",
+      "target": "RO",
       "weight": 1.0
     },
     {
-      "source": "HU",
-      "target": "TR",
+      "source": "GB",
+      "target": "SK",
       "weight": 1.0
     },
     {
@@ -214,6 +309,11 @@
       "weight": 5.0
     },
     {
+      "source": "IE",
+      "target": "UA",
+      "weight": 1.0
+    },
+    {
       "source": "IT",
       "target": "RU",
       "weight": 3.0
@@ -226,7 +326,7 @@
     {
       "source": "NL",
       "target": "RU",
-      "weight": 1.0
+      "weight": 2.0
     },
     {
       "source": "NL",
@@ -236,6 +336,11 @@
     {
       "source": "NL",
       "target": "UA",
+      "weight": 2.0
+    },
+    {
+      "source": "NL",
+      "target": "US",
       "weight": 1.0
     },
     {
@@ -245,20 +350,50 @@
     },
     {
       "source": "PL",
-      "target": "TR",
-      "weight": 1.0
+      "target": "UA",
+      "weight": 5.0
     },
     {
       "source": "PL",
+      "target": "US",
+      "weight": 1.0
+    },
+    {
+      "source": "RO",
+      "target": "RU",
+      "weight": 1.0
+    },
+    {
+      "source": "RO",
       "target": "UA",
-      "weight": 4.0
+      "weight": 1.0
+    },
+    {
+      "source": "RO",
+      "target": "US",
+      "weight": 1.0
     },
     {
       "source": "RU",
       "target": "SE",
-      "weight": 2.0
+      "weight": 1.0
+    },
+    {
+      "source": "RU",
+      "target": "SK",
+      "weight": 1.0
+    },
+    {
+      "source": "SK",
+      "target": "UA",
+      "weight": 1.0
+    },
+    {
+      "source": "SK",
+      "target": "US",
+      "weight": 1.0
     }
   ],
-  "event_count": 253,
+  "event_count": 254,
   "mode": "external"
 }
