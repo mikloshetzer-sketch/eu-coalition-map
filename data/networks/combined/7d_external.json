@@ -2,7 +2,7 @@
   "nodes": [
     {
       "id": "AT",
-      "weight": 3.8
+      "weight": 4.8
     },
     {
       "id": "BE",
@@ -10,11 +10,11 @@
     },
     {
       "id": "CN",
-      "weight": 31.58
+      "weight": 19.58
     },
     {
       "id": "CY",
-      "weight": 14.2
+      "weight": 13.2
     },
     {
       "id": "CZ",
@@ -22,7 +22,7 @@
     },
     {
       "id": "DE",
-      "weight": 93.62
+      "weight": 85.62
     },
     {
       "id": "DK",
@@ -34,19 +34,19 @@
     },
     {
       "id": "ES",
-      "weight": 54.44
+      "weight": 55.44
     },
     {
       "id": "FR",
-      "weight": 174.45
+      "weight": 155.45
     },
     {
       "id": "GB",
-      "weight": 173.47
+      "weight": 172.47
     },
     {
       "id": "GR",
-      "weight": 41.13
+      "weight": 43.13
     },
     {
       "id": "HU",
@@ -58,7 +58,7 @@
     },
     {
       "id": "IT",
-      "weight": 16.49
+      "weight": 17.49
     },
     {
       "id": "MT",
@@ -70,19 +70,23 @@
     },
     {
       "id": "PL",
-      "weight": 25.0
+      "weight": 21.0
     },
     {
       "id": "PT",
       "weight": 64.49
     },
     {
+      "id": "RO",
+      "weight": 3.0
+    },
+    {
       "id": "RU",
-      "weight": 86.12
+      "weight": 80.12
     },
     {
       "id": "SE",
-      "weight": 14.9
+      "weight": 4.9
     },
     {
       "id": "TR",
@@ -90,18 +94,18 @@
     },
     {
       "id": "UA",
-      "weight": 103.02
+      "weight": 87.02
     },
     {
       "id": "US",
-      "weight": 242.34
+      "weight": 243.34
     }
   ],
   "edges": [
     {
       "source": "AT",
       "target": "RU",
-      "weight": 1.0
+      "weight": 2.0
     },
     {
       "source": "AT",
@@ -116,12 +120,12 @@
     {
       "source": "CN",
       "target": "DE",
-      "weight": 12.5
+      "weight": 6.5
     },
     {
       "source": "CN",
       "target": "FR",
-      "weight": 8.54
+      "weight": 2.54
     },
     {
       "source": "CN",
@@ -136,7 +140,7 @@
     {
       "source": "CY",
       "target": "UA",
-      "weight": 6.0
+      "weight": 5.0
     },
     {
       "source": "CY",
@@ -156,7 +160,7 @@
     {
       "source": "DE",
       "target": "RU",
-      "weight": 5.0
+      "weight": 6.0
     },
     {
       "source": "DE",
@@ -166,7 +170,7 @@
     {
       "source": "DE",
       "target": "UA",
-      "weight": 8.8
+      "weight": 5.8
     },
     {
       "source": "DE",
@@ -190,23 +194,28 @@
     },
     {
       "source": "ES",
+      "target": "RU",
+      "weight": 1.0
+    },
+    {
+      "source": "ES",
       "target": "UA",
       "weight": 7.32
     },
     {
       "source": "FR",
       "target": "GB",
-      "weight": 24.92
+      "weight": 23.92
     },
     {
       "source": "FR",
       "target": "RU",
-      "weight": 39.8
+      "weight": 34.8
     },
     {
       "source": "FR",
       "target": "UA",
-      "weight": 27.1
+      "weight": 20.1
     },
     {
       "source": "FR",
@@ -236,12 +245,12 @@
     {
       "source": "GR",
       "target": "RU",
-      "weight": 5.42
+      "weight": 6.42
     },
     {
       "source": "GR",
       "target": "UA",
-      "weight": 18.0
+      "weight": 19.0
     },
     {
       "source": "GR",
@@ -271,7 +280,7 @@
     {
       "source": "IT",
       "target": "RU",
-      "weight": 1.0
+      "weight": 2.0
     },
     {
       "source": "IT",
@@ -296,12 +305,12 @@
     {
       "source": "PL",
       "target": "RU",
-      "weight": 3.0
+      "weight": 1.0
     },
     {
       "source": "PL",
       "target": "UA",
-      "weight": 22.0
+      "weight": 20.0
     },
     {
       "source": "PT",
@@ -314,16 +323,21 @@
       "weight": 2.4
     },
     {
-      "source": "RU",
-      "target": "SE",
-      "weight": 5.0
+      "source": "RO",
+      "target": "RU",
+      "weight": 1.0
     },
     {
-      "source": "SE",
+      "source": "RO",
       "target": "UA",
-      "weight": 5.0
+      "weight": 1.0
+    },
+    {
+      "source": "RO",
+      "target": "US",
+      "weight": 1.0
     }
   ],
-  "event_count": 417,
+  "event_count": 405,
   "mode": "external"
 }
