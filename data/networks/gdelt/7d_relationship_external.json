@@ -2,8 +2,8 @@
   "layer": "gdelt",
   "mode": "external",
   "window_days": 7,
-  "pair_count": 66,
-  "country_count": 18,
+  "pair_count": 77,
+  "country_count": 20,
   "weights": {
     "direct": 0.5,
     "similarity": 0.3,
@@ -22,15 +22,70 @@
       "similarity_weight": 0.842
     },
     {
+      "source": "FR",
+      "target": "US",
+      "score": 76.43,
+      "band": "high",
+      "direct_score": 55.41,
+      "similarity_score": 99.6,
+      "topic_score": 94.21,
+      "direct_weight": 42.89,
+      "similarity_weight": 0.996
+    },
+    {
+      "source": "ES",
+      "target": "US",
+      "score": 72.19,
+      "band": "high",
+      "direct_score": 47.45,
+      "similarity_score": 99.3,
+      "topic_score": 93.39,
+      "direct_weight": 36.73,
+      "similarity_weight": 0.993
+    },
+    {
+      "source": "GB",
+      "target": "IE",
+      "score": 63.32,
+      "band": "high",
+      "direct_score": 36.64,
+      "similarity_score": 96.0,
+      "topic_score": 81.01,
+      "direct_weight": 28.36,
+      "similarity_weight": 0.96
+    },
+    {
+      "source": "FR",
+      "target": "GB",
+      "score": 62.7,
+      "band": "high",
+      "direct_score": 31.94,
+      "similarity_score": 98.3,
+      "topic_score": 86.2,
+      "direct_weight": 24.72,
+      "similarity_weight": 0.983
+    },
+    {
       "source": "IE",
       "target": "US",
-      "score": 62.69,
+      "score": 62.46,
       "band": "high",
       "direct_score": 27.24,
-      "similarity_score": 99.7,
-      "topic_score": 95.79,
+      "similarity_score": 99.6,
+      "topic_score": 94.79,
       "direct_weight": 21.08,
-      "similarity_weight": 0.997
+      "similarity_weight": 0.996
+    },
+    {
+      "source": "GB",
+      "target": "IT",
+      "score": 61.88,
+      "band": "high",
+      "direct_score": 45.28,
+      "similarity_score": 87.6,
+      "topic_score": 64.8,
+      "direct_weight": 35.05,
+      "similarity_weight": 0.876
     },
     {
       "source": "BG",
@@ -44,37 +99,15 @@
       "similarity_weight": 0.777
     },
     {
-      "source": "GB",
-      "target": "IT",
-      "score": 60.28,
-      "band": "high",
-      "direct_score": 45.28,
-      "similarity_score": 85.1,
-      "topic_score": 60.53,
-      "direct_weight": 35.05,
-      "similarity_weight": 0.851
-    },
-    {
-      "source": "ES",
-      "target": "US",
-      "score": 57.46,
+      "source": "CN",
+      "target": "FR",
+      "score": 55.89,
       "band": "medium",
-      "direct_score": 40.32,
-      "similarity_score": 83.9,
-      "topic_score": 60.62,
-      "direct_weight": 31.21,
-      "similarity_weight": 0.839
-    },
-    {
-      "source": "FR",
-      "target": "US",
-      "score": 57.06,
-      "band": "medium",
-      "direct_score": 18.07,
-      "similarity_score": 99.1,
-      "topic_score": 91.46,
-      "direct_weight": 13.99,
-      "similarity_weight": 0.991
+      "direct_score": 14.94,
+      "similarity_score": 99.3,
+      "topic_score": 93.14,
+      "direct_weight": 11.56,
+      "similarity_weight": 0.993
     },
     {
       "source": "BE",
@@ -88,96 +121,63 @@
       "similarity_weight": 0.889
     },
     {
-      "source": "FR",
-      "target": "GB",
-      "score": 54.81,
-      "band": "medium",
-      "direct_score": 31.94,
-      "similarity_score": 86.0,
-      "topic_score": 65.2,
-      "direct_weight": 24.72,
-      "similarity_weight": 0.86
-    },
-    {
-      "source": "CN",
-      "target": "FR",
-      "score": 54.46,
-      "band": "medium",
-      "direct_score": 14.94,
-      "similarity_score": 98.2,
-      "topic_score": 87.68,
-      "direct_weight": 11.56,
-      "similarity_weight": 0.982
-    },
-    {
       "source": "CN",
       "target": "DE",
-      "score": 52.56,
+      "score": 54.5,
       "band": "medium",
-      "direct_score": 7.8,
-      "similarity_score": 99.4,
-      "topic_score": 94.17,
-      "direct_weight": 6.04,
-      "similarity_weight": 0.994
+      "direct_score": 11.16,
+      "similarity_score": 99.6,
+      "topic_score": 95.21,
+      "direct_weight": 8.64,
+      "similarity_weight": 0.996
+    },
+    {
+      "source": "ES",
+      "target": "GB",
+      "score": 52.2,
+      "band": "medium",
+      "direct_score": 11.76,
+      "similarity_score": 98.5,
+      "topic_score": 83.84,
+      "direct_weight": 9.1,
+      "similarity_weight": 0.985
+    },
+    {
+      "source": "DE",
+      "target": "GB",
+      "score": 50.63,
+      "band": "medium",
+      "direct_score": 14.5,
+      "similarity_score": 93.5,
+      "topic_score": 76.67,
+      "direct_weight": 11.22,
+      "similarity_weight": 0.935
+    },
+    {
+      "source": "GB",
+      "target": "RO",
+      "score": 50.63,
+      "band": "medium",
+      "direct_score": 9.06,
+      "similarity_score": 98.7,
+      "topic_score": 82.45,
+      "direct_weight": 7.01,
+      "similarity_weight": 0.987
     },
     {
       "source": "GB",
       "target": "NL",
-      "score": 51.11,
+      "score": 50.11,
       "band": "medium",
       "direct_score": 8.01,
-      "similarity_score": 99.5,
-      "topic_score": 86.28,
+      "similarity_score": 98.7,
+      "topic_score": 82.45,
       "direct_weight": 6.2,
-      "similarity_weight": 0.995
-    },
-    {
-      "source": "DK",
-      "target": "RU",
-      "score": 50.0,
-      "band": "medium",
-      "direct_score": 0.0,
-      "similarity_score": 100.0,
-      "topic_score": 100.0,
-      "direct_weight": 0.0,
-      "similarity_weight": 1.0
+      "similarity_weight": 0.987
     },
     {
       "source": "DK",
       "target": "TR",
-      "score": 50.0,
-      "band": "medium",
-      "direct_score": 0.0,
-      "similarity_score": 100.0,
-      "topic_score": 100.0,
-      "direct_weight": 0.0,
-      "similarity_weight": 1.0
-    },
-    {
-      "source": "ES",
-      "target": "RU",
-      "score": 50.0,
-      "band": "medium",
-      "direct_score": 0.0,
-      "similarity_score": 100.0,
-      "topic_score": 100.0,
-      "direct_weight": 0.0,
-      "similarity_weight": 1.0
-    },
-    {
-      "source": "ES",
-      "target": "TR",
-      "score": 50.0,
-      "band": "medium",
-      "direct_score": 0.0,
-      "similarity_score": 100.0,
-      "topic_score": 100.0,
-      "direct_weight": 0.0,
-      "similarity_weight": 1.0
-    },
-    {
-      "source": "LT",
-      "target": "RU",
       "score": 50.0,
       "band": "medium",
       "direct_score": 0.0,
@@ -199,17 +199,6 @@
     },
     {
       "source": "NL",
-      "target": "RU",
-      "score": 50.0,
-      "band": "medium",
-      "direct_score": 0.0,
-      "similarity_score": 100.0,
-      "topic_score": 100.0,
-      "direct_weight": 0.0,
-      "similarity_weight": 1.0
-    },
-    {
-      "source": "NL",
       "target": "TR",
       "score": 50.0,
       "band": "medium",
@@ -220,125 +209,114 @@
       "similarity_weight": 1.0
     },
     {
-      "source": "DE",
-      "target": "US",
-      "score": 49.86,
+      "source": "RO",
+      "target": "TR",
+      "score": 50.0,
       "band": "medium",
       "direct_score": 0.0,
       "similarity_score": 100.0,
-      "topic_score": 99.31,
+      "topic_score": 100.0,
+      "direct_weight": 0.0,
+      "similarity_weight": 1.0
+    },
+    {
+      "source": "CN",
+      "target": "IE",
+      "score": 49.91,
+      "band": "medium",
+      "direct_score": 0.0,
+      "similarity_score": 100.0,
+      "topic_score": 99.54,
       "direct_weight": 0.0,
       "similarity_weight": 1.0
     },
     {
       "source": "BG",
       "target": "CN",
-      "score": 49.54,
+      "score": 48.84,
       "band": "medium",
       "direct_score": 0.0,
-      "similarity_score": 99.9,
-      "topic_score": 97.83,
+      "similarity_score": 99.6,
+      "topic_score": 94.8,
       "direct_weight": 0.0,
-      "similarity_weight": 0.999
+      "similarity_weight": 0.996
+    },
+    {
+      "source": "DE",
+      "target": "US",
+      "score": 47.73,
+      "band": "medium",
+      "direct_score": 0.0,
+      "similarity_score": 98.8,
+      "topic_score": 90.46,
+      "direct_weight": 0.0,
+      "similarity_weight": 0.988
     },
     {
       "source": "BG",
       "target": "US",
-      "score": 49.35,
+      "score": 47.59,
       "band": "medium",
       "direct_score": 0.0,
-      "similarity_score": 99.8,
-      "topic_score": 97.04,
+      "similarity_score": 98.6,
+      "topic_score": 90.05,
       "direct_weight": 0.0,
-      "similarity_weight": 0.998
+      "similarity_weight": 0.986
     },
     {
       "source": "CN",
-      "target": "IE",
-      "score": 47.65,
+      "target": "ES",
+      "score": 47.16,
       "band": "medium",
       "direct_score": 0.0,
-      "similarity_score": 98.4,
-      "topic_score": 90.66,
+      "similarity_score": 98.1,
+      "topic_score": 88.64,
       "direct_weight": 0.0,
-      "similarity_weight": 0.984
-    },
-    {
-      "source": "GB",
-      "target": "IE",
-      "score": 47.57,
-      "band": "medium",
-      "direct_score": 19.19,
-      "similarity_score": 84.0,
-      "topic_score": 63.86,
-      "direct_weight": 14.85,
-      "similarity_weight": 0.84
-    },
-    {
-      "source": "IT",
-      "target": "US",
-      "score": 47.56,
-      "band": "medium",
-      "direct_score": 6.07,
-      "similarity_score": 94.8,
-      "topic_score": 80.41,
-      "direct_weight": 4.7,
-      "similarity_weight": 0.948
+      "similarity_weight": 0.981
     },
     {
       "source": "CN",
       "target": "IT",
-      "score": 47.18,
+      "score": 46.91,
       "band": "medium",
       "direct_score": 5.61,
-      "similarity_score": 94.3,
-      "topic_score": 80.41,
+      "similarity_score": 93.7,
+      "topic_score": 79.99,
       "direct_weight": 4.34,
-      "similarity_weight": 0.943
+      "similarity_weight": 0.937
     },
     {
       "source": "DK",
       "target": "GB",
-      "score": 47.11,
+      "score": 46.1,
       "band": "medium",
       "direct_score": 0.0,
-      "similarity_score": 99.5,
-      "topic_score": 86.28,
+      "similarity_score": 98.7,
+      "topic_score": 82.45,
       "direct_weight": 0.0,
-      "similarity_weight": 0.995
-    },
-    {
-      "source": "ES",
-      "target": "GB",
-      "score": 47.11,
-      "band": "medium",
-      "direct_score": 0.0,
-      "similarity_score": 99.5,
-      "topic_score": 86.28,
-      "direct_weight": 0.0,
-      "similarity_weight": 0.995
+      "similarity_weight": 0.987
     },
     {
       "source": "GB",
       "target": "LT",
-      "score": 47.11,
+      "score": 46.1,
       "band": "medium",
       "direct_score": 0.0,
-      "similarity_score": 99.5,
-      "topic_score": 86.28,
+      "similarity_score": 98.7,
+      "topic_score": 82.45,
       "direct_weight": 0.0,
-      "similarity_weight": 0.995
+      "similarity_weight": 0.987
     },
     {
-      "source": "DE",
-      "target": "GB",
-      "score": 46.97,
+      "source": "IT",
+      "target": "US",
+      "score": 45.83,
       "band": "medium",
-      "direct_score": 14.5,
-      "similarity_score": 87.5,
-      "topic_score": 67.38,
-      "direct_weight": 11.22,
-      "similarity_weight": 0.875
+      "direct_score": 6.07,
+      "similarity_score": 92.5,
+      "topic_score": 75.24,
+      "direct_weight": 4.7,
+      "similarity_weight": 0.925
     },
     {
       "source": "BG",
@@ -352,26 +330,136 @@
       "similarity_weight": 0.868
     },
     {
-      "source": "BG",
-      "target": "RU",
-      "score": 44.05,
+      "source": "DK",
+      "target": "US",
+      "score": 44.78,
       "band": "medium",
-      "direct_score": 10.59,
-      "similarity_score": 86.8,
-      "topic_score": 63.59,
-      "direct_weight": 8.2,
-      "similarity_weight": 0.868
+      "direct_score": 5.58,
+      "similarity_score": 93.4,
+      "topic_score": 69.85,
+      "direct_weight": 4.32,
+      "similarity_weight": 0.934
+    },
+    {
+      "source": "ES",
+      "target": "RU",
+      "score": 44.41,
+      "band": "medium",
+      "direct_score": 0.0,
+      "similarity_score": 94.6,
+      "topic_score": 80.14,
+      "direct_weight": 0.0,
+      "similarity_weight": 0.946
     },
     {
       "source": "CN",
       "target": "LT",
-      "score": 42.93,
+      "score": 44.25,
       "band": "medium",
       "direct_score": 6.33,
-      "similarity_score": 88.7,
-      "topic_score": 65.76,
+      "similarity_score": 91.1,
+      "topic_score": 68.78,
       "direct_weight": 4.9,
-      "similarity_weight": 0.887
+      "similarity_weight": 0.911
+    },
+    {
+      "source": "DK",
+      "target": "RU",
+      "score": 43.56,
+      "band": "medium",
+      "direct_score": 0.0,
+      "similarity_score": 95.0,
+      "topic_score": 75.28,
+      "direct_weight": 0.0,
+      "similarity_weight": 0.95
+    },
+    {
+      "source": "LT",
+      "target": "RU",
+      "score": 43.56,
+      "band": "medium",
+      "direct_score": 0.0,
+      "similarity_score": 95.0,
+      "topic_score": 75.28,
+      "direct_weight": 0.0,
+      "similarity_weight": 0.95
+    },
+    {
+      "source": "NL",
+      "target": "RU",
+      "score": 43.56,
+      "band": "medium",
+      "direct_score": 0.0,
+      "similarity_score": 95.0,
+      "topic_score": 75.28,
+      "direct_weight": 0.0,
+      "similarity_weight": 0.95
+    },
+    {
+      "source": "RO",
+      "target": "RU",
+      "score": 43.56,
+      "band": "medium",
+      "direct_score": 0.0,
+      "similarity_score": 95.0,
+      "topic_score": 75.28,
+      "direct_weight": 0.0,
+      "similarity_weight": 0.95
+    },
+    {
+      "source": "RO",
+      "target": "US",
+      "score": 43.48,
+      "band": "medium",
+      "direct_score": 2.97,
+      "similarity_score": 93.4,
+      "topic_score": 69.85,
+      "direct_weight": 2.3,
+      "similarity_weight": 0.934
+    },
+    {
+      "source": "BG",
+      "target": "GB",
+      "score": 43.21,
+      "band": "medium",
+      "direct_score": 0.0,
+      "similarity_score": 93.2,
+      "topic_score": 76.27,
+      "direct_weight": 0.0,
+      "similarity_weight": 0.932
+    },
+    {
+      "source": "ES",
+      "target": "TR",
+      "score": 42.91,
+      "band": "medium",
+      "direct_score": 0.0,
+      "similarity_score": 95.6,
+      "topic_score": 71.15,
+      "direct_weight": 0.0,
+      "similarity_weight": 0.956
+    },
+    {
+      "source": "BG",
+      "target": "RU",
+      "score": 42.73,
+      "band": "medium",
+      "direct_score": 10.59,
+      "similarity_score": 82.4,
+      "topic_score": 63.59,
+      "direct_weight": 8.2,
+      "similarity_weight": 0.824
+    },
+    {
+      "source": "FR",
+      "target": "TR",
+      "score": 42.29,
+      "band": "medium",
+      "direct_score": 0.0,
+      "similarity_score": 94.2,
+      "topic_score": 70.17,
+      "direct_weight": 0.0,
+      "similarity_weight": 0.942
     },
     {
       "source": "CZ",
@@ -385,136 +473,136 @@
       "similarity_weight": 0.76
     },
     {
-      "source": "BG",
-      "target": "GB",
-      "score": 41.39,
-      "band": "medium",
-      "direct_score": 0.0,
-      "similarity_score": 90.6,
-      "topic_score": 71.03,
-      "direct_weight": 0.0,
-      "similarity_weight": 0.906
-    },
-    {
-      "source": "DK",
-      "target": "US",
-      "score": 40.09,
-      "band": "medium",
-      "direct_score": 5.58,
-      "similarity_score": 83.9,
-      "topic_score": 60.62,
-      "direct_weight": 4.32,
-      "similarity_weight": 0.839
-    },
-    {
-      "source": "FR",
-      "target": "UA",
-      "score": 39.84,
-      "band": "low",
-      "direct_score": 0.0,
-      "similarity_score": 85.4,
-      "topic_score": 71.08,
-      "direct_weight": 0.0,
-      "similarity_weight": 0.854
-    },
-    {
-      "source": "CN",
-      "target": "DK",
-      "score": 39.76,
-      "band": "low",
-      "direct_score": 0.0,
-      "similarity_score": 88.7,
-      "topic_score": 65.76,
-      "direct_weight": 0.0,
-      "similarity_weight": 0.887
-    },
-    {
-      "source": "CN",
-      "target": "ES",
-      "score": 39.76,
-      "band": "low",
-      "direct_score": 0.0,
-      "similarity_score": 88.7,
-      "topic_score": 65.76,
-      "direct_weight": 0.0,
-      "similarity_weight": 0.887
-    },
-    {
-      "source": "CN",
-      "target": "NL",
-      "score": 39.76,
-      "band": "low",
-      "direct_score": 0.0,
-      "similarity_score": 88.7,
-      "topic_score": 65.76,
-      "direct_weight": 0.0,
-      "similarity_weight": 0.887
-    },
-    {
-      "source": "DE",
-      "target": "UA",
-      "score": 39.46,
-      "band": "low",
-      "direct_score": 4.13,
-      "similarity_score": 81.6,
-      "topic_score": 64.58,
-      "direct_weight": 3.2,
-      "similarity_weight": 0.816
-    },
-    {
-      "source": "IE",
-      "target": "UA",
-      "score": 39.12,
-      "band": "low",
-      "direct_score": 0.0,
-      "similarity_score": 85.0,
-      "topic_score": 68.1,
-      "direct_weight": 0.0,
-      "similarity_weight": 0.85
-    },
-    {
-      "source": "DE",
-      "target": "RU",
-      "score": 38.6,
-      "band": "low",
-      "direct_score": 3.36,
-      "similarity_score": 83.1,
-      "topic_score": 59.93,
-      "direct_weight": 2.6,
-      "similarity_weight": 0.831
-    },
-    {
       "source": "LT",
       "target": "US",
-      "score": 37.29,
-      "band": "low",
+      "score": 41.99,
+      "band": "medium",
       "direct_score": 0.0,
-      "similarity_score": 83.9,
-      "topic_score": 60.62,
+      "similarity_score": 93.4,
+      "topic_score": 69.85,
       "direct_weight": 0.0,
-      "similarity_weight": 0.839
+      "similarity_weight": 0.934
     },
     {
       "source": "NL",
       "target": "US",
-      "score": 37.29,
+      "score": 41.99,
+      "band": "medium",
+      "direct_score": 0.0,
+      "similarity_score": 93.4,
+      "topic_score": 69.85,
+      "direct_weight": 0.0,
+      "similarity_weight": 0.934
+    },
+    {
+      "source": "CN",
+      "target": "DK",
+      "score": 41.09,
+      "band": "medium",
+      "direct_score": 0.0,
+      "similarity_score": 91.1,
+      "topic_score": 68.78,
+      "direct_weight": 0.0,
+      "similarity_weight": 0.911
+    },
+    {
+      "source": "CN",
+      "target": "NL",
+      "score": 41.09,
+      "band": "medium",
+      "direct_score": 0.0,
+      "similarity_score": 91.1,
+      "topic_score": 68.78,
+      "direct_weight": 0.0,
+      "similarity_weight": 0.911
+    },
+    {
+      "source": "CN",
+      "target": "RO",
+      "score": 41.09,
+      "band": "medium",
+      "direct_score": 0.0,
+      "similarity_score": 91.1,
+      "topic_score": 68.78,
+      "direct_weight": 0.0,
+      "similarity_weight": 0.911
+    },
+    {
+      "source": "FR",
+      "target": "RU",
+      "score": 40.88,
+      "band": "medium",
+      "direct_score": 0.0,
+      "similarity_score": 89.5,
+      "topic_score": 70.17,
+      "direct_weight": 0.0,
+      "similarity_weight": 0.895
+    },
+    {
+      "source": "IE",
+      "target": "TR",
+      "score": 40.88,
+      "band": "medium",
+      "direct_score": 0.0,
+      "similarity_score": 90.7,
+      "topic_score": 68.33,
+      "direct_weight": 0.0,
+      "similarity_weight": 0.907
+    },
+    {
+      "source": "IE",
+      "target": "RU",
+      "score": 39.53,
       "band": "low",
       "direct_score": 0.0,
-      "similarity_score": 83.9,
-      "topic_score": 60.62,
+      "similarity_score": 86.2,
+      "topic_score": 68.33,
       "direct_weight": 0.0,
-      "similarity_weight": 0.839
+      "similarity_weight": 0.862
+    },
+    {
+      "source": "HU",
+      "target": "RU",
+      "score": 39.45,
+      "band": "low",
+      "direct_score": 9.04,
+      "similarity_score": 75.2,
+      "topic_score": 61.86,
+      "direct_weight": 7.0,
+      "similarity_weight": 0.752
+    },
+    {
+      "source": "DE",
+      "target": "RU",
+      "score": 39.32,
+      "band": "low",
+      "direct_score": 3.36,
+      "similarity_score": 82.8,
+      "topic_score": 63.99,
+      "direct_weight": 2.6,
+      "similarity_weight": 0.828
     },
     {
       "source": "DE",
       "target": "TR",
-      "score": 36.92,
+      "score": 38.93,
       "band": "low",
       "direct_score": 0.0,
-      "similarity_score": 83.1,
-      "topic_score": 59.93,
+      "similarity_score": 87.1,
+      "topic_score": 63.99,
       "direct_weight": 0.0,
-      "similarity_weight": 0.831
+      "similarity_weight": 0.871
+    },
+    {
+      "source": "DE",
+      "target": "UA",
+      "score": 37.36,
+      "band": "low",
+      "direct_score": 4.13,
+      "similarity_score": 77.3,
+      "topic_score": 60.52,
+      "direct_weight": 3.2,
+      "similarity_weight": 0.773
     },
     {
       "source": "SE",
@@ -528,147 +616,136 @@
       "similarity_weight": 0.778
     },
     {
-      "source": "SE",
-      "target": "US",
-      "score": 35.3,
-      "band": "low",
-      "direct_score": 0.0,
-      "similarity_score": 74.8,
-      "topic_score": 64.29,
-      "direct_weight": 0.0,
-      "similarity_weight": 0.748
-    },
-    {
-      "source": "IE",
-      "target": "RU",
-      "score": 35.01,
-      "band": "low",
-      "direct_score": 0.0,
-      "similarity_score": 79.1,
-      "topic_score": 56.42,
-      "direct_weight": 0.0,
-      "similarity_weight": 0.791
-    },
-    {
-      "source": "IE",
+      "source": "IT",
       "target": "TR",
-      "score": 35.01,
+      "score": 33.6,
       "band": "low",
       "direct_score": 0.0,
-      "similarity_score": 79.1,
-      "topic_score": 56.42,
+      "similarity_score": 79.5,
+      "topic_score": 48.77,
       "direct_weight": 0.0,
-      "similarity_weight": 0.791
-    },
-    {
-      "source": "FR",
-      "target": "RU",
-      "score": 34.93,
-      "band": "low",
-      "direct_score": 0.0,
-      "similarity_score": 80.8,
-      "topic_score": 53.44,
-      "direct_weight": 0.0,
-      "similarity_weight": 0.808
-    },
-    {
-      "source": "FR",
-      "target": "TR",
-      "score": 34.93,
-      "band": "low",
-      "direct_score": 0.0,
-      "similarity_score": 80.8,
-      "topic_score": 53.44,
-      "direct_weight": 0.0,
-      "similarity_weight": 0.808
+      "similarity_weight": 0.795
     },
     {
       "source": "CN",
       "target": "SE",
-      "score": 34.19,
+      "score": 33.05,
       "band": "low",
       "direct_score": 0.0,
-      "similarity_score": 72.1,
-      "topic_score": 62.81,
+      "similarity_score": 70.3,
+      "topic_score": 59.79,
       "direct_weight": 0.0,
-      "similarity_weight": 0.721
+      "similarity_weight": 0.703
+    },
+    {
+      "source": "IE",
+      "target": "UA",
+      "score": 32.99,
+      "band": "low",
+      "direct_score": 0.0,
+      "similarity_score": 72.5,
+      "topic_score": 56.19,
+      "direct_weight": 0.0,
+      "similarity_weight": 0.725
     },
     {
       "source": "IT",
       "target": "RU",
-      "score": 33.6,
+      "score": 32.4,
       "band": "low",
       "direct_score": 0.0,
-      "similarity_score": 79.5,
+      "similarity_score": 75.5,
       "topic_score": 48.77,
       "direct_weight": 0.0,
-      "similarity_weight": 0.795
+      "similarity_weight": 0.755
     },
     {
-      "source": "IT",
-      "target": "TR",
-      "score": 33.6,
+      "source": "SE",
+      "target": "US",
+      "score": 31.35,
       "band": "low",
       "direct_score": 0.0,
-      "similarity_score": 79.5,
-      "topic_score": 48.77,
+      "similarity_score": 67.8,
+      "topic_score": 55.04,
       "direct_weight": 0.0,
-      "similarity_weight": 0.795
+      "similarity_weight": 0.678
+    },
+    {
+      "source": "FR",
+      "target": "UA",
+      "score": 31.06,
+      "band": "low",
+      "direct_score": 0.0,
+      "similarity_score": 67.3,
+      "topic_score": 54.35,
+      "direct_weight": 0.0,
+      "similarity_weight": 0.673
     },
     {
       "source": "GB",
       "target": "SE",
-      "score": 26.63,
+      "score": 28.61,
       "band": "low",
       "direct_score": 4.65,
-      "similarity_score": 55.7,
-      "topic_score": 37.98,
+      "similarity_score": 59.1,
+      "topic_score": 42.77,
       "direct_weight": 3.6,
-      "similarity_weight": 0.557
+      "similarity_weight": 0.591
     },
     {
-      "source": "BE",
+      "source": "ES",
+      "target": "UA",
+      "score": 27.08,
+      "band": "low",
+      "direct_score": 0.0,
+      "similarity_score": 60.7,
+      "topic_score": 44.37,
+      "direct_weight": 0.0,
+      "similarity_weight": 0.607
+    },
+    {
+      "source": "HU",
       "target": "US",
-      "score": 24.23,
+      "score": 23.67,
       "band": "low",
       "direct_score": 0.0,
-      "similarity_score": 54.5,
-      "topic_score": 39.38,
+      "similarity_score": 51.7,
+      "topic_score": 40.82,
       "direct_weight": 0.0,
-      "similarity_weight": 0.545
+      "similarity_weight": 0.517
     },
     {
-      "source": "CZ",
-      "target": "US",
-      "score": 21.14,
+      "source": "HU",
+      "target": "TR",
+      "score": 22.7,
       "band": "low",
       "direct_score": 0.0,
-      "similarity_score": 44.2,
-      "topic_score": 39.38,
+      "similarity_score": 50.9,
+      "topic_score": 37.14,
       "direct_weight": 0.0,
-      "similarity_weight": 0.442
+      "similarity_weight": 0.509
     },
     {
-      "source": "BE",
-      "target": "CN",
-      "score": 20.71,
+      "source": "GB",
+      "target": "HU",
+      "score": 22.49,
       "band": "low",
       "direct_score": 0.0,
-      "similarity_score": 46.2,
-      "topic_score": 34.24,
+      "similarity_score": 50.2,
+      "topic_score": 37.14,
       "direct_weight": 0.0,
-      "similarity_weight": 0.462
+      "similarity_weight": 0.502
     },
     {
-      "source": "RU",
-      "target": "SE",
-      "score": 20.47,
+      "source": "CN",
+      "target": "HU",
+      "score": 21.32,
       "band": "low",
       "direct_score": 0.0,
-      "similarity_score": 49.2,
-      "topic_score": 28.57,
+      "similarity_score": 46.3,
+      "topic_score": 37.14,
       "direct_weight": 0.0,
-      "similarity_weight": 0.492
+      "similarity_weight": 0.463
     },
     {
       "source": "SE",
@@ -682,29 +759,29 @@
       "similarity_weight": 0.492
     },
     {
-      "source": "CN",
-      "target": "CZ",
-      "score": 18.1,
+      "source": "RU",
+      "target": "SE",
+      "score": 19.75,
       "band": "very_low",
       "direct_score": 0.0,
-      "similarity_score": 37.5,
-      "topic_score": 34.24,
+      "similarity_score": 46.8,
+      "topic_score": 28.57,
       "direct_weight": 0.0,
-      "similarity_weight": 0.375
+      "similarity_weight": 0.468
+    },
+    {
+      "source": "BE",
+      "target": "CN",
+      "score": 18.63,
+      "band": "very_low",
+      "direct_score": 0.0,
+      "similarity_score": 41.3,
+      "topic_score": 31.22,
+      "direct_weight": 0.0,
+      "similarity_weight": 0.413
     },
     {
       "source": "DK",
-      "target": "UA",
-      "score": 16.51,
-      "band": "very_low",
-      "direct_score": 0.0,
-      "similarity_score": 38.7,
-      "topic_score": 24.52,
-      "direct_weight": 0.0,
-      "similarity_weight": 0.387
-    },
-    {
-      "source": "ES",
       "target": "UA",
       "score": 16.51,
       "band": "very_low",
@@ -735,13 +812,57 @@
       "topic_score": 24.52,
       "direct_weight": 0.0,
       "similarity_weight": 0.387
+    },
+    {
+      "source": "RO",
+      "target": "UA",
+      "score": 16.51,
+      "band": "very_low",
+      "direct_score": 0.0,
+      "similarity_score": 38.7,
+      "topic_score": 24.52,
+      "direct_weight": 0.0,
+      "similarity_weight": 0.387
+    },
+    {
+      "source": "CN",
+      "target": "CZ",
+      "score": 16.29,
+      "band": "very_low",
+      "direct_score": 0.0,
+      "similarity_score": 33.5,
+      "topic_score": 31.22,
+      "direct_weight": 0.0,
+      "similarity_weight": 0.335
+    },
+    {
+      "source": "BE",
+      "target": "US",
+      "score": 15.91,
+      "band": "very_low",
+      "direct_score": 0.0,
+      "similarity_score": 35.4,
+      "topic_score": 26.47,
+      "direct_weight": 0.0,
+      "similarity_weight": 0.354
+    },
+    {
+      "source": "CZ",
+      "target": "US",
+      "score": 13.9,
+      "band": "very_low",
+      "direct_score": 0.0,
+      "similarity_score": 28.7,
+      "topic_score": 26.47,
+      "direct_weight": 0.0,
+      "similarity_weight": 0.287
     }
   ],
   "by_country": [
     {
       "country": "IT",
       "relationship_count": 6,
-      "average_score": 51.95,
+      "average_score": 51.69,
       "strongest_partner": "UA",
       "strongest_score": 89.5,
       "top_partners": [
@@ -755,35 +876,27 @@
         },
         {
           "partner": "GB",
-          "score": 60.28,
+          "score": 61.88,
           "band": "high",
           "direct_score": 45.28,
-          "similarity_score": 85.1,
-          "topic_score": 60.53
-        },
-        {
-          "partner": "US",
-          "score": 47.56,
-          "band": "medium",
-          "direct_score": 6.07,
-          "similarity_score": 94.8,
-          "topic_score": 80.41
+          "similarity_score": 87.6,
+          "topic_score": 64.8
         },
         {
           "partner": "CN",
-          "score": 47.18,
+          "score": 46.91,
           "band": "medium",
           "direct_score": 5.61,
-          "similarity_score": 94.3,
-          "topic_score": 80.41
+          "similarity_score": 93.7,
+          "topic_score": 79.99
         },
         {
-          "partner": "RU",
-          "score": 33.6,
-          "band": "low",
-          "direct_score": 0.0,
-          "similarity_score": 79.5,
-          "topic_score": 48.77
+          "partner": "US",
+          "score": 45.83,
+          "band": "medium",
+          "direct_score": 6.07,
+          "similarity_score": 92.5,
+          "topic_score": 75.24
         },
         {
           "partner": "TR",
@@ -792,13 +905,135 @@
           "direct_score": 0.0,
           "similarity_score": 79.5,
           "topic_score": 48.77
+        },
+        {
+          "partner": "RU",
+          "score": 32.4,
+          "band": "low",
+          "direct_score": 0.0,
+          "similarity_score": 75.5,
+          "topic_score": 48.77
+        }
+      ]
+    },
+    {
+      "country": "FR",
+      "relationship_count": 6,
+      "average_score": 51.54,
+      "strongest_partner": "US",
+      "strongest_score": 76.43,
+      "top_partners": [
+        {
+          "partner": "US",
+          "score": 76.43,
+          "band": "high",
+          "direct_score": 55.41,
+          "similarity_score": 99.6,
+          "topic_score": 94.21
+        },
+        {
+          "partner": "GB",
+          "score": 62.7,
+          "band": "high",
+          "direct_score": 31.94,
+          "similarity_score": 98.3,
+          "topic_score": 86.2
+        },
+        {
+          "partner": "CN",
+          "score": 55.89,
+          "band": "medium",
+          "direct_score": 14.94,
+          "similarity_score": 99.3,
+          "topic_score": 93.14
+        },
+        {
+          "partner": "TR",
+          "score": 42.29,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 94.2,
+          "topic_score": 70.17
+        },
+        {
+          "partner": "RU",
+          "score": 40.88,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 89.5,
+          "topic_score": 70.17
+        },
+        {
+          "partner": "UA",
+          "score": 31.06,
+          "band": "low",
+          "direct_score": 0.0,
+          "similarity_score": 67.3,
+          "topic_score": 54.35
+        }
+      ]
+    },
+    {
+      "country": "IE",
+      "relationship_count": 6,
+      "average_score": 48.18,
+      "strongest_partner": "GB",
+      "strongest_score": 63.32,
+      "top_partners": [
+        {
+          "partner": "GB",
+          "score": 63.32,
+          "band": "high",
+          "direct_score": 36.64,
+          "similarity_score": 96.0,
+          "topic_score": 81.01
+        },
+        {
+          "partner": "US",
+          "score": 62.46,
+          "band": "high",
+          "direct_score": 27.24,
+          "similarity_score": 99.6,
+          "topic_score": 94.79
+        },
+        {
+          "partner": "CN",
+          "score": 49.91,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 100.0,
+          "topic_score": 99.54
+        },
+        {
+          "partner": "TR",
+          "score": 40.88,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 90.7,
+          "topic_score": 68.33
+        },
+        {
+          "partner": "RU",
+          "score": 39.53,
+          "band": "low",
+          "direct_score": 0.0,
+          "similarity_score": 86.2,
+          "topic_score": 68.33
+        },
+        {
+          "partner": "UA",
+          "score": 32.99,
+          "band": "low",
+          "direct_score": 0.0,
+          "similarity_score": 72.5,
+          "topic_score": 56.19
         }
       ]
     },
     {
       "country": "BG",
       "relationship_count": 6,
-      "average_score": 48.48,
+      "average_score": 48.16,
       "strongest_partner": "UA",
       "strongest_score": 61.27,
       "top_partners": [
@@ -812,19 +1047,19 @@
         },
         {
           "partner": "CN",
-          "score": 49.54,
+          "score": 48.84,
           "band": "medium",
           "direct_score": 0.0,
-          "similarity_score": 99.9,
-          "topic_score": 97.83
+          "similarity_score": 99.6,
+          "topic_score": 94.8
         },
         {
           "partner": "US",
-          "score": 49.35,
+          "score": 47.59,
           "band": "medium",
           "direct_score": 0.0,
-          "similarity_score": 99.8,
-          "topic_score": 97.04
+          "similarity_score": 98.6,
+          "topic_score": 90.05
         },
         {
           "partner": "TR",
@@ -835,451 +1070,329 @@
           "topic_score": 63.59
         },
         {
-          "partner": "RU",
-          "score": 44.05,
-          "band": "medium",
-          "direct_score": 10.59,
-          "similarity_score": 86.8,
-          "topic_score": 63.59
-        },
-        {
           "partner": "GB",
-          "score": 41.39,
+          "score": 43.21,
           "band": "medium",
           "direct_score": 0.0,
-          "similarity_score": 90.6,
-          "topic_score": 71.03
+          "similarity_score": 93.2,
+          "topic_score": 76.27
+        },
+        {
+          "partner": "RU",
+          "score": 42.73,
+          "band": "medium",
+          "direct_score": 10.59,
+          "similarity_score": 82.4,
+          "topic_score": 63.59
         }
       ]
     },
     {
       "country": "GB",
-      "relationship_count": 10,
-      "average_score": 47.01,
-      "strongest_partner": "IT",
-      "strongest_score": 60.28,
+      "relationship_count": 12,
+      "average_score": 48.16,
+      "strongest_partner": "IE",
+      "strongest_score": 63.32,
       "top_partners": [
         {
-          "partner": "IT",
-          "score": 60.28,
+          "partner": "IE",
+          "score": 63.32,
           "band": "high",
-          "direct_score": 45.28,
-          "similarity_score": 85.1,
-          "topic_score": 60.53
+          "direct_score": 36.64,
+          "similarity_score": 96.0,
+          "topic_score": 81.01
         },
         {
           "partner": "FR",
-          "score": 54.81,
-          "band": "medium",
+          "score": 62.7,
+          "band": "high",
           "direct_score": 31.94,
-          "similarity_score": 86.0,
-          "topic_score": 65.2
+          "similarity_score": 98.3,
+          "topic_score": 86.2
         },
         {
-          "partner": "NL",
-          "score": 51.11,
-          "band": "medium",
-          "direct_score": 8.01,
-          "similarity_score": 99.5,
-          "topic_score": 86.28
-        },
-        {
-          "partner": "IE",
-          "score": 47.57,
-          "band": "medium",
-          "direct_score": 19.19,
-          "similarity_score": 84.0,
-          "topic_score": 63.86
-        },
-        {
-          "partner": "DK",
-          "score": 47.11,
-          "band": "medium",
-          "direct_score": 0.0,
-          "similarity_score": 99.5,
-          "topic_score": 86.28
+          "partner": "IT",
+          "score": 61.88,
+          "band": "high",
+          "direct_score": 45.28,
+          "similarity_score": 87.6,
+          "topic_score": 64.8
         },
         {
           "partner": "ES",
-          "score": 47.11,
+          "score": 52.2,
           "band": "medium",
-          "direct_score": 0.0,
-          "similarity_score": 99.5,
-          "topic_score": 86.28
-        },
-        {
-          "partner": "LT",
-          "score": 47.11,
-          "band": "medium",
-          "direct_score": 0.0,
-          "similarity_score": 99.5,
-          "topic_score": 86.28
+          "direct_score": 11.76,
+          "similarity_score": 98.5,
+          "topic_score": 83.84
         },
         {
           "partner": "DE",
-          "score": 46.97,
+          "score": 50.63,
           "band": "medium",
           "direct_score": 14.5,
-          "similarity_score": 87.5,
-          "topic_score": 67.38
+          "similarity_score": 93.5,
+          "topic_score": 76.67
+        },
+        {
+          "partner": "RO",
+          "score": 50.63,
+          "band": "medium",
+          "direct_score": 9.06,
+          "similarity_score": 98.7,
+          "topic_score": 82.45
+        },
+        {
+          "partner": "NL",
+          "score": 50.11,
+          "band": "medium",
+          "direct_score": 8.01,
+          "similarity_score": 98.7,
+          "topic_score": 82.45
+        },
+        {
+          "partner": "DK",
+          "score": 46.1,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 98.7,
+          "topic_score": 82.45
+        },
+        {
+          "partner": "LT",
+          "score": 46.1,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 98.7,
+          "topic_score": 82.45
         },
         {
           "partner": "BG",
-          "score": 41.39,
+          "score": 43.21,
           "band": "medium",
           "direct_score": 0.0,
-          "similarity_score": 90.6,
-          "topic_score": 71.03
-        },
-        {
-          "partner": "SE",
-          "score": 26.63,
-          "band": "low",
-          "direct_score": 4.65,
-          "similarity_score": 55.7,
-          "topic_score": 37.98
-        }
-      ]
-    },
-    {
-      "country": "FR",
-      "relationship_count": 6,
-      "average_score": 46.01,
-      "strongest_partner": "US",
-      "strongest_score": 57.06,
-      "top_partners": [
-        {
-          "partner": "US",
-          "score": 57.06,
-          "band": "medium",
-          "direct_score": 18.07,
-          "similarity_score": 99.1,
-          "topic_score": 91.46
-        },
-        {
-          "partner": "GB",
-          "score": 54.81,
-          "band": "medium",
-          "direct_score": 31.94,
-          "similarity_score": 86.0,
-          "topic_score": 65.2
-        },
-        {
-          "partner": "CN",
-          "score": 54.46,
-          "band": "medium",
-          "direct_score": 14.94,
-          "similarity_score": 98.2,
-          "topic_score": 87.68
-        },
-        {
-          "partner": "UA",
-          "score": 39.84,
-          "band": "low",
-          "direct_score": 0.0,
-          "similarity_score": 85.4,
-          "topic_score": 71.08
-        },
-        {
-          "partner": "RU",
-          "score": 34.93,
-          "band": "low",
-          "direct_score": 0.0,
-          "similarity_score": 80.8,
-          "topic_score": 53.44
-        },
-        {
-          "partner": "TR",
-          "score": 34.93,
-          "band": "low",
-          "direct_score": 0.0,
-          "similarity_score": 80.8,
-          "topic_score": 53.44
-        }
-      ]
-    },
-    {
-      "country": "IE",
-      "relationship_count": 6,
-      "average_score": 44.51,
-      "strongest_partner": "US",
-      "strongest_score": 62.69,
-      "top_partners": [
-        {
-          "partner": "US",
-          "score": 62.69,
-          "band": "high",
-          "direct_score": 27.24,
-          "similarity_score": 99.7,
-          "topic_score": 95.79
-        },
-        {
-          "partner": "CN",
-          "score": 47.65,
-          "band": "medium",
-          "direct_score": 0.0,
-          "similarity_score": 98.4,
-          "topic_score": 90.66
-        },
-        {
-          "partner": "GB",
-          "score": 47.57,
-          "band": "medium",
-          "direct_score": 19.19,
-          "similarity_score": 84.0,
-          "topic_score": 63.86
-        },
-        {
-          "partner": "UA",
-          "score": 39.12,
-          "band": "low",
-          "direct_score": 0.0,
-          "similarity_score": 85.0,
-          "topic_score": 68.1
-        },
-        {
-          "partner": "RU",
-          "score": 35.01,
-          "band": "low",
-          "direct_score": 0.0,
-          "similarity_score": 79.1,
-          "topic_score": 56.42
-        },
-        {
-          "partner": "TR",
-          "score": 35.01,
-          "band": "low",
-          "direct_score": 0.0,
-          "similarity_score": 79.1,
-          "topic_score": 56.42
-        }
-      ]
-    },
-    {
-      "country": "DE",
-      "relationship_count": 6,
-      "average_score": 44.06,
-      "strongest_partner": "CN",
-      "strongest_score": 52.56,
-      "top_partners": [
-        {
-          "partner": "CN",
-          "score": 52.56,
-          "band": "medium",
-          "direct_score": 7.8,
-          "similarity_score": 99.4,
-          "topic_score": 94.17
-        },
-        {
-          "partner": "US",
-          "score": 49.86,
-          "band": "medium",
-          "direct_score": 0.0,
-          "similarity_score": 100.0,
-          "topic_score": 99.31
-        },
-        {
-          "partner": "GB",
-          "score": 46.97,
-          "band": "medium",
-          "direct_score": 14.5,
-          "similarity_score": 87.5,
-          "topic_score": 67.38
-        },
-        {
-          "partner": "UA",
-          "score": 39.46,
-          "band": "low",
-          "direct_score": 4.13,
-          "similarity_score": 81.6,
-          "topic_score": 64.58
-        },
-        {
-          "partner": "RU",
-          "score": 38.6,
-          "band": "low",
-          "direct_score": 3.36,
-          "similarity_score": 83.1,
-          "topic_score": 59.93
-        },
-        {
-          "partner": "TR",
-          "score": 36.92,
-          "band": "low",
-          "direct_score": 0.0,
-          "similarity_score": 83.1,
-          "topic_score": 59.93
+          "similarity_score": 93.2,
+          "topic_score": 76.27
         }
       ]
     },
     {
       "country": "ES",
       "relationship_count": 6,
-      "average_score": 43.47,
+      "average_score": 47.66,
       "strongest_partner": "US",
-      "strongest_score": 57.46,
+      "strongest_score": 72.19,
       "top_partners": [
         {
           "partner": "US",
-          "score": 57.46,
-          "band": "medium",
-          "direct_score": 40.32,
-          "similarity_score": 83.9,
-          "topic_score": 60.62
-        },
-        {
-          "partner": "RU",
-          "score": 50.0,
-          "band": "medium",
-          "direct_score": 0.0,
-          "similarity_score": 100.0,
-          "topic_score": 100.0
-        },
-        {
-          "partner": "TR",
-          "score": 50.0,
-          "band": "medium",
-          "direct_score": 0.0,
-          "similarity_score": 100.0,
-          "topic_score": 100.0
+          "score": 72.19,
+          "band": "high",
+          "direct_score": 47.45,
+          "similarity_score": 99.3,
+          "topic_score": 93.39
         },
         {
           "partner": "GB",
-          "score": 47.11,
+          "score": 52.2,
           "band": "medium",
-          "direct_score": 0.0,
-          "similarity_score": 99.5,
-          "topic_score": 86.28
+          "direct_score": 11.76,
+          "similarity_score": 98.5,
+          "topic_score": 83.84
         },
         {
           "partner": "CN",
-          "score": 39.76,
-          "band": "low",
+          "score": 47.16,
+          "band": "medium",
           "direct_score": 0.0,
-          "similarity_score": 88.7,
-          "topic_score": 65.76
+          "similarity_score": 98.1,
+          "topic_score": 88.64
+        },
+        {
+          "partner": "RU",
+          "score": 44.41,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 94.6,
+          "topic_score": 80.14
+        },
+        {
+          "partner": "TR",
+          "score": 42.91,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 95.6,
+          "topic_score": 71.15
         },
         {
           "partner": "UA",
-          "score": 16.51,
-          "band": "very_low",
+          "score": 27.08,
+          "band": "low",
           "direct_score": 0.0,
-          "similarity_score": 38.7,
-          "topic_score": 24.52
+          "similarity_score": 60.7,
+          "topic_score": 44.37
+        }
+      ]
+    },
+    {
+      "country": "DE",
+      "relationship_count": 6,
+      "average_score": 44.75,
+      "strongest_partner": "CN",
+      "strongest_score": 54.5,
+      "top_partners": [
+        {
+          "partner": "CN",
+          "score": 54.5,
+          "band": "medium",
+          "direct_score": 11.16,
+          "similarity_score": 99.6,
+          "topic_score": 95.21
+        },
+        {
+          "partner": "GB",
+          "score": 50.63,
+          "band": "medium",
+          "direct_score": 14.5,
+          "similarity_score": 93.5,
+          "topic_score": 76.67
+        },
+        {
+          "partner": "US",
+          "score": 47.73,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 98.8,
+          "topic_score": 90.46
+        },
+        {
+          "partner": "RU",
+          "score": 39.32,
+          "band": "low",
+          "direct_score": 3.36,
+          "similarity_score": 82.8,
+          "topic_score": 63.99
+        },
+        {
+          "partner": "TR",
+          "score": 38.93,
+          "band": "low",
+          "direct_score": 0.0,
+          "similarity_score": 87.1,
+          "topic_score": 63.99
+        },
+        {
+          "partner": "UA",
+          "score": 37.36,
+          "band": "low",
+          "direct_score": 4.13,
+          "similarity_score": 77.3,
+          "topic_score": 60.52
         }
       ]
     },
     {
       "country": "US",
-      "relationship_count": 12,
-      "average_score": 43.28,
-      "strongest_partner": "IE",
-      "strongest_score": 62.69,
+      "relationship_count": 14,
+      "average_score": 43.52,
+      "strongest_partner": "FR",
+      "strongest_score": 76.43,
       "top_partners": [
         {
+          "partner": "FR",
+          "score": 76.43,
+          "band": "high",
+          "direct_score": 55.41,
+          "similarity_score": 99.6,
+          "topic_score": 94.21
+        },
+        {
+          "partner": "ES",
+          "score": 72.19,
+          "band": "high",
+          "direct_score": 47.45,
+          "similarity_score": 99.3,
+          "topic_score": 93.39
+        },
+        {
           "partner": "IE",
-          "score": 62.69,
+          "score": 62.46,
           "band": "high",
           "direct_score": 27.24,
-          "similarity_score": 99.7,
-          "topic_score": 95.79
-        },
-        {
-          "partner": "ES",
-          "score": 57.46,
-          "band": "medium",
-          "direct_score": 40.32,
-          "similarity_score": 83.9,
-          "topic_score": 60.62
-        },
-        {
-          "partner": "FR",
-          "score": 57.06,
-          "band": "medium",
-          "direct_score": 18.07,
-          "similarity_score": 99.1,
-          "topic_score": 91.46
+          "similarity_score": 99.6,
+          "topic_score": 94.79
         },
         {
           "partner": "DE",
-          "score": 49.86,
+          "score": 47.73,
           "band": "medium",
           "direct_score": 0.0,
-          "similarity_score": 100.0,
-          "topic_score": 99.31
+          "similarity_score": 98.8,
+          "topic_score": 90.46
         },
         {
           "partner": "BG",
-          "score": 49.35,
+          "score": 47.59,
           "band": "medium",
           "direct_score": 0.0,
-          "similarity_score": 99.8,
-          "topic_score": 97.04
+          "similarity_score": 98.6,
+          "topic_score": 90.05
         },
         {
           "partner": "IT",
-          "score": 47.56,
+          "score": 45.83,
           "band": "medium",
           "direct_score": 6.07,
-          "similarity_score": 94.8,
-          "topic_score": 80.41
+          "similarity_score": 92.5,
+          "topic_score": 75.24
         },
         {
           "partner": "DK",
-          "score": 40.09,
+          "score": 44.78,
           "band": "medium",
           "direct_score": 5.58,
-          "similarity_score": 83.9,
-          "topic_score": 60.62
+          "similarity_score": 93.4,
+          "topic_score": 69.85
+        },
+        {
+          "partner": "RO",
+          "score": 43.48,
+          "band": "medium",
+          "direct_score": 2.97,
+          "similarity_score": 93.4,
+          "topic_score": 69.85
         },
         {
           "partner": "LT",
-          "score": 37.29,
-          "band": "low",
+          "score": 41.99,
+          "band": "medium",
           "direct_score": 0.0,
-          "similarity_score": 83.9,
-          "topic_score": 60.62
+          "similarity_score": 93.4,
+          "topic_score": 69.85
         },
         {
           "partner": "NL",
-          "score": 37.29,
-          "band": "low",
+          "score": 41.99,
+          "band": "medium",
           "direct_score": 0.0,
-          "similarity_score": 83.9,
-          "topic_score": 60.62
-        },
-        {
-          "partner": "SE",
-          "score": 35.3,
-          "band": "low",
-          "direct_score": 0.0,
-          "similarity_score": 74.8,
-          "topic_score": 64.29
+          "similarity_score": 93.4,
+          "topic_score": 69.85
         }
       ]
     },
     {
-      "country": "NL",
+      "country": "RO",
       "relationship_count": 6,
-      "average_score": 40.78,
+      "average_score": 40.88,
       "strongest_partner": "GB",
-      "strongest_score": 51.11,
+      "strongest_score": 50.63,
       "top_partners": [
         {
           "partner": "GB",
-          "score": 51.11,
+          "score": 50.63,
           "band": "medium",
-          "direct_score": 8.01,
-          "similarity_score": 99.5,
-          "topic_score": 86.28
-        },
-        {
-          "partner": "RU",
-          "score": 50.0,
-          "band": "medium",
-          "direct_score": 0.0,
-          "similarity_score": 100.0,
-          "topic_score": 100.0
+          "direct_score": 9.06,
+          "similarity_score": 98.7,
+          "topic_score": 82.45
         },
         {
           "partner": "TR",
@@ -1290,166 +1403,28 @@
           "topic_score": 100.0
         },
         {
-          "partner": "CN",
-          "score": 39.76,
-          "band": "low",
-          "direct_score": 0.0,
-          "similarity_score": 88.7,
-          "topic_score": 65.76
-        },
-        {
-          "partner": "US",
-          "score": 37.29,
-          "band": "low",
-          "direct_score": 0.0,
-          "similarity_score": 83.9,
-          "topic_score": 60.62
-        },
-        {
-          "partner": "UA",
-          "score": 16.51,
-          "band": "very_low",
-          "direct_score": 0.0,
-          "similarity_score": 38.7,
-          "topic_score": 24.52
-        }
-      ]
-    },
-    {
-      "country": "RU",
-      "relationship_count": 10,
-      "average_score": 40.67,
-      "strongest_partner": "DK",
-      "strongest_score": 50.0,
-      "top_partners": [
-        {
-          "partner": "DK",
-          "score": 50.0,
-          "band": "medium",
-          "direct_score": 0.0,
-          "similarity_score": 100.0,
-          "topic_score": 100.0
-        },
-        {
-          "partner": "ES",
-          "score": 50.0,
-          "band": "medium",
-          "direct_score": 0.0,
-          "similarity_score": 100.0,
-          "topic_score": 100.0
-        },
-        {
-          "partner": "LT",
-          "score": 50.0,
-          "band": "medium",
-          "direct_score": 0.0,
-          "similarity_score": 100.0,
-          "topic_score": 100.0
-        },
-        {
-          "partner": "NL",
-          "score": 50.0,
-          "band": "medium",
-          "direct_score": 0.0,
-          "similarity_score": 100.0,
-          "topic_score": 100.0
-        },
-        {
-          "partner": "BG",
-          "score": 44.05,
-          "band": "medium",
-          "direct_score": 10.59,
-          "similarity_score": 86.8,
-          "topic_score": 63.59
-        },
-        {
-          "partner": "DE",
-          "score": 38.6,
-          "band": "low",
-          "direct_score": 3.36,
-          "similarity_score": 83.1,
-          "topic_score": 59.93
-        },
-        {
-          "partner": "IE",
-          "score": 35.01,
-          "band": "low",
-          "direct_score": 0.0,
-          "similarity_score": 79.1,
-          "topic_score": 56.42
-        },
-        {
-          "partner": "FR",
-          "score": 34.93,
-          "band": "low",
-          "direct_score": 0.0,
-          "similarity_score": 80.8,
-          "topic_score": 53.44
-        },
-        {
-          "partner": "IT",
-          "score": 33.6,
-          "band": "low",
-          "direct_score": 0.0,
-          "similarity_score": 79.5,
-          "topic_score": 48.77
-        },
-        {
-          "partner": "SE",
-          "score": 20.47,
-          "band": "low",
-          "direct_score": 0.0,
-          "similarity_score": 49.2,
-          "topic_score": 28.57
-        }
-      ]
-    },
-    {
-      "country": "LT",
-      "relationship_count": 6,
-      "average_score": 40.64,
-      "strongest_partner": "RU",
-      "strongest_score": 50.0,
-      "top_partners": [
-        {
           "partner": "RU",
-          "score": 50.0,
+          "score": 43.56,
           "band": "medium",
           "direct_score": 0.0,
-          "similarity_score": 100.0,
-          "topic_score": 100.0
-        },
-        {
-          "partner": "TR",
-          "score": 50.0,
-          "band": "medium",
-          "direct_score": 0.0,
-          "similarity_score": 100.0,
-          "topic_score": 100.0
-        },
-        {
-          "partner": "GB",
-          "score": 47.11,
-          "band": "medium",
-          "direct_score": 0.0,
-          "similarity_score": 99.5,
-          "topic_score": 86.28
-        },
-        {
-          "partner": "CN",
-          "score": 42.93,
-          "band": "medium",
-          "direct_score": 6.33,
-          "similarity_score": 88.7,
-          "topic_score": 65.76
+          "similarity_score": 95.0,
+          "topic_score": 75.28
         },
         {
           "partner": "US",
-          "score": 37.29,
-          "band": "low",
+          "score": 43.48,
+          "band": "medium",
+          "direct_score": 2.97,
+          "similarity_score": 93.4,
+          "topic_score": 69.85
+        },
+        {
+          "partner": "CN",
+          "score": 41.09,
+          "band": "medium",
           "direct_score": 0.0,
-          "similarity_score": 83.9,
-          "topic_score": 60.62
+          "similarity_score": 91.1,
+          "topic_score": 68.78
         },
         {
           "partner": "UA",
@@ -1463,21 +1438,13 @@
     },
     {
       "country": "TR",
-      "relationship_count": 10,
-      "average_score": 40.62,
+      "relationship_count": 12,
+      "average_score": 40.59,
       "strongest_partner": "DK",
       "strongest_score": 50.0,
       "top_partners": [
         {
           "partner": "DK",
-          "score": 50.0,
-          "band": "medium",
-          "direct_score": 0.0,
-          "similarity_score": 100.0,
-          "topic_score": 100.0
-        },
-        {
-          "partner": "ES",
           "score": 50.0,
           "band": "medium",
           "direct_score": 0.0,
@@ -1494,6 +1461,14 @@
         },
         {
           "partner": "NL",
+          "score": 50.0,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 100.0,
+          "topic_score": 100.0
+        },
+        {
+          "partner": "RO",
           "score": 50.0,
           "band": "medium",
           "direct_score": 0.0,
@@ -1509,28 +1484,36 @@
           "topic_score": 63.59
         },
         {
-          "partner": "DE",
-          "score": 36.92,
-          "band": "low",
+          "partner": "ES",
+          "score": 42.91,
+          "band": "medium",
           "direct_score": 0.0,
-          "similarity_score": 83.1,
-          "topic_score": 59.93
-        },
-        {
-          "partner": "IE",
-          "score": 35.01,
-          "band": "low",
-          "direct_score": 0.0,
-          "similarity_score": 79.1,
-          "topic_score": 56.42
+          "similarity_score": 95.6,
+          "topic_score": 71.15
         },
         {
           "partner": "FR",
-          "score": 34.93,
+          "score": 42.29,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 94.2,
+          "topic_score": 70.17
+        },
+        {
+          "partner": "IE",
+          "score": 40.88,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 90.7,
+          "topic_score": 68.33
+        },
+        {
+          "partner": "DE",
+          "score": 38.93,
           "band": "low",
           "direct_score": 0.0,
-          "similarity_score": 80.8,
-          "topic_score": 53.44
+          "similarity_score": 87.1,
+          "topic_score": 63.99
         },
         {
           "partner": "IT",
@@ -1539,31 +1522,23 @@
           "direct_score": 0.0,
           "similarity_score": 79.5,
           "topic_score": 48.77
-        },
-        {
-          "partner": "SE",
-          "score": 20.47,
-          "band": "low",
-          "direct_score": 0.0,
-          "similarity_score": 49.2,
-          "topic_score": 28.57
         }
       ]
     },
     {
-      "country": "DK",
+      "country": "NL",
       "relationship_count": 6,
-      "average_score": 40.58,
-      "strongest_partner": "RU",
-      "strongest_score": 50.0,
+      "average_score": 40.54,
+      "strongest_partner": "GB",
+      "strongest_score": 50.11,
       "top_partners": [
         {
-          "partner": "RU",
-          "score": 50.0,
+          "partner": "GB",
+          "score": 50.11,
           "band": "medium",
-          "direct_score": 0.0,
-          "similarity_score": 100.0,
-          "topic_score": 100.0
+          "direct_score": 8.01,
+          "similarity_score": 98.7,
+          "topic_score": 82.45
         },
         {
           "partner": "TR",
@@ -1574,28 +1549,142 @@
           "topic_score": 100.0
         },
         {
-          "partner": "GB",
-          "score": 47.11,
+          "partner": "RU",
+          "score": 43.56,
           "band": "medium",
           "direct_score": 0.0,
-          "similarity_score": 99.5,
-          "topic_score": 86.28
+          "similarity_score": 95.0,
+          "topic_score": 75.28
         },
         {
           "partner": "US",
-          "score": 40.09,
+          "score": 41.99,
           "band": "medium",
-          "direct_score": 5.58,
-          "similarity_score": 83.9,
-          "topic_score": 60.62
+          "direct_score": 0.0,
+          "similarity_score": 93.4,
+          "topic_score": 69.85
         },
         {
           "partner": "CN",
-          "score": 39.76,
-          "band": "low",
+          "score": 41.09,
+          "band": "medium",
           "direct_score": 0.0,
-          "similarity_score": 88.7,
-          "topic_score": 65.76
+          "similarity_score": 91.1,
+          "topic_score": 68.78
+        },
+        {
+          "partner": "UA",
+          "score": 16.51,
+          "band": "very_low",
+          "direct_score": 0.0,
+          "similarity_score": 38.7,
+          "topic_score": 24.52
+        }
+      ]
+    },
+    {
+      "country": "LT",
+      "relationship_count": 6,
+      "average_score": 40.4,
+      "strongest_partner": "TR",
+      "strongest_score": 50.0,
+      "top_partners": [
+        {
+          "partner": "TR",
+          "score": 50.0,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 100.0,
+          "topic_score": 100.0
+        },
+        {
+          "partner": "GB",
+          "score": 46.1,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 98.7,
+          "topic_score": 82.45
+        },
+        {
+          "partner": "CN",
+          "score": 44.25,
+          "band": "medium",
+          "direct_score": 6.33,
+          "similarity_score": 91.1,
+          "topic_score": 68.78
+        },
+        {
+          "partner": "RU",
+          "score": 43.56,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 95.0,
+          "topic_score": 75.28
+        },
+        {
+          "partner": "US",
+          "score": 41.99,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 93.4,
+          "topic_score": 69.85
+        },
+        {
+          "partner": "UA",
+          "score": 16.51,
+          "band": "very_low",
+          "direct_score": 0.0,
+          "similarity_score": 38.7,
+          "topic_score": 24.52
+        }
+      ]
+    },
+    {
+      "country": "DK",
+      "relationship_count": 6,
+      "average_score": 40.34,
+      "strongest_partner": "TR",
+      "strongest_score": 50.0,
+      "top_partners": [
+        {
+          "partner": "TR",
+          "score": 50.0,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 100.0,
+          "topic_score": 100.0
+        },
+        {
+          "partner": "GB",
+          "score": 46.1,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 98.7,
+          "topic_score": 82.45
+        },
+        {
+          "partner": "US",
+          "score": 44.78,
+          "band": "medium",
+          "direct_score": 5.58,
+          "similarity_score": 93.4,
+          "topic_score": 69.85
+        },
+        {
+          "partner": "RU",
+          "score": 43.56,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 95.0,
+          "topic_score": 75.28
+        },
+        {
+          "partner": "CN",
+          "score": 41.09,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 91.1,
+          "topic_score": 68.78
         },
         {
           "partner": "UA",
@@ -1609,97 +1698,186 @@
     },
     {
       "country": "CN",
-      "relationship_count": 12,
-      "average_score": 40.55,
+      "relationship_count": 14,
+      "average_score": 40.0,
       "strongest_partner": "FR",
-      "strongest_score": 54.46,
+      "strongest_score": 55.89,
       "top_partners": [
         {
           "partner": "FR",
-          "score": 54.46,
+          "score": 55.89,
           "band": "medium",
           "direct_score": 14.94,
-          "similarity_score": 98.2,
-          "topic_score": 87.68
+          "similarity_score": 99.3,
+          "topic_score": 93.14
         },
         {
           "partner": "DE",
-          "score": 52.56,
+          "score": 54.5,
           "band": "medium",
-          "direct_score": 7.8,
-          "similarity_score": 99.4,
-          "topic_score": 94.17
-        },
-        {
-          "partner": "BG",
-          "score": 49.54,
-          "band": "medium",
-          "direct_score": 0.0,
-          "similarity_score": 99.9,
-          "topic_score": 97.83
+          "direct_score": 11.16,
+          "similarity_score": 99.6,
+          "topic_score": 95.21
         },
         {
           "partner": "IE",
-          "score": 47.65,
+          "score": 49.91,
           "band": "medium",
           "direct_score": 0.0,
-          "similarity_score": 98.4,
-          "topic_score": 90.66
+          "similarity_score": 100.0,
+          "topic_score": 99.54
         },
         {
-          "partner": "IT",
-          "score": 47.18,
+          "partner": "BG",
+          "score": 48.84,
           "band": "medium",
-          "direct_score": 5.61,
-          "similarity_score": 94.3,
-          "topic_score": 80.41
-        },
-        {
-          "partner": "LT",
-          "score": 42.93,
-          "band": "medium",
-          "direct_score": 6.33,
-          "similarity_score": 88.7,
-          "topic_score": 65.76
-        },
-        {
-          "partner": "DK",
-          "score": 39.76,
-          "band": "low",
           "direct_score": 0.0,
-          "similarity_score": 88.7,
-          "topic_score": 65.76
+          "similarity_score": 99.6,
+          "topic_score": 94.8
         },
         {
           "partner": "ES",
-          "score": 39.76,
-          "band": "low",
+          "score": 47.16,
+          "band": "medium",
           "direct_score": 0.0,
-          "similarity_score": 88.7,
-          "topic_score": 65.76
+          "similarity_score": 98.1,
+          "topic_score": 88.64
+        },
+        {
+          "partner": "IT",
+          "score": 46.91,
+          "band": "medium",
+          "direct_score": 5.61,
+          "similarity_score": 93.7,
+          "topic_score": 79.99
+        },
+        {
+          "partner": "LT",
+          "score": 44.25,
+          "band": "medium",
+          "direct_score": 6.33,
+          "similarity_score": 91.1,
+          "topic_score": 68.78
+        },
+        {
+          "partner": "DK",
+          "score": 41.09,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 91.1,
+          "topic_score": 68.78
         },
         {
           "partner": "NL",
-          "score": 39.76,
-          "band": "low",
+          "score": 41.09,
+          "band": "medium",
           "direct_score": 0.0,
-          "similarity_score": 88.7,
-          "topic_score": 65.76
+          "similarity_score": 91.1,
+          "topic_score": 68.78
         },
         {
-          "partner": "SE",
-          "score": 34.19,
+          "partner": "RO",
+          "score": 41.09,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 91.1,
+          "topic_score": 68.78
+        }
+      ]
+    },
+    {
+      "country": "RU",
+      "relationship_count": 12,
+      "average_score": 39.39,
+      "strongest_partner": "ES",
+      "strongest_score": 44.41,
+      "top_partners": [
+        {
+          "partner": "ES",
+          "score": 44.41,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 94.6,
+          "topic_score": 80.14
+        },
+        {
+          "partner": "DK",
+          "score": 43.56,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 95.0,
+          "topic_score": 75.28
+        },
+        {
+          "partner": "LT",
+          "score": 43.56,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 95.0,
+          "topic_score": 75.28
+        },
+        {
+          "partner": "NL",
+          "score": 43.56,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 95.0,
+          "topic_score": 75.28
+        },
+        {
+          "partner": "RO",
+          "score": 43.56,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 95.0,
+          "topic_score": 75.28
+        },
+        {
+          "partner": "BG",
+          "score": 42.73,
+          "band": "medium",
+          "direct_score": 10.59,
+          "similarity_score": 82.4,
+          "topic_score": 63.59
+        },
+        {
+          "partner": "FR",
+          "score": 40.88,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 89.5,
+          "topic_score": 70.17
+        },
+        {
+          "partner": "IE",
+          "score": 39.53,
           "band": "low",
           "direct_score": 0.0,
-          "similarity_score": 72.1,
-          "topic_score": 62.81
+          "similarity_score": 86.2,
+          "topic_score": 68.33
+        },
+        {
+          "partner": "HU",
+          "score": 39.45,
+          "band": "low",
+          "direct_score": 9.04,
+          "similarity_score": 75.2,
+          "topic_score": 61.86
+        },
+        {
+          "partner": "DE",
+          "score": 39.32,
+          "band": "low",
+          "direct_score": 3.36,
+          "similarity_score": 82.8,
+          "topic_score": 63.99
         }
       ]
     },
     {
       "country": "UA",
-      "relationship_count": 12,
-      "average_score": 39.11,
+      "relationship_count": 13,
+      "average_score": 36.87,
       "strongest_partner": "IT",
       "strongest_score": 89.5,
       "top_partners": [
@@ -1736,28 +1914,12 @@
           "topic_score": 60.46
         },
         {
-          "partner": "FR",
-          "score": 39.84,
-          "band": "low",
-          "direct_score": 0.0,
-          "similarity_score": 85.4,
-          "topic_score": 71.08
-        },
-        {
           "partner": "DE",
-          "score": 39.46,
+          "score": 37.36,
           "band": "low",
           "direct_score": 4.13,
-          "similarity_score": 81.6,
-          "topic_score": 64.58
-        },
-        {
-          "partner": "IE",
-          "score": 39.12,
-          "band": "low",
-          "direct_score": 0.0,
-          "similarity_score": 85.0,
-          "topic_score": 68.1
+          "similarity_score": 77.3,
+          "topic_score": 60.52
         },
         {
           "partner": "SE",
@@ -1768,15 +1930,31 @@
           "topic_score": 64.39
         },
         {
-          "partner": "DK",
-          "score": 16.51,
-          "band": "very_low",
+          "partner": "IE",
+          "score": 32.99,
+          "band": "low",
           "direct_score": 0.0,
-          "similarity_score": 38.7,
-          "topic_score": 24.52
+          "similarity_score": 72.5,
+          "topic_score": 56.19
+        },
+        {
+          "partner": "FR",
+          "score": 31.06,
+          "band": "low",
+          "direct_score": 0.0,
+          "similarity_score": 67.3,
+          "topic_score": 54.35
         },
         {
           "partner": "ES",
+          "score": 27.08,
+          "band": "low",
+          "direct_score": 0.0,
+          "similarity_score": 60.7,
+          "topic_score": 44.37
+        },
+        {
+          "partner": "DK",
           "score": 16.51,
           "band": "very_low",
           "direct_score": 0.0,
@@ -1788,7 +1966,7 @@
     {
       "country": "BE",
       "relationship_count": 3,
-      "average_score": 33.51,
+      "average_score": 30.04,
       "strongest_partner": "UA",
       "strongest_score": 55.58,
       "top_partners": [
@@ -1801,27 +1979,27 @@
           "topic_score": 56.3
         },
         {
-          "partner": "US",
-          "score": 24.23,
-          "band": "low",
+          "partner": "CN",
+          "score": 18.63,
+          "band": "very_low",
           "direct_score": 0.0,
-          "similarity_score": 54.5,
-          "topic_score": 39.38
+          "similarity_score": 41.3,
+          "topic_score": 31.22
         },
         {
-          "partner": "CN",
-          "score": 20.71,
-          "band": "low",
+          "partner": "US",
+          "score": 15.91,
+          "band": "very_low",
           "direct_score": 0.0,
-          "similarity_score": 46.2,
-          "topic_score": 34.24
+          "similarity_score": 35.4,
+          "topic_score": 26.47
         }
       ]
     },
     {
       "country": "SE",
       "relationship_count": 6,
-      "average_score": 28.88,
+      "average_score": 28.24,
       "strongest_partner": "UA",
       "strongest_score": 36.22,
       "top_partners": [
@@ -1834,36 +2012,28 @@
           "topic_score": 64.39
         },
         {
-          "partner": "US",
-          "score": 35.3,
+          "partner": "CN",
+          "score": 33.05,
           "band": "low",
           "direct_score": 0.0,
-          "similarity_score": 74.8,
-          "topic_score": 64.29
+          "similarity_score": 70.3,
+          "topic_score": 59.79
         },
         {
-          "partner": "CN",
-          "score": 34.19,
+          "partner": "US",
+          "score": 31.35,
           "band": "low",
           "direct_score": 0.0,
-          "similarity_score": 72.1,
-          "topic_score": 62.81
+          "similarity_score": 67.8,
+          "topic_score": 55.04
         },
         {
           "partner": "GB",
-          "score": 26.63,
+          "score": 28.61,
           "band": "low",
           "direct_score": 4.65,
-          "similarity_score": 55.7,
-          "topic_score": 37.98
-        },
-        {
-          "partner": "RU",
-          "score": 20.47,
-          "band": "low",
-          "direct_score": 0.0,
-          "similarity_score": 49.2,
-          "topic_score": 28.57
+          "similarity_score": 59.1,
+          "topic_score": 42.77
         },
         {
           "partner": "TR",
@@ -1872,13 +2042,70 @@
           "direct_score": 0.0,
           "similarity_score": 49.2,
           "topic_score": 28.57
+        },
+        {
+          "partner": "RU",
+          "score": 19.75,
+          "band": "very_low",
+          "direct_score": 0.0,
+          "similarity_score": 46.8,
+          "topic_score": 28.57
+        }
+      ]
+    },
+    {
+      "country": "HU",
+      "relationship_count": 5,
+      "average_score": 25.93,
+      "strongest_partner": "RU",
+      "strongest_score": 39.45,
+      "top_partners": [
+        {
+          "partner": "RU",
+          "score": 39.45,
+          "band": "low",
+          "direct_score": 9.04,
+          "similarity_score": 75.2,
+          "topic_score": 61.86
+        },
+        {
+          "partner": "US",
+          "score": 23.67,
+          "band": "low",
+          "direct_score": 0.0,
+          "similarity_score": 51.7,
+          "topic_score": 40.82
+        },
+        {
+          "partner": "TR",
+          "score": 22.7,
+          "band": "low",
+          "direct_score": 0.0,
+          "similarity_score": 50.9,
+          "topic_score": 37.14
+        },
+        {
+          "partner": "GB",
+          "score": 22.49,
+          "band": "low",
+          "direct_score": 0.0,
+          "similarity_score": 50.2,
+          "topic_score": 37.14
+        },
+        {
+          "partner": "CN",
+          "score": 21.32,
+          "band": "low",
+          "direct_score": 0.0,
+          "similarity_score": 46.3,
+          "topic_score": 37.14
         }
       ]
     },
     {
       "country": "CZ",
       "relationship_count": 3,
-      "average_score": 27.17,
+      "average_score": 24.15,
       "strongest_partner": "UA",
       "strongest_score": 42.26,
       "top_partners": [
@@ -1891,26 +2118,26 @@
           "topic_score": 60.46
         },
         {
-          "partner": "US",
-          "score": 21.14,
-          "band": "low",
-          "direct_score": 0.0,
-          "similarity_score": 44.2,
-          "topic_score": 39.38
-        },
-        {
           "partner": "CN",
-          "score": 18.1,
+          "score": 16.29,
           "band": "very_low",
           "direct_score": 0.0,
-          "similarity_score": 37.5,
-          "topic_score": 34.24
+          "similarity_score": 33.5,
+          "topic_score": 31.22
+        },
+        {
+          "partner": "US",
+          "score": 13.9,
+          "band": "very_low",
+          "direct_score": 0.0,
+          "similarity_score": 28.7,
+          "topic_score": 26.47
         }
       ]
     }
   ],
   "current": {
-    "event_count": 127,
-    "graph_event_count": 127
+    "event_count": 156,
+    "graph_event_count": 156
   }
 }
