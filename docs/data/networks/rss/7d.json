@@ -2,27 +2,35 @@
   "nodes": [
     {
       "id": "BE",
-      "weight": 10.0
+      "weight": 7.0
+    },
+    {
+      "id": "CN",
+      "weight": 1.0
     },
     {
       "id": "CY",
-      "weight": 8.0
+      "weight": 10.0
     },
     {
       "id": "DE",
-      "weight": 66.0
+      "weight": 75.0
     },
     {
       "id": "DK",
-      "weight": 9.0
+      "weight": 11.0
     },
     {
       "id": "EE",
       "weight": 10.0
     },
     {
+      "id": "FI",
+      "weight": 1.0
+    },
+    {
       "id": "FR",
-      "weight": 44.0
+      "weight": 61.0
     },
     {
       "id": "GB",
@@ -34,11 +42,15 @@
     },
     {
       "id": "IE",
-      "weight": 17.0
+      "weight": 19.0
+    },
+    {
+      "id": "LU",
+      "weight": 2.0
     },
     {
       "id": "PL",
-      "weight": 15.0
+      "weight": 20.0
     },
     {
       "id": "RO",
@@ -46,11 +58,11 @@
     },
     {
       "id": "RU",
-      "weight": 53.0
+      "weight": 64.0
     },
     {
       "id": "SE",
-      "weight": 7.0
+      "weight": 5.0
     },
     {
       "id": "SK",
@@ -58,24 +70,29 @@
     },
     {
       "id": "UA",
-      "weight": 43.0
+      "weight": 52.0
     }
   ],
   "edges": [
     {
       "source": "BE",
       "target": "DE",
-      "weight": 10.0
+      "weight": 7.0
+    },
+    {
+      "source": "CN",
+      "target": "DE",
+      "weight": 1.0
     },
     {
       "source": "CY",
       "target": "DK",
-      "weight": 4.0
+      "weight": 5.0
     },
     {
       "source": "CY",
       "target": "IE",
-      "weight": 4.0
+      "weight": 5.0
     },
     {
       "source": "DE",
@@ -84,13 +101,18 @@
     },
     {
       "source": "DE",
+      "target": "FI",
+      "weight": 1.0
+    },
+    {
+      "source": "DE",
       "target": "FR",
-      "weight": 7.0
+      "weight": 10.0
     },
     {
       "source": "DE",
       "target": "GB",
-      "weight": 5.0
+      "weight": 7.0
     },
     {
       "source": "DE",
@@ -100,7 +122,7 @@
     {
       "source": "DE",
       "target": "PL",
-      "weight": 5.0
+      "weight": 6.0
     },
     {
       "source": "DE",
@@ -110,7 +132,12 @@
     {
       "source": "DE",
       "target": "RU",
-      "weight": 17.0
+      "weight": 19.0
+    },
+    {
+      "source": "DE",
+      "target": "SE",
+      "weight": 1.0
     },
     {
       "source": "DE",
@@ -120,12 +147,12 @@
     {
       "source": "DE",
       "target": "UA",
-      "weight": 13.0
+      "weight": 14.0
     },
     {
       "source": "DK",
       "target": "IE",
-      "weight": 4.0
+      "weight": 5.0
     },
     {
       "source": "DK",
@@ -155,7 +182,7 @@
     {
       "source": "FR",
       "target": "GB",
-      "weight": 11.0
+      "weight": 15.0
     },
     {
       "source": "FR",
@@ -165,17 +192,22 @@
     {
       "source": "FR",
       "target": "RU",
-      "weight": 11.0
+      "weight": 16.0
+    },
+    {
+      "source": "FR",
+      "target": "SE",
+      "weight": 1.0
     },
     {
       "source": "FR",
       "target": "UA",
-      "weight": 11.0
+      "weight": 15.0
     },
     {
       "source": "GB",
       "target": "SE",
-      "weight": 7.0
+      "weight": 1.0
     },
     {
       "source": "HR",
@@ -203,14 +235,24 @@
       "weight": 2.0
     },
     {
+      "source": "LU",
+      "target": "RU",
+      "weight": 1.0
+    },
+    {
+      "source": "LU",
+      "target": "UA",
+      "weight": 1.0
+    },
+    {
       "source": "PL",
       "target": "RU",
-      "weight": 5.0
+      "weight": 7.0
     },
     {
       "source": "PL",
       "target": "UA",
-      "weight": 4.0
+      "weight": 6.0
     },
     {
       "source": "RO",
@@ -224,8 +266,18 @@
     },
     {
       "source": "RU",
+      "target": "SE",
+      "weight": 1.0
+    },
+    {
+      "source": "RU",
       "target": "SK",
       "weight": 5.0
+    },
+    {
+      "source": "SE",
+      "target": "UA",
+      "weight": 1.0
     },
     {
       "source": "SK",
@@ -233,6 +285,6 @@
       "weight": 5.0
     }
   ],
-  "event_count": 303,
+  "event_count": 312,
   "mode": "all"
 }
