@@ -2,23 +2,23 @@
   "nodes": [
     {
       "id": "BE",
-      "weight": 7.0
+      "weight": 6.0
+    },
+    {
+      "id": "BG",
+      "weight": 1.0
     },
     {
       "id": "CN",
-      "weight": 3.0
-    },
-    {
-      "id": "CY",
-      "weight": 10.0
+      "weight": 4.0
     },
     {
       "id": "DE",
-      "weight": 69.0
+      "weight": 53.0
     },
     {
       "id": "DK",
-      "weight": 11.0
+      "weight": 4.0
     },
     {
       "id": "EE",
@@ -26,7 +26,7 @@
     },
     {
       "id": "ES",
-      "weight": 5.0
+      "weight": 9.0
     },
     {
       "id": "FI",
@@ -34,35 +34,43 @@
     },
     {
       "id": "FR",
-      "weight": 68.0
+      "weight": 55.0
     },
     {
       "id": "GB",
-      "weight": 24.0
+      "weight": 17.0
+    },
+    {
+      "id": "GR",
+      "weight": 3.0
     },
     {
       "id": "IE",
-      "weight": 14.0
+      "weight": 4.0
     },
     {
       "id": "IT",
-      "weight": 1.0
+      "weight": 3.0
     },
     {
       "id": "LU",
       "weight": 2.0
     },
     {
+      "id": "LV",
+      "weight": 1.0
+    },
+    {
       "id": "NL",
-      "weight": 5.0
+      "weight": 10.0
     },
     {
       "id": "PL",
-      "weight": 21.0
+      "weight": 23.0
     },
     {
       "id": "RO",
-      "weight": 12.0
+      "weight": 10.0
     },
     {
       "id": "RU",
@@ -70,22 +78,27 @@
     },
     {
       "id": "SE",
-      "weight": 9.0
+      "weight": 16.0
     },
     {
       "id": "SK",
-      "weight": 2.0
+      "weight": 3.0
     },
     {
       "id": "UA",
-      "weight": 46.0
+      "weight": 41.0
     }
   ],
   "edges": [
     {
       "source": "BE",
       "target": "DE",
-      "weight": 7.0
+      "weight": 6.0
+    },
+    {
+      "source": "BG",
+      "target": "LV",
+      "weight": 1.0
     },
     {
       "source": "CN",
@@ -95,17 +108,7 @@
     {
       "source": "CN",
       "target": "NL",
-      "weight": 1.0
-    },
-    {
-      "source": "CY",
-      "target": "DK",
-      "weight": 5.0
-    },
-    {
-      "source": "CY",
-      "target": "IE",
-      "weight": 5.0
+      "weight": 2.0
     },
     {
       "source": "DE",
@@ -120,27 +123,27 @@
     {
       "source": "DE",
       "target": "FR",
-      "weight": 11.0
+      "weight": 8.0
     },
     {
       "source": "DE",
       "target": "GB",
-      "weight": 7.0
+      "weight": 2.0
     },
     {
       "source": "DE",
       "target": "PL",
-      "weight": 6.0
+      "weight": 7.0
     },
     {
       "source": "DE",
       "target": "RO",
-      "weight": 3.0
+      "weight": 2.0
     },
     {
       "source": "DE",
       "target": "RU",
-      "weight": 17.0
+      "weight": 14.0
     },
     {
       "source": "DE",
@@ -155,12 +158,22 @@
     {
       "source": "DE",
       "target": "UA",
-      "weight": 11.0
+      "weight": 7.0
     },
     {
       "source": "DK",
-      "target": "IE",
-      "weight": 5.0
+      "target": "GB",
+      "weight": 1.0
+    },
+    {
+      "source": "DK",
+      "target": "GR",
+      "weight": 1.0
+    },
+    {
+      "source": "DK",
+      "target": "SE",
+      "weight": 1.0
     },
     {
       "source": "DK",
@@ -190,32 +203,32 @@
     {
       "source": "ES",
       "target": "NL",
-      "weight": 1.0
+      "weight": 2.0
     },
     {
       "source": "ES",
       "target": "RU",
-      "weight": 1.0
+      "weight": 2.0
     },
     {
       "source": "ES",
       "target": "SE",
-      "weight": 1.0
+      "weight": 2.0
     },
     {
       "source": "ES",
       "target": "UA",
-      "weight": 2.0
+      "weight": 3.0
     },
     {
       "source": "FR",
       "target": "GB",
-      "weight": 16.0
+      "weight": 11.0
     },
     {
       "source": "FR",
       "target": "IT",
-      "weight": 1.0
+      "weight": 2.0
     },
     {
       "source": "FR",
@@ -225,7 +238,7 @@
     {
       "source": "FR",
       "target": "RU",
-      "weight": 19.0
+      "weight": 18.0
     },
     {
       "source": "FR",
@@ -235,52 +248,67 @@
     {
       "source": "FR",
       "target": "UA",
-      "weight": 16.0
+      "weight": 11.0
+    },
+    {
+      "source": "GB",
+      "target": "GR",
+      "weight": 1.0
     },
     {
       "source": "GB",
       "target": "SE",
-      "weight": 1.0
-    },
-    {
-      "source": "IE",
-      "target": "RU",
       "weight": 2.0
     },
     {
-      "source": "IE",
-      "target": "UA",
-      "weight": 2.0
-    },
-    {
-      "source": "LU",
-      "target": "RU",
-      "weight": 1.0
-    },
-    {
-      "source": "LU",
-      "target": "UA",
-      "weight": 1.0
-    },
-    {
-      "source": "NL",
-      "target": "RU",
-      "weight": 1.0
-    },
-    {
-      "source": "NL",
+      "source": "GR",
       "target": "SE",
       "weight": 1.0
     },
     {
-      "source": "NL",
+      "source": "IE",
+      "target": "RU",
+      "weight": 2.0
+    },
+    {
+      "source": "IE",
+      "target": "UA",
+      "weight": 2.0
+    },
+    {
+      "source": "IT",
       "target": "UA",
       "weight": 1.0
     },
     {
+      "source": "LU",
+      "target": "RU",
+      "weight": 1.0
+    },
+    {
+      "source": "LU",
+      "target": "UA",
+      "weight": 1.0
+    },
+    {
+      "source": "NL",
+      "target": "RU",
+      "weight": 2.0
+    },
+    {
+      "source": "NL",
+      "target": "SE",
+      "weight": 2.0
+    },
+    {
+      "source": "NL",
+      "target": "UA",
+      "weight": 2.0
+    },
+    {
       "source": "PL",
       "target": "RU",
-      "weight": 9.0
+      "weight": 10.0
     },
     {
       "source": "PL",
@@ -290,7 +318,7 @@
     {
       "source": "RO",
       "target": "RU",
-      "weight": 3.0
+      "weight": 2.0
     },
     {
       "source": "RO",
@@ -300,19 +328,19 @@
     {
       "source": "RU",
       "target": "SE",
-      "weight": 2.0
+      "weight": 3.0
     },
     {
       "source": "RU",
       "target": "SK",
-      "weight": 1.0
+      "weight": 2.0
     },
     {
       "source": "SE",
       "target": "UA",
-      "weight": 2.0
+      "weight": 3.0
     }
   ],
-  "event_count": 279,
+  "event_count": 264,
   "mode": "all"
 }
