@@ -6,86 +6,244 @@
 <title>EU Political Alignment Monitor</title>
 <meta name="description" content="EU political interaction, interest and voting alignment dashboard." />
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+
 <style>
 :root{
-  --bg:#07111f;--bg2:#0b1728;--panel:#0f1d30;--panel2:#13243a;--line:#223550;
-  --text:#e7eef8;--muted:#8fa3bd;--blue:#4f8cff;--cyan:#31c3e0;--green:#42c88a;
-  --amber:#e8b24a;--red:#ef6a78;--purple:#a68bff;--white:#fff;--shadow:0 16px 40px rgba(0,0,0,.24);
-  --radius:16px;--radius-sm:10px;
+  --navy:#0b3653; --navy2:#124f70; --cyan:#2098cf; --blue:#177db2;
+  --sky:#eaf2f7; --panel:#ffffff; --panel2:#f8fbfd; --line:#d5e1e8;
+  --text:#103b55; --text2:#355d72; --muted:#6c8594; --green:#159a72;
+  --amber:#d99a1c; --red:#d33f31; --violet:#7c4ce4; --shadow:0 10px 26px rgba(24,65,88,.08);
+  --radius:18px; --radius-sm:11px;
 }
-*{box-sizing:border-box} html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-body{min-height:100vh;background:radial-gradient(circle at 12% -10%,rgba(79,140,255,.18),transparent 28%),linear-gradient(180deg,#07111f,#091523 50%,#07111f)}
-button,select{font:inherit}.app{max-width:1600px;margin:0 auto;padding:0 22px 36px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:22px 0 18px;border-bottom:1px solid rgba(255,255,255,.07)}
-.brand{display:flex;align-items:center;gap:14px}.mark{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(145deg,#1c4fa0,#174074);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
-.mark span{font-weight:800;letter-spacing:-1px}.brand h1{font-size:20px;margin:0;letter-spacing:.1px}.brand p{margin:3px 0 0;color:var(--muted);font-size:12px}.statusline{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:12px}.dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 14px rgba(66,200,138,.7)}
-.hero{padding:28px 0 18px;display:flex;align-items:end;justify-content:space-between;gap:24px}.hero h2{font-size:34px;line-height:1.06;margin:0 0 9px;letter-spacing:-.9px}.hero p{max-width:800px;margin:0;color:var(--muted);line-height:1.55;font-size:14px}.scope-note{max-width:420px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:rgba(15,29,48,.74);font-size:12px;color:var(--muted);line-height:1.5}.scope-note strong{color:var(--text)}
-.toolbar{display:flex;flex-wrap:wrap;align-items:end;gap:10px;padding:14px;border:1px solid var(--line);background:rgba(15,29,48,.82);border-radius:var(--radius);box-shadow:var(--shadow);position:sticky;top:8px;z-index:20;backdrop-filter:blur(14px)}
-.control{display:grid;gap:6px}.control label{font-size:10px;text-transform:uppercase;letter-spacing:.9px;color:var(--muted);font-weight:700}.control select{min-width:135px;background:#0a1524;color:var(--text);border:1px solid var(--line);border-radius:9px;padding:9px 10px;outline:none}.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#0a1524}.seg button{border:0;border-right:1px solid var(--line);background:transparent;color:var(--muted);padding:9px 12px;cursor:pointer}.seg button:last-child{border-right:0}.seg button.active{color:white;background:#17345d}.grow{flex:1}.refresh{border:1px solid #2d4e78;background:#17345d;color:white;border-radius:10px;padding:9px 14px;cursor:pointer}.refresh:hover{background:#1a4072}
-.tabs{display:flex;gap:6px;margin:18px 0 14px;overflow:auto;padding-bottom:2px}.tab{border:1px solid transparent;background:transparent;color:var(--muted);padding:10px 14px;border-radius:10px;cursor:pointer;white-space:nowrap;font-weight:700;font-size:13px}.tab.active{color:white;background:#13243a;border-color:#29415f}.tab .soon{margin-left:6px;font-size:9px;color:var(--amber);font-weight:800}
-.view{display:none}.view.active{display:block}.grid{display:grid;gap:14px}.kpis{grid-template-columns:repeat(6,minmax(0,1fr));margin-bottom:14px}.card{background:linear-gradient(180deg,rgba(17,33,54,.96),rgba(12,25,42,.96));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}.kpi{padding:16px 17px;min-height:105px}.kpi .label{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);font-weight:800}.kpi .value{font-size:28px;font-weight:800;margin-top:9px;letter-spacing:-.8px}.kpi .sub{font-size:11px;color:var(--muted);margin-top:5px}.kpi .accent{color:var(--cyan)}
-.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:17px 18px 0}.section-head h3{margin:0;font-size:14px}.section-head p{margin:4px 0 0;color:var(--muted);font-size:11px}.pill{font-size:10px;border:1px solid var(--line);border-radius:99px;padding:5px 8px;color:var(--muted);white-space:nowrap}.two{grid-template-columns:minmax(0,2fr) minmax(300px,.86fr)}.two-equal{grid-template-columns:1fr 1fr}.three{grid-template-columns:repeat(3,1fr)}
-.chart-wrap{padding:12px 14px 16px}.network{height:560px;width:100%;display:block;border-radius:12px;background:radial-gradient(circle at center,rgba(79,140,255,.08),transparent 55%)}.network.tall{height:690px}.legend{display:flex;flex-wrap:wrap;gap:12px;padding:0 18px 14px;font-size:10px;color:var(--muted)}.legend span{display:flex;align-items:center;gap:6px}.sw{width:16px;height:3px;border-radius:4px;background:var(--blue)}
-.list{padding:8px 14px 16px}.row{display:grid;grid-template-columns:38px 1fr auto;align-items:center;gap:10px;padding:11px 4px;border-bottom:1px solid rgba(255,255,255,.06)}.row:last-child{border-bottom:0}.rank{font-size:11px;color:var(--muted)}.row strong{font-size:12px}.row small{display:block;margin-top:3px;color:var(--muted);font-size:10px}.score{font-size:13px;font-weight:800}.bar{height:5px;background:#14243a;border-radius:5px;overflow:hidden;margin-top:7px}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--cyan));border-radius:5px}
-.cluster{padding:14px;border-bottom:1px solid rgba(255,255,255,.06)}.cluster:last-child{border-bottom:0}.cluster-top{display:flex;align-items:center;justify-content:space-between;gap:10px}.cluster-name{font-weight:800;font-size:12px}.cluster-members{font-size:11px;color:var(--text);margin-top:7px;line-height:1.55}.cluster-topic{font-size:10px;color:var(--muted);margin-top:6px}.cluster-dot{width:9px;height:9px;border-radius:50%;background:var(--purple)}
-.insight{padding:17px 18px;line-height:1.65;color:#c7d5e7;font-size:12px}.insight strong{color:white}.warning{padding:11px 13px;border:1px solid rgba(232,178,74,.32);background:rgba(232,178,74,.08);border-radius:10px;color:#d8c28f;font-size:11px;line-height:1.55;margin:0 14px 14px}
-.country-layout{grid-template-columns:300px minmax(0,1fr)}.country-side{padding:16px}.country-title{display:flex;align-items:center;gap:12px}.flag{width:42px;height:30px;border:1px solid var(--line);border-radius:6px;display:grid;place-items:center;color:var(--muted);font-size:11px;background:#0a1524}.country-title h3{margin:0;font-size:20px}.country-title p{margin:3px 0 0;color:var(--muted);font-size:11px}.country-metric{margin-top:18px}.country-metric .lab{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}.country-metric .num{font-size:25px;font-weight:800;margin-top:4px}.topic-bars{padding:12px 18px 18px}.topic-line{display:grid;grid-template-columns:150px 1fr 48px;gap:10px;align-items:center;margin:11px 0}.topic-line label{font-size:11px;color:#c7d5e7}.topic-line .track{height:9px;background:#0a1524;border-radius:6px;overflow:hidden}.topic-line .fill{height:100%;background:linear-gradient(90deg,#315ea5,#31c3e0);border-radius:6px}.topic-line b{font-size:11px;text-align:right}
-.matrix-wrap{overflow:auto;padding:10px 14px 16px}.matrix{border-collapse:separate;border-spacing:3px;min-width:860px;width:100%}.matrix th{font-size:10px;color:var(--muted);font-weight:700;padding:7px 5px;position:sticky;top:0;background:var(--panel);z-index:2}.matrix th:first-child{text-align:left;position:sticky;left:0;z-index:3}.matrix td:first-child{font-size:10px;font-weight:700;color:#dbe6f3;position:sticky;left:0;background:#0f1d30;z-index:1;padding:0 7px}.cell{height:28px;border-radius:5px;text-align:center;font-size:9px;color:rgba(255,255,255,.82);min-width:52px}
-.vote-empty,.empty{padding:34px 20px;text-align:center;color:var(--muted);font-size:12px;line-height:1.65}.badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;border:1px solid var(--line);border-radius:99px;padding:5px 8px;color:var(--muted)}.badge.good{border-color:rgba(66,200,138,.35);color:#83dcb0}.badge.warn{border-color:rgba(232,178,74,.35);color:#e6c877}.badge.bad{border-color:rgba(239,106,120,.35);color:#ef9aa3}
-.party-grid{padding:18px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.party-box{border:1px dashed #35506f;border-radius:12px;padding:16px;background:rgba(9,21,35,.65)}.party-box h4{margin:0 0 7px;font-size:12px}.party-box p{font-size:10px;color:var(--muted);line-height:1.55;margin:0}.footer{margin-top:18px;padding:14px 4px;color:#6e829b;font-size:10px;display:flex;justify-content:space-between;gap:20px;border-top:1px solid rgba(255,255,255,.06)}
-.tooltip{position:fixed;pointer-events:none;display:none;z-index:99;max-width:320px;padding:10px 11px;border:1px solid #38506e;background:#081320;color:#dce8f6;border-radius:9px;box-shadow:0 12px 30px rgba(0,0,0,.35);font-size:10px;line-height:1.5}.loading{opacity:.55;pointer-events:none}.error{margin:12px 0;padding:12px 14px;border:1px solid rgba(239,106,120,.34);background:rgba(239,106,120,.08);color:#f2a3ac;border-radius:10px;font-size:11px;display:none}
-@media(max-width:1200px){.kpis{grid-template-columns:repeat(3,1fr)}.two,.country-layout{grid-template-columns:1fr}.three{grid-template-columns:1fr 1fr}.party-grid{grid-template-columns:1fr 1fr}}
-@media(max-width:720px){.app{padding:0 12px 28px}.hero{display:block}.scope-note{margin-top:14px}.hero h2{font-size:28px}.kpis{grid-template-columns:1fr 1fr}.two-equal,.three{grid-template-columns:1fr}.party-grid{grid-template-columns:1fr}.network{height:460px}.topbar{align-items:flex-start}.statusline{display:none}.topic-line{grid-template-columns:110px 1fr 40px}}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--sky);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+body{min-height:100vh}
+button,select{font:inherit}
+.app{max-width:1600px;margin:0 auto;padding:0 24px 38px}
+
+.site-header{
+  margin:0 -24px 22px;
+  padding:26px 52px 28px;
+  color:white;
+  background:linear-gradient(105deg,#103e5a 0%,#155978 58%,#2b9bd0 100%);
+  box-shadow:0 8px 26px rgba(14,61,87,.14);
+}
+.brandline{display:flex;align-items:center;justify-content:space-between;gap:24px}
+.brand-left{display:flex;align-items:flex-start;gap:18px}
+.brand-mark{
+  width:50px;height:50px;border:1px solid rgba(255,255,255,.28);border-radius:12px;
+  display:grid;place-items:center;background:rgba(255,255,255,.08);font-weight:800;font-size:16px
+}
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.site-header h1{
+  margin:0;font-family:Georgia,"Times New Roman",serif;font-size:46px;line-height:1.02;letter-spacing:-1.4px
+}
+.site-header p{margin:12px 0 0;max-width:900px;font-size:14px;line-height:1.55;font-weight:700;color:#e6f3fa}
+.header-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.header-pill{
+  border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.1);color:#fff;
+  border-radius:24px;padding:10px 15px;font-size:11px;font-weight:800
+}
+.header-pill.primary{background:#188dcc;border-color:#188dcc}
+.statusline{display:flex;align-items:center;gap:7px;font-size:11px;color:#edf8fd}
+.dot{width:8px;height:8px;border-radius:50%;background:#57d39b}
+
+.overview-lead{
+  background:#fff;border:1px solid var(--line);border-left:6px solid var(--cyan);
+  border-radius:var(--radius);box-shadow:var(--shadow);padding:24px 28px;margin-bottom:16px;
+  display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center
+}
+.overview-kicker{font-size:11px;letter-spacing:1.8px;text-transform:uppercase;font-weight:800;color:#0a6c9d}
+.overview-lead h2{font-family:Georgia,"Times New Roman",serif;font-size:34px;line-height:1.08;margin:7px 0 10px;color:#0f4666}
+.overview-lead p{margin:0;color:var(--text2);font-size:13px;line-height:1.65;max-width:930px}
+.update-box{text-align:right;min-width:250px}
+.update-box small{display:block;font-size:10px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.7px}
+.update-box strong{display:block;font-size:17px;margin-top:7px;color:#0f4666}
+.coverage-badge{display:inline-flex;margin-top:10px;padding:8px 12px;border-radius:22px;background:#fff6e6;border:1px solid #f2ce8c;color:#93620d;font-size:10px;font-weight:800}
+
+.toolbar{
+  display:flex;flex-wrap:wrap;align-items:end;gap:12px;padding:13px 15px;
+  background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);
+  position:sticky;top:8px;z-index:30
+}
+.control{display:grid;gap:5px}.control label{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:800}
+.control select{min-width:145px;background:#fff;color:var(--text);border:1px solid #cbd9e1;border-radius:9px;padding:8px 10px;outline:none}
+.seg{display:flex;border:1px solid #cbd9e1;border-radius:9px;overflow:hidden;background:#f7fafc}
+.seg button{border:0;border-right:1px solid #cbd9e1;background:transparent;color:var(--text2);padding:8px 11px;cursor:pointer}
+.seg button:last-child{border-right:0}.seg button.active{color:#fff;background:var(--navy2)}
+.grow{flex:1}.refresh{border:0;background:var(--cyan);color:white;border-radius:10px;padding:9px 14px;font-weight:800;cursor:pointer}
+.refresh:hover{background:#1686ba}
+
+.tabs{display:flex;gap:5px;margin:14px 0;overflow:auto;padding:5px;background:#fff;border:1px solid var(--line);border-radius:13px}
+.tab{border:0;background:transparent;color:var(--text2);padding:10px 15px;border-radius:9px;cursor:pointer;white-space:nowrap;font-weight:800;font-size:12px}
+.tab.active{color:white;background:var(--navy2)}
+.tab .soon{margin-left:6px;font-size:8px;color:#fff0ba}
+
+.view{display:none}.view.active{display:block}.grid{display:grid;gap:14px}
+.kpis{grid-template-columns:repeat(6,minmax(0,1fr));margin-bottom:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.kpi{padding:17px 14px;min-height:116px;text-align:center;border-top:4px solid #2098cf}
+.kpi:nth-child(2){border-top-color:#159a72}.kpi:nth-child(3){border-top-color:#d33f31}.kpi:nth-child(4){border-top-color:#7c4ce4}.kpi:nth-child(5){border-top-color:#d99a1c}.kpi:nth-child(6){border-top-color:#b58a12}
+.kpi .label{font-size:9px;text-transform:uppercase;letter-spacing:.75px;color:var(--muted);font-weight:800;line-height:1.35}
+.kpi .value{font-size:28px;font-weight:800;margin-top:8px;letter-spacing:-.6px;color:#0f4666}
+.kpi .sub{font-size:10px;color:var(--muted);margin-top:6px;line-height:1.35}.kpi .accent{color:var(--cyan)}
+
+.section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:19px 20px 0}
+.section-head h3{margin:0;font-size:18px;color:#104967}
+.section-head p{margin:5px 0 0;color:var(--muted);font-size:10px;line-height:1.5}
+.pill,.badge{font-size:9px;border:1px solid #cad9e2;border-radius:99px;padding:6px 9px;color:var(--text2);white-space:nowrap;background:#f7fafc}
+.badge.good{border-color:#a4dec8;color:#0c7654;background:#eefaf5}.badge.warn{border-color:#efd49b;color:#906210;background:#fff9eb}.badge.bad{border-color:#f0b2ad;color:#a62d24;background:#fff3f1}
+
+.two{grid-template-columns:minmax(0,1.6fr) minmax(330px,.8fr)}
+.two-equal{grid-template-columns:1fr 1fr}.three{grid-template-columns:repeat(3,1fr)}
+.overview-top{grid-template-columns:1.05fr .95fr .95fr}
+.chart-wrap{padding:12px 16px 18px}
+.network{height:520px;width:100%;display:block;border-radius:13px;background:radial-gradient(circle at center,#f5fbfe,#edf6fa 70%)}
+.network.tall{height:660px}
+.legend{display:flex;flex-wrap:wrap;gap:12px;padding:0 18px 15px;font-size:9px;color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:6px}.sw{width:17px;height:3px;border-radius:4px;background:var(--blue)}
+
+.list{padding:8px 16px 18px}
+.row{display:grid;grid-template-columns:32px 1fr auto;align-items:center;gap:10px;padding:11px 2px;border-bottom:1px solid #e6edf1}
+.row:last-child{border-bottom:0}.rank{font-size:10px;color:var(--muted)}.row strong{font-size:11px;color:#214f67}.row small{display:block;margin-top:3px;color:var(--muted);font-size:9px}
+.score{font-size:12px;font-weight:800;color:#0f4666}
+.bar{height:5px;background:#e8eff3;border-radius:5px;overflow:hidden;margin-top:7px}.bar i{display:block;height:100%;background:linear-gradient(90deg,#1e7fb4,#22a4d9);border-radius:5px}
+
+.cluster{padding:13px 0;border-bottom:1px solid #e6edf1}.cluster:last-child{border-bottom:0}
+.cluster-top{display:flex;align-items:center;justify-content:space-between;gap:10px}.cluster-name{font-weight:800;font-size:11px;color:#214f67}
+.cluster-members{font-size:10px;color:var(--text2);margin-top:7px;line-height:1.55}.cluster-topic{font-size:9px;color:var(--muted);margin-top:6px}
+.insight{padding:16px 20px;line-height:1.65;color:var(--text2);font-size:11px}.insight strong{color:#0f4666}
+.warning{padding:11px 13px;border:1px solid #efd49b;background:#fff9eb;border-radius:10px;color:#7c631c;font-size:10px;line-height:1.55;margin:0 16px 16px}
+
+.country-layout{grid-template-columns:300px minmax(0,1fr)}.country-side{padding:16px}
+.country-title{display:flex;align-items:center;gap:12px}.flag{width:44px;height:32px;border:1px solid #cbd9e1;border-radius:6px;display:grid;place-items:center;color:var(--text2);font-size:11px;background:#f5f9fb}
+.country-title h3{margin:0;font-size:20px}.country-title p{margin:3px 0 0;color:var(--muted);font-size:10px}
+.country-metric{margin-top:18px}.country-metric .lab{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}.country-metric .num{font-size:25px;font-weight:800;margin-top:4px;color:#0f4666}
+
+.topic-bars{padding:12px 20px 20px}.topic-line{display:grid;grid-template-columns:150px 1fr 48px;gap:10px;align-items:center;margin:11px 0}
+.topic-line label{font-size:10px;color:var(--text2)}.topic-line .track{height:9px;background:#e7eff3;border-radius:6px;overflow:hidden}.topic-line .fill{height:100%;background:linear-gradient(90deg,#177db2,#26a2d6);border-radius:6px}.topic-line b{font-size:10px;text-align:right}
+
+.matrix-wrap{overflow:auto;padding:10px 14px 16px}.matrix{border-collapse:separate;border-spacing:3px;min-width:860px;width:100%}
+.matrix th{font-size:9px;color:var(--muted);font-weight:700;padding:7px 5px;position:sticky;top:0;background:#fff;z-index:2}
+.matrix th:first-child{text-align:left;position:sticky;left:0;z-index:3}.matrix td:first-child{font-size:9px;font-weight:700;color:var(--text2);position:sticky;left:0;background:#fff;z-index:1;padding:0 7px}
+.cell{height:28px;border-radius:5px;text-align:center;font-size:8px;color:#fff;min-width:52px}
+
+.party-grid{padding:18px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.party-box{border:1px dashed #b8cbd6;border-radius:12px;padding:16px;background:#f7fafc}
+.party-box h4{margin:0 0 7px;font-size:11px}.party-box p{font-size:9px;color:var(--muted);line-height:1.55;margin:0}
+.vote-empty,.empty{padding:28px 18px;text-align:center;color:var(--muted);font-size:10px;line-height:1.6}
+.footer{margin-top:20px;padding:15px 4px;color:#718a99;font-size:9px;display:flex;justify-content:space-between;gap:20px;border-top:1px solid #d8e3e9}
+
+.tooltip{position:fixed;pointer-events:none;display:none;z-index:99;max-width:320px;padding:10px 11px;border:1px solid #244f68;background:#0e405b;color:#fff;border-radius:9px;box-shadow:0 12px 30px rgba(0,0,0,.22);font-size:9px;line-height:1.5}
+.loading{opacity:.58;pointer-events:none}.error{margin:12px 0;padding:12px 14px;border:1px solid #f0b2ad;background:#fff3f1;color:#a62d24;border-radius:10px;font-size:10px;display:none}
+
+.method-box{padding:16px 20px 20px;color:var(--text2);font-size:10px;line-height:1.6}
+.method-box strong{color:#0f4666}
+.section-note{font-size:10px;color:var(--muted);line-height:1.55;margin:0 20px 18px}
+.subnav-label{font-size:9px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.8px;margin-right:4px}
+
+@media(max-width:1200px){
+  .kpis{grid-template-columns:repeat(3,1fr)}.two,.country-layout,.overview-top{grid-template-columns:1fr}.three{grid-template-columns:1fr 1fr}.party-grid{grid-template-columns:1fr 1fr}
+  .site-header h1{font-size:39px}
+}
+@media(max-width:760px){
+  .app{padding:0 12px 28px}.site-header{margin:0 -12px 16px;padding:20px 18px}.brandline,.brand-left{align-items:flex-start}.brandline{display:block}.header-actions{justify-content:flex-start;margin-top:18px}
+  .site-header h1{font-size:32px}.overview-lead{grid-template-columns:1fr;padding:20px}.update-box{text-align:left;min-width:0}
+  .kpis{grid-template-columns:1fr 1fr}.two-equal,.three{grid-template-columns:1fr}.party-grid{grid-template-columns:1fr}.network{height:430px}.topic-line{grid-template-columns:110px 1fr 40px}
+}
 </style>
+
 </head>
 <body>
 <div class="app" id="app">
-  <div class="topbar">
-    <div class="brand"><div class="mark"><span>EU</span></div><div><h1>EU Political Alignment Monitor</h1><p>Interaction · Interests · Voting · Political groups</p></div></div>
-    <div class="statusline"><span class="dot"></span><span id="statusText">Ready</span></div>
-  </div>
+  <header class="site-header">
+    <div class="brandline">
+      <div class="brand-left">
+        <div class="brand-mark">EU</div>
+        <div>
+          <div class="eyebrow">TÖRÉSVONALAK.BLOG</div>
+          <h1>EU Political Alignment Monitor</h1>
+          <p>EU-tagállamok politikai kapcsolatai, fő érdekei, együttműködési mintázatai és szavazási viselkedése · Political relations, policy interests and voting patterns inside and beyond the EU.</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="header-pill"><span class="statusline"><span class="dot"></span><span id="statusText">Ready</span></span></div>
+        <div class="header-pill primary">Elemző dashboard</div>
+      </div>
+    </div>
+  </header>
 
-  <div class="hero">
-    <div><h2>Mapping political relationships<br>inside and beyond the EU</h2><p>The monitor separates observed political interaction from policy-interest concentration and voting alignment. It is designed to identify changing country groups without treating simple co-occurrence as political agreement.</p></div>
-    <div class="scope-note"><strong>Interpretation rule:</strong> RSS/GDELT links show observed interaction and topic co-occurrence. Only voting data should be interpreted as voting alignment. Composite alignment will be added after the underlying layers are validated.</div>
-  </div>
+  <section class="overview-lead">
+    <div>
+      <div class="overview-kicker">EU POLITICAL INTELLIGENCE OVERVIEW</div>
+      <h2>Európai politikai helyzetkép</h2>
+      <p>A dashboard elkülöníti a megfigyelt országkapcsolatokat, a témák súlyát és a tényleges szavazási mintázatokat. Az RSS/GDELT együtt-előfordulás nem jelent automatikusan politikai egyetértést; a szavazási réteg külön kezelendő.</p>
+    </div>
+    <div class="update-box">
+      <small>FRISSÍTÉS / UPDATED</small>
+      <strong id="updatedStamp">adatbetöltéskor</strong>
+      <span class="coverage-badge">FELTÁRÓ / EXPLORATORY</span>
+    </div>
+  </section>
 
   <div class="toolbar">
-    <div class="control"><label>Data source</label><select id="source"><option value="combined">Combined</option><option value="rss">RSS</option><option value="gdelt">GDELT</option><option value="votes">Votes</option></select></div>
-    <div class="control"><label>Window</label><div class="seg" id="windowSeg"><button data-v="7d">7d</button><button class="active" data-v="30d">30d</button><button data-v="90d">90d</button></div></div>
-    <div class="control"><label>Relation scope</label><select id="scope"><option value="all">All relations</option><option value="internal">EU internal</option><option value="external">EU external</option></select></div>
-    <div class="control"><label>Topic</label><select id="topic"><option value="all">All topics</option><option value="migration">Migration</option><option value="ukraine_russia">Ukraine / Russia</option><option value="enlargement">Enlargement</option><option value="defence">Defence</option><option value="energy">Energy</option><option value="fiscal">Fiscal</option><option value="rule_of_law">Rule of law</option><option value="trade">Economic / Internal Market</option></select></div>
-    <div class="grow"></div><button class="refresh" id="refresh">Reload data</button>
+    <div class="control"><label>Adatforrás / Source</label><select id="source"><option value="combined">Combined</option><option value="rss">RSS</option><option value="gdelt">GDELT</option><option value="votes">Votes</option></select></div>
+    <div class="control"><label>Időablak / Window</label><div class="seg" id="windowSeg"><button data-v="7d">7d</button><button class="active" data-v="30d">30d</button><button data-v="90d">90d</button></div></div>
+    <div class="control"><label>Kapcsolat / Scope</label><select id="scope"><option value="all">All relations</option><option value="internal">EU internal</option><option value="external">EU external</option></select></div>
+    <div class="control"><label>Téma / Topic</label><select id="topic"><option value="all">All topics</option><option value="migration">Migration</option><option value="ukraine_russia">Ukraine / Russia</option><option value="enlargement">Enlargement</option><option value="defence">Defence</option><option value="energy">Energy</option><option value="fiscal">Fiscal</option><option value="rule_of_law">Rule of law</option><option value="trade">Economic / Internal Market</option></select></div>
+    <div class="grow"></div><button class="refresh" id="refresh">Adatok frissítése</button>
   </div>
   <div class="error" id="error"></div>
 
   <div class="tabs" id="tabs">
+    <span class="subnav-label">Nézet:</span>
     <button class="tab active" data-tab="overview">Overview</button>
     <button class="tab" data-tab="countries">Countries</button>
-    <button class="tab" data-tab="network">Network</button>
+    <button class="tab" data-tab="network">Relations</button>
     <button class="tab" data-tab="interests">Interests</button>
     <button class="tab" data-tab="voting">Voting</button>
-    <button class="tab" data-tab="parties">Parties <span class="soon">NEXT</span></button>
   </div>
 
   <section class="view active" id="view-overview">
     <div class="grid kpis">
-      <div class="card kpi"><div class="label">Observed countries</div><div class="value" id="kCountries">—</div><div class="sub">nodes in selected network</div></div>
-      <div class="card kpi"><div class="label">Political signals</div><div class="value" id="kEvents">—</div><div class="sub">events in selected window</div></div>
-      <div class="card kpi"><div class="label">Active links</div><div class="value" id="kLinks">—</div><div class="sub">country-pair relationships</div></div>
-      <div class="card kpi"><div class="label">Detected groups</div><div class="value accent" id="kClusters">—</div><div class="sub">topology-based exploratory clusters</div></div>
-      <div class="card kpi"><div class="label">Dominant topic</div><div class="value" style="font-size:19px" id="kTopic">—</div><div class="sub" id="kTopicSub">share of weighted links</div></div>
-      <div class="card kpi"><div class="label">Strongest pair</div><div class="value" style="font-size:19px" id="kPair">—</div><div class="sub" id="kPairSub">interaction weight</div></div>
+      <div class="card kpi"><div class="label">MEGFIGYELT ORSZÁGOK<br>OBSERVED COUNTRIES</div><div class="value" id="kCountries">—</div><div class="sub">nodes in selected network</div></div>
+      <div class="card kpi"><div class="label">POLITIKAI ESEMÉNYEK<br>POLITICAL EVENTS</div><div class="value" id="kEvents">—</div><div class="sub">signals in selected window</div></div>
+      <div class="card kpi"><div class="label">ORSZÁGKAPCSOLATOK<br>COUNTRY LINKS</div><div class="value" id="kLinks">—</div><div class="sub">observed country-pair links</div></div>
+      <div class="card kpi"><div class="label">FELTÁRÓ CSOPORTOK<br>EMERGING GROUPS</div><div class="value accent" id="kClusters">—</div><div class="sub">topology-based groups</div></div>
+      <div class="card kpi"><div class="label">DOMINÁNS TÉMA<br>DOMINANT POLICY</div><div class="value" style="font-size:18px" id="kTopic">—</div><div class="sub" id="kTopicSub">weighted topic share</div></div>
+      <div class="card kpi"><div class="label">LEGERŐSEBB PÁR<br>STRONGEST PAIR</div><div class="value" style="font-size:18px" id="kPair">—</div><div class="sub" id="kPairSub">interaction weight</div></div>
     </div>
-    <div class="grid two">
-      <div class="card"><div class="section-head"><div><h3 id="overviewNetworkTitle">Observed interaction network</h3><p id="overviewNetworkSub">Country co-occurrence and topic-linked relationships</p></div><span class="pill" id="networkModePill">Interaction</span></div><div class="chart-wrap"><svg id="networkOverview" class="network"></svg></div><div class="legend"><span><i class="sw"></i> stronger link = higher observed weight</span><span><i class="sw" style="background:var(--cyan)"></i> node size = country weight</span></div></div>
-      <div class="grid">
-        <div class="card"><div class="section-head"><div><h3>Emerging groups</h3><p>Exploratory topology clusters, not predefined blocs</p></div></div><div id="clusters" class="list"></div></div>
-        <div class="card"><div class="section-head"><div><h3>Strongest relationships</h3><p id="pairCaption">Observed interaction pairs</p></div></div><div id="topPairs" class="list"></div></div>
+
+    <div class="grid overview-top">
+      <div class="card">
+        <div class="section-head"><div><h3>Feltáró országcsoportok</h3><p>Frequently connected country groups · nem automatikusan politikai koalíciók</p></div></div>
+        <div id="clusters" class="list"></div>
+      </div>
+      <div class="card">
+        <div class="section-head"><div><h3>Legerősebb kapcsolatok</h3><p id="pairCaption">Observed interaction pairs</p></div></div>
+        <div id="topPairs" class="list"></div>
+      </div>
+      <div class="card">
+        <div class="section-head"><div><h3>Fő érdektémák</h3><p>Topic concentration in the selected evidence layer</p></div></div>
+        <div id="topicBars" class="topic-bars"></div>
       </div>
     </div>
+
     <div class="grid two-equal" style="margin-top:14px">
-      <div class="card"><div class="section-head"><div><h3>Topic concentration</h3><p>Weighted share of themes in the current network</p></div></div><div id="topicBars" class="topic-bars"></div></div>
-      <div class="card"><div class="section-head"><div><h3>Analytical reading</h3><p>What the selected data can and cannot support</p></div></div><div class="insight" id="analysisText"></div><div class="warning" id="methodWarning"></div></div>
+      <div class="card">
+        <div class="section-head"><div><h3>Elemző értelmezés</h3><p>What the selected evidence currently supports</p></div></div>
+        <div class="insight" id="analysisText"></div><div class="warning" id="methodWarning"></div>
+      </div>
+      <div class="card">
+        <div class="section-head"><div><h3>Módszertani olvasat</h3><p>How to read the dashboard correctly</p></div></div>
+        <div class="method-box"><strong>Interaction:</strong> az országok közös megjelenése és témakapcsolata.<br><strong>Interest:</strong> egy téma relatív súlya az adott országhoz kapcsolódó eseményekben.<br><strong>Voting:</strong> külön adatbázis alapján mért együttszavazási kapcsolat.<br><strong>Coalition:</strong> csak akkor nevezzük annak, ha a kapcsolatot érdekalapú, álláspont- és szavazási adatok is alátámasztják.</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px">
+      <div class="section-head"><div><h3 id="overviewNetworkTitle">Részletes kapcsolati hálózat</h3><p id="overviewNetworkSub">Analytical network view · secondary overview layer</p></div><span class="pill" id="networkModePill">Interaction</span></div>
+      <div class="section-note">A hálózati ábra részletes elemzéshez hasznos. A vastagabb él nagyobb megfigyelt kapcsolati súlyt jelent; ez önmagában nem azonos politikai egyetértéssel.</div>
+      <div class="chart-wrap"><svg id="networkOverview" class="network"></svg></div>
+      <div class="legend"><span><i class="sw"></i> stronger link = higher observed weight</span><span><i class="sw" style="background:#7c4ce4"></i> external actor</span></div>
     </div>
   </section>
 
@@ -116,7 +274,7 @@ button,select{font:inherit}.app{max-width:1600px;margin:0 auto;padding:0 22px 36
     <div class="card"><div class="section-head"><div><h3>European party-group layer</h3><p>Prepared UI for the next data integration phase</p></div><span class="badge warn">DATA LAYER PENDING</span></div><div class="party-grid"><div class="party-box"><h4>MEP voting graph</h4><p>MEP ↔ MEP and national delegation ↔ national delegation roll-call similarity.</p></div><div class="party-box"><h4>Political group cohesion</h4><p>EPP, S&amp;D, Renew, ECR, PfE, Greens/EFA, The Left, ESN and non-inscrits.</p></div><div class="party-box"><h4>National–party divergence</h4><p>Measure when an MEP or national delegation follows its European group more closely than its national pattern.</p></div><div class="party-box"><h4>Issue-specific movement</h4><p>Compare party and national alignment separately on defence, migration, energy, enlargement and other policy fields.</p></div></div><div class="warning">This page intentionally does not fabricate party metrics from country co-occurrence data. It becomes active after roll-call and MEP reference data are connected.</div></div>
   </section>
 
-  <div class="footer"><span>EU Political Alignment Monitor · Dashboard v2</span><span>Observed interaction ≠ political agreement · voting alignment is treated separately</span></div>
+  <div class="footer"><span>EU Political Alignment Monitor · Törésvonalak dashboard</span><span>Observed interaction ≠ political agreement · voting evidence is treated separately</span></div>
 </div>
 <div class="tooltip" id="tooltip"></div>
 <script>
@@ -148,7 +306,7 @@ function clusterTopic(g,members){const set=new Set(members),tot={};(g.edges||[])
 function setLoading(v){$('app').classList.toggle('loading',v);$('statusText').textContent=v?'Loading data…':'Ready'}
 function showError(msg){$('error').style.display=msg?'block':'none';$('error').textContent=msg||''}
 async function loadAll(){setLoading(true);showError('');try{const src=state.source;const [graph,heat,sim,rel,weekly,votes]=await Promise.all([json(pathGraph(src)),json(pathOpt(src,'heatmap'),true),json(pathOpt(src,'similarity'),true),json(pathOpt(src,'relationship'),true),json(pathReport(src),true),json(pathGraph('votes'),true)]);state.graph=graph;state.heatmap=heat;state.similarity=sim;state.relationship=rel;state.weekly=weekly;state.votes=votes;renderAll()}catch(e){console.error(e);showError(`Could not load the selected data layer. ${e.message}`)}finally{setLoading(false)}}
-function renderAll(){const g=filteredGraph(state.graph);renderKPIs(g);renderClusters(g);renderTopPairs(g);renderTopics(g);renderAnalysis(g);populateCountries(g);renderNetwork('#networkOverview',g);renderNetwork('#networkFull',g);renderCountry();renderInterests(g);renderVoting();$('networkModePill').textContent=relationLabel();$('fullNetworkPill').textContent=relationLabel();$('overviewNetworkTitle').textContent=state.source==='votes'?'Voting alignment network':'Observed interaction network';$('overviewNetworkSub').textContent=state.source==='votes'?'Country-pair voting relationships':'Country co-occurrence and topic-linked relationships';$('pairCaption').textContent=state.source==='votes'?'Available voting pairs':'Observed interaction pairs'}
+function renderAll(){if($('updatedStamp')){$('updatedStamp').textContent=new Date().toLocaleString('hu-HU',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})}const g=filteredGraph(state.graph);renderKPIs(g);renderClusters(g);renderTopPairs(g);renderTopics(g);renderAnalysis(g);populateCountries(g);renderNetwork('#networkOverview',g);renderNetwork('#networkFull',g);renderCountry();renderInterests(g);renderVoting();$('networkModePill').textContent=relationLabel();$('fullNetworkPill').textContent=relationLabel();$('overviewNetworkTitle').textContent=state.source==='votes'?'Voting alignment network':'Observed interaction network';$('overviewNetworkSub').textContent=state.source==='votes'?'Country-pair voting relationships':'Country co-occurrence and topic-linked relationships';$('pairCaption').textContent=state.source==='votes'?'Available voting pairs':'Observed interaction pairs'}
 function renderKPIs(g){const cl=clusters(g),tt=topicTotals(g),topT=Object.entries(tt).sort((a,b)=>b[1]-a[1])[0],sum=Object.values(tt).reduce((a,b)=>a+b,0)||1,topE=[...(g.edges||[])].sort((a,b)=>(+b.weight||0)-(+a.weight||0))[0];$('kCountries').textContent=fmt(g.nodes.length);$('kEvents').textContent=fmt(g.event_count??state.graph?.event_count??0);$('kLinks').textContent=fmt(g.edges.length);$('kClusters').textContent=fmt(cl.length);$('kTopic').textContent=topT?topicName(topT[0]):'—';$('kTopicSub').textContent=topT?`${Math.round(topT[1]/sum*100)}% of weighted topic signals`:'no topic weights';$('kPair').textContent=topE?`${topE.source?.id||topE.source} ↔ ${topE.target?.id||topE.target}`:'—';$('kPairSub').textContent=topE?`${relationLabel()} weight: ${fmt(topE.weight)}`:'no pair data'}
 function renderClusters(g){const arr=clusters(g);$('clusters').innerHTML=arr.length?arr.slice(0,5).map((m,i)=>{const t=clusterTopic(g,m);return `<div class="cluster"><div class="cluster-top"><div class="cluster-name">Group ${i+1}</div><span class="badge">${m.length} countries</span></div><div class="cluster-members">${m.map(x=>esc(nameOf(x))).join(' · ')}</div><div class="cluster-topic">Dominant observed theme: <strong>${t?esc(topicName(t)):'—'}</strong></div></div>`}).join(''):`<div class="empty">No multi-country topology clusters in this filtered view.</div>`}
 function pairRows(edges,max=7){const m=Math.max(...edges.map(e=>+e.weight||0),1);return edges.slice(0,max).map((e,i)=>{const a=e.source?.id||e.source,b=e.target?.id||e.target,tt=edgeTopTopic(e);return `<div class="row"><div class="rank">#${i+1}</div><div><strong>${esc(nameOf(a))} ↔ ${esc(nameOf(b))}</strong><small>${tt?esc(topicName(tt)):'No topic label'}</small><div class="bar"><i style="width:${Math.max(4,(+e.weight||0)/m*100)}%"></i></div></div><div class="score">${fmt(e.weight,1)}</div></div>`}).join('')}
