@@ -1,17 +1,25 @@
 # scripts/build_window_networks.py
 
 import json
-from pathlib import Path
-from datetime import datetime, timedelta, timezone
+import math
+import sys
 from collections import defaultdict
+from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 from itertools import combinations
-import math
+from pathlib import Path
+
+# Repository root. When this script is executed directly with
+# `python scripts/build_window_networks.py`, Python normally adds only the
+# `scripts/` directory to sys.path. We therefore add the repo root BEFORE
+# importing sibling packages such as `detectors`.
+ROOT = Path(__file__).resolve().parent.parent
+
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from detectors.relationship_detector import detect_relationship_from_parts
 
-
-ROOT = Path(__file__).resolve().parent.parent
 
 EVENTS_DIR = ROOT / "data" / "events"
 NETWORK_DIR = ROOT / "data" / "networks"
@@ -96,7 +104,6 @@ VALID_RELATION_TYPES = {
     "neutral",
     "mixed",
 }
-
 
 # -----------------------------
 # IO HELPERS
