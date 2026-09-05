@@ -3,12 +3,16 @@
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
-from detectors.topic_detector import detect_topics_from_parts, get_primary_topic_from_parts
+from detectors.topic_detector import (
+    detect_topics_from_parts,
+    get_primary_topic_from_parts,
+)
 from detectors.country_detector import (
     detect_countries_from_parts,
     split_country_groups,
     build_country_pairs,
 )
+from detectors.relationship_detector import detect_relationship_from_parts
 
 
 def utc_now_iso() -> str:
@@ -40,9 +44,17 @@ def build_event(
 ) -> Dict[str, Any]:
     """
     Build a normalized event record from raw source material.
-    This is the common event structure used across all layers.
-    """
 
+    The event contains:
+    - detected policy topics
+    - detected countries and country pairs
+    - event-level relationship classification
+
+    Relationship classification describes the language/tone of the current
+    event only. It does NOT by itself mean that the countries are strategic
+    allies or adversaries. Aggregated country-to-country interpretation is
+    performed later by the analysis layer.
+    """
     normalized_layer = normalize_layer_name(layer)
 
     topics = detect_topics_from_parts(
@@ -66,6 +78,12 @@ def build_event(
     country_groups = split_country_groups(countries)
     country_pairs = build_country_pairs(countries)
 
+    relationship = detect_relationship_from_parts(
+        title=title,
+        summary=summary,
+        body=body,
+    )
+
     event = {
         "layer": normalized_layer,
         "source_name": source_name.strip(),
@@ -76,11 +94,34 @@ def build_event(
         "url": url.strip(),
         "published_at": published_at,
         "collected_at": collected_at or utc_now_iso(),
+
+        # Policy layer
         "topics": topics,
         "primary_topic": primary_topic,
+
+        # Country layer
         "countries": countries,
         "country_groups": country_groups,
         "country_pairs": country_pairs,
+
+        # Relationship / stance layer
+        "relation_type": relationship.get("relation_type", "neutral"),
+        "relationship_score": relationship.get("relationship_score", 0.0),
+        "relationship_confidence": relationship.get("confidence", 0.0),
+        "relationship_signals": relationship.get("signals", {}),
+        "relationship_signal_strength": relationship.get(
+            "signal_strength",
+            {
+                "cooperative": 0.0,
+                "conflictual": 0.0,
+                "neutral": 0.0,
+            },
+        ),
+        "relationship_method": relationship.get(
+            "method",
+            "rule_based_relationship_v1",
+        ),
+
         "metadata": metadata or {},
     }
 
@@ -95,11 +136,33 @@ def event_has_countries(event: Dict[str, Any]) -> bool:
     return bool(event.get("countries"))
 
 
+def event_has_country_pair(event: Dict[str, Any]) -> bool:
+    """
+    True when at least two detected countries form an analysable pair.
+    This is useful for relationship-network analysis, but it is intentionally
+    not part of the minimum relevance rule because single-country events can
+    still be valuable for country and policy profiles.
+    """
+    return bool(event.get("country_pairs"))
+
+
+def event_has_relationship(event: Dict[str, Any]) -> bool:
+    return event.get("relation_type") in {
+        "cooperative",
+        "conflictual",
+        "neutral",
+        "mixed",
+    }
+
+
 def event_is_relevant(event: Dict[str, Any]) -> bool:
     """
-    Minimal relevance rule for now:
-    - must have at least 1 topic
-    - must have at least 1 country
+    Minimum relevance rule:
+    - must have at least 1 detected topic
+    - must have at least 1 detected country
+
+    We deliberately do not require a country pair here. Single-country events
+    remain useful for later country-interest and policy-profile analysis.
     """
     return event_has_topics(event) and event_has_countries(event)
 
