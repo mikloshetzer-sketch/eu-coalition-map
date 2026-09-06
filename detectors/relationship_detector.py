@@ -1,309 +1,623 @@
 # detectors/relationship_detector.py
+
 """
-Rule-based relationship / stance detector for EU Coalition Map.
+Semantic relationship detector for country-to-country political relations.
 
-Classifies event-level country interaction tone as:
-    cooperative | conflictual | neutral | mixed
+Version: rule_based_relationship_v2_pair
 
-Outputs:
-    relationship_score in [-1.0, +1.0]
-    confidence in [0.0, 1.0]
-    matched lexical signals
+Purpose
+-------
+This module separates two different questions:
 
-This module uses only the Python standard library plus the project's existing
-text normalizer, so it requires no new dependency in GitHub Actions.
+1. Event-level language:
+   What is the general tone of an article/event?
+2. Pair-level relationship:
+   Does the text contain evidence that country A and country B are cooperating,
+   conflicting, or interacting neutrally with each other?
+
+The pair-level detector is the preferred API for network edges.
+
+Important analytical rule
+--------------------------
+A negative article that merely mentions several countries must NOT make every
+country pair conflictual. Pair-level classification therefore requires local
+textual evidence connecting the two actors.
+
+If there is not enough pair-specific evidence, the result is `unclassified`,
+not `neutral`.
+
+Public API
+----------
+Backward-compatible event-level functions:
+    detect_relationship(text)
+    detect_relationship_from_parts(title="", summary="", body="")
+    get_relationship_type(text)
+    get_relationship_score(text)
+    relationship_is_directional(result)
+
+New pair-level functions:
+    detect_pair_relationship(text, country_a, country_b)
+    detect_pair_relationship_from_parts(
+        country_a,
+        country_b,
+        title="",
+        summary="",
+        body="",
+    )
 """
 
 from __future__ import annotations
 
 import re
-from typing import Dict, Iterable, List, Tuple
+import unicodedata
+from collections import defaultdict
+from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 
-from utils.text_normalizer import build_searchable_text, normalize_text
 
+METHOD_EVENT = "rule_based_relationship_v2_event"
+METHOD_PAIR = "rule_based_relationship_v2_pair"
+
+VALID_RELATION_TYPES = {
+    "cooperative",
+    "conflictual",
+    "neutral",
+    "mixed",
+    "unclassified",
+}
+
+NEGATION_TERMS = {
+    "not",
+    "no",
+    "never",
+    "without",
+    "deny",
+    "denied",
+    "denies",
+    "reject",
+    "rejected",
+    "rejects",
+    "failed to",
+    "failure to",
+    "didn't",
+    "did not",
+    "doesn't",
+    "does not",
+}
+
+# ---------------------------------------------------------------------------
+# COUNTRY ALIASES
+# ---------------------------------------------------------------------------
+
+# The detector accepts ISO-like codes from the rest of the repo.
+# Aliases are intentionally conservative and English-oriented because the
+# current RSS/GDELT corpus is predominantly English-language.
+COUNTRY_ALIASES: Dict[str, Tuple[str, ...]] = {
+    "AT": ("austria", "austrian"),
+    "BE": ("belgium", "belgian"),
+    "BG": ("bulgaria", "bulgarian"),
+    "HR": ("croatia", "croatian"),
+    "CY": ("cyprus", "cypriot"),
+    "CZ": ("czech republic", "czechia", "czech"),
+    "DK": ("denmark", "danish"),
+    "EE": ("estonia", "estonian"),
+    "FI": ("finland", "finnish"),
+    "FR": ("france", "french"),
+    "DE": ("germany", "german"),
+    "GR": ("greece", "greek"),
+    "HU": ("hungary", "hungarian"),
+    "IE": ("ireland", "irish"),
+    "IT": ("italy", "italian"),
+    "LV": ("latvia", "latvian"),
+    "LT": ("lithuania", "lithuanian"),
+    "LU": ("luxembourg", "luxembourgish"),
+    "MT": ("malta", "maltese"),
+    "NL": ("netherlands", "dutch"),
+    "PL": ("poland", "polish"),
+    "PT": ("portugal", "portuguese"),
+    "RO": ("romania", "romanian"),
+    "SK": ("slovakia", "slovak"),
+    "SI": ("slovenia", "slovenian"),
+    "ES": ("spain", "spanish"),
+    "SE": ("sweden", "swedish"),
+
+    # Common external actors already present in the dashboard corpus.
+    "GB": (
+        "united kingdom",
+        "uk",
+        "britain",
+        "british",
+        "england",
+    ),
+    "US": (
+        "united states",
+        "u.s.",
+        "u.s",
+        "us",
+        "america",
+        "american",
+        "washington",
+    ),
+    "RU": (
+        "russia",
+        "russian",
+        "moscow",
+        "kremlin",
+    ),
+    "UA": (
+        "ukraine",
+        "ukrainian",
+        "kyiv",
+        "kiev",
+    ),
+    "CN": (
+        "china",
+        "chinese",
+        "beijing",
+    ),
+    "TR": (
+        "turkey",
+        "türkiye",
+        "turkiye",
+        "turkish",
+        "ankara",
+    ),
+}
+
+
+# ---------------------------------------------------------------------------
+# SIGNAL LEXICONS
+# ---------------------------------------------------------------------------
 
 COOPERATIVE_PHRASES: Dict[str, float] = {
     "agreed to cooperate": 1.00,
     "agreed to work together": 1.00,
-    "will work together": 0.90,
-    "working together": 0.75,
-    "joint cooperation": 0.85,
-    "strengthen cooperation": 0.90,
-    "deepen cooperation": 0.90,
-    "closer cooperation": 0.80,
-    "strategic partnership": 1.00,
-    "bilateral partnership": 0.85,
-    "partnership agreement": 0.85,
-    "joint declaration": 0.75,
-    "joint statement": 0.65,
-    "joint initiative": 0.80,
-    "common position": 0.90,
-    "shared position": 0.85,
-    "coordinated position": 0.85,
-    "coordinate their positions": 0.90,
-    "mutual support": 0.95,
-    "expressed support": 0.70,
-    "backs": 0.65,
-    "backed": 0.65,
-    "supports": 0.60,
-    "supported": 0.60,
-    "welcomed": 0.50,
-    "praised": 0.55,
-    "security cooperation": 0.85,
-    "defence cooperation": 0.90,
-    "defense cooperation": 0.90,
-    "military cooperation": 0.90,
-    "intelligence cooperation": 0.90,
-    "joint military exercise": 0.85,
-    "joint exercises": 0.75,
-    "security partnership": 0.90,
-    "defence partnership": 0.90,
-    "defense partnership": 0.90,
-    "reaffirmed alliance": 1.00,
-    "reaffirmed their alliance": 1.00,
-    "allied countries": 0.65,
+    "pledged to cooperate": 0.95,
+    "jointly agreed": 0.90,
+    "joint agreement": 0.95,
+    "reached an agreement": 0.95,
+    "signed an agreement": 1.00,
+    "signed a deal": 0.95,
     "trade agreement": 0.85,
-    "free trade agreement": 0.90,
-    "economic cooperation": 0.80,
-    "energy cooperation": 0.80,
-    "investment agreement": 0.75,
-    "signed an agreement": 0.70,
-    "signed a memorandum": 0.65,
-    "memorandum of understanding": 0.70,
-    "joint project": 0.65,
-    "peace agreement": 1.00,
-    "ceasefire agreement": 0.90,
-    "normalise relations": 0.90,
-    "normalize relations": 0.90,
-    "restore diplomatic relations": 0.95,
-    "improve relations": 0.80,
-    "rapprochement": 0.85,
-    "reconciliation": 0.85,
+    "defence agreement": 0.95,
+    "defense agreement": 0.95,
+    "security agreement": 0.95,
+    "strategic partnership": 1.00,
+    "bilateral partnership": 0.90,
+    "defence cooperation": 0.95,
+    "defense cooperation": 0.95,
+    "security cooperation": 0.95,
+    "military cooperation": 0.90,
+    "economic cooperation": 0.85,
+    "energy cooperation": 0.85,
+    "deepened cooperation": 0.95,
+    "strengthened cooperation": 0.95,
+    "strengthen cooperation": 0.90,
+    "closer cooperation": 0.85,
+    "closer ties": 0.85,
+    "strengthened ties": 0.90,
+    "strengthen ties": 0.85,
+    "improved relations": 0.90,
+    "support for": 0.65,
+    "backed": 0.60,
+    "supported": 0.60,
+    "endorsed": 0.65,
+    "approved": 0.55,
+    "coordinated": 0.70,
+    "coordination": 0.65,
+    "joint initiative": 0.85,
+    "joint declaration": 0.85,
+    "joint statement": 0.70,
+    "mutual support": 0.90,
+    "allied with": 0.90,
+    "alliance with": 0.90,
+    "partnered with": 0.85,
+    "cooperated with": 0.90,
+    "working together": 0.75,
+    "common position": 0.80,
+    "shared position": 0.80,
+    "aligned with": 0.75,
+    "welcomed the agreement": 0.65,
+    "welcomed cooperation": 0.75,
+    "solidarity with": 0.85,
+    "aid to": 0.60,
+    "assistance to": 0.60,
 }
 
 CONFLICTUAL_PHRASES: Dict[str, float] = {
-    "condemned": 0.85,
-    "condemns": 0.85,
-    "strongly condemned": 1.00,
-    "criticised": 0.70,
-    "criticized": 0.70,
-    "strongly criticised": 0.90,
-    "strongly criticized": 0.90,
-    "accused": 0.75,
-    "accuses": 0.75,
-    "blamed": 0.70,
-    "blames": 0.70,
-    "denounced": 0.85,
-    "denounces": 0.85,
-    "rejected": 0.65,
-    "opposes": 0.70,
-    "opposed": 0.70,
-    "dispute": 0.55,
-    "diplomatic dispute": 0.80,
-    "political dispute": 0.70,
-    "tensions with": 0.75,
-    "relations deteriorated": 0.90,
-    "deteriorating relations": 0.85,
-    "imposed sanctions": 1.00,
+    "condemned": 0.75,
+    "condemns": 0.75,
+    "criticised": 0.60,
+    "criticized": 0.60,
+    "accused": 0.70,
+    "accuses": 0.70,
+    "threatened": 0.85,
+    "threatens": 0.85,
+    "warned": 0.50,
     "sanctions against": 0.95,
-    "new sanctions": 0.80,
-    "economic sanctions": 0.90,
-    "targeted sanctions": 0.90,
-    "trade restrictions": 0.70,
-    "export restrictions": 0.70,
-    "import ban": 0.80,
-    "embargo": 0.85,
-    "retaliatory measures": 0.90,
-    "retaliation against": 0.90,
-    "expelled diplomats": 0.95,
-    "expulsion of diplomats": 0.95,
-    "summoned the ambassador": 0.70,
-    "military threat": 0.95,
-    "threatened military action": 1.00,
-    "military confrontation": 1.00,
-    "armed confrontation": 1.00,
-    "armed conflict": 1.00,
+    "sanctioned": 0.90,
+    "imposed sanctions": 1.00,
+    "retaliated": 0.90,
+    "retaliation against": 0.95,
+    "expelled diplomats": 1.00,
+    "diplomatic row": 0.90,
+    "diplomatic dispute": 0.90,
+    "political dispute": 0.80,
+    "trade dispute": 0.80,
+    "trade war": 0.95,
+    "border dispute": 0.90,
+    "territorial dispute": 0.95,
+    "military threat": 1.00,
     "military attack": 1.00,
-    "attacked": 0.90,
-    "air strike": 0.90,
-    "airstrike": 0.90,
-    "missile strike": 0.95,
-    "drone strike": 0.90,
+    "attacked": 1.00,
+    "attack on": 1.00,
+    "struck": 0.90,
+    "strike on": 0.90,
     "invaded": 1.00,
-    "invasion": 1.00,
-    "occupation": 0.90,
-    "violated airspace": 0.95,
-    "border clash": 0.90,
-    "hostile action": 0.90,
+    "invasion of": 1.00,
+    "occupied": 0.90,
+    "occupation of": 0.90,
+    "cyber attack": 0.95,
+    "cyberattack": 0.95,
     "hybrid attack": 0.95,
-    "cyber attack": 0.90,
-    "cyberattack": 0.90,
-    "espionage": 0.75,
-    "sabotage": 0.85,
-    "cut diplomatic ties": 1.00,
-    "severed diplomatic relations": 1.00,
-    "recalled its ambassador": 0.80,
-    "closed its embassy": 0.80,
+    "hostile action": 0.95,
+    "hostile act": 0.95,
+    "hostile relations": 0.90,
+    "opposed": 0.65,
+    "opposes": 0.65,
+    "rejected": 0.60,
+    "blocked": 0.65,
+    "vetoed": 0.75,
+    "clashed with": 0.90,
+    "conflict with": 0.90,
+    "tensions with": 0.80,
+    "tension between": 0.80,
+    "dispute with": 0.85,
+    "dispute between": 0.85,
+    "protested against": 0.80,
+    "interference by": 0.85,
+    "meddling by": 0.85,
+    "espionage": 0.80,
+    "spy scandal": 0.90,
 }
 
 NEUTRAL_PHRASES: Dict[str, float] = {
     "held talks": 0.70,
-    "held a meeting": 0.60,
-    "met with": 0.45,
-    "bilateral meeting": 0.55,
-    "official visit": 0.50,
-    "state visit": 0.50,
-    "diplomatic talks": 0.65,
-    "negotiations": 0.55,
-    "discussed": 0.45,
-    "discusses": 0.45,
-    "consultations": 0.55,
-    "phone call": 0.45,
-    "telephone call": 0.45,
-    "summit": 0.35,
-    "meeting between": 0.50,
-    "delegation visited": 0.45,
-    "foreign minister met": 0.50,
-    "prime minister met": 0.50,
-    "president met": 0.50,
-}
-
-NEGATION_TOKENS = {
-    "not", "no", "never", "without", "denied", "denies", "rejects", "rejected"
+    "met with": 0.65,
+    "meeting with": 0.65,
+    "bilateral meeting": 0.75,
+    "bilateral talks": 0.75,
+    "talks with": 0.65,
+    "discussed": 0.55,
+    "discussions with": 0.60,
+    "negotiations with": 0.65,
+    "negotiations between": 0.65,
+    "consultations with": 0.60,
+    "dialogue with": 0.60,
+    "summit with": 0.65,
+    "visit to": 0.45,
+    "visited": 0.45,
+    "delegation from": 0.45,
+    "delegation to": 0.45,
+    "phone call": 0.40,
+    "spoke with": 0.50,
+    "talked with": 0.50,
 }
 
 
-def _prepare_text(*parts: str) -> str:
-    text = build_searchable_text(*parts)
-    return normalize_text(text, lowercase=True)
+# Pair-binding words make a local signal more likely to describe the relation
+# between the two actors rather than an unrelated third-party event.
+PAIR_BINDERS = (
+    "with",
+    "between",
+    "against",
+    "toward",
+    "towards",
+    "and",
+    "versus",
+    "vs",
+    "from",
+    "to",
+)
 
 
-def _phrase_pattern(phrase: str) -> re.Pattern:
-    normalized = normalize_text(phrase, lowercase=True)
-    escaped = re.escape(normalized).replace(r"\ ", r"\s+")
-    return re.compile(rf"\b{escaped}\b", re.IGNORECASE)
+# ---------------------------------------------------------------------------
+# TEXT HELPERS
+# ---------------------------------------------------------------------------
+
+def _strip_accents(value: str) -> str:
+    return "".join(
+        c
+        for c in unicodedata.normalize("NFKD", value)
+        if not unicodedata.combining(c)
+    )
 
 
-def _is_negated(text: str, match_start: int, lookback_chars: int = 45) -> bool:
-    left = text[max(0, match_start - lookback_chars):match_start]
-    words = re.findall(r"\b[\w'-]+\b", left.lower())
-    return any(token in NEGATION_TOKENS for token in words[-6:])
+def _normalize_text(value: str) -> str:
+    value = _strip_accents(str(value or "")).lower()
+    value = value.replace("\u2019", "'")
+    value = value.replace("\u2018", "'")
+    value = value.replace("\u2013", "-")
+    value = value.replace("\u2014", "-")
+    value = re.sub(r"\s+", " ", value)
+    return value.strip()
 
 
-def _collect_matches(text: str, phrases: Dict[str, float]) -> List[Dict[str, object]]:
-    matches: List[Dict[str, object]] = []
-    for phrase, strength in phrases.items():
-        pattern = _phrase_pattern(phrase)
+def _split_sentences(text: str) -> List[str]:
+    text = str(text or "").strip()
+    if not text:
+        return []
+
+    # Keep headline-like segments useful even when punctuation is sparse.
+    parts = re.split(r"(?<=[.!?;])\s+|\n+", text)
+    return [p.strip() for p in parts if p.strip()]
+
+
+def _country_aliases(code: str) -> Tuple[str, ...]:
+    code = str(code or "").strip().upper()
+    aliases = COUNTRY_ALIASES.get(code, ())
+    return tuple(_normalize_text(x) for x in aliases)
+
+
+def _contains_alias(text: str, aliases: Sequence[str]) -> bool:
+    if not text or not aliases:
+        return False
+
+    for alias in aliases:
+        if not alias:
+            continue
+
+        # Very short aliases such as US/UK must be matched as words.
+        if len(alias) <= 3:
+            if re.search(rf"(?<!\w){re.escape(alias)}(?!\w)", text):
+                return True
+        else:
+            if alias in text:
+                return True
+
+    return False
+
+
+def _alias_positions(text: str, aliases: Sequence[str]) -> List[Tuple[int, int, str]]:
+    positions = []
+
+    for alias in aliases:
+        if not alias:
+            continue
+
+        if len(alias) <= 3:
+            pattern = re.compile(rf"(?<!\w){re.escape(alias)}(?!\w)")
+        else:
+            pattern = re.compile(re.escape(alias))
+
         for match in pattern.finditer(text):
-            negated = _is_negated(text, match.start())
-            effective_strength = strength * (0.25 if negated else 1.0)
+            positions.append((match.start(), match.end(), alias))
+
+    return sorted(positions)
+
+
+def _nearest_actor_distance(
+    text: str,
+    aliases_a: Sequence[str],
+    aliases_b: Sequence[str],
+) -> Optional[int]:
+    pos_a = _alias_positions(text, aliases_a)
+    pos_b = _alias_positions(text, aliases_b)
+
+    if not pos_a or not pos_b:
+        return None
+
+    best = None
+
+    for a_start, a_end, _ in pos_a:
+        for b_start, b_end, _ in pos_b:
+            if a_end <= b_start:
+                distance = b_start - a_end
+            elif b_end <= a_start:
+                distance = a_start - b_end
+            else:
+                distance = 0
+
+            if best is None or distance < best:
+                best = distance
+
+    return best
+
+
+def _has_negation_near(text: str, phrase_start: int, window: int = 45) -> bool:
+    left = text[max(0, phrase_start - window):phrase_start]
+
+    for neg in NEGATION_TERMS:
+        if neg in left:
+            return True
+
+    return False
+
+
+def _find_phrase_matches(
+    text: str,
+    phrases: Dict[str, float],
+) -> List[Dict[str, object]]:
+    matches = []
+
+    for phrase, strength in phrases.items():
+        start = 0
+
+        while True:
+            idx = text.find(phrase, start)
+            if idx < 0:
+                break
+
+            negated = _has_negation_near(text, idx)
+
             matches.append({
                 "phrase": phrase,
-                "strength": round(float(effective_strength), 3),
+                "strength": float(strength),
+                "start": idx,
+                "end": idx + len(phrase),
                 "negated": negated,
-                "start": match.start(),
             })
-    matches.sort(key=lambda item: (-float(item["strength"]), int(item["start"])))
+
+            start = idx + max(1, len(phrase))
+
     return matches
 
 
-def _sum_signal_strength(matches: Iterable[Dict[str, object]]) -> float:
-    values = sorted((float(item["strength"]) for item in matches), reverse=True)
-    if not values:
-        return 0.0
-    total = 0.0
-    decay = 1.0
-    for value in values[:8]:
-        total += value * decay
-        decay *= 0.68
-    return total
+def _score_signal_matches(
+    cooperative_matches: Sequence[Dict[str, object]],
+    conflictual_matches: Sequence[Dict[str, object]],
+    neutral_matches: Sequence[Dict[str, object]],
+) -> Dict[str, float]:
+    coop = 0.0
+    conflict = 0.0
+    neutral = 0.0
+
+    for m in cooperative_matches:
+        strength = float(m["strength"])
+        if m.get("negated"):
+            conflict += strength * 0.60
+        else:
+            coop += strength
+
+    for m in conflictual_matches:
+        strength = float(m["strength"])
+        if m.get("negated"):
+            neutral += strength * 0.40
+        else:
+            conflict += strength
+
+    for m in neutral_matches:
+        strength = float(m["strength"])
+        if not m.get("negated"):
+            neutral += strength
+
+    return {
+        "cooperative": coop,
+        "conflictual": conflict,
+        "neutral": neutral,
+    }
 
 
-def _confidence_from_evidence(
-    cooperative_strength: float,
-    conflictual_strength: float,
-    neutral_strength: float,
-) -> float:
-    directional = cooperative_strength + conflictual_strength
-    total = directional + (neutral_strength * 0.50)
-    if total <= 0:
-        return 0.15
-    base = min(0.92, 0.34 + (total * 0.18))
-    if cooperative_strength > 0 and conflictual_strength > 0:
-        balance = min(cooperative_strength, conflictual_strength) / max(
-            cooperative_strength, conflictual_strength
-        )
-        base -= 0.18 * balance
-    return round(max(0.15, min(0.95, base)), 3)
+def _classification_from_strengths(
+    strengths: Dict[str, float],
+    *,
+    allow_unclassified: bool = True,
+) -> Dict[str, object]:
+    coop = float(strengths.get("cooperative", 0.0) or 0.0)
+    conflict = float(strengths.get("conflictual", 0.0) or 0.0)
+    neutral = float(strengths.get("neutral", 0.0) or 0.0)
 
+    evidence = coop + conflict + neutral
 
-def _classify(
-    cooperative_strength: float,
-    conflictual_strength: float,
-    neutral_strength: float,
-) -> Tuple[str, float]:
-    directional_total = cooperative_strength + conflictual_strength
-    if directional_total == 0:
-        return "neutral", 0.0
+    if evidence <= 0:
+        return {
+            "relation_type": "unclassified" if allow_unclassified else "neutral",
+            "relationship_score": 0.0,
+            "confidence": 0.0 if allow_unclassified else 0.10,
+        }
 
-    raw_score = (cooperative_strength - conflictual_strength) / max(directional_total, 1e-9)
-    score = max(-1.0, min(1.0, raw_score))
+    polarity_den = coop + conflict
 
-    weaker = min(cooperative_strength, conflictual_strength)
-    stronger = max(cooperative_strength, conflictual_strength)
+    if polarity_den > 0:
+        score = (coop - conflict) / polarity_den
+    else:
+        score = 0.0
 
-    if weaker >= 0.55 and stronger > 0 and (weaker / stronger) >= 0.45:
-        return "mixed", round(score, 3)
+    score = max(-1.0, min(1.0, score))
 
-    if stronger < 0.55 and neutral_strength >= stronger:
-        return "neutral", round(score * 0.35, 3)
+    # Confidence is intentionally conservative.
+    # Strong explicit signals increase confidence; neutral language alone
+    # remains moderate.
+    strongest = max(coop, conflict, neutral)
+    confidence = min(0.95, 0.20 + strongest * 0.45)
 
-    if score >= 0.18:
-        return "cooperative", round(score, 3)
-    if score <= -0.18:
-        return "conflictual", round(score, 3)
-    return "mixed", round(score, 3)
+    if coop > 0 and conflict > 0:
+        # If both directions are present and neither clearly dominates,
+        # classify as mixed.
+        dominance = abs(coop - conflict) / max(coop + conflict, 0.000001)
 
+        if dominance < 0.35:
+            relation_type = "mixed"
+        elif coop > conflict:
+            relation_type = "cooperative"
+        else:
+            relation_type = "conflictual"
 
-def detect_relationship(text: str) -> Dict[str, object]:
-    """Detect event-level relationship tone from one text blob."""
-    searchable = _prepare_text(text)
+    elif coop > 0:
+        relation_type = "cooperative"
 
-    cooperative_matches = _collect_matches(searchable, COOPERATIVE_PHRASES)
-    conflictual_matches = _collect_matches(searchable, CONFLICTUAL_PHRASES)
-    neutral_matches = _collect_matches(searchable, NEUTRAL_PHRASES)
+    elif conflict > 0:
+        relation_type = "conflictual"
 
-    cooperative_strength = _sum_signal_strength(cooperative_matches)
-    conflictual_strength = _sum_signal_strength(conflictual_matches)
-    neutral_strength = _sum_signal_strength(neutral_matches)
-
-    relation_type, relationship_score = _classify(
-        cooperative_strength,
-        conflictual_strength,
-        neutral_strength,
-    )
-
-    confidence = _confidence_from_evidence(
-        cooperative_strength,
-        conflictual_strength,
-        neutral_strength,
-    )
+    else:
+        relation_type = "neutral"
 
     return {
         "relation_type": relation_type,
-        "relationship_score": relationship_score,
-        "confidence": confidence,
+        "relationship_score": round(score, 3),
+        "confidence": round(confidence, 3),
+    }
+
+
+# ---------------------------------------------------------------------------
+# EVENT-LEVEL DETECTION
+# ---------------------------------------------------------------------------
+
+def detect_relationship(text: str) -> Dict[str, object]:
+    """
+    Classify the general relationship language of a text.
+
+    This function is retained for backward compatibility. For network edges,
+    prefer `detect_pair_relationship()`.
+    """
+    normalized = _normalize_text(text)
+
+    if not normalized:
+        return {
+            "relation_type": "unclassified",
+            "relationship_score": 0.0,
+            "confidence": 0.0,
+            "signals": {
+                "cooperative": [],
+                "conflictual": [],
+                "neutral": [],
+            },
+            "signal_strength": {
+                "cooperative": 0.0,
+                "conflictual": 0.0,
+                "neutral": 0.0,
+            },
+            "method": METHOD_EVENT,
+            "directional": False,
+        }
+
+    coop_matches = _find_phrase_matches(normalized, COOPERATIVE_PHRASES)
+    conflict_matches = _find_phrase_matches(normalized, CONFLICTUAL_PHRASES)
+    neutral_matches = _find_phrase_matches(normalized, NEUTRAL_PHRASES)
+
+    strengths = _score_signal_matches(
+        coop_matches,
+        conflict_matches,
+        neutral_matches,
+    )
+
+    classification = _classification_from_strengths(
+        strengths,
+        allow_unclassified=True,
+    )
+
+    return {
+        **classification,
         "signals": {
-            "cooperative": cooperative_matches[:8],
-            "conflictual": conflictual_matches[:8],
-            "neutral": neutral_matches[:8],
+            "cooperative": [m["phrase"] for m in coop_matches],
+            "conflictual": [m["phrase"] for m in conflict_matches],
+            "neutral": [m["phrase"] for m in neutral_matches],
         },
         "signal_strength": {
-            "cooperative": round(cooperative_strength, 3),
-            "conflictual": round(conflictual_strength, 3),
-            "neutral": round(neutral_strength, 3),
+            key: round(value, 3)
+            for key, value in strengths.items()
         },
-        "method": "rule_based_relationship_v1",
+        "method": METHOD_EVENT,
+        "directional": False,
     }
 
 
@@ -312,18 +626,423 @@ def detect_relationship_from_parts(
     summary: str = "",
     body: str = "",
 ) -> Dict[str, object]:
-    """Detect relationship tone from title + summary + body."""
-    searchable = _prepare_text(title, summary, body)
-    return detect_relationship(searchable)
+    """
+    Event-level detector with source-part weighting.
 
+    Unlike v1, absence of an explicit relationship signal becomes
+    `unclassified`, not `neutral`.
+    """
+    parts = [
+        ("title", title, 1.25),
+        ("summary", summary, 1.00),
+        ("body", body, 0.75),
+    ]
+
+    aggregate = {
+        "cooperative": 0.0,
+        "conflictual": 0.0,
+        "neutral": 0.0,
+    }
+
+    signal_lists = {
+        "cooperative": [],
+        "conflictual": [],
+        "neutral": [],
+    }
+
+    any_text = False
+
+    for part_name, text, multiplier in parts:
+        if not str(text or "").strip():
+            continue
+
+        any_text = True
+        result = detect_relationship(text)
+
+        strengths = result.get("signal_strength", {}) or {}
+
+        for key in aggregate:
+            aggregate[key] += float(strengths.get(key, 0.0) or 0.0) * multiplier
+
+        signals = result.get("signals", {}) or {}
+
+        for key in signal_lists:
+            for phrase in signals.get(key, []) or []:
+                signal_lists[key].append(f"{part_name}:{phrase}")
+
+    if not any_text:
+        return {
+            "relation_type": "unclassified",
+            "relationship_score": 0.0,
+            "confidence": 0.0,
+            "signals": signal_lists,
+            "signal_strength": aggregate,
+            "method": METHOD_EVENT,
+            "directional": False,
+        }
+
+    classification = _classification_from_strengths(
+        aggregate,
+        allow_unclassified=True,
+    )
+
+    return {
+        **classification,
+        "signals": signal_lists,
+        "signal_strength": {
+            key: round(value, 3)
+            for key, value in aggregate.items()
+        },
+        "method": METHOD_EVENT,
+        "directional": False,
+    }
+
+
+# ---------------------------------------------------------------------------
+# PAIR-LEVEL DETECTION
+# ---------------------------------------------------------------------------
+
+def _sentence_pair_evidence(
+    sentence: str,
+    country_a: str,
+    country_b: str,
+) -> Optional[Dict[str, object]]:
+    normalized = _normalize_text(sentence)
+
+    aliases_a = _country_aliases(country_a)
+    aliases_b = _country_aliases(country_b)
+
+    if not aliases_a or not aliases_b:
+        return None
+
+    if not _contains_alias(normalized, aliases_a):
+        return None
+
+    if not _contains_alias(normalized, aliases_b):
+        return None
+
+    distance = _nearest_actor_distance(
+        normalized,
+        aliases_a,
+        aliases_b,
+    )
+
+    # Very long distances in a single sentence often mean the two countries
+    # are independently mentioned rather than semantically linked.
+    if distance is None or distance > 180:
+        return None
+
+    coop_matches = _find_phrase_matches(normalized, COOPERATIVE_PHRASES)
+    conflict_matches = _find_phrase_matches(normalized, CONFLICTUAL_PHRASES)
+    neutral_matches = _find_phrase_matches(normalized, NEUTRAL_PHRASES)
+
+    if not coop_matches and not conflict_matches and not neutral_matches:
+        return None
+
+    strengths = _score_signal_matches(
+        coop_matches,
+        conflict_matches,
+        neutral_matches,
+    )
+
+    # Closer actor mentions receive more weight.
+    proximity_multiplier = 1.0
+
+    if distance <= 35:
+        proximity_multiplier = 1.30
+    elif distance <= 75:
+        proximity_multiplier = 1.15
+    elif distance > 130:
+        proximity_multiplier = 0.75
+
+    for key in strengths:
+        strengths[key] *= proximity_multiplier
+
+    return {
+        "sentence": sentence.strip(),
+        "distance": distance,
+        "strengths": strengths,
+        "signals": {
+            "cooperative": [m["phrase"] for m in coop_matches],
+            "conflictual": [m["phrase"] for m in conflict_matches],
+            "neutral": [m["phrase"] for m in neutral_matches],
+        },
+    }
+
+
+def detect_pair_relationship(
+    text: str,
+    country_a: str,
+    country_b: str,
+) -> Dict[str, object]:
+    """
+    Detect relationship evidence specifically between two countries.
+
+    Requirements for classification:
+    - both countries must be present in the same local sentence/segment,
+    - the segment must also contain a relationship signal,
+    - otherwise return `unclassified`.
+
+    This avoids propagating an article's general negative tone to every pair
+    in a multi-country event.
+    """
+    a = str(country_a or "").strip().upper()
+    b = str(country_b or "").strip().upper()
+
+    if not a or not b or a == b:
+        return {
+            "relation_type": "unclassified",
+            "relationship_score": 0.0,
+            "confidence": 0.0,
+            "signals": {
+                "cooperative": [],
+                "conflictual": [],
+                "neutral": [],
+            },
+            "signal_strength": {
+                "cooperative": 0.0,
+                "conflictual": 0.0,
+                "neutral": 0.0,
+            },
+            "evidence": [],
+            "country_a": a,
+            "country_b": b,
+            "method": METHOD_PAIR,
+            "directional": False,
+        }
+
+    aliases_a = _country_aliases(a)
+    aliases_b = _country_aliases(b)
+
+    if not aliases_a or not aliases_b:
+        return {
+            "relation_type": "unclassified",
+            "relationship_score": 0.0,
+            "confidence": 0.0,
+            "signals": {
+                "cooperative": [],
+                "conflictual": [],
+                "neutral": [],
+            },
+            "signal_strength": {
+                "cooperative": 0.0,
+                "conflictual": 0.0,
+                "neutral": 0.0,
+            },
+            "evidence": [],
+            "country_a": a,
+            "country_b": b,
+            "method": METHOD_PAIR,
+            "directional": False,
+        }
+
+    aggregate = {
+        "cooperative": 0.0,
+        "conflictual": 0.0,
+        "neutral": 0.0,
+    }
+
+    signal_lists = {
+        "cooperative": [],
+        "conflictual": [],
+        "neutral": [],
+    }
+
+    evidence = []
+
+    for sentence in _split_sentences(text):
+        item = _sentence_pair_evidence(
+            sentence,
+            a,
+            b,
+        )
+
+        if not item:
+            continue
+
+        evidence.append({
+            "sentence": item["sentence"],
+            "distance": item["distance"],
+            "signals": item["signals"],
+        })
+
+        strengths = item["strengths"]
+
+        for key in aggregate:
+            aggregate[key] += float(strengths.get(key, 0.0) or 0.0)
+
+        for key in signal_lists:
+            signal_lists[key].extend(item["signals"].get(key, []) or [])
+
+    classification = _classification_from_strengths(
+        aggregate,
+        allow_unclassified=True,
+    )
+
+    # Pair confidence must reflect actual pair-specific evidence.
+    if not evidence:
+        classification = {
+            "relation_type": "unclassified",
+            "relationship_score": 0.0,
+            "confidence": 0.0,
+        }
+    else:
+        # Slightly boost confidence when independent sentences support the pair.
+        evidence_bonus = min(0.15, max(0, len(evidence) - 1) * 0.04)
+        classification["confidence"] = round(
+            min(
+                0.98,
+                float(classification["confidence"]) + evidence_bonus,
+            ),
+            3,
+        )
+
+    return {
+        **classification,
+        "signals": signal_lists,
+        "signal_strength": {
+            key: round(value, 3)
+            for key, value in aggregate.items()
+        },
+        "evidence": evidence[:8],
+        "country_a": a,
+        "country_b": b,
+        "method": METHOD_PAIR,
+        "directional": False,
+    }
+
+
+def detect_pair_relationship_from_parts(
+    country_a: str,
+    country_b: str,
+    title: str = "",
+    summary: str = "",
+    body: str = "",
+) -> Dict[str, object]:
+    """
+    Pair detector with source-part weighting.
+
+    Headline evidence receives the highest weight, then summary, then body.
+    """
+    a = str(country_a or "").strip().upper()
+    b = str(country_b or "").strip().upper()
+
+    parts = [
+        ("title", title, 1.35),
+        ("summary", summary, 1.00),
+        ("body", body, 0.80),
+    ]
+
+    aggregate = {
+        "cooperative": 0.0,
+        "conflictual": 0.0,
+        "neutral": 0.0,
+    }
+
+    signal_lists = {
+        "cooperative": [],
+        "conflictual": [],
+        "neutral": [],
+    }
+
+    evidence = []
+
+    for part_name, text, multiplier in parts:
+        if not str(text or "").strip():
+            continue
+
+        result = detect_pair_relationship(
+            text,
+            a,
+            b,
+        )
+
+        strengths = result.get("signal_strength", {}) or {}
+
+        for key in aggregate:
+            aggregate[key] += (
+                float(strengths.get(key, 0.0) or 0.0)
+                * multiplier
+            )
+
+        signals = result.get("signals", {}) or {}
+
+        for key in signal_lists:
+            for phrase in signals.get(key, []) or []:
+                signal_lists[key].append(f"{part_name}:{phrase}")
+
+        for item in result.get("evidence", []) or []:
+            evidence.append({
+                "part": part_name,
+                **item,
+            })
+
+    classification = _classification_from_strengths(
+        aggregate,
+        allow_unclassified=True,
+    )
+
+    if not evidence:
+        classification = {
+            "relation_type": "unclassified",
+            "relationship_score": 0.0,
+            "confidence": 0.0,
+        }
+    else:
+        evidence_bonus = min(0.15, max(0, len(evidence) - 1) * 0.04)
+        classification["confidence"] = round(
+            min(
+                0.98,
+                float(classification["confidence"]) + evidence_bonus,
+            ),
+            3,
+        )
+
+    return {
+        **classification,
+        "signals": signal_lists,
+        "signal_strength": {
+            key: round(value, 3)
+            for key, value in aggregate.items()
+        },
+        "evidence": evidence[:10],
+        "country_a": a,
+        "country_b": b,
+        "method": METHOD_PAIR,
+        "directional": False,
+    }
+
+
+# ---------------------------------------------------------------------------
+# BACKWARD-COMPATIBILITY HELPERS
+# ---------------------------------------------------------------------------
 
 def get_relationship_type(text: str) -> str:
-    return str(detect_relationship(text)["relation_type"])
+    return str(
+        detect_relationship(text).get(
+            "relation_type",
+            "unclassified",
+        )
+    )
 
 
 def get_relationship_score(text: str) -> float:
-    return float(detect_relationship(text)["relationship_score"])
+    try:
+        return float(
+            detect_relationship(text).get(
+                "relationship_score",
+                0.0,
+            )
+        )
+    except Exception:
+        return 0.0
 
 
 def relationship_is_directional(result: Dict[str, object]) -> bool:
-    return result.get("relation_type") in {"cooperative", "conflictual", "mixed"}
+    return bool(
+        (result or {}).get(
+            "directional",
+            False,
+        )
+    )
+
