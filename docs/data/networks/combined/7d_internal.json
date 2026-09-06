@@ -387,8 +387,8 @@
       "interaction_weight": 2.0,
       "interaction_count": 2,
       "topics": {
-        "ukraine_russia": 2.0,
-        "defence": 1.0
+        "ukraine_russia": 1.5,
+        "defence": 0.5
       },
       "relationship_score": null,
       "dominant_relation": "unclassified",
@@ -508,8 +508,8 @@
       "interaction_weight": 1.0,
       "interaction_count": 1,
       "topics": {
-        "defence": 1.0,
-        "ukraine_russia": 1.0
+        "defence": 0.5,
+        "ukraine_russia": 0.5
       },
       "relationship_score": null,
       "dominant_relation": "unclassified",
@@ -629,9 +629,9 @@
       "interaction_weight": 1.0,
       "interaction_count": 1,
       "topics": {
-        "defence": 1.0,
-        "enlargement": 1.0,
-        "ukraine_russia": 1.0
+        "defence": 0.333,
+        "enlargement": 0.333,
+        "ukraine_russia": 0.333
       },
       "relationship_score": null,
       "dominant_relation": "unclassified",
@@ -692,6 +692,17 @@
     "note": "Repeated daily snapshot records are counted once before window aggregation."
   },
   "mode": "internal",
+  "topic_metadata": {
+    "method": "country_pair_topic_salience_v2",
+    "semantic_dimension": "salience",
+    "stance_inferred": false,
+    "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
+    "event_topic_method_counts": {
+      "equal_legacy_topic_share_fallback": 159
+    },
+    "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
+    "note": "Topic prominence does not imply support, opposition or shared policy position."
+  },
   "relationship_metadata": {
     "method": "semantic_pair_relationship_aggregation_v4_consistency_aware",
     "score_range": [
