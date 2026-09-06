@@ -22,6 +22,8 @@ if str(ROOT) not in sys.path:
 
 from detectors.relationship_detector import detect_pair_relationship_from_parts
 
+NETWORK_BUILDER_VERSION = "v6_topic_salience"
+
 
 EVENTS_DIR = ROOT / "data" / "events"
 NETWORK_DIR = ROOT / "data" / "networks"
@@ -564,23 +566,201 @@ def filter_pair_by_mode(a: str, b: str, mode: str) -> bool:
     return False
 
 
+
+def event_topic_distribution(event):
+    """
+    Return a normalized 0..1 topic-salience distribution for one event.
+
+    Preferred source:
+      event["topic_salience"] from topic_detector v2 / event_builder v3.
+
+    Backward-compatible fallbacks:
+      1. normalize event["topic_scores"] if available;
+      2. split salience equally across legacy event["topics"].
+
+    Methodological meaning:
+      This represents how prominent each policy topic is in the event.
+      It does NOT represent support/opposition or policy stance.
+
+    The returned values sum to approximately 1.0 when at least one valid
+    topic is available.
+    """
+    raw_salience = event.get("topic_salience")
+
+    if isinstance(raw_salience, dict):
+        cleaned = {}
+
+        for topic, value in raw_salience.items():
+            if topic not in TOPICS:
+                continue
+
+            try:
+                numeric = max(0.0, float(value or 0.0))
+            except Exception:
+                numeric = 0.0
+
+            if numeric > 0:
+                cleaned[topic] = numeric
+
+        total = sum(cleaned.values())
+
+        if total > 0:
+            return {
+                topic: value / total
+                for topic, value in cleaned.items()
+            }
+
+    raw_scores = event.get("topic_scores")
+
+    if isinstance(raw_scores, dict):
+        cleaned = {}
+
+        for topic, value in raw_scores.items():
+            if topic not in TOPICS:
+                continue
+
+            try:
+                numeric = max(0.0, float(value or 0.0))
+            except Exception:
+                numeric = 0.0
+
+            if numeric > 0:
+                cleaned[topic] = numeric
+
+        total = sum(cleaned.values())
+
+        if total > 0:
+            return {
+                topic: value / total
+                for topic, value in cleaned.items()
+            }
+
+    topics = event.get("topics", []) or []
+
+    if not isinstance(topics, list):
+        topics = []
+
+    valid_topics = []
+
+    for topic in topics:
+        if not isinstance(topic, str):
+            continue
+
+        topic = topic.strip()
+
+        if topic in TOPICS and topic not in valid_topics:
+            valid_topics.append(topic)
+
+    if not valid_topics:
+        return {}
+
+    equal_share = 1.0 / len(valid_topics)
+
+    return {
+        topic: equal_share
+        for topic in valid_topics
+    }
+
+
+def event_topic_method(event):
+    """
+    Describe which topic representation was used for one event.
+    """
+    raw_salience = event.get("topic_salience")
+
+    if isinstance(raw_salience, dict) and any(
+        topic in TOPICS
+        and _safe_positive_number(value) > 0
+        for topic, value in raw_salience.items()
+    ):
+        return str(
+            event.get("topic_method")
+            or "event_topic_salience"
+        )
+
+    raw_scores = event.get("topic_scores")
+
+    if isinstance(raw_scores, dict) and any(
+        topic in TOPICS
+        and _safe_positive_number(value) > 0
+        for topic, value in raw_scores.items()
+    ):
+        return "normalized_topic_scores_fallback"
+
+    if event.get("topics"):
+        return "equal_legacy_topic_share_fallback"
+
+    return "no_topic_evidence"
+
+
+def _safe_positive_number(value):
+    try:
+        return max(0.0, float(value or 0.0))
+    except Exception:
+        return 0.0
+
+
+def topic_method_counts(events):
+    counts = defaultdict(int)
+
+    for event in events:
+        counts[event_topic_method(event)] += 1
+
+    return dict(
+        sorted(
+            counts.items(),
+            key=lambda item: item[0],
+        )
+    )
+
+
 def normalize_heatmap_rows(rows):
+    """
+    Normalize only topic fields while preserving country diagnostics.
+
+    Topic values become a per-country distribution whose absolute values sum
+    to 1.0 when evidence exists.
+    """
     norm_rows = []
 
     for row in rows:
-        vals = [abs(row[t]) for t in TOPICS]
+        vals = [
+            abs(float(row.get(topic, 0.0) or 0.0))
+            for topic in TOPICS
+        ]
         total = sum(vals)
 
-        new_row = {"country": row["country"]}
+        new_row = {
+            key: value
+            for key, value in row.items()
+            if key not in TOPICS and key != "total"
+        }
 
-        for t in TOPICS:
+        for topic in TOPICS:
+            value = float(
+                row.get(
+                    topic,
+                    0.0,
+                )
+                or 0.0
+            )
+
             if total > 0:
-                new_row[t] = round(row[t] / total, 6)
+                new_row[topic] = round(
+                    value / total,
+                    6,
+                )
             else:
-                new_row[t] = 0.0
+                new_row[topic] = 0.0
 
-        new_row["total"] = round(total, 6)
-        norm_rows.append(new_row)
+        new_row["total"] = round(
+            total,
+            6,
+        )
+
+        norm_rows.append(
+            new_row
+        )
 
     return norm_rows
 
@@ -1129,9 +1309,7 @@ def build_graph(events, mode="all"):
         pairs = e.get("country_pairs", []) or []
         weight = compute_weight(e)
 
-        topics = e.get("topics", []) or []
-        if not isinstance(topics, list):
-            topics = []
+        topic_distribution = event_topic_distribution(e)
 
         for pair in pairs:
             if not isinstance(pair, (list, tuple)) or len(pair) != 2:
@@ -1183,12 +1361,15 @@ def build_graph(events, mode="all"):
             node_weights[b] += weight
             edge_event_counts[key] += 1
 
-            # Topic evidence for the pair.
-            for topic in topics:
-                if isinstance(topic, str):
-                    topic = topic.strip()
-                    if topic in TOPICS:
-                        edge_topics[key][topic] += weight
+            # Topic salience for the pair.
+            #
+            # The event's total topic mass equals its interaction weight.
+            # Multi-topic events therefore no longer add the FULL interaction
+            # weight independently to every detected topic.
+            for topic, salience_share in topic_distribution.items():
+                edge_topics[key][topic] += (
+                    weight * salience_share
+                )
 
             # Semantic relationship layer.
             if relation_type in VALID_RELATION_TYPES:
@@ -1351,6 +1532,24 @@ def build_graph(events, mode="all"):
             ),
         },
         "mode": mode,
+        "topic_metadata": {
+            "method": "country_pair_topic_salience_v2",
+            "semantic_dimension": "salience",
+            "stance_inferred": False,
+            "aggregation": (
+                "event interaction weight multiplied by normalized "
+                "event-level topic salience"
+            ),
+            "event_topic_method_counts": topic_method_counts(events),
+            "legacy_fallback": (
+                "events without topic_salience/topic_scores split one unit "
+                "equally across their legacy topic list"
+            ),
+            "note": (
+                "Topic prominence does not imply support, opposition or "
+                "shared policy position."
+            ),
+        },
         "relationship_metadata": {
             "method": "semantic_pair_relationship_aggregation_v4_consistency_aware",
             "score_range": [-1.0, 1.0],
@@ -1425,12 +1624,24 @@ def countries_for_heatmap(event, mode="all"):
 
 
 def build_heatmap(events, mode="all", normalized=False):
+    """
+    Build COUNTRY × TOPIC SALIENCE rows.
+
+    Each event contributes:
+        compute_weight(event) * event_topic_salience_share
+
+    to every selected country connected to that event.
+
+    This is a prominence/exposure measure only. It does not encode stance.
+    """
     country_topic = defaultdict(lambda: defaultdict(float))
+    country_event_count = defaultdict(int)
+    country_weight_total = defaultdict(float)
 
     for e in events:
-        topics = e.get("topics", []) or []
+        topic_distribution = event_topic_distribution(e)
 
-        if not topics:
+        if not topic_distribution:
             continue
 
         countries = countries_for_heatmap(e, mode)
@@ -1441,26 +1652,70 @@ def build_heatmap(events, mode="all", normalized=False):
         weight = compute_weight(e)
 
         for c in countries:
-            for t in topics:
-                if t in TOPICS:
-                    country_topic[c][t] += weight
+            country_event_count[c] += 1
+            country_weight_total[c] += weight
+
+            for topic, salience_share in topic_distribution.items():
+                country_topic[c][topic] += (
+                    weight * salience_share
+                )
 
     rows = []
 
     for country in sorted(country_topic.keys()):
-        row = {"country": country}
+        row = {
+            "country": country,
+        }
         total = 0.0
 
-        for t in TOPICS:
-            value = country_topic[country].get(t, 0.0)
-            row[t] = round(value, 3)
+        for topic in TOPICS:
+            value = country_topic[country].get(
+                topic,
+                0.0,
+            )
+            row[topic] = round(
+                value,
+                3,
+            )
             total += value
 
-        row["total"] = round(total, 3)
+        row["total"] = round(
+            total,
+            3,
+        )
+        row["event_count"] = int(
+            country_event_count[country]
+        )
+        row["interaction_weight_total"] = round(
+            country_weight_total[country],
+            3,
+        )
+
         rows.append(row)
 
     if normalized:
         rows = normalize_heatmap_rows(rows)
+
+        # Restore useful diagnostics removed by the legacy normalization helper.
+        event_counts = {
+            country: int(count)
+            for country, count in country_event_count.items()
+        }
+        weight_totals = {
+            country: round(value, 3)
+            for country, value in country_weight_total.items()
+        }
+
+        for row in rows:
+            country = row["country"]
+            row["event_count"] = event_counts.get(
+                country,
+                0,
+            )
+            row["interaction_weight_total"] = weight_totals.get(
+                country,
+                0.0,
+            )
 
     return {
         "topics": TOPICS,
@@ -1468,6 +1723,14 @@ def build_heatmap(events, mode="all", normalized=False):
         "event_count": len(events),
         "mode": mode,
         "normalized": normalized,
+        "semantic_dimension": "salience",
+        "stance_inferred": False,
+        "method": "country_topic_salience_aggregation_v2",
+        "event_topic_method_counts": topic_method_counts(events),
+        "note": (
+            "Rows measure relative topic prominence for each country. "
+            "Similar salience does not imply similar policy position."
+        ),
     }
 
 
@@ -1501,6 +1764,13 @@ def build_similarity(events, mode="all"):
         "edges": edges,
         "event_count": len(events),
         "mode": mode,
+        "method": "topic_salience_cosine_similarity_v2",
+        "semantic_dimension": "salience_similarity",
+        "stance_inferred": False,
+        "note": (
+            "Similarity means countries have similar observed topic-salience "
+            "profiles. It does not mean they share the same policy stance."
+        ),
     }
 
 
@@ -2147,10 +2417,10 @@ def build_relationship_index_from_components(
     window_days,
 ):
     """
-    Retains the previous 0..100 interaction/policy affinity index while adding
+    Retains the previous 0..100 interaction/topic-salience affinity index while adding
     the new signed semantic relationship score from the graph.
 
-    Do not interpret `score` as positive/negative political relations.
+    Do not interpret `score` as political agreement or positive/negative relations.
     For RSS/GDELT/combined use `semantic_relationship_score` and
     `dominant_relation` for that purpose.
     """
