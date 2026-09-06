@@ -3,6 +3,8 @@
 import json
 import math
 import sys
+import hashlib
+import re
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
@@ -139,11 +141,239 @@ def parse_json(path: Path):
     return []
 
 
+
+def _norm_space(value):
+    return re.sub(r"\s+", " ", str(value or "")).strip()
+
+
+def _norm_url(value):
+    url = _norm_space(value)
+    if not url:
+        return ""
+
+    if "#" in url:
+        url = url.split("#", 1)[0]
+
+    return url.rstrip("/")
+
+
+def _norm_title(value):
+    value = _norm_space(value).lower()
+    value = re.sub(r"[^\w\s]", " ", value, flags=re.UNICODE)
+    value = re.sub(r"\s+", " ", value).strip()
+    return value
+
+
+def _event_source_name(event):
+    for key in (
+        "source_name",
+        "source",
+        "publisher",
+        "domain",
+        "feed_name",
+    ):
+        value = event.get(key)
+        if value:
+            return _norm_space(value).lower()
+
+    return ""
+
+
+def _event_published_at(event):
+    for key in (
+        "published_at",
+        "published",
+        "publication_date",
+        "date",
+        "datetime",
+        "timestamp",
+    ):
+        value = event.get(key)
+        if value:
+            return _norm_space(value)
+
+    return ""
+
+
+def _gdelt_event_id(event):
+    for key in (
+        "GlobalEventID",
+        "global_event_id",
+        "globaleventid",
+        "event_id",
+        "gdelt_event_id",
+    ):
+        value = event.get(key)
+        if value not in (None, ""):
+            return str(value).strip()
+
+    return ""
+
+
+def _event_url(event):
+    for key in (
+        "url",
+        "link",
+        "article_url",
+        "source_url",
+        "canonical_url",
+    ):
+        value = event.get(key)
+        if value:
+            return _norm_url(value)
+
+    return ""
+
+
+def _event_title(event):
+    for key in (
+        "title",
+        "headline",
+        "name",
+    ):
+        value = event.get(key)
+        if value:
+            return _norm_title(value)
+
+    return ""
+
+
+def _event_fallback_hash(event):
+    source = _event_source_name(event)
+    title = _event_title(event)
+    published = _event_published_at(event)
+
+    if title:
+        raw = f"{source}|{title}|{published}"
+    else:
+        summary = _norm_space(
+            event.get("summary")
+            or event.get("description")
+        )
+        body = _norm_space(event.get("body"))
+        raw = f"{source}|{published}|{summary[:500]}|{body[:500]}"
+
+    return hashlib.sha1(
+        raw.encode("utf-8")
+    ).hexdigest()
+
+
+def event_dedupe_key(event, layer):
+    """
+    Stable identity for one source layer.
+
+    RSS:
+        canonical URL first.
+    GDELT:
+        GlobalEventID first, then URL.
+    Fallback:
+        source + normalized title + publication timestamp/date.
+    """
+    layer = str(layer or "").strip().lower()
+
+    if layer == "gdelt":
+        gdelt_id = _gdelt_event_id(event)
+
+        if gdelt_id:
+            return f"gdelt:id:{gdelt_id}"
+
+    url = _event_url(event)
+
+    if url:
+        return f"{layer}:url:{url}"
+
+    return (
+        f"{layer}:fallback:"
+        f"{_event_fallback_hash(event)}"
+    )
+
+
+def combined_event_dedupe_key(event):
+    """
+    Cross-source identity for the combined layer.
+
+    When RSS and GDELT reference the same canonical URL, the article is counted
+    once. If no URL exists, use source/title/publication fingerprint.
+    """
+    url = _event_url(event)
+
+    if url:
+        return f"combined:url:{url}"
+
+    source = _event_source_name(event)
+    title = _event_title(event)
+    published = _event_published_at(event)
+
+    if title:
+        raw = f"{source}|{title}|{published}"
+    else:
+        summary = _norm_space(
+            event.get("summary")
+            or event.get("description")
+        )
+        raw = f"{source}|{published}|{summary[:500]}"
+
+    digest = hashlib.sha1(
+        raw.encode("utf-8")
+    ).hexdigest()
+
+    return f"combined:fallback:{digest}"
+
+
+def deduplicate_events(events, layer=""):
+    """
+    Collapse repeated records across daily snapshots.
+
+    Source files remain untouched. Only the in-memory analysis dataset is
+    deduplicated.
+
+    The first record is retained. `_dedupe_repeat_count` stores how many source
+    records represented the same event/article.
+    """
+    seen = {}
+    deduped = []
+
+    for event in events:
+        if not isinstance(event, dict):
+            continue
+
+        if layer == "combined":
+            key = combined_event_dedupe_key(event)
+        else:
+            key = event_dedupe_key(
+                event,
+                layer,
+            )
+
+        if key in seen:
+            kept = seen[key]
+            kept["_dedupe_repeat_count"] = (
+                int(
+                    kept.get(
+                        "_dedupe_repeat_count",
+                        1,
+                    )
+                )
+                + 1
+            )
+            continue
+
+        event_copy = dict(event)
+        event_copy["_dedupe_key"] = key
+        event_copy["_dedupe_repeat_count"] = 1
+
+        seen[key] = event_copy
+        deduped.append(event_copy)
+
+    return deduped
+
+
 def load_events(layer: str):
     events = []
 
     if layer == "rss":
         rss_dir = EVENTS_DIR / "rss"
+
         if rss_dir.exists():
             for f in sorted(rss_dir.glob("*.jsonl")):
                 events += parse_jsonl(f)
@@ -153,6 +383,7 @@ def load_events(layer: str):
 
     elif layer == "gdelt":
         gdelt_dir = EVENTS_DIR / "gdelt"
+
         if gdelt_dir.exists():
             for f in sorted(gdelt_dir.glob("*.jsonl")):
                 events += parse_jsonl(f)
@@ -177,7 +408,15 @@ def load_events(layer: str):
         votes_file = votes_dir / "council_votes.json"
         events = parse_json(votes_file)
 
-    return events
+    # Voting observations represent separate votes and already have their own
+    # semantics. Do not apply article-style deduplication to them here.
+    if layer == "votes":
+        return events
+
+    return deduplicate_events(
+        events,
+        layer=layer,
+    )
 
 
 # -----------------------------
@@ -904,6 +1143,14 @@ def build_graph(events, mode="all"):
         "nodes": nodes,
         "edges": edges,
         "event_count": len(events),
+        "deduplication": {
+            "enabled": True,
+            "method": "gdelt_id_or_url_then_source_title_date_v1",
+            "note": (
+                "Repeated daily snapshot records are counted once "
+                "before window aggregation."
+            ),
+        },
         "mode": mode,
         "relationship_metadata": {
             "method": "semantic_pair_relationship_aggregation_v2",
@@ -2536,9 +2783,28 @@ def main():
         print(f"\nLayer: {layer}")
 
         events = load_events(layer)
+        duplicate_repeats = sum(
+            max(
+                0,
+                int(
+                    e.get(
+                        "_dedupe_repeat_count",
+                        1,
+                    )
+                )
+                - 1,
+            )
+            for e in events
+            if isinstance(e, dict)
+        )
+
         print(
-            "events loaded:",
+            "events loaded after dedup:",
             len(events),
+        )
+        print(
+            "duplicate snapshot records collapsed:",
+            duplicate_repeats,
         )
 
         for window_name, days in WINDOWS.items():
