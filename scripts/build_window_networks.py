@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from detectors.relationship_detector import detect_relationship_from_parts
+from detectors.relationship_detector import detect_pair_relationship_from_parts
 
 
 EVENTS_DIR = ROOT / "data" / "events"
@@ -467,59 +467,156 @@ def classify_votes_relation(weight):
 # SEMANTIC RELATIONSHIP HELPERS
 # -----------------------------
 
-def relationship_from_event(event):
+def relationship_from_pair(event, country_a, country_b):
     """
-    Return the semantic relationship classification for an event.
+    Return semantic relationship evidence specifically for one country pair.
 
-    New events already contain the detector fields created by event_builder.
-    Older stored events are classified on the fly so that historical 7/30/90d
-    windows do not remain permanently 'unclassified'.
+    The previous implementation classified an entire event once and copied
+    that result to every country pair mentioned in the event. That could make
+    unrelated pairs appear conflictual simply because a multi-country article
+    contained negative language.
+
+    v2 instead evaluates the actual pair:
+      - both actors must appear in the same local text segment,
+      - the segment must contain relationship language,
+      - otherwise the pair is `unclassified`.
+
+    Historical stored events are classified on the fly, so source event files
+    do not need to be rewritten before rebuilding 7d/30d/90d networks.
     """
-    relation_type = str(event.get("relation_type", "")).strip().lower()
+    a = str(country_a or "").strip().upper()
+    b = str(country_b or "").strip().upper()
 
-    if relation_type in VALID_RELATION_TYPES:
-        try:
-            score = clamp_relation(
-                float(event.get("relationship_score", 0.0) or 0.0)
-            )
-        except Exception:
-            score = 0.0
-
-        try:
-            confidence = max(
-                0.0,
-                min(
-                    1.0,
-                    float(event.get("relationship_confidence", 0.0) or 0.0),
-                ),
-            )
-        except Exception:
-            confidence = 0.0
-
+    if not a or not b or a == b:
         return {
-            "relation_type": relation_type,
-            "relationship_score": score,
-            "confidence": confidence,
-            "method": event.get(
-                "relationship_method",
-                "rule_based_relationship_v1",
-            ),
+            "relation_type": "unclassified",
+            "relationship_score": 0.0,
+            "confidence": 0.0,
+            "method": "rule_based_relationship_v2_pair",
         }
 
-    # Backfill older events without changing the source event files.
+    # Optional future-compatible stored pair relationship structure.
+    # Supported forms:
+    #   pair_relationships["DE-RU"] = {...}
+    #   pair_relationships["RU-DE"] = {...}
+    #   pair_relationships = [{"source":"DE","target":"RU", ...}, ...]
+    stored = event.get("pair_relationships")
+
+    if isinstance(stored, dict):
+        candidate = (
+            stored.get(f"{a}-{b}")
+            or stored.get(f"{b}-{a}")
+            or stored.get(f"{a}_{b}")
+            or stored.get(f"{b}_{a}")
+        )
+
+        if isinstance(candidate, dict):
+            relation_type = str(
+                candidate.get("relation_type", "unclassified")
+            ).strip().lower()
+
+            if relation_type not in VALID_RELATION_TYPES:
+                relation_type = "unclassified"
+
+            try:
+                score = clamp_relation(
+                    float(candidate.get("relationship_score", 0.0) or 0.0)
+                )
+            except Exception:
+                score = 0.0
+
+            try:
+                confidence = max(
+                    0.0,
+                    min(
+                        1.0,
+                        float(candidate.get("confidence", 0.0) or 0.0),
+                    ),
+                )
+            except Exception:
+                confidence = 0.0
+
+            return {
+                "relation_type": relation_type,
+                "relationship_score": score,
+                "confidence": confidence,
+                "method": candidate.get(
+                    "method",
+                    "stored_pair_relationship",
+                ),
+            }
+
+    elif isinstance(stored, list):
+        for candidate in stored:
+            if not isinstance(candidate, dict):
+                continue
+
+            ca = str(
+                candidate.get("source")
+                or candidate.get("country_a")
+                or ""
+            ).strip().upper()
+
+            cb = str(
+                candidate.get("target")
+                or candidate.get("country_b")
+                or ""
+            ).strip().upper()
+
+            if {ca, cb} != {a, b}:
+                continue
+
+            relation_type = str(
+                candidate.get("relation_type", "unclassified")
+            ).strip().lower()
+
+            if relation_type not in VALID_RELATION_TYPES:
+                relation_type = "unclassified"
+
+            try:
+                score = clamp_relation(
+                    float(candidate.get("relationship_score", 0.0) or 0.0)
+                )
+            except Exception:
+                score = 0.0
+
+            try:
+                confidence = max(
+                    0.0,
+                    min(
+                        1.0,
+                        float(candidate.get("confidence", 0.0) or 0.0),
+                    ),
+                )
+            except Exception:
+                confidence = 0.0
+
+            return {
+                "relation_type": relation_type,
+                "relationship_score": score,
+                "confidence": confidence,
+                "method": candidate.get(
+                    "method",
+                    "stored_pair_relationship",
+                ),
+            }
+
+    # Pair-level backfill for current and historical event files.
     try:
-        detected = detect_relationship_from_parts(
+        detected = detect_pair_relationship_from_parts(
+            country_a=a,
+            country_b=b,
             title=str(event.get("title", "") or ""),
             summary=str(event.get("summary", "") or ""),
             body=str(event.get("body", "") or ""),
         )
 
         relation_type = str(
-            detected.get("relation_type", "neutral")
+            detected.get("relation_type", "unclassified")
         ).strip().lower()
 
         if relation_type not in VALID_RELATION_TYPES:
-            relation_type = "neutral"
+            relation_type = "unclassified"
 
         return {
             "relation_type": relation_type,
@@ -535,7 +632,7 @@ def relationship_from_event(event):
             ),
             "method": detected.get(
                 "method",
-                "rule_based_relationship_v1",
+                "rule_based_relationship_v2_pair",
             ),
         }
 
@@ -603,7 +700,7 @@ def build_graph(events, mode="all"):
 
     New fields explain what the observed relationship looks like:
       relationship_score       -1.0 .. +1.0
-      dominant_relation        cooperative/conflictual/neutral/mixed
+      dominant_relation        cooperative/conflictual/neutral/mixed/unclassified
       relationship_label       score-aware summary label
       relationship_confidence  mean detector confidence
       classification_coverage  share of edge events classified
@@ -637,15 +734,6 @@ def build_graph(events, mode="all"):
         if not isinstance(topics, list):
             topics = []
 
-        semantic = relationship_from_event(e)
-        relation_type = semantic.get("relation_type", "unclassified")
-        relation_score = float(
-            semantic.get("relationship_score", 0.0) or 0.0
-        )
-        relation_confidence = float(
-            semantic.get("confidence", 0.0) or 0.0
-        )
-
         for pair in pairs:
             if not isinstance(pair, (list, tuple)) or len(pair) != 2:
                 continue
@@ -662,6 +750,33 @@ def build_graph(events, mode="all"):
                 continue
 
             key = tuple(sorted([a, b]))
+
+            # Pair-specific semantic relationship. Unlike the previous
+            # event-level implementation, this classification is computed
+            # independently for the actual pair being aggregated.
+            semantic = relationship_from_pair(e, a, b)
+            relation_type = semantic.get(
+                "relation_type",
+                "unclassified",
+            )
+
+            try:
+                relation_score = float(
+                    semantic.get("relationship_score", 0.0) or 0.0
+                )
+            except Exception:
+                relation_score = 0.0
+
+            try:
+                relation_confidence = max(
+                    0.0,
+                    min(
+                        1.0,
+                        float(semantic.get("confidence", 0.0) or 0.0),
+                    ),
+                )
+            except Exception:
+                relation_confidence = 0.0
 
             # Legacy interaction layer.
             edge_weights[key] += weight
@@ -791,7 +906,7 @@ def build_graph(events, mode="all"):
         "event_count": len(events),
         "mode": mode,
         "relationship_metadata": {
-            "method": "semantic_relationship_aggregation_v1",
+            "method": "semantic_pair_relationship_aggregation_v2",
             "score_range": [-1.0, 1.0],
             "positive_meaning": "cooperative_language",
             "negative_meaning": "conflictual_language",
