@@ -55,7 +55,7 @@ from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 
 
 METHOD_EVENT = "rule_based_relationship_v2_event"
-METHOD_PAIR = "rule_based_relationship_v2_pair"
+METHOD_PAIR = "rule_based_relationship_v3_pair_binding"
 
 VALID_RELATION_TYPES = {
     "cooperative",
@@ -303,6 +303,16 @@ NEUTRAL_PHRASES: Dict[str, float] = {
     "talked with": 0.50,
 }
 
+
+# Pair-level v3 binding controls.
+#
+# A sentence may contain two countries and negative language without describing
+# a conflict between those two countries. The v3 detector therefore requires
+# the relationship cue to be locally bound to both actors and rejects cues that
+# are more naturally attached to a third-country actor.
+PAIR_SIGNAL_MAX_SPAN = 135
+PAIR_SIGNAL_STRONG_SPAN = 80
+THIRD_ACTOR_MARGIN = 18
 
 # Pair-binding words make a local signal more likely to describe the relation
 # between the two actors rather than an unrelated third-party event.
@@ -702,6 +712,271 @@ def detect_relationship_from_parts(
 # PAIR-LEVEL DETECTION
 # ---------------------------------------------------------------------------
 
+
+def _all_country_mentions(
+    text: str,
+    exclude_codes: Sequence[str] = (),
+) -> List[Dict[str, object]]:
+    """
+    Return country mentions in a normalized sentence.
+
+    Used only for third-party attribution checks. A third actor that is closer
+    to a relationship cue than one of the tested pair actors is evidence that
+    the cue may describe another relationship.
+    """
+    excluded = {
+        str(code or "").strip().upper()
+        for code in exclude_codes
+    }
+
+    mentions: List[Dict[str, object]] = []
+
+    for code in COUNTRY_ALIASES:
+        if code in excluded:
+            continue
+
+        for start, end, alias in _alias_positions(
+            text,
+            _country_aliases(code),
+        ):
+            mentions.append({
+                "code": code,
+                "start": start,
+                "end": end,
+                "alias": alias,
+            })
+
+    return mentions
+
+
+def _span_distance(
+    start_a: int,
+    end_a: int,
+    start_b: int,
+    end_b: int,
+) -> int:
+    if end_a < start_b:
+        return start_b - end_a
+
+    if end_b < start_a:
+        return start_a - end_b
+
+    return 0
+
+
+def _nearest_mention_to_span(
+    mentions: Sequence[Tuple[int, int, str]],
+    span_start: int,
+    span_end: int,
+) -> Optional[Tuple[int, Tuple[int, int, str]]]:
+    best = None
+
+    for mention in mentions:
+        start, end, _alias = mention
+        distance = _span_distance(
+            start,
+            end,
+            span_start,
+            span_end,
+        )
+
+        if best is None or distance < best[0]:
+            best = (distance, mention)
+
+    return best
+
+
+def _third_actor_distance_to_span(
+    third_mentions: Sequence[Dict[str, object]],
+    span_start: int,
+    span_end: int,
+) -> Optional[int]:
+    best = None
+
+    for mention in third_mentions:
+        distance = _span_distance(
+            int(mention["start"]),
+            int(mention["end"]),
+            span_start,
+            span_end,
+        )
+
+        if best is None or distance < best:
+            best = distance
+
+    return best
+
+
+def _cue_is_bound_to_pair(
+    normalized: str,
+    match: Dict[str, object],
+    aliases_a: Sequence[str],
+    aliases_b: Sequence[str],
+    third_mentions: Sequence[Dict[str, object]],
+    signal_type: str,
+) -> Tuple[bool, Dict[str, object]]:
+    """
+    Decide whether one lexical relationship cue actually binds country A to B.
+
+    Conditions:
+    1. cue must be reasonably close to BOTH actors;
+    2. the complete A-cue-B local span must not be excessively wide;
+    3. for cooperative/conflictual cues, reject likely third-party attribution
+       when another country is substantially closer to the cue than one member
+       of the tested pair.
+
+    This deliberately prefers `unclassified` over false bilateral inference.
+    """
+    cue_start = int(match.get("start", 0) or 0)
+    cue_end = int(match.get("end", cue_start) or cue_start)
+
+    positions_a = _alias_positions(
+        normalized,
+        aliases_a,
+    )
+    positions_b = _alias_positions(
+        normalized,
+        aliases_b,
+    )
+
+    nearest_a = _nearest_mention_to_span(
+        positions_a,
+        cue_start,
+        cue_end,
+    )
+    nearest_b = _nearest_mention_to_span(
+        positions_b,
+        cue_start,
+        cue_end,
+    )
+
+    if nearest_a is None or nearest_b is None:
+        return False, {
+            "reason": "missing_pair_actor",
+        }
+
+    distance_a, mention_a = nearest_a
+    distance_b, mention_b = nearest_b
+
+    local_start = min(
+        mention_a[0],
+        mention_b[0],
+        cue_start,
+    )
+    local_end = max(
+        mention_a[1],
+        mention_b[1],
+        cue_end,
+    )
+    local_span = local_end - local_start
+
+    # A relationship cue far from one of the actors is usually contextual,
+    # not bilateral.
+    if (
+        distance_a > PAIR_SIGNAL_MAX_SPAN
+        or distance_b > PAIR_SIGNAL_MAX_SPAN
+        or local_span > (PAIR_SIGNAL_MAX_SPAN * 2)
+    ):
+        return False, {
+            "reason": "cue_too_far_from_pair",
+            "distance_a": distance_a,
+            "distance_b": distance_b,
+            "local_span": local_span,
+        }
+
+    third_distance = _third_actor_distance_to_span(
+        third_mentions,
+        cue_start,
+        cue_end,
+    )
+
+    farther_pair_distance = max(
+        distance_a,
+        distance_b,
+    )
+
+    # The strongest protection against:
+    # "Germany and Ukraine discussed Russia's attacks..."
+    # "Germany condemned Russia's attack while Ukraine..."
+    #
+    # If a third actor is materially closer to a conflict/cooperation cue than
+    # one member of the tested pair, do not transfer that cue to A-B.
+    if (
+        signal_type in {"conflictual", "cooperative"}
+        and third_distance is not None
+        and third_distance + THIRD_ACTOR_MARGIN < farther_pair_distance
+    ):
+        return False, {
+            "reason": "third_actor_closer_to_cue",
+            "distance_a": distance_a,
+            "distance_b": distance_b,
+            "third_actor_distance": third_distance,
+        }
+
+    # Very local cues are strongest. Wider but still valid spans are retained
+    # with reduced weight.
+    if max(distance_a, distance_b) <= 35:
+        binding_multiplier = 1.25
+    elif max(distance_a, distance_b) <= PAIR_SIGNAL_STRONG_SPAN:
+        binding_multiplier = 1.0
+    else:
+        binding_multiplier = 0.70
+
+    return True, {
+        "reason": "pair_bound",
+        "distance_a": distance_a,
+        "distance_b": distance_b,
+        "third_actor_distance": third_distance,
+        "binding_multiplier": binding_multiplier,
+        "local_span": local_span,
+    }
+
+
+def _filter_pair_bound_matches(
+    normalized: str,
+    matches: Sequence[Dict[str, object]],
+    aliases_a: Sequence[str],
+    aliases_b: Sequence[str],
+    third_mentions: Sequence[Dict[str, object]],
+    signal_type: str,
+) -> Tuple[List[Dict[str, object]], List[Dict[str, object]]]:
+    accepted: List[Dict[str, object]] = []
+    rejected: List[Dict[str, object]] = []
+
+    for match in matches:
+        valid, binding = _cue_is_bound_to_pair(
+            normalized=normalized,
+            match=match,
+            aliases_a=aliases_a,
+            aliases_b=aliases_b,
+            third_mentions=third_mentions,
+            signal_type=signal_type,
+        )
+
+        enriched = {
+            **match,
+            "binding": binding,
+        }
+
+        if valid:
+            multiplier = float(
+                binding.get(
+                    "binding_multiplier",
+                    1.0,
+                )
+                or 1.0
+            )
+            enriched["weight"] = (
+                float(match.get("weight", 0.0) or 0.0)
+                * multiplier
+            )
+            accepted.append(enriched)
+        else:
+            rejected.append(enriched)
+
+    return accepted, rejected
+
+
 def _sentence_pair_evidence(
     sentence: str,
     country_a: str,
@@ -727,15 +1002,60 @@ def _sentence_pair_evidence(
         aliases_b,
     )
 
-    # Very long distances in a single sentence often mean the two countries
-    # are independently mentioned rather than semantically linked.
     if distance is None or distance > 180:
         return None
 
-    coop_matches = _find_phrase_matches(normalized, COOPERATIVE_PHRASES)
-    conflict_matches = _find_phrase_matches(normalized, CONFLICTUAL_PHRASES)
-    neutral_matches = _find_phrase_matches(normalized, NEUTRAL_PHRASES)
+    raw_coop = _find_phrase_matches(
+        normalized,
+        COOPERATIVE_PHRASES,
+    )
+    raw_conflict = _find_phrase_matches(
+        normalized,
+        CONFLICTUAL_PHRASES,
+    )
+    raw_neutral = _find_phrase_matches(
+        normalized,
+        NEUTRAL_PHRASES,
+    )
 
+    if not raw_coop and not raw_conflict and not raw_neutral:
+        return None
+
+    third_mentions = _all_country_mentions(
+        normalized,
+        exclude_codes=(
+            country_a,
+            country_b,
+        ),
+    )
+
+    coop_matches, rejected_coop = _filter_pair_bound_matches(
+        normalized,
+        raw_coop,
+        aliases_a,
+        aliases_b,
+        third_mentions,
+        "cooperative",
+    )
+    conflict_matches, rejected_conflict = _filter_pair_bound_matches(
+        normalized,
+        raw_conflict,
+        aliases_a,
+        aliases_b,
+        third_mentions,
+        "conflictual",
+    )
+    neutral_matches, rejected_neutral = _filter_pair_bound_matches(
+        normalized,
+        raw_neutral,
+        aliases_a,
+        aliases_b,
+        third_mentions,
+        "neutral",
+    )
+
+    # If the sentence has relationship language but none of it can be bound to
+    # the tested pair, it is context only and must not classify the pair.
     if not coop_matches and not conflict_matches and not neutral_matches:
         return None
 
@@ -745,15 +1065,16 @@ def _sentence_pair_evidence(
         neutral_matches,
     )
 
-    # Closer actor mentions receive more weight.
+    # Pair mention proximity remains useful, but is now secondary to explicit
+    # cue-to-actor binding.
     proximity_multiplier = 1.0
 
     if distance <= 35:
-        proximity_multiplier = 1.30
-    elif distance <= 75:
         proximity_multiplier = 1.15
+    elif distance <= 75:
+        proximity_multiplier = 1.05
     elif distance > 130:
-        proximity_multiplier = 0.75
+        proximity_multiplier = 0.80
 
     for key in strengths:
         strengths[key] *= proximity_multiplier
@@ -763,9 +1084,55 @@ def _sentence_pair_evidence(
         "distance": distance,
         "strengths": strengths,
         "signals": {
-            "cooperative": [m["phrase"] for m in coop_matches],
-            "conflictual": [m["phrase"] for m in conflict_matches],
-            "neutral": [m["phrase"] for m in neutral_matches],
+            "cooperative": [
+                m["phrase"]
+                for m in coop_matches
+            ],
+            "conflictual": [
+                m["phrase"]
+                for m in conflict_matches
+            ],
+            "neutral": [
+                m["phrase"]
+                for m in neutral_matches
+            ],
+        },
+        "binding": {
+            "cooperative": [
+                m.get("binding", {})
+                for m in coop_matches
+            ],
+            "conflictual": [
+                m.get("binding", {})
+                for m in conflict_matches
+            ],
+            "neutral": [
+                m.get("binding", {})
+                for m in neutral_matches
+            ],
+        },
+        "rejected_context_signals": {
+            "cooperative": [
+                {
+                    "phrase": m.get("phrase"),
+                    "binding": m.get("binding", {}),
+                }
+                for m in rejected_coop
+            ],
+            "conflictual": [
+                {
+                    "phrase": m.get("phrase"),
+                    "binding": m.get("binding", {}),
+                }
+                for m in rejected_conflict
+            ],
+            "neutral": [
+                {
+                    "phrase": m.get("phrase"),
+                    "binding": m.get("binding", {}),
+                }
+                for m in rejected_neutral
+            ],
         },
     }
 
@@ -780,11 +1147,12 @@ def detect_pair_relationship(
 
     Requirements for classification:
     - both countries must be present in the same local sentence/segment,
-    - the segment must also contain a relationship signal,
+    - a relationship cue must be locally bound to both tested actors,
+    - a closer third-country actor can invalidate conflict/cooperation cues,
     - otherwise return `unclassified`.
 
-    This avoids propagating an article's general negative tone to every pair
-    in a multi-country event.
+    The detector measures bilateral relation evidence, not the positive or
+    negative tone of the topic itself.
     """
     a = str(country_a or "").strip().upper()
     b = str(country_b or "").strip().upper()
@@ -864,6 +1232,14 @@ def detect_pair_relationship(
             "sentence": item["sentence"],
             "distance": item["distance"],
             "signals": item["signals"],
+            "binding": item.get(
+                "binding",
+                {},
+            ),
+            "rejected_context_signals": item.get(
+                "rejected_context_signals",
+                {},
+            ),
         })
 
         strengths = item["strengths"]
@@ -1045,4 +1421,3 @@ def relationship_is_directional(result: Dict[str, object]) -> bool:
             False,
         )
     )
-
