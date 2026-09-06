@@ -915,11 +915,13 @@ def dominant_relation_from_counts(counts):
 MIN_RELATIONSHIP_CLASSIFIED_EVENTS = 3
 MIN_RELATIONSHIP_COVERAGE = 0.15
 
+MODERATE_RELATIONSHIP_CLASSIFIED_EVENTS = 5
+MODERATE_RELATIONSHIP_COVERAGE = 0.10
+MODERATE_DIRECTIONAL_CONSISTENCY = 0.80
+
 STRONG_RELATIONSHIP_CLASSIFIED_EVENTS = 8
 STRONG_RELATIONSHIP_COVERAGE = 0.20
-
-MODERATE_RELATIONSHIP_CLASSIFIED_EVENTS = 5
-MODERATE_RELATIONSHIP_COVERAGE = 0.15
+STRONG_DIRECTIONAL_CONSISTENCY = 0.80
 
 
 def semantic_relationship_label(score, dominant):
@@ -945,26 +947,38 @@ def assess_relationship_evidence(
     observed_label,
     classified_events,
     total_events,
+    relationship_counts,
 ):
     """
-    Separate an observed semantic signal from an assessed relationship.
+    Evidence-aware bilateral assessment.
 
-    A small number of explicit sentences can be analytically interesting, but
-    one article must not define an entire bilateral relationship. Therefore:
+    A fixed coverage threshold can understate frequently mentioned pairs.
+    Version v5 therefore combines:
+      - explicit classified-event count,
+      - classification coverage,
+      - directional consistency.
 
-      observed_relationship_label
-          What the pair-level detector found in the classified evidence.
+    Directional consistency = the largest classified relationship class
+    divided by all classified pair-level events.
 
-      assessed_relationship
-          The label promoted to dashboard/intelligence use only when there are
-          at least MIN_RELATIONSHIP_CLASSIFIED_EVENTS classified observations
-          and sufficient classification coverage.
+    Levels:
+      none:
+        no classified evidence
 
-      evidence_level
-          none | insufficient | limited | moderate | strong
+      insufficient:
+        evidence exists but does not reach an assessment threshold
 
-    This does not discard sparse signals. They remain available as observed
-    evidence while the assessed relationship becomes `insufficient_evidence`.
+      limited:
+        >=3 classified events AND >=15% coverage
+
+      moderate:
+        >=5 classified events AND
+        (>=10% coverage OR >=80% directional consistency)
+
+      strong:
+        >=8 classified events AND
+        >=20% coverage AND
+        >=80% directional consistency
     """
     try:
         classified_events = int(classified_events or 0)
@@ -976,45 +990,82 @@ def assess_relationship_evidence(
     except Exception:
         total_events = 0
 
+    counts = relationship_counts or {}
+
     coverage = (
         classified_events / total_events
         if total_events > 0
         else 0.0
     )
 
+    classified_class_counts = [
+        int(counts.get("cooperative", 0) or 0),
+        int(counts.get("conflictual", 0) or 0),
+        int(counts.get("neutral", 0) or 0),
+        int(counts.get("mixed", 0) or 0),
+    ]
+
+    dominant_count = (
+        max(classified_class_counts)
+        if classified_class_counts
+        else 0
+    )
+
+    directional_consistency = (
+        dominant_count / classified_events
+        if classified_events > 0
+        else 0.0
+    )
+
+    base = {
+        "directional_consistency": round(
+            directional_consistency,
+            3,
+        ),
+    }
+
     if classified_events <= 0:
         return {
+            **base,
             "assessed_relationship": "unclassified",
             "evidence_status": "no_classified_evidence",
             "evidence_level": "none",
             "evidence_sufficient": False,
         }
 
-    sufficient = (
+    strong = (
+        classified_events >= STRONG_RELATIONSHIP_CLASSIFIED_EVENTS
+        and coverage >= STRONG_RELATIONSHIP_COVERAGE
+        and directional_consistency >= STRONG_DIRECTIONAL_CONSISTENCY
+    )
+
+    moderate = (
+        classified_events >= MODERATE_RELATIONSHIP_CLASSIFIED_EVENTS
+        and (
+            coverage >= MODERATE_RELATIONSHIP_COVERAGE
+            or directional_consistency >= MODERATE_DIRECTIONAL_CONSISTENCY
+        )
+    )
+
+    limited = (
         classified_events >= MIN_RELATIONSHIP_CLASSIFIED_EVENTS
         and coverage >= MIN_RELATIONSHIP_COVERAGE
     )
 
-    if not sufficient:
+    if strong:
+        level = "strong"
+    elif moderate:
+        level = "moderate"
+    elif limited:
+        level = "limited"
+    else:
         return {
+            **base,
             "assessed_relationship": "insufficient_evidence",
             "evidence_status": "below_assessment_threshold",
             "evidence_level": "insufficient",
             "evidence_sufficient": False,
         }
-
-    if (
-        classified_events >= STRONG_RELATIONSHIP_CLASSIFIED_EVENTS
-        and coverage >= STRONG_RELATIONSHIP_COVERAGE
-    ):
-        level = "strong"
-    elif (
-        classified_events >= MODERATE_RELATIONSHIP_CLASSIFIED_EVENTS
-        and coverage >= MODERATE_RELATIONSHIP_COVERAGE
-    ):
-        level = "moderate"
-    else:
-        level = "limited"
 
     assessed = (
         observed_label
@@ -1023,6 +1074,7 @@ def assess_relationship_evidence(
     )
 
     return {
+        **base,
         "assessed_relationship": assessed,
         "evidence_status": "assessment_threshold_met",
         "evidence_level": level,
@@ -1227,6 +1279,7 @@ def build_graph(events, mode="all"):
             observed_label=observed_label,
             classified_events=classified_events,
             total_events=total_events,
+            relationship_counts=counts,
         )
 
         coverage = (
@@ -1280,6 +1333,9 @@ def build_graph(events, mode="all"):
             "evidence_sufficient": assessment[
                 "evidence_sufficient"
             ],
+            "directional_consistency": assessment[
+                "directional_consistency"
+            ],
         })
 
     return {
@@ -1296,7 +1352,7 @@ def build_graph(events, mode="all"):
         },
         "mode": mode,
         "relationship_metadata": {
-            "method": "semantic_pair_relationship_aggregation_v3_evidence_aware",
+            "method": "semantic_pair_relationship_aggregation_v4_consistency_aware",
             "score_range": [-1.0, 1.0],
             "positive_meaning": "cooperative_language",
             "negative_meaning": "conflictual_language",
@@ -1318,17 +1374,23 @@ def build_graph(events, mode="all"):
                 "moderate_classification_coverage": (
                     MODERATE_RELATIONSHIP_COVERAGE
                 ),
+                "moderate_directional_consistency": (
+                    MODERATE_DIRECTIONAL_CONSISTENCY
+                ),
                 "strong_classified_events": (
                     STRONG_RELATIONSHIP_CLASSIFIED_EVENTS
                 ),
                 "strong_classification_coverage": (
                     STRONG_RELATIONSHIP_COVERAGE
                 ),
+                "strong_directional_consistency": (
+                    STRONG_DIRECTIONAL_CONSISTENCY
+                ),
             },
             "note": (
                 "Interaction intensity, observed semantic signal and assessed "
-                "relationship are separate measures. Sparse semantic evidence "
-                "is preserved but labelled insufficient_evidence."
+                "relationship are separate measures. Evidence strength uses "
+                "classified count, coverage and directional consistency."
             ),
         },
     }
@@ -2231,6 +2293,10 @@ def build_relationship_index_from_components(
                 "evidence_sufficient": graph_edge.get(
                     "evidence_sufficient",
                     False,
+                ),
+                "directional_consistency": graph_edge.get(
+                    "directional_consistency",
+                    0.0,
                 ),
                 "relationship_confidence": graph_edge.get(
                     "relationship_confidence"
