@@ -907,6 +907,21 @@ def dominant_relation_from_counts(counts):
     return "mixed"
 
 
+# Minimum evidence required before an observed semantic signal may be
+# promoted to an assessed country-pair relationship.
+#
+# The detector may still record 1-2 meaningful events, but those remain
+# "insufficient_evidence" at the relationship-assessment layer.
+MIN_RELATIONSHIP_CLASSIFIED_EVENTS = 3
+MIN_RELATIONSHIP_COVERAGE = 0.15
+
+STRONG_RELATIONSHIP_CLASSIFIED_EVENTS = 8
+STRONG_RELATIONSHIP_COVERAGE = 0.20
+
+MODERATE_RELATIONSHIP_CLASSIFIED_EVENTS = 5
+MODERATE_RELATIONSHIP_COVERAGE = 0.15
+
+
 def semantic_relationship_label(score, dominant):
     if dominant == "unclassified":
         return "unclassified"
@@ -926,6 +941,95 @@ def semantic_relationship_label(score, dominant):
     return "mixed"
 
 
+def assess_relationship_evidence(
+    observed_label,
+    classified_events,
+    total_events,
+):
+    """
+    Separate an observed semantic signal from an assessed relationship.
+
+    A small number of explicit sentences can be analytically interesting, but
+    one article must not define an entire bilateral relationship. Therefore:
+
+      observed_relationship_label
+          What the pair-level detector found in the classified evidence.
+
+      assessed_relationship
+          The label promoted to dashboard/intelligence use only when there are
+          at least MIN_RELATIONSHIP_CLASSIFIED_EVENTS classified observations
+          and sufficient classification coverage.
+
+      evidence_level
+          none | insufficient | limited | moderate | strong
+
+    This does not discard sparse signals. They remain available as observed
+    evidence while the assessed relationship becomes `insufficient_evidence`.
+    """
+    try:
+        classified_events = int(classified_events or 0)
+    except Exception:
+        classified_events = 0
+
+    try:
+        total_events = int(total_events or 0)
+    except Exception:
+        total_events = 0
+
+    coverage = (
+        classified_events / total_events
+        if total_events > 0
+        else 0.0
+    )
+
+    if classified_events <= 0:
+        return {
+            "assessed_relationship": "unclassified",
+            "evidence_status": "no_classified_evidence",
+            "evidence_level": "none",
+            "evidence_sufficient": False,
+        }
+
+    sufficient = (
+        classified_events >= MIN_RELATIONSHIP_CLASSIFIED_EVENTS
+        and coverage >= MIN_RELATIONSHIP_COVERAGE
+    )
+
+    if not sufficient:
+        return {
+            "assessed_relationship": "insufficient_evidence",
+            "evidence_status": "below_assessment_threshold",
+            "evidence_level": "insufficient",
+            "evidence_sufficient": False,
+        }
+
+    if (
+        classified_events >= STRONG_RELATIONSHIP_CLASSIFIED_EVENTS
+        and coverage >= STRONG_RELATIONSHIP_COVERAGE
+    ):
+        level = "strong"
+    elif (
+        classified_events >= MODERATE_RELATIONSHIP_CLASSIFIED_EVENTS
+        and coverage >= MODERATE_RELATIONSHIP_COVERAGE
+    ):
+        level = "moderate"
+    else:
+        level = "limited"
+
+    assessed = (
+        observed_label
+        if observed_label not in (None, "", "unclassified")
+        else "unclassified"
+    )
+
+    return {
+        "assessed_relationship": assessed,
+        "evidence_status": "assessment_threshold_met",
+        "evidence_level": level,
+        "evidence_sufficient": True,
+    }
+
+
 # -----------------------------
 # RSS / GDELT / COMBINED LOGIC
 # -----------------------------
@@ -938,13 +1042,17 @@ def build_graph(events, mode="all"):
     for dashboard/backward compatibility.
 
     New fields explain what the observed relationship looks like:
-      relationship_score       -1.0 .. +1.0
-      dominant_relation        cooperative/conflictual/neutral/mixed/unclassified
-      relationship_label       score-aware summary label
-      relationship_confidence  mean detector confidence
-      classification_coverage  share of edge events classified
-      relationship_counts      event counts by class
-      topics                   weighted topic evidence for this pair
+      relationship_score          -1.0 .. +1.0 observed semantic score
+      dominant_relation           dominant class in classified observations
+      observed_relationship_label raw score-aware semantic label
+      relationship_label          assessed label used by dashboard
+      assessed_relationship       same assessed label, explicit field
+      relationship_confidence     mean detector confidence
+      classification_coverage     share of edge events classified
+      relationship_counts         event counts by class
+      evidence_level              none/insufficient/limited/moderate/strong
+      evidence_sufficient         whether assessment threshold was met
+      topics                      weighted topic evidence for this pair
 
     IMPORTANT:
     High `weight` does not mean political closeness.
@@ -1110,6 +1218,23 @@ def build_graph(events, mode="all"):
             )
         )
 
+        observed_label = semantic_relationship_label(
+            semantic_score,
+            dominant,
+        )
+
+        assessment = assess_relationship_evidence(
+            observed_label=observed_label,
+            classified_events=classified_events,
+            total_events=total_events,
+        )
+
+        coverage = (
+            classified_events / total_events
+            if total_events
+            else 0.0
+        )
+
         edges.append({
             "source": a,
             "target": b,
@@ -1122,21 +1247,39 @@ def build_graph(events, mode="all"):
             # Pair topics.
             "topics": topics,
 
-            # Semantic relationship.
+            # Observed pair-level semantic signal.
             "relationship_score": semantic_score,
             "dominant_relation": dominant,
-            "relationship_label": semantic_relationship_label(
-                semantic_score,
-                dominant,
-            ),
+            "observed_relationship_label": observed_label,
             "relationship_confidence": mean_confidence,
             "relationship_counts": counts,
             "classified_events": classified_events,
             "unclassified_events": counts["unclassified"],
             "classification_coverage": round(
-                classified_events / total_events,
+                coverage,
                 3,
-            ) if total_events else 0.0,
+            ),
+
+            # Evidence-aware intelligence assessment.
+            #
+            # `relationship_label` intentionally becomes the assessed label so
+            # existing dashboard code stops presenting one-off observations as
+            # full bilateral relationships.
+            "relationship_label": assessment[
+                "assessed_relationship"
+            ],
+            "assessed_relationship": assessment[
+                "assessed_relationship"
+            ],
+            "evidence_status": assessment[
+                "evidence_status"
+            ],
+            "evidence_level": assessment[
+                "evidence_level"
+            ],
+            "evidence_sufficient": assessment[
+                "evidence_sufficient"
+            ],
         })
 
     return {
@@ -1153,15 +1296,39 @@ def build_graph(events, mode="all"):
         },
         "mode": mode,
         "relationship_metadata": {
-            "method": "semantic_pair_relationship_aggregation_v2",
+            "method": "semantic_pair_relationship_aggregation_v3_evidence_aware",
             "score_range": [-1.0, 1.0],
             "positive_meaning": "cooperative_language",
             "negative_meaning": "conflictual_language",
             "zero_meaning": "neutral_or_balanced_language",
             "weight_meaning": "weighted_interaction_intensity",
+            "observed_label_meaning": (
+                "semantic direction found in explicitly classified evidence"
+            ),
+            "assessed_label_meaning": (
+                "dashboard/intelligence relationship label after evidence "
+                "thresholds are applied"
+            ),
+            "assessment_thresholds": {
+                "minimum_classified_events": MIN_RELATIONSHIP_CLASSIFIED_EVENTS,
+                "minimum_classification_coverage": MIN_RELATIONSHIP_COVERAGE,
+                "moderate_classified_events": (
+                    MODERATE_RELATIONSHIP_CLASSIFIED_EVENTS
+                ),
+                "moderate_classification_coverage": (
+                    MODERATE_RELATIONSHIP_COVERAGE
+                ),
+                "strong_classified_events": (
+                    STRONG_RELATIONSHIP_CLASSIFIED_EVENTS
+                ),
+                "strong_classification_coverage": (
+                    STRONG_RELATIONSHIP_COVERAGE
+                ),
+            },
             "note": (
-                "Interaction weight and semantic relationship score are "
-                "separate measures."
+                "Interaction intensity, observed semantic signal and assessed "
+                "relationship are separate measures. Sparse semantic evidence "
+                "is preserved but labelled insufficient_evidence."
             ),
         },
     }
@@ -2039,6 +2206,32 @@ def build_relationship_index_from_components(
                     "relationship_label",
                     "unclassified",
                 ),
+                "assessed_relationship": graph_edge.get(
+                    "assessed_relationship",
+                    graph_edge.get(
+                        "relationship_label",
+                        "unclassified",
+                    ),
+                ),
+                "observed_relationship_label": graph_edge.get(
+                    "observed_relationship_label",
+                    graph_edge.get(
+                        "dominant_relation",
+                        "unclassified",
+                    ),
+                ),
+                "evidence_status": graph_edge.get(
+                    "evidence_status",
+                    "unknown",
+                ),
+                "evidence_level": graph_edge.get(
+                    "evidence_level",
+                    "none",
+                ),
+                "evidence_sufficient": graph_edge.get(
+                    "evidence_sufficient",
+                    False,
+                ),
                 "relationship_confidence": graph_edge.get(
                     "relationship_confidence"
                 ),
@@ -2112,6 +2305,32 @@ def build_relationship_index_from_components(
                     "dominant_relation": item.get(
                         "dominant_relation",
                         "unclassified",
+                    ),
+                    "relationship_label": item.get(
+                        "relationship_label",
+                        "unclassified",
+                    ),
+                    "assessed_relationship": item.get(
+                        "assessed_relationship",
+                        item.get(
+                            "relationship_label",
+                            "unclassified",
+                        ),
+                    ),
+                    "observed_relationship_label": item.get(
+                        "observed_relationship_label",
+                        item.get(
+                            "dominant_relation",
+                            "unclassified",
+                        ),
+                    ),
+                    "evidence_level": item.get(
+                        "evidence_level",
+                        "none",
+                    ),
+                    "evidence_sufficient": item.get(
+                        "evidence_sufficient",
+                        False,
                     ),
                     "relationship_label": item.get(
                         "relationship_label",
