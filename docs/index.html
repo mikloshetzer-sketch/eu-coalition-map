@@ -6,7 +6,6 @@
 <title>EU Political Alignment Monitor</title>
 <meta name="description" content="EU political interaction, interest and voting alignment dashboard." />
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-
 <style>
 :root{
   --navy:#0b3653; --navy2:#124f70; --cyan:#2098cf; --blue:#177db2;
@@ -20,13 +19,10 @@ html,body{margin:0;background:var(--sky);color:var(--text);font-family:Arial,Hel
 body{min-height:100vh}
 button,select{font:inherit}
 .app{max-width:1600px;margin:0 auto;padding:0 24px 38px}
-
 .site-header{
-  margin:0 -24px 22px;
-  padding:26px 52px 28px;
-  color:white;
+  margin:0 -24px 22px;padding:26px 52px 28px;color:white;
   background:linear-gradient(105deg,#103e5a 0%,#155978 58%,#2b9bd0 100%);
-  box-shadow:0 8px 26px rgba(14,61,87,.14);
+  box-shadow:0 8px 26px rgba(14,61,87,.14)
 }
 .brandline{display:flex;align-items:center;justify-content:space-between;gap:24px}
 .brand-left{display:flex;align-items:flex-start;gap:18px}
@@ -35,15 +31,10 @@ button,select{font:inherit}
   display:grid;place-items:center;background:rgba(255,255,255,.08);font-weight:800;font-size:16px
 }
 .eyebrow{font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
-.site-header h1{
-  margin:0;font-family:Georgia,"Times New Roman",serif;font-size:46px;line-height:1.02;letter-spacing:-1.4px
-}
+.site-header h1{margin:0;font-family:Georgia,"Times New Roman",serif;font-size:46px;line-height:1.02;letter-spacing:-1.4px}
 .site-header p{margin:12px 0 0;max-width:900px;font-size:14px;line-height:1.55;font-weight:700;color:#e6f3fa}
 .header-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
-.header-pill{
-  border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.1);color:#fff;
-  border-radius:24px;padding:10px 15px;font-size:11px;font-weight:800
-}
+.header-pill{border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.1);color:#fff;border-radius:24px;padding:10px 15px;font-size:11px;font-weight:800}
 .header-pill.primary{background:#188dcc;border-color:#188dcc}
 .statusline{display:flex;align-items:center;gap:7px;font-size:11px;color:#edf8fd}
 .dot{width:8px;height:8px;border-radius:50%;background:#57d39b}
@@ -66,20 +57,23 @@ button,select{font:inherit}
   background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);
   position:sticky;top:8px;z-index:30
 }
-.control{display:grid;gap:5px}.control label{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:800}
+.control{display:grid;gap:5px}
+.control label{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:800}
 .control select{min-width:145px;background:#fff;color:var(--text);border:1px solid #cbd9e1;border-radius:9px;padding:8px 10px;outline:none}
 .seg{display:flex;border:1px solid #cbd9e1;border-radius:9px;overflow:hidden;background:#f7fafc}
 .seg button{border:0;border-right:1px solid #cbd9e1;background:transparent;color:var(--text2);padding:8px 11px;cursor:pointer}
-.seg button:last-child{border-right:0}.seg button.active{color:#fff;background:var(--navy2)}
-.grow{flex:1}.refresh{border:0;background:var(--cyan);color:white;border-radius:10px;padding:9px 14px;font-weight:800;cursor:pointer}
+.seg button:last-child{border-right:0}
+.seg button.active{color:#fff;background:var(--navy2)}
+.grow{flex:1}
+.refresh{border:0;background:var(--cyan);color:white;border-radius:10px;padding:9px 14px;font-weight:800;cursor:pointer}
 .refresh:hover{background:#1686ba}
-
 .tabs{display:flex;gap:5px;margin:14px 0;overflow:auto;padding:5px;background:#fff;border:1px solid var(--line);border-radius:13px}
 .tab{border:0;background:transparent;color:var(--text2);padding:10px 15px;border-radius:9px;cursor:pointer;white-space:nowrap;font-weight:800;font-size:12px}
 .tab.active{color:white;background:var(--navy2)}
-.tab .soon{margin-left:6px;font-size:8px;color:#fff0ba}
+.subnav-label{font-size:9px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.8px;margin-right:4px}
 
-.view{display:none}.view.active{display:block}.grid{display:grid;gap:14px}
+.view{display:none}.view.active{display:block}
+.grid{display:grid;gap:14px}
 .kpis{grid-template-columns:repeat(6,minmax(0,1fr));margin-bottom:16px}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
 .kpi{padding:17px 14px;min-height:116px;text-align:center;border-top:4px solid #2098cf}
@@ -92,8 +86,9 @@ button,select{font:inherit}
 .section-head h3{margin:0;font-size:18px;color:#104967}
 .section-head p{margin:5px 0 0;color:var(--muted);font-size:10px;line-height:1.5}
 .pill,.badge{font-size:9px;border:1px solid #cad9e2;border-radius:99px;padding:6px 9px;color:var(--text2);white-space:nowrap;background:#f7fafc}
-.badge.good{border-color:#a4dec8;color:#0c7654;background:#eefaf5}.badge.warn{border-color:#efd49b;color:#906210;background:#fff9eb}.badge.bad{border-color:#f0b2ad;color:#a62d24;background:#fff3f1}
-
+.badge.good{border-color:#a4dec8;color:#0c7654;background:#eefaf5}
+.badge.warn{border-color:#efd49b;color:#906210;background:#fff9eb}
+.badge.bad{border-color:#f0b2ad;color:#a62d24;background:#fff3f1}
 .two{grid-template-columns:minmax(0,1.6fr) minmax(330px,.8fr)}
 .two-equal{grid-template-columns:1fr 1fr}.three{grid-template-columns:repeat(3,1fr)}
 .overview-top{grid-template-columns:1.05fr .95fr .95fr}
@@ -102,24 +97,23 @@ button,select{font:inherit}
 .network.tall{height:660px}
 .legend{display:flex;flex-wrap:wrap;gap:12px;padding:0 18px 15px;font-size:9px;color:var(--muted)}
 .legend span{display:flex;align-items:center;gap:6px}.sw{width:17px;height:3px;border-radius:4px;background:var(--blue)}
-
 .list{padding:8px 16px 18px}
 .row{display:grid;grid-template-columns:32px 1fr auto;align-items:center;gap:10px;padding:11px 2px;border-bottom:1px solid #e6edf1}
 .row:last-child{border-bottom:0}.rank{font-size:10px;color:var(--muted)}.row strong{font-size:11px;color:#214f67}.row small{display:block;margin-top:3px;color:var(--muted);font-size:9px}
 .score{font-size:12px;font-weight:800;color:#0f4666}
 .bar{height:5px;background:#e8eff3;border-radius:5px;overflow:hidden;margin-top:7px}.bar i{display:block;height:100%;background:linear-gradient(90deg,#1e7fb4,#22a4d9);border-radius:5px}
-
 .cluster{padding:13px 0;border-bottom:1px solid #e6edf1}.cluster:last-child{border-bottom:0}
 .cluster-top{display:flex;align-items:center;justify-content:space-between;gap:10px}.cluster-name{font-weight:800;font-size:11px;color:#214f67}
 .cluster-members{font-size:10px;color:var(--text2);margin-top:7px;line-height:1.55}.cluster-topic{font-size:9px;color:var(--muted);margin-top:6px}
 .insight{padding:16px 20px;line-height:1.65;color:var(--text2);font-size:11px}.insight strong{color:#0f4666}
 .warning{padding:11px 13px;border:1px solid #efd49b;background:#fff9eb;border-radius:10px;color:#7c631c;font-size:10px;line-height:1.55;margin:0 16px 16px}
+.method-box{padding:16px 20px 20px;color:var(--text2);font-size:10px;line-height:1.6}.method-box strong{color:#0f4666}
+.section-note{font-size:10px;color:var(--muted);line-height:1.55;margin:0 20px 18px}
 
 .country-layout{grid-template-columns:300px minmax(0,1fr)}.country-side{padding:16px}
 .country-title{display:flex;align-items:center;gap:12px}.flag{width:44px;height:32px;border:1px solid #cbd9e1;border-radius:6px;display:grid;place-items:center;color:var(--text2);font-size:11px;background:#f5f9fb}
 .country-title h3{margin:0;font-size:20px}.country-title p{margin:3px 0 0;color:var(--muted);font-size:10px}
 .country-metric{margin-top:18px}.country-metric .lab{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}.country-metric .num{font-size:25px;font-weight:800;margin-top:4px;color:#0f4666}
-
 .topic-bars{padding:12px 20px 20px}.topic-line{display:grid;grid-template-columns:150px 1fr 48px;gap:10px;align-items:center;margin:11px 0}
 .topic-line label{font-size:10px;color:var(--text2)}.topic-line .track{height:9px;background:#e7eff3;border-radius:6px;overflow:hidden}.topic-line .fill{height:100%;background:linear-gradient(90deg,#177db2,#26a2d6);border-radius:6px}.topic-line b{font-size:10px;text-align:right}
 
@@ -132,26 +126,109 @@ button,select{font:inherit}
 .party-box h4{margin:0 0 7px;font-size:11px}.party-box p{font-size:9px;color:var(--muted);line-height:1.55;margin:0}
 .vote-empty,.empty{padding:28px 18px;text-align:center;color:var(--muted);font-size:10px;line-height:1.6}
 .footer{margin-top:20px;padding:15px 4px;color:#718a99;font-size:9px;display:flex;justify-content:space-between;gap:20px;border-top:1px solid #d8e3e9}
-
 .tooltip{position:fixed;pointer-events:none;display:none;z-index:99;max-width:320px;padding:10px 11px;border:1px solid #244f68;background:#0e405b;color:#fff;border-radius:9px;box-shadow:0 12px 30px rgba(0,0,0,.22);font-size:9px;line-height:1.5}
 .loading{opacity:.58;pointer-events:none}.error{margin:12px 0;padding:12px 14px;border:1px solid #f0b2ad;background:#fff3f1;color:#a62d24;border-radius:10px;font-size:10px;display:none}
 
-.method-box{padding:16px 20px 20px;color:var(--text2);font-size:10px;line-height:1.6}
-.method-box strong{color:#0f4666}
-.section-note{font-size:10px;color:var(--muted);line-height:1.55;margin:0 20px 18px}
-.subnav-label{font-size:9px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.8px;margin-right:4px}
+/* Relationship Intelligence Matrix — migration-monitor inspired */
+.rel-monitor-card{
+  margin-top:14px;
+  border-top:3px solid var(--cyan);
+  overflow:hidden;
+}
+.rel-monitor-head{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:18px;
+  padding:18px 20px 14px;border-bottom:1px solid var(--line)
+}
+.rel-monitor-head h3{margin:0;font-size:19px;color:#104967}
+.rel-monitor-head p{margin:5px 0 0;color:var(--muted);font-size:10px;line-height:1.5;max-width:820px}
+.rel-monitor-actions{display:flex;gap:8px;align-items:end;flex-wrap:wrap;justify-content:flex-end}
+.rel-mini-control{display:grid;gap:4px}
+.rel-mini-control label{font-size:8px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.7px}
+.rel-mini-control select{
+  min-width:135px;padding:7px 9px;border:1px solid #cbd9e1;border-radius:8px;
+  background:#fff;color:var(--text);font-size:10px
+}
+.rel-summary-strip{
+  display:grid;grid-template-columns:repeat(5,1fr);
+  border-bottom:1px solid var(--line);background:#f8fbfd
+}
+.rel-summary-cell{
+  padding:10px 14px;border-right:1px solid var(--line);min-height:55px
+}
+.rel-summary-cell:last-child{border-right:0}
+.rel-summary-cell small{display:block;font-size:8px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.7px}
+.rel-summary-cell strong{display:block;margin-top:5px;font-size:16px;color:#0f4666}
+.rel-summary-cell.conflict strong{color:var(--red)}
+.rel-summary-cell.coop strong{color:var(--green)}
+.rel-table-wrap{overflow:auto;max-height:620px;background:#fff}
+.rel-table{
+  width:100%;border-collapse:separate;border-spacing:0;min-width:1120px;
+  font-size:10px
+}
+.rel-table thead th{
+  position:sticky;top:0;z-index:5;
+  background:#0f4f70;color:#fff;padding:10px 9px;text-align:left;
+  border-right:1px solid rgba(255,255,255,.16);font-size:8px;
+  text-transform:uppercase;letter-spacing:.55px;white-space:nowrap
+}
+.rel-table thead th:first-child{left:0;z-index:7}
+.rel-table tbody td{
+  padding:9px 9px;border-right:1px solid #e0e9ee;border-bottom:1px solid #dce7ed;
+  vertical-align:middle;background:#fff;color:var(--text2)
+}
+.rel-table tbody tr:nth-child(even) td{background:#fbfdfe}
+.rel-table tbody tr:hover td{background:#eef7fb}
+.rel-table tbody td:first-child{
+  position:sticky;left:0;z-index:3;background:#fff;font-weight:800;color:#123f59
+}
+.rel-table tbody tr:nth-child(even) td:first-child{background:#fbfdfe}
+.rel-table tbody tr:hover td:first-child{background:#eef7fb}
+.pair-cell{min-width:180px}
+.pair-code{display:block;font-size:12px;font-weight:900;color:#0e4665;letter-spacing:.15px}
+.pair-name{display:block;margin-top:3px;font-size:8px;color:var(--muted);font-weight:500}
+.scope-tag{display:inline-flex;padding:4px 7px;border-radius:6px;font-size:8px;font-weight:800;border:1px solid #cddce4;background:#f6fafc;color:#4b6979}
+.scope-tag.external{background:#f6f1ff;border-color:#ddd0ff;color:#6943b7}
+.relation-tag{
+  display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:7px;
+  font-size:8px;font-weight:900;text-transform:uppercase;letter-spacing:.3px;border:1px solid
+}
+.relation-tag::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.relation-conflictual{color:#a92f27;background:#fff1ef;border-color:#efb5af}
+.relation-cooperative{color:#087357;background:#eefaf5;border-color:#a9dfcd}
+.relation-neutral{color:#526d7c;background:#f5f8fa;border-color:#ccd9df}
+.relation-mixed{color:#8a5d0b;background:#fff7e6;border-color:#edce91}
+.relation-insufficient_evidence{color:#8b650f;background:#fff9eb;border-color:#edd49d}
+.relation-unclassified{color:#738895;background:#f7f9fa;border-color:#d8e2e7}
+.evidence-tag{
+  display:inline-flex;padding:4px 7px;border-radius:6px;font-size:8px;font-weight:900;
+  text-transform:uppercase;border:1px solid
+}
+.ev-strong{color:#075c45;background:#e9f8f2;border-color:#8ed4bc}
+.ev-moderate{color:#1a638b;background:#edf7fc;border-color:#a9d5e9}
+.ev-limited{color:#8a5d0b;background:#fff7e6;border-color:#edce91}
+.ev-insufficient{color:#986b13;background:#fff9eb;border-color:#efd8a8}
+.ev-none{color:#718593;background:#f7f9fa;border-color:#d8e2e7}
+.metric-big{font-size:13px;font-weight:900;color:#0f4666}
+.metric-sub{display:block;margin-top:2px;font-size:8px;color:var(--muted)}
+.consistency-track{height:5px;width:82px;background:#e6edf1;border-radius:5px;overflow:hidden;margin-bottom:3px}
+.consistency-track i{display:block;height:100%;background:linear-gradient(90deg,#4ea7cb,#176f9d);border-radius:5px}
+.topic-stack{display:flex;flex-wrap:wrap;gap:4px;max-width:250px}
+.topic-mini{display:inline-flex;padding:3px 5px;border-radius:5px;background:#edf6fa;border:1px solid #d5e7ef;color:#396579;font-size:7px;font-weight:800}
+.rel-empty{padding:34px 20px;text-align:center;color:var(--muted);font-size:10px}
+.rel-footnote{padding:10px 14px;border-top:1px solid var(--line);background:#f8fbfd;color:var(--muted);font-size:8px;line-height:1.5}
 
 @media(max-width:1200px){
   .kpis{grid-template-columns:repeat(3,1fr)}.two,.country-layout,.overview-top{grid-template-columns:1fr}.three{grid-template-columns:1fr 1fr}.party-grid{grid-template-columns:1fr 1fr}
   .site-header h1{font-size:39px}
+  .rel-summary-strip{grid-template-columns:repeat(3,1fr)}
 }
 @media(max-width:760px){
   .app{padding:0 12px 28px}.site-header{margin:0 -12px 16px;padding:20px 18px}.brandline,.brand-left{align-items:flex-start}.brandline{display:block}.header-actions{justify-content:flex-start;margin-top:18px}
   .site-header h1{font-size:32px}.overview-lead{grid-template-columns:1fr;padding:20px}.update-box{text-align:left;min-width:0}
   .kpis{grid-template-columns:1fr 1fr}.two-equal,.three{grid-template-columns:1fr}.party-grid{grid-template-columns:1fr}.network{height:430px}.topic-line{grid-template-columns:110px 1fr 40px}
+  .rel-monitor-head{display:block}.rel-monitor-actions{justify-content:flex-start;margin-top:12px}.rel-summary-strip{grid-template-columns:1fr 1fr}
 }
 </style>
-
 </head>
 <body>
 <div class="app" id="app">
@@ -192,6 +269,7 @@ button,select{font:inherit}
     <div class="control"><label>Téma / Topic</label><select id="topic"><option value="all">All topics</option><option value="migration">Migration</option><option value="ukraine_russia">Ukraine / Russia</option><option value="enlargement">Enlargement</option><option value="defence">Defence</option><option value="energy">Energy</option><option value="fiscal">Fiscal</option><option value="rule_of_law">Rule of law</option><option value="trade">Economic / Internal Market</option></select></div>
     <div class="grow"></div><button class="refresh" id="refresh">Adatok frissítése</button>
   </div>
+
   <div class="error" id="error"></div>
 
   <div class="tabs" id="tabs">
@@ -235,15 +313,71 @@ button,select{font:inherit}
       </div>
       <div class="card">
         <div class="section-head"><div><h3>Módszertani olvasat</h3><p>How to read the dashboard correctly</p></div></div>
-        <div class="method-box"><strong>Interaction:</strong> az országok közös megjelenése és témakapcsolata.<br><strong>Interest:</strong> egy téma relatív súlya az adott országhoz kapcsolódó eseményekben.<br><strong>Voting:</strong> külön adatbázis alapján mért együttszavazási kapcsolat.<br><strong>Coalition:</strong> csak akkor nevezzük annak, ha a kapcsolatot érdekalapú, álláspont- és szavazási adatok is alátámasztják.</div>
+        <div class="method-box"><strong>Interaction:</strong> az országok közös megjelenése és témakapcsolata.<br><strong>Relationship:</strong> csak explicit kétoldalú nyelvi bizonyítékból minősített kapcsolat.<br><strong>Interest:</strong> egy téma relatív súlya az adott országhoz kapcsolódó eseményekben.<br><strong>Voting:</strong> külön adatbázis alapján mért együttszavazási kapcsolat.<br><strong>Coalition:</strong> csak akkor nevezzük annak, ha a kapcsolatot érdekalapú, álláspont- és szavazási adatok is alátámasztják.</div>
       </div>
     </div>
 
-    <div class="card" style="margin-top:14px">
-      <div class="section-head"><div><h3 id="overviewNetworkTitle">Részletes kapcsolati hálózat</h3><p id="overviewNetworkSub">Analytical network view · secondary overview layer</p></div><span class="pill" id="networkModePill">Interaction</span></div>
-      <div class="section-note">A hálózati ábra részletes elemzéshez hasznos. A vastagabb él nagyobb megfigyelt kapcsolati súlyt jelent; ez önmagában nem azonos politikai egyetértéssel.</div>
-      <div class="chart-wrap"><svg id="networkOverview" class="network"></svg></div>
-      <div class="legend"><span><i class="sw"></i> stronger link = higher observed weight</span><span><i class="sw" style="background:#7c4ce4"></i> external actor</span></div>
+    <div class="card rel-monitor-card">
+      <div class="rel-monitor-head">
+        <div>
+          <h3>Relationship Intelligence Matrix</h3>
+          <p>Gyors kétoldalú áttekintés · interaction, explicit relationship evidence, bizonyítéki erősség és fő témák egy táblában. A hálózati diagram a Relations nézetben továbbra is elérhető.</p>
+        </div>
+        <div class="rel-monitor-actions">
+          <div class="rel-mini-control">
+            <label>Relationship</label>
+            <select id="relFilter">
+              <option value="all">All assessments</option>
+              <option value="assessed">Assessed only</option>
+              <option value="conflictual">Conflictual</option>
+              <option value="cooperative">Cooperative</option>
+              <option value="neutral">Neutral</option>
+              <option value="mixed">Mixed</option>
+              <option value="insufficient_evidence">Insufficient evidence</option>
+              <option value="unclassified">Unclassified</option>
+            </select>
+          </div>
+          <div class="rel-mini-control">
+            <label>Sort</label>
+            <select id="relSort">
+              <option value="evidence">Evidence first</option>
+              <option value="interactions">Interactions</option>
+              <option value="coverage">Coverage</option>
+              <option value="consistency">Consistency</option>
+              <option value="pair">Country pair A–Z</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="rel-summary-strip">
+        <div class="rel-summary-cell"><small>Visible pairs</small><strong id="rmVisible">—</strong></div>
+        <div class="rel-summary-cell conflict"><small>Conflictual</small><strong id="rmConflict">—</strong></div>
+        <div class="rel-summary-cell coop"><small>Cooperative</small><strong id="rmCoop">—</strong></div>
+        <div class="rel-summary-cell"><small>Sufficient evidence</small><strong id="rmSufficient">—</strong></div>
+        <div class="rel-summary-cell"><small>Unclassified</small><strong id="rmUnclassified">—</strong></div>
+      </div>
+
+      <div class="rel-table-wrap">
+        <table class="rel-table">
+          <thead>
+            <tr>
+              <th>Country pair</th>
+              <th>Scope</th>
+              <th>Interactions</th>
+              <th>Assessed relation</th>
+              <th>Evidence</th>
+              <th>Explicit signals</th>
+              <th>Coverage</th>
+              <th>Consistency</th>
+              <th>Main topics</th>
+            </tr>
+          </thead>
+          <tbody id="relationshipMatrixBody"></tbody>
+        </table>
+        <div id="relationshipMatrixEmpty" class="rel-empty" style="display:none">No country-pair relationships match the current filters.</div>
+      </div>
+      <div class="rel-footnote">Reading rule: interaction count shows how often a pair appears together. Assessed relation is based only on explicit pair-level evidence. “Insufficient evidence” means a semantic signal exists but is not strong enough for a final bilateral assessment. Consistency is shown as classified signals / classified signals and percentage, so 1/1 is visibly different from 5/5.</div>
     </div>
   </section>
 
@@ -251,38 +385,52 @@ button,select{font:inherit}
     <div class="grid country-layout">
       <div class="card country-side"><div class="control"><label>Country profile</label><select id="countrySelect" style="width:100%;margin-top:6px"></select></div><div id="countrySummary"></div></div>
       <div class="grid">
-        <div class="grid two-equal"><div class="card"><div class="section-head"><div><h3>Main policy interests</h3><p>Topic salience derived from current network evidence</p></div></div><div id="countryTopics" class="topic-bars"></div></div><div class="card"><div class="section-head"><div><h3>Top partners</h3><p id="countryPartnerLabel">Strongest observed interaction</p></div></div><div id="countryPartners" class="list"></div></div></div>
+        <div class="grid two-equal">
+          <div class="card"><div class="section-head"><div><h3>Main policy interests</h3><p>Topic salience derived from current network evidence</p></div></div><div id="countryTopics" class="topic-bars"></div></div>
+          <div class="card"><div class="section-head"><div><h3>Top partners</h3><p id="countryPartnerLabel">Strongest observed interaction</p></div></div><div id="countryPartners" class="list"></div></div>
+        </div>
         <div class="card"><div class="section-head"><div><h3>Country relationship map</h3><p>Selected country and its current first-degree network</p></div></div><div class="chart-wrap"><svg id="networkCountry" class="network"></svg></div></div>
       </div>
     </div>
   </section>
 
   <section class="view" id="view-network">
-    <div class="card"><div class="section-head"><div><h3>Full relationship network</h3><p>Use source, time window, scope and topic filters above</p></div><span class="pill" id="fullNetworkPill">Interaction</span></div><div class="chart-wrap"><svg id="networkFull" class="network tall"></svg></div></div>
+    <div class="card"><div class="section-head"><div><h3>Full relationship network</h3><p>Use source, time window, scope and topic filters above</p></div><span class="pill" id="fullNetworkPill">Interaction</span></div><div class="section-note">A hálózati ábra strukturális mintázatok és klaszterek vizsgálatára szolgál. Az él vastagsága megfigyelt kapcsolati súly, nem automatikusan politikai egyetértés.</div><div class="chart-wrap"><svg id="networkFull" class="network tall"></svg></div></div>
   </section>
 
   <section class="view" id="view-interests">
-    <div class="grid two-equal" style="margin-bottom:14px"><div class="card"><div class="section-head"><div><h3>Country × policy matrix</h3><p>Topic salience reconstructed from weighted country relationships</p></div></div><div class="matrix-wrap"><table id="interestMatrix" class="matrix"></table></div></div><div class="card"><div class="section-head"><div><h3>Interest similarity</h3><p>Countries with similar topic distributions</p></div></div><div id="interestPairs" class="list"></div><div class="warning">Similarity here means similar observed topic profiles. It does not yet prove identical policy positions. A stance layer is required for that.</div></div></div>
+    <div class="grid two-equal" style="margin-bottom:14px">
+      <div class="card"><div class="section-head"><div><h3>Country × policy matrix</h3><p>Topic salience reconstructed from weighted country relationships</p></div></div><div class="matrix-wrap"><table id="interestMatrix" class="matrix"></table></div></div>
+      <div class="card"><div class="section-head"><div><h3>Interest similarity</h3><p>Countries with similar topic distributions</p></div></div><div id="interestPairs" class="list"></div><div class="warning">Similarity here means similar observed topic profiles. It does not yet prove identical policy positions. A stance layer is required for that.</div></div>
+    </div>
   </section>
 
   <section class="view" id="view-voting">
-    <div class="grid kpis" style="grid-template-columns:repeat(4,1fr)"><div class="card kpi"><div class="label">Vote network nodes</div><div class="value" id="vNodes">—</div><div class="sub">countries with voting data</div></div><div class="card kpi"><div class="label">Vote relationships</div><div class="value" id="vEdges">—</div><div class="sub">pairwise vote links</div></div><div class="card kpi"><div class="label">Vote events</div><div class="value" id="vEvents">—</div><div class="sub">records represented in current window</div></div><div class="card kpi"><div class="label">Coverage status</div><div class="value" style="font-size:18px" id="vCoverage">—</div><div class="sub">data maturity indicator</div></div></div>
-    <div class="grid two"><div class="card"><div class="section-head"><div><h3>Voting alignment network</h3><p>Only this layer should be interpreted as voting behaviour</p></div><span class="pill">Votes</span></div><div class="chart-wrap"><svg id="networkVotes" class="network"></svg></div></div><div class="card"><div class="section-head"><div><h3>Strongest voting pairs</h3><p>Available pair weights in the votes layer</p></div></div><div id="votePairs" class="list"></div><div id="voteNotice" class="warning"></div></div></div>
-  </section>
-
-  <section class="view" id="view-parties">
-    <div class="card"><div class="section-head"><div><h3>European party-group layer</h3><p>Prepared UI for the next data integration phase</p></div><span class="badge warn">DATA LAYER PENDING</span></div><div class="party-grid"><div class="party-box"><h4>MEP voting graph</h4><p>MEP ↔ MEP and national delegation ↔ national delegation roll-call similarity.</p></div><div class="party-box"><h4>Political group cohesion</h4><p>EPP, S&amp;D, Renew, ECR, PfE, Greens/EFA, The Left, ESN and non-inscrits.</p></div><div class="party-box"><h4>National–party divergence</h4><p>Measure when an MEP or national delegation follows its European group more closely than its national pattern.</p></div><div class="party-box"><h4>Issue-specific movement</h4><p>Compare party and national alignment separately on defence, migration, energy, enlargement and other policy fields.</p></div></div><div class="warning">This page intentionally does not fabricate party metrics from country co-occurrence data. It becomes active after roll-call and MEP reference data are connected.</div></div>
+    <div class="grid kpis" style="grid-template-columns:repeat(4,1fr)">
+      <div class="card kpi"><div class="label">Vote network nodes</div><div class="value" id="vNodes">—</div><div class="sub">countries with voting data</div></div>
+      <div class="card kpi"><div class="label">Vote relationships</div><div class="value" id="vEdges">—</div><div class="sub">pairwise vote links</div></div>
+      <div class="card kpi"><div class="label">Vote events</div><div class="value" id="vEvents">—</div><div class="sub">records represented in current window</div></div>
+      <div class="card kpi"><div class="label">Coverage status</div><div class="value" style="font-size:18px" id="vCoverage">—</div><div class="sub">data maturity indicator</div></div>
+    </div>
+    <div class="grid two">
+      <div class="card"><div class="section-head"><div><h3>Voting alignment network</h3><p>Only this layer should be interpreted as voting behaviour</p></div><span class="pill">Votes</span></div><div class="chart-wrap"><svg id="networkVotes" class="network"></svg></div></div>
+      <div class="card"><div class="section-head"><div><h3>Strongest voting pairs</h3><p>Available pair weights in the votes layer</p></div></div><div id="votePairs" class="list"></div><div id="voteNotice" class="warning"></div></div>
+    </div>
   </section>
 
   <div class="footer"><span>EU Political Alignment Monitor · Törésvonalak dashboard</span><span>Observed interaction ≠ political agreement · voting evidence is treated separately</span></div>
 </div>
+
 <div class="tooltip" id="tooltip"></div>
+
 <script>
 const EU27=new Set(['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT','LV','LT','LU','MT','NL','PL','PT','RO','SK','SI','ES','SE']);
 const NAMES={AT:'Austria',BE:'Belgium',BG:'Bulgaria',HR:'Croatia',CY:'Cyprus',CZ:'Czechia',DK:'Denmark',EE:'Estonia',FI:'Finland',FR:'France',DE:'Germany',GR:'Greece',HU:'Hungary',IE:'Ireland',IT:'Italy',LV:'Latvia',LT:'Lithuania',LU:'Luxembourg',MT:'Malta',NL:'Netherlands',PL:'Poland',PT:'Portugal',RO:'Romania',SK:'Slovakia',SI:'Slovenia',ES:'Spain',SE:'Sweden',US:'United States',USA:'United States',GB:'United Kingdom',UK:'United Kingdom',UA:'Ukraine',RU:'Russia',CN:'China',TR:'Türkiye',RS:'Serbia',NO:'Norway',CH:'Switzerland'};
 const TOPIC_LABELS={migration:'Migration',ukraine_russia:'Ukraine / Russia',enlargement:'Enlargement',defence:'Defence',energy:'Energy',fiscal:'Fiscal',rule_of_law:'Rule of law',trade:'Economic / Internal Market'};
-const state={source:'combined',window:'30d',scope:'all',topic:'all',graph:null,heatmap:null,similarity:null,relationship:null,weekly:null,votes:null};
-const $=id=>document.getElementById(id); const tooltip=$('tooltip');
+const state={source:'combined',window:'30d',scope:'all',topic:'all',graph:null,heatmap:null,similarity:null,relationship:null,weekly:null,votes:null,relFilter:'all',relSort:'evidence'};
+const $=id=>document.getElementById(id);
+const tooltip=$('tooltip');
+
 function basePath(){return window.location.pathname.includes('eu-coalition-map')?'/eu-coalition-map':''}
 function suffix(){return state.scope==='all'?'':`_${state.scope}`}
 function pathGraph(source=state.source){return `${basePath()}/data/networks/${source}/${state.window}${suffix()}.json`}
@@ -290,40 +438,381 @@ function pathOpt(source,tail){return `${basePath()}/data/networks/${source}/${st
 function pathReport(source=state.source){return `${basePath()}/data/reports/${source}_${state.window}_weekly_report${suffix()}.json`}
 async function json(path,optional=false){try{const r=await fetch(path,{cache:'no-store'});if(!r.ok)throw new Error(`${r.status} ${path}`);return await r.json()}catch(e){if(optional)return null;throw e}}
 function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
-function nameOf(id){return NAMES[id]||id} function topicName(t){return TOPIC_LABELS[t]||t}
+function nameOf(id){return NAMES[id]||id}
+function topicName(t){return TOPIC_LABELS[t]||t}
 function fmt(n,d=0){return Number.isFinite(+n)?Number(n).toLocaleString('en-US',{maximumFractionDigits:d}):'—'}
+function pct(v,d=0){return Number.isFinite(+v)?`${(Number(v)*100).toFixed(d)}%`:'—'}
 function relationLabel(){return state.source==='votes'?'Voting alignment':'Observed interaction'}
-function filteredGraph(g){if(!g)return{nodes:[],edges:[],event_count:0};let edges=(g.edges||[]).filter(e=>state.topic==='all'||(+((e.topics||{})[state.topic]||0)>0));const ids=new Set(edges.flatMap(e=>[e.source?.id||e.source,e.target?.id||e.target]));let nodes=(g.nodes||[]).filter(n=>ids.has(n.id));if(!edges.length&&state.topic==='all')nodes=g.nodes||[];return{...g,nodes,edges}}
-function topicTotals(g){const out={};(g?.edges||[]).forEach(e=>Object.entries(e.topics||{}).forEach(([t,v])=>out[t]=(out[t]||0)+(+v||0)));return out}
-function countryTopics(g,c){const out={};(g?.edges||[]).forEach(e=>{const s=e.source?.id||e.source,t=e.target?.id||e.target;if(s===c||t===c)Object.entries(e.topics||{}).forEach(([k,v])=>out[k]=(out[k]||0)+(+v||0))});return out}
-function countryPartners(g,c){return (g?.edges||[]).filter(e=>{const s=e.source?.id||e.source,t=e.target?.id||e.target;return s===c||t===c}).map(e=>({id:(e.source?.id||e.source)===c?(e.target?.id||e.target):(e.source?.id||e.source),weight:+e.weight||0,topics:e.topics||{}})).sort((a,b)=>b.weight-a.weight)}
+function filteredGraph(g){
+  if(!g)return{nodes:[],edges:[],event_count:0};
+  let edges=(g.edges||[]).filter(e=>state.topic==='all'||(+((e.topics||{})[state.topic]||0)>0));
+  const ids=new Set(edges.flatMap(e=>[e.source?.id||e.source,e.target?.id||e.target]));
+  let nodes=(g.nodes||[]).filter(n=>ids.has(n.id));
+  if(!edges.length&&state.topic==='all')nodes=g.nodes||[];
+  return{...g,nodes,edges}
+}
+function topicTotals(g){
+  const out={};
+  (g?.edges||[]).forEach(e=>Object.entries(e.topics||{}).forEach(([t,v])=>out[t]=(out[t]||0)+(+v||0)));
+  return out
+}
+function countryTopics(g,c){
+  const out={};
+  (g?.edges||[]).forEach(e=>{
+    const s=e.source?.id||e.source,t=e.target?.id||e.target;
+    if(s===c||t===c)Object.entries(e.topics||{}).forEach(([k,v])=>out[k]=(out[k]||0)+(+v||0))
+  });
+  return out
+}
+function countryPartners(g,c){
+  return (g?.edges||[])
+    .filter(e=>{const s=e.source?.id||e.source,t=e.target?.id||e.target;return s===c||t===c})
+    .map(e=>({id:(e.source?.id||e.source)===c?(e.target?.id||e.target):(e.source?.id||e.source),weight:+e.weight||0,topics:e.topics||{}}))
+    .sort((a,b)=>b.weight-a.weight)
+}
 function edgeTopTopic(e){const a=Object.entries(e.topics||{}).sort((x,y)=>y[1]-x[1]);return a[0]?.[0]||null}
 function normalizeTopics(obj){const sum=Object.values(obj).reduce((a,b)=>a+(+b||0),0)||1;const r={};Object.keys(TOPIC_LABELS).forEach(t=>r[t]=(obj[t]||0)/sum);return r}
 function cosine(a,b){const keys=Object.keys(TOPIC_LABELS);let dot=0,aa=0,bb=0;keys.forEach(k=>{dot+=(a[k]||0)*(b[k]||0);aa+=(a[k]||0)**2;bb+=(b[k]||0)**2});return aa&&bb?dot/Math.sqrt(aa*bb):0}
-function interestSimilarities(g){const ids=(g.nodes||[]).map(n=>n.id).filter(id=>EU27.has(id));const prof=Object.fromEntries(ids.map(id=>[id,normalizeTopics(countryTopics(g,id))]));const pairs=[];for(let i=0;i<ids.length;i++)for(let j=i+1;j<ids.length;j++)pairs.push({a:ids[i],b:ids[j],score:cosine(prof[ids[i]],prof[ids[j]])});return pairs.sort((a,b)=>b.score-a.score)}
-function clusters(g){const nodes=(g.nodes||[]).map(n=>n.id), adj=new Map(nodes.map(n=>[n,new Map()]));(g.edges||[]).forEach(e=>{const a=e.source?.id||e.source,b=e.target?.id||e.target,w=+e.weight||1;if(!adj.has(a))adj.set(a,new Map());if(!adj.has(b))adj.set(b,new Map());adj.get(a).set(b,w);adj.get(b).set(a,w)});let lab=new Map(nodes.map(n=>[n,n]));for(let pass=0;pass<12;pass++){let changed=false;for(const n of nodes){const scores={};for(const [m,w] of (adj.get(n)||[])){const l=lab.get(m);scores[l]=(scores[l]||0)+w}const best=Object.entries(scores).sort((a,b)=>b[1]-a[1]||String(a[0]).localeCompare(String(b[0])))[0]?.[0];if(best&&best!==lab.get(n)){lab.set(n,best);changed=true}}if(!changed)break}const groups={};nodes.forEach(n=>(groups[lab.get(n)]??=[]).push(n));return Object.values(groups).filter(a=>a.length>1).sort((a,b)=>b.length-a.length)}
-function clusterTopic(g,members){const set=new Set(members),tot={};(g.edges||[]).forEach(e=>{const a=e.source?.id||e.source,b=e.target?.id||e.target;if(set.has(a)&&set.has(b))Object.entries(e.topics||{}).forEach(([t,v])=>tot[t]=(tot[t]||0)+(+v||0))});return Object.entries(tot).sort((a,b)=>b[1]-a[1])[0]?.[0]||null}
+function interestSimilarities(g){
+  const ids=(g.nodes||[]).map(n=>n.id).filter(id=>EU27.has(id));
+  const prof=Object.fromEntries(ids.map(id=>[id,normalizeTopics(countryTopics(g,id))]));
+  const pairs=[];
+  for(let i=0;i<ids.length;i++)for(let j=i+1;j<ids.length;j++)pairs.push({a:ids[i],b:ids[j],score:cosine(prof[ids[i]],prof[ids[j]])});
+  return pairs.sort((a,b)=>b.score-a.score)
+}
+function clusters(g){
+  const nodes=(g.nodes||[]).map(n=>n.id),adj=new Map(nodes.map(n=>[n,new Map()]));
+  (g.edges||[]).forEach(e=>{
+    const a=e.source?.id||e.source,b=e.target?.id||e.target,w=+e.weight||1;
+    if(!adj.has(a))adj.set(a,new Map());if(!adj.has(b))adj.set(b,new Map());
+    adj.get(a).set(b,w);adj.get(b).set(a,w)
+  });
+  let lab=new Map(nodes.map(n=>[n,n]));
+  for(let pass=0;pass<12;pass++){
+    let changed=false;
+    for(const n of nodes){
+      const scores={};
+      for(const [m,w] of (adj.get(n)||[])){const l=lab.get(m);scores[l]=(scores[l]||0)+w}
+      const best=Object.entries(scores).sort((a,b)=>b[1]-a[1]||String(a[0]).localeCompare(String(b[0])))[0]?.[0];
+      if(best&&best!==lab.get(n)){lab.set(n,best);changed=true}
+    }
+    if(!changed)break
+  }
+  const groups={};nodes.forEach(n=>(groups[lab.get(n)]??=[]).push(n));
+  return Object.values(groups).filter(a=>a.length>1).sort((a,b)=>b.length-a.length)
+}
+function clusterTopic(g,members){
+  const set=new Set(members),tot={};
+  (g.edges||[]).forEach(e=>{
+    const a=e.source?.id||e.source,b=e.target?.id||e.target;
+    if(set.has(a)&&set.has(b))Object.entries(e.topics||{}).forEach(([t,v])=>tot[t]=(tot[t]||0)+(+v||0))
+  });
+  return Object.entries(tot).sort((a,b)=>b[1]-a[1])[0]?.[0]||null
+}
 function setLoading(v){$('app').classList.toggle('loading',v);$('statusText').textContent=v?'Loading data…':'Ready'}
 function showError(msg){$('error').style.display=msg?'block':'none';$('error').textContent=msg||''}
-async function loadAll(){setLoading(true);showError('');try{const src=state.source;const [graph,heat,sim,rel,weekly,votes]=await Promise.all([json(pathGraph(src)),json(pathOpt(src,'heatmap'),true),json(pathOpt(src,'similarity'),true),json(pathOpt(src,'relationship'),true),json(pathReport(src),true),json(pathGraph('votes'),true)]);state.graph=graph;state.heatmap=heat;state.similarity=sim;state.relationship=rel;state.weekly=weekly;state.votes=votes;renderAll()}catch(e){console.error(e);showError(`Could not load the selected data layer. ${e.message}`)}finally{setLoading(false)}}
-function renderAll(){if($('updatedStamp')){$('updatedStamp').textContent=new Date().toLocaleString('hu-HU',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})}const g=filteredGraph(state.graph);renderKPIs(g);renderClusters(g);renderTopPairs(g);renderTopics(g);renderAnalysis(g);populateCountries(g);renderNetwork('#networkOverview',g);renderNetwork('#networkFull',g);renderCountry();renderInterests(g);renderVoting();$('networkModePill').textContent=relationLabel();$('fullNetworkPill').textContent=relationLabel();$('overviewNetworkTitle').textContent=state.source==='votes'?'Voting alignment network':'Observed interaction network';$('overviewNetworkSub').textContent=state.source==='votes'?'Country-pair voting relationships':'Country co-occurrence and topic-linked relationships';$('pairCaption').textContent=state.source==='votes'?'Available voting pairs':'Observed interaction pairs'}
-function renderKPIs(g){const cl=clusters(g),tt=topicTotals(g),topT=Object.entries(tt).sort((a,b)=>b[1]-a[1])[0],sum=Object.values(tt).reduce((a,b)=>a+b,0)||1,topE=[...(g.edges||[])].sort((a,b)=>(+b.weight||0)-(+a.weight||0))[0];$('kCountries').textContent=fmt(g.nodes.length);$('kEvents').textContent=fmt(g.event_count??state.graph?.event_count??0);$('kLinks').textContent=fmt(g.edges.length);$('kClusters').textContent=fmt(cl.length);$('kTopic').textContent=topT?topicName(topT[0]):'—';$('kTopicSub').textContent=topT?`${Math.round(topT[1]/sum*100)}% of weighted topic signals`:'no topic weights';$('kPair').textContent=topE?`${topE.source?.id||topE.source} ↔ ${topE.target?.id||topE.target}`:'—';$('kPairSub').textContent=topE?`${relationLabel()} weight: ${fmt(topE.weight)}`:'no pair data'}
-function renderClusters(g){const arr=clusters(g);$('clusters').innerHTML=arr.length?arr.slice(0,5).map((m,i)=>{const t=clusterTopic(g,m);return `<div class="cluster"><div class="cluster-top"><div class="cluster-name">Group ${i+1}</div><span class="badge">${m.length} countries</span></div><div class="cluster-members">${m.map(x=>esc(nameOf(x))).join(' · ')}</div><div class="cluster-topic">Dominant observed theme: <strong>${t?esc(topicName(t)):'—'}</strong></div></div>`}).join(''):`<div class="empty">No multi-country topology clusters in this filtered view.</div>`}
-function pairRows(edges,max=7){const m=Math.max(...edges.map(e=>+e.weight||0),1);return edges.slice(0,max).map((e,i)=>{const a=e.source?.id||e.source,b=e.target?.id||e.target,tt=edgeTopTopic(e);return `<div class="row"><div class="rank">#${i+1}</div><div><strong>${esc(nameOf(a))} ↔ ${esc(nameOf(b))}</strong><small>${tt?esc(topicName(tt)):'No topic label'}</small><div class="bar"><i style="width:${Math.max(4,(+e.weight||0)/m*100)}%"></i></div></div><div class="score">${fmt(e.weight,1)}</div></div>`}).join('')}
-function renderTopPairs(g){const e=[...(g.edges||[])].sort((a,b)=>(+b.weight||0)-(+a.weight||0));$('topPairs').innerHTML=e.length?pairRows(e):`<div class="empty">No relationships in this view.</div>`}
-function renderTopics(g){const tt=topicTotals(g),arr=Object.entries(tt).sort((a,b)=>b[1]-a[1]),max=Math.max(...arr.map(x=>x[1]),1),sum=arr.reduce((a,x)=>a+x[1],0)||1;$('topicBars').innerHTML=arr.length?arr.map(([t,v])=>`<div class="topic-line"><label>${esc(topicName(t))}</label><div class="track"><div class="fill" style="width:${v/max*100}%"></div></div><b>${Math.round(v/sum*100)}%</b></div>`).join(''):`<div class="empty">No topic weights available.</div>`}
-function renderAnalysis(g){const edges=[...(g.edges||[])].sort((a,b)=>(+b.weight||0)-(+a.weight||0)),top=edges[0],cl=clusters(g),tt=topicTotals(g),t=Object.entries(tt).sort((a,b)=>b[1]-a[1])[0]?.[0];if(state.source==='votes'){$('analysisText').innerHTML=`The selected <strong>Votes</strong> layer can be used to inspect pairwise voting patterns. ${top?`The strongest available pair is <strong>${esc(nameOf(top.source?.id||top.source))}–${esc(nameOf(top.target?.id||top.target))}</strong>.`:''} ${t?`The dominant represented policy field is <strong>${esc(topicName(t))}</strong>.`:''}`;$('methodWarning').textContent='Voting alignment quality depends on vote coverage. A high pair score should be interpreted only after the number and type of underlying votes are sufficiently broad.'}else{$('analysisText').innerHTML=`This view contains <strong>${fmt(g.edges.length)} observed country-pair links</strong>. ${top?`The strongest observed interaction is <strong>${esc(nameOf(top.source?.id||top.source))}–${esc(nameOf(top.target?.id||top.target))}</strong>.`:''} ${t?`The most prominent theme is <strong>${esc(topicName(t))}</strong>.`:''} The topology currently produces <strong>${cl.length} exploratory multi-country groups</strong>. These groups are useful for discovery, not yet as proof of durable coalitions.`;$('methodWarning').textContent='RSS/GDELT co-occurrence does not establish agreement, alliance or common interest by itself. The next analytical layer must add stance/position evidence before these clusters are called political coalitions.'}}
-function populateCountries(g){const prev=$('countrySelect').value;const ids=[...(g.nodes||[])].map(n=>n.id).sort((a,b)=>nameOf(a).localeCompare(nameOf(b)));$('countrySelect').innerHTML=ids.map(id=>`<option value="${esc(id)}">${esc(nameOf(id))} (${esc(id)})</option>`).join('');if(ids.includes(prev))$('countrySelect').value=prev;else if(ids.length)$('countrySelect').value=ids[0]}
-function renderCountry(){const g=filteredGraph(state.graph),c=$('countrySelect').value;if(!c){$('countrySummary').innerHTML='<div class="empty">No country selected.</div>';return}const n=(g.nodes||[]).find(x=>x.id===c),p=countryPartners(g,c),ct=countryTopics(g,c),sum=Object.values(ct).reduce((a,b)=>a+b,0),lead=Object.entries(ct).sort((a,b)=>b[1]-a[1])[0];$('countrySummary').innerHTML=`<div class="country-title" style="margin-top:18px"><div class="flag">${esc(c)}</div><div><h3>${esc(nameOf(c))}</h3><p>${EU27.has(c)?'EU member state':'External partner / actor'}</p></div></div><div class="country-metric"><div class="lab">Network weight</div><div class="num">${fmt(n?.weight??0)}</div></div><div class="country-metric"><div class="lab">Observed partners</div><div class="num">${fmt(p.length)}</div></div><div class="country-metric"><div class="lab">Dominant topic</div><div class="num" style="font-size:18px">${lead?esc(topicName(lead[0])):'—'}</div></div><div class="country-metric"><div class="lab">Topic signal volume</div><div class="num">${fmt(sum)}</div></div>`;renderCountryTopics(ct);$('countryPartnerLabel').textContent=state.source==='votes'?'Strongest available voting relations':'Strongest observed interaction';$('countryPartners').innerHTML=p.length?p.slice(0,8).map((x,i)=>`<div class="row"><div class="rank">#${i+1}</div><div><strong>${esc(nameOf(x.id))}</strong><small>${esc(topicName(edgeTopTopic({topics:x.topics})||'—'))}</small></div><div class="score">${fmt(x.weight,1)}</div></div>`).join(''):`<div class="empty">No first-degree partners.</div>`;const subset={nodes:[...(g.nodes||[])].filter(n=>n.id===c||p.slice(0,12).some(x=>x.id===n.id)),edges:[...(g.edges||[])].filter(e=>{const a=e.source?.id||e.source,b=e.target?.id||e.target;return a===c||b===c})};renderNetwork('#networkCountry',subset,{focus:c})}
-function renderCountryTopics(ct){const arr=Object.entries(ct).sort((a,b)=>b[1]-a[1]),max=Math.max(...arr.map(x=>x[1]),1),sum=arr.reduce((a,x)=>a+x[1],0)||1;$('countryTopics').innerHTML=arr.length?arr.map(([t,v])=>`<div class="topic-line"><label>${esc(topicName(t))}</label><div class="track"><div class="fill" style="width:${v/max*100}%"></div></div><b>${Math.round(v/sum*100)}%</b></div>`).join(''):`<div class="empty">No topic profile available.</div>`}
-function renderInterests(g){const ids=(g.nodes||[]).map(n=>n.id).filter(id=>EU27.has(id)).sort((a,b)=>nameOf(a).localeCompare(nameOf(b))), topics=Object.keys(TOPIC_LABELS), vals={};ids.forEach(id=>vals[id]=normalizeTopics(countryTopics(g,id)));let html='<thead><tr><th>Country</th>'+topics.map(t=>`<th>${esc(topicName(t))}</th>`).join('')+'</tr></thead><tbody>';for(const id of ids){html+=`<tr><td>${esc(nameOf(id))}</td>`+topics.map(t=>{const v=vals[id][t]||0,a=.08+v*.78;return `<td class="cell" style="background:rgba(49,195,224,${a.toFixed(2)})">${v?Math.round(v*100):0}</td>`}).join('')+'</tr>'}html+='</tbody>';$('interestMatrix').innerHTML=ids.length?html:'<tbody><tr><td class="empty">No EU country topic profiles.</td></tr></tbody>';const sim=interestSimilarities(g);$('interestPairs').innerHTML=sim.length?sim.slice(0,12).map((x,i)=>`<div class="row"><div class="rank">#${i+1}</div><div><strong>${esc(nameOf(x.a))} ↔ ${esc(nameOf(x.b))}</strong><small>topic-profile similarity</small><div class="bar"><i style="width:${x.score*100}%"></i></div></div><div class="score">${Math.round(x.score*100)}%</div></div>`).join(''):`<div class="empty">Not enough topic-profile data.</div>`}
-function renderVoting(){const g=state.votes;if(!g){$('vNodes').textContent=$('vEdges').textContent=$('vEvents').textContent='—';$('vCoverage').textContent='Not available';$('votePairs').innerHTML='<div class="vote-empty">Votes network file is not available for this selection.</div>';$('voteNotice').textContent='Connect or generate the votes network for this window to activate this layer.';d3.select('#networkVotes').selectAll('*').remove();return}const fg=filteredVoteGraph(g);$('vNodes').textContent=fmt(fg.nodes.length);$('vEdges').textContent=fmt(fg.edges.length);$('vEvents').textContent=fmt(fg.event_count||0);const coverage=(fg.nodes.length>=20&&(+fg.event_count||0)>=30)?'Developing':(fg.nodes.length>=10?'Limited':'Prototype');$('vCoverage').textContent=coverage;const es=[...(fg.edges||[])].sort((a,b)=>(+b.weight||0)-(+a.weight||0));$('votePairs').innerHTML=es.length?pairRows(es,10):'<div class="vote-empty">No voting pairs in this filtered view.</div>';$('voteNotice').textContent=coverage==='Prototype'?'Coverage is still prototype-level. Treat pair rankings as a functionality demonstration rather than a robust EU voting-alignment conclusion.':'Coverage is improving, but conclusions should still report vote count and policy coverage.';renderNetwork('#networkVotes',fg,{votes:true})}
-function filteredVoteGraph(g){let edges=(g.edges||[]).filter(e=>state.topic==='all'||(+((e.topics||{})[state.topic]||0)>0));const ids=new Set(edges.flatMap(e=>[e.source?.id||e.source,e.target?.id||e.target]));return{...g,edges,nodes:(g.nodes||[]).filter(n=>ids.has(n.id)||(state.topic==='all'&&!edges.length))}}
-function renderNetwork(sel,g,opts={}){const svg=d3.select(sel);svg.selectAll('*').remove();const el=document.querySelector(sel);if(!el||!g)return;const width=el.clientWidth||900,height=el.clientHeight||560;svg.attr('viewBox',`0 0 ${width} ${height}`);const nodes=(g.nodes||[]).map(d=>({...d})),links=(g.edges||[]).map(d=>({...d,source:d.source?.id||d.source,target:d.target?.id||d.target}));if(!nodes.length){svg.append('text').attr('x',width/2).attr('y',height/2).attr('text-anchor','middle').attr('fill','#7890aa').attr('font-size',12).text('No network data for this view');return}const maxW=d3.max(nodes,d=>+d.weight||1)||1,maxE=d3.max(links,d=>+d.weight||1)||1;const root=svg.append('g');const zoom=d3.zoom().scaleExtent([.35,4]).on('zoom',ev=>root.attr('transform',ev.transform));svg.call(zoom);const link=root.append('g').selectAll('line').data(links).join('line').attr('stroke',opts.votes?'#42c88a':'#5478a5').attr('stroke-opacity',d=>.18+.55*((+d.weight||1)/maxE)).attr('stroke-width',d=>.7+4*((+d.weight||1)/maxE));const node=root.append('g').selectAll('g').data(nodes).join('g').style('cursor','pointer');node.append('circle').attr('r',d=>7+13*Math.sqrt((+d.weight||1)/maxW)).attr('fill',d=>opts.focus===d.id?'#e8b24a':EU27.has(d.id)?'#3978d4':'#a68bff').attr('stroke','#dbe9ff').attr('stroke-opacity',.65).attr('stroke-width',1.1);node.append('text').text(d=>d.id).attr('text-anchor','middle').attr('dy','.35em').attr('font-size',d=>8+2*Math.sqrt((+d.weight||1)/maxW)).attr('font-weight',800).attr('fill','white').style('pointer-events','none');node.on('mousemove',(ev,d)=>{const p=countryPartners({edges:links},d.id).slice(0,3);tooltip.innerHTML=`<strong>${esc(nameOf(d.id))}</strong><br>weight: ${fmt(d.weight,1)}${p.length?'<br>top links: '+p.map(x=>esc(x.id)).join(', '):''}`;tooltip.style.display='block';tooltip.style.left=(ev.clientX+12)+'px';tooltip.style.top=(ev.clientY+12)+'px'}).on('mouseleave',()=>tooltip.style.display='none');const sim=d3.forceSimulation(nodes).force('link',d3.forceLink(links).id(d=>d.id).distance(d=>90+35*(1-(+d.weight||1)/maxE)).strength(.45)).force('charge',d3.forceManyBody().strength(-240)).force('center',d3.forceCenter(width/2,height/2)).force('collision',d3.forceCollide().radius(d=>18+12*Math.sqrt((+d.weight||1)/maxW))).on('tick',()=>{link.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y).attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);node.attr('transform',d=>`translate(${d.x},${d.y})`)});node.call(d3.drag().on('start',(ev,d)=>{if(!ev.active)sim.alphaTarget(.3).restart();d.fx=d.x;d.fy=d.y}).on('drag',(ev,d)=>{d.fx=ev.x;d.fy=ev.y}).on('end',(ev,d)=>{if(!ev.active)sim.alphaTarget(0);d.fx=null;d.fy=null}))}
-function activateTab(tab){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===`view-${tab}`));setTimeout(()=>{const g=filteredGraph(state.graph);if(tab==='overview')renderNetwork('#networkOverview',g);if(tab==='network')renderNetwork('#networkFull',g);if(tab==='countries')renderCountry();if(tab==='voting')renderVoting()},50)}
+
+async function loadAll(){
+  setLoading(true);showError('');
+  try{
+    const src=state.source;
+    const [graph,heat,sim,rel,weekly,votes]=await Promise.all([
+      json(pathGraph(src)),
+      json(pathOpt(src,'heatmap'),true),
+      json(pathOpt(src,'similarity'),true),
+      json(pathOpt(src,'relationship'),true),
+      json(pathReport(src),true),
+      json(pathGraph('votes'),true)
+    ]);
+    state.graph=graph;state.heatmap=heat;state.similarity=sim;state.relationship=rel;state.weekly=weekly;state.votes=votes;
+    renderAll()
+  }catch(e){
+    console.error(e);
+    showError(`Could not load the selected data layer.\n${e.message}`)
+  }finally{setLoading(false)}
+}
+
+function renderAll(){
+  if($('updatedStamp'))$('updatedStamp').textContent=new Date().toLocaleString('hu-HU',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+  const g=filteredGraph(state.graph);
+  renderKPIs(g);renderClusters(g);renderTopPairs(g);renderTopics(g);renderAnalysis(g);renderRelationshipMatrix(g);
+  populateCountries(g);renderNetwork('#networkFull',g);renderCountry();renderInterests(g);renderVoting();
+  $('fullNetworkPill').textContent=relationLabel();
+  $('pairCaption').textContent=state.source==='votes'?'Available voting pairs':'Observed interaction pairs'
+}
+
+function renderKPIs(g){
+  const cl=clusters(g),tt=topicTotals(g),topT=Object.entries(tt).sort((a,b)=>b[1]-a[1])[0];
+  const sum=Object.values(tt).reduce((a,b)=>a+b,0)||1;
+  const topE=[...(g.edges||[])].sort((a,b)=>(+b.weight||0)-(+a.weight||0))[0];
+  $('kCountries').textContent=fmt(g.nodes.length);
+  $('kEvents').textContent=fmt(g.event_count??state.graph?.event_count??0);
+  $('kLinks').textContent=fmt(g.edges.length);
+  $('kClusters').textContent=fmt(cl.length);
+  $('kTopic').textContent=topT?topicName(topT[0]):'—';
+  $('kTopicSub').textContent=topT?`${Math.round(topT[1]/sum*100)}% of weighted topic signals`:'no topic weights';
+  $('kPair').textContent=topE?`${topE.source?.id||topE.source} ↔ ${topE.target?.id||topE.target}`:'—';
+  $('kPairSub').textContent=topE?`${relationLabel()} weight: ${fmt(topE.weight)}`:'no pair data'
+}
+
+function renderClusters(g){
+  const arr=clusters(g);
+  $('clusters').innerHTML=arr.length?arr.slice(0,5).map((m,i)=>{
+    const t=clusterTopic(g,m);
+    return `<div class="cluster"><div class="cluster-top"><div class="cluster-name">Group ${i+1}</div><span class="badge">${m.length} countries</span></div><div class="cluster-members">${m.map(x=>esc(nameOf(x))).join(' · ')}</div><div class="cluster-topic">Dominant observed theme: <strong>${t?esc(topicName(t)):'—'}</strong></div></div>`
+  }).join(''):`<div class="empty">No multi-country topology clusters in this filtered view.</div>`
+}
+
+function pairRows(edges,max=7){
+  const m=Math.max(...edges.map(e=>+e.weight||0),1);
+  return edges.slice(0,max).map((e,i)=>{
+    const a=e.source?.id||e.source,b=e.target?.id||e.target,tt=edgeTopTopic(e);
+    return `<div class="row"><div class="rank">#${i+1}</div><div><strong>${esc(nameOf(a))} ↔ ${esc(nameOf(b))}</strong><small>${tt?esc(topicName(tt)):'No topic label'}</small><div class="bar"><i style="width:${Math.max(4,(+e.weight||0)/m*100)}%"></i></div></div><div class="score">${fmt(e.weight,1)}</div></div>`
+  }).join('')
+}
+function renderTopPairs(g){
+  const e=[...(g.edges||[])].sort((a,b)=>(+b.weight||0)-(+a.weight||0));
+  $('topPairs').innerHTML=e.length?pairRows(e):`<div class="empty">No relationships in this view.</div>`
+}
+function renderTopics(g){
+  const tt=topicTotals(g),arr=Object.entries(tt).sort((a,b)=>b[1]-a[1]),max=Math.max(...arr.map(x=>x[1]),1),sum=arr.reduce((a,x)=>a+x[1],0)||1;
+  $('topicBars').innerHTML=arr.length?arr.map(([t,v])=>`<div class="topic-line"><label>${esc(topicName(t))}</label><div class="track"><div class="fill" style="width:${v/max*100}%"></div></div><b>${Math.round(v/sum*100)}%</b></div>`).join(''):`<div class="empty">No topic weights available.</div>`
+}
+
+function renderAnalysis(g){
+  const edges=[...(g.edges||[])].sort((a,b)=>(+b.weight||0)-(+a.weight||0)),top=edges[0],cl=clusters(g),tt=topicTotals(g),t=Object.entries(tt).sort((a,b)=>b[1]-a[1])[0]?.[0];
+  if(state.source==='votes'){
+    $('analysisText').innerHTML=`The selected <strong>Votes</strong> layer can be used to inspect pairwise voting patterns. ${top?`The strongest available pair is <strong>${esc(nameOf(top.source?.id||top.source))}–${esc(nameOf(top.target?.id||top.target))}</strong>.`:''} ${t?`The dominant represented policy field is <strong>${esc(topicName(t))}</strong>.`:''}`;
+    $('methodWarning').textContent='Voting alignment quality depends on vote coverage. A high pair score should be interpreted only after the number and type of underlying votes are sufficiently broad.'
+  }else{
+    $('analysisText').innerHTML=`This view contains <strong>${fmt(g.edges.length)} observed country-pair links</strong>. ${top?`The strongest observed interaction is <strong>${esc(nameOf(top.source?.id||top.source))}–${esc(nameOf(top.target?.id||top.target))}</strong>.`:''} ${t?`The most prominent theme is <strong>${esc(topicName(t))}</strong>.`:''} The topology currently produces <strong>${cl.length} exploratory multi-country groups</strong>. These groups are useful for discovery, not yet as proof of durable coalitions.`;
+    $('methodWarning').textContent='RSS/GDELT co-occurrence does not establish agreement, alliance or common interest by itself. The relationship matrix only upgrades a pair when explicit bilateral evidence reaches the configured evidence threshold.'
+  }
+}
+
+/* -------- Relationship Intelligence Matrix -------- */
+function relationValue(e){
+  return String(
+    e.assessed_relationship ??
+    e.relationship_label ??
+    e.observed_relationship_label ??
+    e.dominant_relation ??
+    'unclassified'
+  ).toLowerCase()
+}
+function evidenceValue(e){
+  const v=String(e.evidence_level??'none').toLowerCase();
+  return ['strong','moderate','limited','insufficient','none'].includes(v)?v:'none'
+}
+function classifiedCount(e){return Number(e.classified_events??0)||0}
+function unclassifiedCount(e){return Number(e.unclassified_events??0)||0}
+function interactionCount(e){return Number(e.interaction_count??0)||0}
+function consistencyValue(e){
+  if(Number.isFinite(+e.directional_consistency))return Math.max(0,Math.min(1,+e.directional_consistency));
+  const c=classifiedCount(e),counts=e.relationship_counts||{};
+  if(!c)return 0;
+  const dominant=Math.max(+counts.cooperative||0,+counts.conflictual||0,+counts.neutral||0,+counts.mixed||0);
+  return dominant/c
+}
+function pairScope(a,b){return EU27.has(a)&&EU27.has(b)?'EU–EU':'EU–external'}
+function evidenceRank(v){return ({strong:5,moderate:4,limited:3,insufficient:2,none:1}[v]||0)}
+function assessmentRank(v){return ({conflictual:6,cooperative:5,mixed:4,neutral:3,insufficient_evidence:2,unclassified:1}[v]||0)}
+function relationText(v){
+  return ({
+    conflictual:'Conflictual',
+    cooperative:'Cooperative',
+    neutral:'Neutral',
+    mixed:'Mixed',
+    insufficient_evidence:'Insufficient evidence',
+    unclassified:'Unclassified'
+  }[v]||v)
+}
+function evidenceText(v){return ({strong:'Strong',moderate:'Moderate',limited:'Limited',insufficient:'Insufficient',none:'None'}[v]||v)}
+function relationFilterMatch(e){
+  const r=relationValue(e);
+  if(state.relFilter==='all')return true;
+  if(state.relFilter==='assessed')return ['conflictual','cooperative','neutral','mixed'].includes(r);
+  return r===state.relFilter
+}
+function relationshipSort(edges){
+  return edges.sort((a,b)=>{
+    const ra=relationValue(a),rb=relationValue(b),ea=evidenceValue(a),eb=evidenceValue(b);
+    if(state.relSort==='interactions')return interactionCount(b)-interactionCount(a)||(+b.weight||0)-(+a.weight||0);
+    if(state.relSort==='coverage')return (+b.classification_coverage||0)-(+a.classification_coverage||0)||classifiedCount(b)-classifiedCount(a);
+    if(state.relSort==='consistency')return consistencyValue(b)-consistencyValue(a)||classifiedCount(b)-classifiedCount(a);
+    if(state.relSort==='pair'){
+      const ap=`${a.source?.id||a.source}-${a.target?.id||a.target}`,bp=`${b.source?.id||b.source}-${b.target?.id||b.target}`;
+      return ap.localeCompare(bp)
+    }
+    return evidenceRank(eb)-evidenceRank(ea)||
+           Number(b.evidence_sufficient===true)-Number(a.evidence_sufficient===true)||
+           assessmentRank(rb)-assessmentRank(ra)||
+           classifiedCount(b)-classifiedCount(a)||
+           interactionCount(b)-interactionCount(a)
+  })
+}
+function topicMiniHtml(e){
+  const arr=Object.entries(e.topics||{}).sort((a,b)=>(+b[1]||0)-(+a[1]||0)).slice(0,3);
+  return arr.length?`<div class="topic-stack">${arr.map(([t])=>`<span class="topic-mini">${esc(topicName(t))}</span>`).join('')}</div>`:'—'
+}
+function renderRelationshipMatrix(g){
+  const all=[...(g.edges||[])];
+  let edges=all.filter(relationFilterMatch);
+  edges=relationshipSort(edges);
+
+  const conflict=all.filter(e=>relationValue(e)==='conflictual').length;
+  const coop=all.filter(e=>relationValue(e)==='cooperative').length;
+  const sufficient=all.filter(e=>e.evidence_sufficient===true).length;
+  const unclassified=all.filter(e=>relationValue(e)==='unclassified').length;
+  $('rmVisible').textContent=fmt(edges.length);
+  $('rmConflict').textContent=fmt(conflict);
+  $('rmCoop').textContent=fmt(coop);
+  $('rmSufficient').textContent=fmt(sufficient);
+  $('rmUnclassified').textContent=fmt(unclassified);
+
+  const body=$('relationshipMatrixBody'),empty=$('relationshipMatrixEmpty');
+  if(!edges.length){
+    body.innerHTML='';empty.style.display='block';return
+  }
+  empty.style.display='none';
+
+  body.innerHTML=edges.map(e=>{
+    const a=e.source?.id||e.source,b=e.target?.id||e.target;
+    const r=relationValue(e),ev=evidenceValue(e),classified=classifiedCount(e),interactions=interactionCount(e);
+    const coverage=Number(e.classification_coverage??0)||0,cons=consistencyValue(e);
+    const counts=e.relationship_counts||{};
+    const dominantClass=Math.max(+counts.cooperative||0,+counts.conflictual||0,+counts.neutral||0,+counts.mixed||0);
+    const scope=pairScope(a,b);
+    const explicitDetail=classified?`${dominantClass}/${classified} dominant`:'no explicit signal';
+    const consistencyLabel=classified?`${dominantClass}/${classified} · ${pct(cons,0)}`:'—';
+    return `<tr>
+      <td class="pair-cell"><span class="pair-code">${esc(a)} ↔ ${esc(b)}</span><span class="pair-name">${esc(nameOf(a))} · ${esc(nameOf(b))}</span></td>
+      <td><span class="scope-tag ${scope==='EU–external'?'external':''}">${esc(scope)}</span></td>
+      <td><span class="metric-big">${fmt(interactions)}</span><span class="metric-sub">weight ${fmt(e.interaction_weight??e.weight,1)}</span></td>
+      <td><span class="relation-tag relation-${esc(r)}">${esc(relationText(r))}</span></td>
+      <td><span class="evidence-tag ev-${esc(ev)}">${esc(evidenceText(ev))}</span></td>
+      <td><span class="metric-big">${fmt(classified)}</span><span class="metric-sub">${esc(explicitDetail)}</span></td>
+      <td><span class="metric-big">${pct(coverage,1)}</span><span class="metric-sub">${fmt(classified)} classified / ${fmt(interactions)} interactions</span></td>
+      <td>${classified?`<div class="consistency-track"><i style="width:${Math.round(cons*100)}%"></i></div><span class="metric-sub">${esc(consistencyLabel)}</span>`:'—'}</td>
+      <td>${topicMiniHtml(e)}</td>
+    </tr>`
+  }).join('')
+}
+
+function populateCountries(g){
+  const prev=$('countrySelect').value;
+  const ids=[...(g.nodes||[])].map(n=>n.id).sort((a,b)=>nameOf(a).localeCompare(nameOf(b)));
+  $('countrySelect').innerHTML=ids.map(id=>`<option value="${esc(id)}">${esc(nameOf(id))} (${esc(id)})</option>`).join('');
+  if(ids.includes(prev))$('countrySelect').value=prev;else if(ids.length)$('countrySelect').value=ids[0]
+}
+function renderCountry(){
+  const g=filteredGraph(state.graph),c=$('countrySelect').value;
+  if(!c){$('countrySummary').innerHTML='<div class="empty">No country selected.</div>';return}
+  const n=(g.nodes||[]).find(x=>x.id===c),p=countryPartners(g,c),ct=countryTopics(g,c),sum=Object.values(ct).reduce((a,b)=>a+b,0),lead=Object.entries(ct).sort((a,b)=>b[1]-a[1])[0];
+  $('countrySummary').innerHTML=`<div class="country-title" style="margin-top:18px"><div class="flag">${esc(c)}</div><div><h3>${esc(nameOf(c))}</h3><p>${EU27.has(c)?'EU member state':'External partner / actor'}</p></div></div><div class="country-metric"><div class="lab">Network weight</div><div class="num">${fmt(n?.weight??0)}</div></div><div class="country-metric"><div class="lab">Observed partners</div><div class="num">${fmt(p.length)}</div></div><div class="country-metric"><div class="lab">Dominant topic</div><div class="num" style="font-size:18px">${lead?esc(topicName(lead[0])):'—'}</div></div><div class="country-metric"><div class="lab">Topic signal volume</div><div class="num">${fmt(sum)}</div></div>`;
+  renderCountryTopics(ct);
+  $('countryPartnerLabel').textContent=state.source==='votes'?'Strongest available voting relations':'Strongest observed interaction';
+  $('countryPartners').innerHTML=p.length?p.slice(0,8).map((x,i)=>`<div class="row"><div class="rank">#${i+1}</div><div><strong>${esc(nameOf(x.id))}</strong><small>${esc(topicName(edgeTopTopic({topics:x.topics})||'—'))}</small></div><div class="score">${fmt(x.weight,1)}</div></div>`).join(''):`<div class="empty">No first-degree partners.</div>`;
+  const subset={nodes:[...(g.nodes||[])].filter(n=>n.id===c||p.slice(0,12).some(x=>x.id===n.id)),edges:[...(g.edges||[])].filter(e=>{const a=e.source?.id||e.source,b=e.target?.id||e.target;return a===c||b===c})};
+  renderNetwork('#networkCountry',subset,{focus:c})
+}
+function renderCountryTopics(ct){
+  const arr=Object.entries(ct).sort((a,b)=>b[1]-a[1]),max=Math.max(...arr.map(x=>x[1]),1),sum=arr.reduce((a,x)=>a+x[1],0)||1;
+  $('countryTopics').innerHTML=arr.length?arr.map(([t,v])=>`<div class="topic-line"><label>${esc(topicName(t))}</label><div class="track"><div class="fill" style="width:${v/max*100}%"></div></div><b>${Math.round(v/sum*100)}%</b></div>`).join(''):`<div class="empty">No topic profile available.</div>`
+}
+function renderInterests(g){
+  const ids=(g.nodes||[]).map(n=>n.id).filter(id=>EU27.has(id)).sort((a,b)=>nameOf(a).localeCompare(nameOf(b))),topics=Object.keys(TOPIC_LABELS),vals={};
+  ids.forEach(id=>vals[id]=normalizeTopics(countryTopics(g,id)));
+  let html='<thead><tr><th>Country</th>'+topics.map(t=>`<th>${esc(topicName(t))}</th>`).join('')+'</tr></thead><tbody>';
+  for(const id of ids){
+    html+=`<tr><td>${esc(nameOf(id))}</td>`+topics.map(t=>{const v=vals[id][t]||0,a=.08+v*.78;return `<td class="cell" style="background:rgba(49,195,224,${a.toFixed(2)})">${v?Math.round(v*100):0}</td>`}).join('')+'</tr>'
+  }
+  html+='</tbody>';
+  $('interestMatrix').innerHTML=ids.length?html:'<tbody><tr><td class="empty">No EU country topic profiles.</td></tr></tbody>';
+  const sim=interestSimilarities(g);
+  $('interestPairs').innerHTML=sim.length?sim.slice(0,12).map((x,i)=>`<div class="row"><div class="rank">#${i+1}</div><div><strong>${esc(nameOf(x.a))} ↔ ${esc(nameOf(x.b))}</strong><small>topic-profile similarity</small><div class="bar"><i style="width:${x.score*100}%"></i></div></div><div class="score">${Math.round(x.score*100)}%</div></div>`).join(''):`<div class="empty">Not enough topic-profile data.</div>`
+}
+function renderVoting(){
+  const g=state.votes;
+  if(!g){
+    $('vNodes').textContent=$('vEdges').textContent=$('vEvents').textContent='—';$('vCoverage').textContent='Not available';
+    $('votePairs').innerHTML='<div class="vote-empty">Votes network file is not available for this selection.</div>';
+    $('voteNotice').textContent='Connect or generate the votes network for this window to activate this layer.';
+    d3.select('#networkVotes').selectAll('*').remove();return
+  }
+  const fg=filteredVoteGraph(g);
+  $('vNodes').textContent=fmt(fg.nodes.length);$('vEdges').textContent=fmt(fg.edges.length);$('vEvents').textContent=fmt(fg.event_count||0);
+  const coverage=(fg.nodes.length>=20&&(+fg.event_count||0)>=30)?'Developing':(fg.nodes.length>=10?'Limited':'Prototype');
+  $('vCoverage').textContent=coverage;
+  const es=[...(fg.edges||[])].sort((a,b)=>(+b.weight||0)-(+a.weight||0));
+  $('votePairs').innerHTML=es.length?pairRows(es,10):'<div class="vote-empty">No voting pairs in this filtered view.</div>';
+  $('voteNotice').textContent=coverage==='Prototype'?'Coverage is still prototype-level. Treat pair rankings as a functionality demonstration rather than a robust EU voting-alignment conclusion.':'Coverage is improving, but conclusions should still report vote count and policy coverage.';
+  renderNetwork('#networkVotes',fg,{votes:true})
+}
+function filteredVoteGraph(g){
+  let edges=(g.edges||[]).filter(e=>state.topic==='all'||(+((e.topics||{})[state.topic]||0)>0));
+  const ids=new Set(edges.flatMap(e=>[e.source?.id||e.source,e.target?.id||e.target]));
+  return{...g,edges,nodes:(g.nodes||[]).filter(n=>ids.has(n.id)||(state.topic==='all'&&!edges.length))}
+}
+function renderNetwork(sel,g,opts={}){
+  const svg=d3.select(sel);svg.selectAll('*').remove();const el=document.querySelector(sel);if(!el||!g)return;
+  const width=el.clientWidth||900,height=el.clientHeight||560;svg.attr('viewBox',`0 0 ${width} ${height}`);
+  const nodes=(g.nodes||[]).map(d=>({...d})),links=(g.edges||[]).map(d=>({...d,source:d.source?.id||d.source,target:d.target?.id||d.target}));
+  if(!nodes.length){svg.append('text').attr('x',width/2).attr('y',height/2).attr('text-anchor','middle').attr('fill','#7890aa').attr('font-size',12).text('No network data for this view');return}
+  const maxW=d3.max(nodes,d=>+d.weight||1)||1,maxE=d3.max(links,d=>+d.weight||1)||1;
+  const root=svg.append('g');const zoom=d3.zoom().scaleExtent([.35,4]).on('zoom',ev=>root.attr('transform',ev.transform));svg.call(zoom);
+  const link=root.append('g').selectAll('line').data(links).join('line').attr('stroke',opts.votes?'#42c88a':'#5478a5').attr('stroke-opacity',d=>.18+.55*((+d.weight||1)/maxE)).attr('stroke-width',d=>.7+4*((+d.weight||1)/maxE));
+  const node=root.append('g').selectAll('g').data(nodes).join('g').style('cursor','pointer');
+  node.append('circle').attr('r',d=>7+13*Math.sqrt((+d.weight||1)/maxW)).attr('fill',d=>opts.focus===d.id?'#e8b24a':EU27.has(d.id)?'#3978d4':'#a68bff').attr('stroke','#dbe9ff').attr('stroke-opacity',.65).attr('stroke-width',1.1);
+  node.append('text').text(d=>d.id).attr('text-anchor','middle').attr('dy','.35em').attr('font-size',d=>8+2*Math.sqrt((+d.weight||1)/maxW)).attr('font-weight',800).attr('fill','white').style('pointer-events','none');
+  node.on('mousemove',(ev,d)=>{
+    const p=countryPartners({edges:links},d.id).slice(0,3);
+    tooltip.innerHTML=`<strong>${esc(nameOf(d.id))}</strong><br>weight: ${fmt(d.weight,1)}${p.length?'<br>top links: '+p.map(x=>esc(x.id)).join(', '):''}`;
+    tooltip.style.display='block';tooltip.style.left=(ev.clientX+12)+'px';tooltip.style.top=(ev.clientY+12)+'px'
+  }).on('mouseleave',()=>tooltip.style.display='none');
+  const sim=d3.forceSimulation(nodes)
+    .force('link',d3.forceLink(links).id(d=>d.id).distance(d=>90+35*(1-(+d.weight||1)/maxE)).strength(.45))
+    .force('charge',d3.forceManyBody().strength(-240))
+    .force('center',d3.forceCenter(width/2,height/2))
+    .force('collision',d3.forceCollide().radius(d=>18+12*Math.sqrt((+d.weight||1)/maxW)))
+    .on('tick',()=>{
+      link.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y).attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);
+      node.attr('transform',d=>`translate(${d.x},${d.y})`)
+    });
+  node.call(d3.drag().on('start',(ev,d)=>{if(!ev.active)sim.alphaTarget(.3).restart();d.fx=d.x;d.fy=d.y}).on('drag',(ev,d)=>{d.fx=ev.x;d.fy=ev.y}).on('end',(ev,d)=>{if(!ev.active)sim.alphaTarget(0);d.fx=null;d.fy=null}))
+}
+function activateTab(tab){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===`view-${tab}`));
+  setTimeout(()=>{
+    const g=filteredGraph(state.graph);
+    if(tab==='network')renderNetwork('#networkFull',g);
+    if(tab==='countries')renderCountry();
+    if(tab==='voting')renderVoting();
+    if(tab==='overview')renderRelationshipMatrix(g)
+  },50)
+}
+
 document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>activateTab(b.dataset.tab)));
-$('source').addEventListener('change',e=>{state.source=e.target.value;loadAll()});$('scope').addEventListener('change',e=>{state.scope=e.target.value;loadAll()});$('topic').addEventListener('change',e=>{state.topic=e.target.value;renderAll()});$('refresh').addEventListener('click',loadAll);$('countrySelect').addEventListener('change',renderCountry);document.querySelectorAll('#windowSeg button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('#windowSeg button').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.window=b.dataset.v;loadAll()}));window.addEventListener('resize',()=>{clearTimeout(window.__rr);window.__rr=setTimeout(()=>{const g=filteredGraph(state.graph);renderNetwork('#networkOverview',g);renderNetwork('#networkFull',g);renderCountry();renderVoting()},180)});
+$('source').addEventListener('change',e=>{state.source=e.target.value;loadAll()});
+$('scope').addEventListener('change',e=>{state.scope=e.target.value;loadAll()});
+$('topic').addEventListener('change',e=>{state.topic=e.target.value;renderAll()});
+$('refresh').addEventListener('click',loadAll);
+$('countrySelect').addEventListener('change',renderCountry);
+$('relFilter').addEventListener('change',e=>{state.relFilter=e.target.value;renderRelationshipMatrix(filteredGraph(state.graph))});
+$('relSort').addEventListener('change',e=>{state.relSort=e.target.value;renderRelationshipMatrix(filteredGraph(state.graph))});
+document.querySelectorAll('#windowSeg button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#windowSeg button').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.window=b.dataset.v;loadAll()
+}));
+window.addEventListener('resize',()=>{
+  clearTimeout(window.__rr);
+  window.__rr=setTimeout(()=>{
+    const g=filteredGraph(state.graph);
+    renderNetwork('#networkFull',g);renderCountry();renderVoting()
+  },180)
+});
 loadAll();
 </script>
 </body>
 </html>
+
