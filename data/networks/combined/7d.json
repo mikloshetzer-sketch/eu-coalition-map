@@ -10,7 +10,7 @@
     },
     {
       "id": "BG",
-      "weight": 9.6
+      "weight": 13.8
     },
     {
       "id": "CN",
@@ -26,7 +26,7 @@
     },
     {
       "id": "DE",
-      "weight": 543.2
+      "weight": 546.3
     },
     {
       "id": "DK",
@@ -42,15 +42,15 @@
     },
     {
       "id": "FI",
-      "weight": 126.23
+      "weight": 123.23
     },
     {
       "id": "FR",
-      "weight": 169.43
+      "weight": 203.76
     },
     {
       "id": "GB",
-      "weight": 264.24
+      "weight": 270.34
     },
     {
       "id": "GR",
@@ -86,7 +86,7 @@
     },
     {
       "id": "PL",
-      "weight": 49.2
+      "weight": 58.22
     },
     {
       "id": "PT",
@@ -98,7 +98,7 @@
     },
     {
       "id": "RU",
-      "weight": 326.6
+      "weight": 331.61
     },
     {
       "id": "SE",
@@ -110,15 +110,15 @@
     },
     {
       "id": "TR",
-      "weight": 22.73
+      "weight": 47.21
     },
     {
       "id": "UA",
-      "weight": 119.36
+      "weight": 123.57
     },
     {
       "id": "US",
-      "weight": 258.14
+      "weight": 267.99
     }
   ],
   "edges": [
@@ -535,6 +535,30 @@
     },
     {
       "source": "BG",
+      "target": "RU",
+      "weight": 4.2,
+      "interaction_weight": 4.2,
+      "interaction_count": 1,
+      "topics": {
+        "defence": 4.2
+      },
+      "relationship_score": 0.0,
+      "dominant_relation": "neutral",
+      "relationship_label": "neutral",
+      "relationship_confidence": 0.15,
+      "relationship_counts": {
+        "cooperative": 0,
+        "conflictual": 0,
+        "neutral": 1,
+        "mixed": 0,
+        "unclassified": 0
+      },
+      "classified_events": 1,
+      "unclassified_events": 0,
+      "classification_coverage": 1.0
+    },
+    {
+      "source": "BG",
       "target": "SE",
       "weight": 2.6,
       "interaction_weight": 2.6,
@@ -827,32 +851,6 @@
     },
     {
       "source": "DE",
-      "target": "FI",
-      "weight": 1.0,
-      "interaction_weight": 1.0,
-      "interaction_count": 1,
-      "topics": {
-        "defence": 1.0,
-        "energy": 1.0,
-        "ukraine_russia": 1.0
-      },
-      "relationship_score": 0.0,
-      "dominant_relation": "neutral",
-      "relationship_label": "neutral",
-      "relationship_confidence": 0.15,
-      "relationship_counts": {
-        "cooperative": 0,
-        "conflictual": 0,
-        "neutral": 1,
-        "mixed": 0,
-        "unclassified": 0
-      },
-      "classified_events": 1,
-      "unclassified_events": 0,
-      "classification_coverage": 1.0
-    },
-    {
-      "source": "DE",
       "target": "FR",
       "weight": 9.6,
       "interaction_weight": 9.6,
@@ -879,11 +877,11 @@
     {
       "source": "DE",
       "target": "GB",
-      "weight": 31.02,
-      "interaction_weight": 31.02,
-      "interaction_count": 9,
+      "weight": 37.12,
+      "interaction_weight": 37.12,
+      "interaction_count": 11,
       "topics": {
-        "defence": 23.42,
+        "defence": 29.52,
         "fiscal": 7.6,
         "trade": 7.6
       },
@@ -894,11 +892,11 @@
       "relationship_counts": {
         "cooperative": 0,
         "conflictual": 0,
-        "neutral": 9,
+        "neutral": 11,
         "mixed": 0,
         "unclassified": 0
       },
-      "classified_events": 9,
+      "classified_events": 11,
       "unclassified_events": 0,
       "classification_coverage": 1.0
     },
@@ -1081,58 +1079,57 @@
     {
       "source": "DE",
       "target": "RU",
-      "weight": 199.03,
-      "interaction_weight": 199.03,
-      "interaction_count": 77,
+      "weight": 198.03,
+      "interaction_weight": 198.03,
+      "interaction_count": 76,
       "topics": {
-        "defence": 131.13,
-        "ukraine_russia": 53.0,
+        "defence": 130.13,
+        "ukraine_russia": 52.0,
         "trade": 46.9,
         "fiscal": 41.9,
-        "energy": 5.0,
+        "energy": 4.0,
         "migration": 3.0
       },
-      "relationship_score": -0.249,
+      "relationship_score": -0.25,
       "dominant_relation": "neutral",
       "relationship_label": "conflictual",
-      "relationship_confidence": 0.237,
+      "relationship_confidence": 0.238,
       "relationship_counts": {
         "cooperative": 0,
         "conflictual": 16,
-        "neutral": 61,
+        "neutral": 60,
         "mixed": 0,
         "unclassified": 0
       },
-      "classified_events": 77,
+      "classified_events": 76,
       "unclassified_events": 0,
       "classification_coverage": 1.0
     },
     {
       "source": "DE",
       "target": "UA",
-      "weight": 44.7,
-      "interaction_weight": 44.7,
-      "interaction_count": 25,
+      "weight": 43.7,
+      "interaction_weight": 43.7,
+      "interaction_count": 24,
       "topics": {
-        "ukraine_russia": 24.4,
-        "defence": 14.0,
+        "ukraine_russia": 23.4,
+        "defence": 13.0,
         "rule_of_law": 11.9,
         "fiscal": 6.8,
-        "trade": 6.8,
-        "energy": 1.0
+        "trade": 6.8
       },
-      "relationship_score": -0.322,
+      "relationship_score": -0.327,
       "dominant_relation": "neutral",
       "relationship_label": "conflictual",
-      "relationship_confidence": 0.233,
+      "relationship_confidence": 0.236,
       "relationship_counts": {
         "cooperative": 0,
         "conflictual": 5,
-        "neutral": 20,
+        "neutral": 19,
         "mixed": 0,
         "unclassified": 0
       },
-      "classified_events": 25,
+      "classified_events": 24,
       "unclassified_events": 0,
       "classification_coverage": 1.0
     },
@@ -1584,15 +1581,14 @@
     {
       "source": "FI",
       "target": "RU",
-      "weight": 35.04,
-      "interaction_weight": 35.04,
-      "interaction_count": 18,
+      "weight": 34.04,
+      "interaction_weight": 34.04,
+      "interaction_count": 17,
       "topics": {
         "rule_of_law": 18.8,
-        "defence": 9.7,
+        "defence": 8.7,
         "trade": 5.54,
-        "ukraine_russia": 2.0,
-        "energy": 1.0
+        "ukraine_russia": 1.0
       },
       "relationship_score": 0.0,
       "dominant_relation": "neutral",
@@ -1601,11 +1597,11 @@
       "relationship_counts": {
         "cooperative": 0,
         "conflictual": 0,
-        "neutral": 18,
+        "neutral": 17,
         "mixed": 0,
         "unclassified": 0
       },
-      "classified_events": 18,
+      "classified_events": 17,
       "unclassified_events": 0,
       "classification_coverage": 1.0
     },
@@ -1660,16 +1656,15 @@
     {
       "source": "FI",
       "target": "UA",
-      "weight": 35.6,
-      "interaction_weight": 35.6,
-      "interaction_count": 11,
+      "weight": 34.6,
+      "interaction_weight": 34.6,
+      "interaction_count": 10,
       "topics": {
-        "defence": 22.6,
+        "defence": 21.6,
         "rule_of_law": 10.0,
         "fiscal": 2.0,
         "trade": 2.0,
-        "ukraine_russia": 2.0,
-        "energy": 1.0
+        "ukraine_russia": 1.0
       },
       "relationship_score": 0.0,
       "dominant_relation": "neutral",
@@ -1678,11 +1673,11 @@
       "relationship_counts": {
         "cooperative": 0,
         "conflictual": 0,
-        "neutral": 11,
+        "neutral": 10,
         "mixed": 0,
         "unclassified": 0
       },
-      "classified_events": 11,
+      "classified_events": 10,
       "unclassified_events": 0,
       "classification_coverage": 1.0
     },
@@ -1844,6 +1839,31 @@
     },
     {
       "source": "FR",
+      "target": "TR",
+      "weight": 24.48,
+      "interaction_weight": 24.48,
+      "interaction_count": 12,
+      "topics": {
+        "defence": 18.24,
+        "trade": 6.24
+      },
+      "relationship_score": 0.0,
+      "dominant_relation": "neutral",
+      "relationship_label": "neutral",
+      "relationship_confidence": 0.15,
+      "relationship_counts": {
+        "cooperative": 0,
+        "conflictual": 0,
+        "neutral": 12,
+        "mixed": 0,
+        "unclassified": 0
+      },
+      "classified_events": 12,
+      "unclassified_events": 0,
+      "classification_coverage": 1.0
+    },
+    {
+      "source": "FR",
       "target": "UA",
       "weight": 5.46,
       "interaction_weight": 5.46,
@@ -1872,11 +1892,11 @@
     {
       "source": "FR",
       "target": "US",
-      "weight": 17.7,
-      "interaction_weight": 17.7,
-      "interaction_count": 5,
+      "weight": 27.55,
+      "interaction_weight": 27.55,
+      "interaction_count": 10,
       "topics": {
-        "defence": 10.7,
+        "defence": 20.55,
         "trade": 7.0
       },
       "relationship_score": 0.0,
@@ -1886,11 +1906,11 @@
       "relationship_counts": {
         "cooperative": 0,
         "conflictual": 0,
-        "neutral": 5,
+        "neutral": 10,
         "mixed": 0,
         "unclassified": 0
       },
-      "classified_events": 5,
+      "classified_events": 10,
       "unclassified_events": 0,
       "classification_coverage": 1.0
     },
@@ -2439,52 +2459,52 @@
     {
       "source": "PL",
       "target": "RU",
-      "weight": 9.0,
-      "interaction_weight": 9.0,
-      "interaction_count": 9,
+      "weight": 11.81,
+      "interaction_weight": 11.81,
+      "interaction_count": 11,
       "topics": {
         "ukraine_russia": 9.0,
-        "defence": 5.0,
+        "defence": 7.81,
         "migration": 3.0,
         "rule_of_law": 2.0
       },
-      "relationship_score": -0.56,
+      "relationship_score": -0.476,
       "dominant_relation": "neutral",
       "relationship_label": "conflictual",
-      "relationship_confidence": 0.265,
+      "relationship_confidence": 0.244,
       "relationship_counts": {
         "cooperative": 0,
         "conflictual": 2,
-        "neutral": 7,
+        "neutral": 9,
         "mixed": 0,
         "unclassified": 0
       },
-      "classified_events": 9,
+      "classified_events": 11,
       "unclassified_events": 0,
       "classification_coverage": 1.0
     },
     {
       "source": "PL",
       "target": "UA",
-      "weight": 8.4,
-      "interaction_weight": 8.4,
-      "interaction_count": 5,
+      "weight": 14.61,
+      "interaction_weight": 14.61,
+      "interaction_count": 10,
       "topics": {
-        "ukraine_russia": 8.4,
-        "defence": 6.4
+        "defence": 12.61,
+        "ukraine_russia": 8.4
       },
-      "relationship_score": -0.691,
-      "dominant_relation": "conflictual",
+      "relationship_score": -0.51,
+      "dominant_relation": "neutral",
       "relationship_label": "conflictual",
-      "relationship_confidence": 0.422,
+      "relationship_confidence": 0.286,
       "relationship_counts": {
         "cooperative": 0,
         "conflictual": 3,
-        "neutral": 2,
+        "neutral": 7,
         "mixed": 0,
         "unclassified": 0
       },
-      "classified_events": 5,
+      "classified_events": 10,
       "unclassified_events": 0,
       "classification_coverage": 1.0
     },
@@ -2587,7 +2607,7 @@
       "classification_coverage": 1.0
     }
   ],
-  "event_count": 646,
+  "event_count": 663,
   "mode": "all",
   "relationship_metadata": {
     "method": "semantic_relationship_aggregation_v1",
