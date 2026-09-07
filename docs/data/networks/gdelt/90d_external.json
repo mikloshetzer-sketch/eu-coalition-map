@@ -1,6 +1,10 @@
 {
   "nodes": [
     {
+      "id": "AT",
+      "weight": 7.9
+    },
+    {
       "id": "BE",
       "weight": 7.34
     },
@@ -22,7 +26,7 @@
     },
     {
       "id": "EE",
-      "weight": 8.98
+      "weight": 5.88
     },
     {
       "id": "ES",
@@ -34,11 +38,11 @@
     },
     {
       "id": "FR",
-      "weight": 153.46
+      "weight": 151.04
     },
     {
       "id": "GB",
-      "weight": 238.52
+      "weight": 236.1
     },
     {
       "id": "GR",
@@ -90,14 +94,44 @@
     },
     {
       "id": "UA",
-      "weight": 74.91
+      "weight": 71.81
     },
     {
       "id": "US",
-      "weight": 267.09
+      "weight": 274.99
     }
   ],
   "edges": [
+    {
+      "source": "AT",
+      "target": "US",
+      "weight": 7.9,
+      "interaction_weight": 7.9,
+      "interaction_count": 1,
+      "topics": {
+        "defence": 7.9
+      },
+      "relationship_score": null,
+      "dominant_relation": "unclassified",
+      "observed_relationship_label": "unclassified",
+      "relationship_confidence": null,
+      "relationship_counts": {
+        "cooperative": 0,
+        "conflictual": 0,
+        "neutral": 0,
+        "mixed": 0,
+        "unclassified": 1
+      },
+      "classified_events": 0,
+      "unclassified_events": 1,
+      "classification_coverage": 0.0,
+      "relationship_label": "unclassified",
+      "assessed_relationship": "unclassified",
+      "evidence_status": "no_classified_evidence",
+      "evidence_level": "none",
+      "evidence_sufficient": false,
+      "directional_consistency": 0.0
+    },
     {
       "source": "BE",
       "target": "GB",
@@ -649,36 +683,6 @@
       "directional_consistency": 0.0
     },
     {
-      "source": "EE",
-      "target": "UA",
-      "weight": 3.1,
-      "interaction_weight": 3.1,
-      "interaction_count": 1,
-      "topics": {
-        "defence": 3.1
-      },
-      "relationship_score": null,
-      "dominant_relation": "unclassified",
-      "observed_relationship_label": "unclassified",
-      "relationship_confidence": null,
-      "relationship_counts": {
-        "cooperative": 0,
-        "conflictual": 0,
-        "neutral": 0,
-        "mixed": 0,
-        "unclassified": 1
-      },
-      "classified_events": 0,
-      "unclassified_events": 1,
-      "classification_coverage": 0.0,
-      "relationship_label": "unclassified",
-      "assessed_relationship": "unclassified",
-      "evidence_status": "no_classified_evidence",
-      "evidence_level": "none",
-      "evidence_sufficient": false,
-      "directional_consistency": 0.0
-    },
-    {
       "source": "ES",
       "target": "GB",
       "weight": 34.92,
@@ -835,12 +839,12 @@
     {
       "source": "FR",
       "target": "GB",
-      "weight": 76.49,
-      "interaction_weight": 76.49,
-      "interaction_count": 11,
+      "weight": 74.07,
+      "interaction_weight": 74.07,
+      "interaction_count": 10,
       "topics": {
         "defence": 35.01,
-        "trade": 28.78,
+        "trade": 26.36,
         "rule_of_law": 12.7
       },
       "relationship_score": null,
@@ -852,10 +856,10 @@
         "conflictual": 0,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 11
+        "unclassified": 10
       },
       "classified_events": 0,
-      "unclassified_events": 11,
+      "unclassified_events": 10,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -1632,7 +1636,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 233,
+  "event_count": 235,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -1645,7 +1649,7 @@
     "stance_inferred": false,
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
-      "equal_legacy_topic_share_fallback": 233
+      "equal_legacy_topic_share_fallback": 235
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
     "note": "Topic prominence does not imply support, opposition or shared policy position."

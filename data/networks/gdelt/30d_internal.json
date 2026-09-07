@@ -2,7 +2,7 @@
   "nodes": [
     {
       "id": "AT",
-      "weight": 6.8
+      "weight": 9.22
     },
     {
       "id": "BG",
@@ -18,11 +18,11 @@
     },
     {
       "id": "DE",
-      "weight": 6.36
+      "weight": 11.68
     },
     {
       "id": "FR",
-      "weight": 4.9
+      "weight": 7.84
     },
     {
       "id": "IE",
@@ -30,7 +30,7 @@
     },
     {
       "id": "IT",
-      "weight": 6.96
+      "weight": 9.9
     },
     {
       "id": "MT",
@@ -42,7 +42,7 @@
     },
     {
       "id": "PL",
-      "weight": 1.7
+      "weight": 4.6
     },
     {
       "id": "PT",
@@ -58,6 +58,36 @@
       "interaction_count": 1,
       "topics": {
         "defence": 6.8
+      },
+      "relationship_score": null,
+      "dominant_relation": "unclassified",
+      "observed_relationship_label": "unclassified",
+      "relationship_confidence": null,
+      "relationship_counts": {
+        "cooperative": 0,
+        "conflictual": 0,
+        "neutral": 0,
+        "mixed": 0,
+        "unclassified": 1
+      },
+      "classified_events": 0,
+      "unclassified_events": 1,
+      "classification_coverage": 0.0,
+      "relationship_label": "unclassified",
+      "assessed_relationship": "unclassified",
+      "evidence_status": "no_classified_evidence",
+      "evidence_level": "none",
+      "evidence_sufficient": false,
+      "directional_consistency": 0.0
+    },
+    {
+      "source": "AT",
+      "target": "DE",
+      "weight": 2.42,
+      "interaction_weight": 2.42,
+      "interaction_count": 1,
+      "topics": {
+        "trade": 2.42
       },
       "relationship_score": null,
       "dominant_relation": "unclassified",
@@ -233,11 +263,42 @@
     {
       "source": "DE",
       "target": "PL",
-      "weight": 1.7,
-      "interaction_weight": 1.7,
+      "weight": 4.6,
+      "interaction_weight": 4.6,
+      "interaction_count": 2,
+      "topics": {
+        "rule_of_law": 2.9,
+        "defence": 1.7
+      },
+      "relationship_score": null,
+      "dominant_relation": "unclassified",
+      "observed_relationship_label": "unclassified",
+      "relationship_confidence": null,
+      "relationship_counts": {
+        "cooperative": 0,
+        "conflictual": 0,
+        "neutral": 0,
+        "mixed": 0,
+        "unclassified": 2
+      },
+      "classified_events": 0,
+      "unclassified_events": 2,
+      "classification_coverage": 0.0,
+      "relationship_label": "unclassified",
+      "assessed_relationship": "unclassified",
+      "evidence_status": "no_classified_evidence",
+      "evidence_level": "none",
+      "evidence_sufficient": false,
+      "directional_consistency": 0.0
+    },
+    {
+      "source": "FR",
+      "target": "IE",
+      "weight": 2.6,
+      "interaction_weight": 2.6,
       "interaction_count": 1,
       "topics": {
-        "defence": 1.7
+        "defence": 2.6
       },
       "relationship_score": null,
       "dominant_relation": "unclassified",
@@ -262,12 +323,12 @@
     },
     {
       "source": "FR",
-      "target": "IE",
-      "weight": 2.6,
-      "interaction_weight": 2.6,
+      "target": "IT",
+      "weight": 2.94,
+      "interaction_weight": 2.94,
       "interaction_count": 1,
       "topics": {
-        "defence": 2.6
+        "defence": 2.94
       },
       "relationship_score": null,
       "dominant_relation": "unclassified",
@@ -351,7 +412,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 81,
+  "event_count": 85,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -364,7 +425,7 @@
     "stance_inferred": false,
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
-      "equal_legacy_topic_share_fallback": 81
+      "equal_legacy_topic_share_fallback": 85
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
     "note": "Topic prominence does not imply support, opposition or shared policy position."
