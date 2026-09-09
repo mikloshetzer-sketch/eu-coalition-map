@@ -21,15 +21,15 @@
       "weight": 1
     },
     {
+      "id": "GR",
+      "weight": 1
+    },
+    {
       "id": "IE",
       "weight": 1
     },
     {
       "id": "IT",
-      "weight": 1
-    },
-    {
-      "id": "NL",
       "weight": 1
     },
     {
@@ -44,22 +44,22 @@
   "edges": [
     {
       "source": "AT",
-      "target": "DE",
-      "weight": 0.746
-    },
-    {
-      "source": "AT",
       "target": "ES",
       "weight": 0.956
     },
     {
       "source": "AT",
       "target": "FI",
-      "weight": 0.47
+      "weight": 0.956
     },
     {
       "source": "AT",
       "target": "FR",
+      "weight": 0.956
+    },
+    {
+      "source": "AT",
+      "target": "GR",
       "weight": 0.956
     },
     {
@@ -70,11 +70,6 @@
     {
       "source": "AT",
       "target": "IT",
-      "weight": 0.956
-    },
-    {
-      "source": "AT",
-      "target": "NL",
       "weight": 0.956
     },
     {
@@ -89,47 +84,22 @@
     },
     {
       "source": "DE",
-      "target": "ES",
-      "weight": 0.696
-    },
-    {
-      "source": "DE",
-      "target": "FI",
-      "weight": 0.403
-    },
-    {
-      "source": "DE",
-      "target": "FR",
-      "weight": 0.696
-    },
-    {
-      "source": "DE",
-      "target": "IE",
-      "weight": 0.696
-    },
-    {
-      "source": "DE",
-      "target": "IT",
-      "weight": 0.696
-    },
-    {
-      "source": "DE",
-      "target": "NL",
-      "weight": 0.696
-    },
-    {
-      "source": "DE",
       "target": "PL",
-      "weight": 0.723
+      "weight": 0.691
     },
     {
-      "source": "DE",
-      "target": "PT",
-      "weight": 0.585
+      "source": "ES",
+      "target": "FI",
+      "weight": 1.0
     },
     {
       "source": "ES",
       "target": "FR",
+      "weight": 1.0
+    },
+    {
+      "source": "ES",
+      "target": "GR",
       "weight": 1.0
     },
     {
@@ -140,11 +110,6 @@
     {
       "source": "ES",
       "target": "IT",
-      "weight": 1.0
-    },
-    {
-      "source": "ES",
-      "target": "NL",
       "weight": 1.0
     },
     {
@@ -159,8 +124,38 @@
     },
     {
       "source": "FI",
+      "target": "FR",
+      "weight": 1.0
+    },
+    {
+      "source": "FI",
+      "target": "GR",
+      "weight": 1.0
+    },
+    {
+      "source": "FI",
+      "target": "IE",
+      "weight": 1.0
+    },
+    {
+      "source": "FI",
+      "target": "IT",
+      "weight": 1.0
+    },
+    {
+      "source": "FI",
       "target": "PL",
-      "weight": 0.865
+      "weight": 0.261
+    },
+    {
+      "source": "FI",
+      "target": "PT",
+      "weight": 0.707
+    },
+    {
+      "source": "FR",
+      "target": "GR",
+      "weight": 1.0
     },
     {
       "source": "FR",
@@ -174,16 +169,31 @@
     },
     {
       "source": "FR",
-      "target": "NL",
-      "weight": 1.0
-    },
-    {
-      "source": "FR",
       "target": "PL",
       "weight": 0.261
     },
     {
       "source": "FR",
+      "target": "PT",
+      "weight": 0.707
+    },
+    {
+      "source": "GR",
+      "target": "IE",
+      "weight": 1.0
+    },
+    {
+      "source": "GR",
+      "target": "IT",
+      "weight": 1.0
+    },
+    {
+      "source": "GR",
+      "target": "PL",
+      "weight": 0.261
+    },
+    {
+      "source": "GR",
       "target": "PT",
       "weight": 0.707
     },
@@ -194,11 +204,6 @@
     },
     {
       "source": "IE",
-      "target": "NL",
-      "weight": 1.0
-    },
-    {
-      "source": "IE",
       "target": "PL",
       "weight": 0.261
     },
@@ -209,31 +214,16 @@
     },
     {
       "source": "IT",
-      "target": "NL",
-      "weight": 1.0
-    },
-    {
-      "source": "IT",
       "target": "PL",
       "weight": 0.261
     },
     {
       "source": "IT",
-      "target": "PT",
-      "weight": 0.707
-    },
-    {
-      "source": "NL",
-      "target": "PL",
-      "weight": 0.261
-    },
-    {
-      "source": "NL",
       "target": "PT",
       "weight": 0.707
     }
   ],
-  "event_count": 33,
+  "event_count": 25,
   "mode": "internal",
   "method": "topic_salience_cosine_similarity_v2",
   "semantic_dimension": "salience_similarity",
