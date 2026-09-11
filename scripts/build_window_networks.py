@@ -22,7 +22,7 @@ if str(ROOT) not in sys.path:
 
 from detectors.relationship_detector import detect_pair_relationship_from_parts
 
-NETWORK_BUILDER_VERSION = "v7_topic_salience_stance"
+NETWORK_BUILDER_VERSION = "v8_policy_issue_stance"
 
 
 EVENTS_DIR = ROOT / "data" / "events"
@@ -725,31 +725,81 @@ def topic_method_counts(events):
 
 
 
-def _event_stance_map(event):
+def _event_policy_stance_map(event):
     """
-    Return compact event-level country × topic stance evidence.
+    Return event-level COUNTRY × POLICY-ISSUE stance evidence.
 
-    Preferred schema:
-        event["stances"][COUNTRY][topic]
+    Preferred source:
+        event["stance_analysis"]["classified"][COUNTRY][policy_issue]
 
-    Events without the stance v4 schema simply contribute no stance evidence.
-    We do not infer stance from topic salience or relationship tone.
+    This is important because stance detector v2 classifies concrete policy
+    issues such as:
+        sanctions_on_russia
+        military_support_ukraine
+        nuclear_deployment
+
+    rather than broad topics such as ukraine_russia or defence.
+
+    Backward fallback:
+        event["stances"]
+
+    The fallback is accepted only when each record itself contains a parent
+    `topic` or `policy_issue` field. Broad legacy topic-only stance records are
+    deliberately ignored rather than reinterpreted.
     """
+    analysis = event.get("stance_analysis", {})
+
+    if isinstance(analysis, dict):
+        classified = analysis.get("classified", {})
+
+        if isinstance(classified, dict) and classified:
+            return classified
+
     stances = event.get("stances", {})
 
     if not isinstance(stances, dict):
         return {}
 
-    return stances
+    safe = {}
+
+    for country, issue_map in stances.items():
+        if not isinstance(issue_map, dict):
+            continue
+
+        for key, record in issue_map.items():
+            if not isinstance(record, dict):
+                continue
+
+            policy_issue = (
+                record.get("policy_issue")
+                or key
+            )
+
+            parent_topic = record.get("topic")
+
+            # Never treat a broad legacy topic key as a policy issue.
+            if (
+                not policy_issue
+                or (
+                    policy_issue in TOPICS
+                    and not parent_topic
+                )
+            ):
+                continue
+
+            safe.setdefault(
+                str(country).upper(),
+                {},
+            )[str(policy_issue)] = record
+
+    return safe
 
 
 def _stance_event_weight(event, stance_record):
     """
-    Weight one explicit stance observation.
+    Weight one explicit policy-issue stance observation.
 
-    Event importance is moderated by detector confidence. This preserves source
-    weighting while preventing a weak semantic classification from receiving
-    full GDELT/RSS event weight.
+    Event importance is moderated by detector confidence.
     """
     base = compute_weight(event)
 
@@ -772,8 +822,6 @@ def _stance_event_weight(event, stance_record):
         ),
     )
 
-    # Classified evidence should have some minimum contribution, while stronger
-    # detector confidence scales toward the event's full weight.
     confidence_factor = (
         0.35
         + 0.65 * confidence
@@ -792,14 +840,7 @@ def _stance_confidence(
     total_weight,
 ):
     """
-    Confidence in the AGGREGATED country-topic stance.
-
-    Combines:
-      - number of independent classified events,
-      - directional consistency,
-      - accumulated weighted evidence.
-
-    This is evidence confidence, not probability that the policy is "true".
+    Confidence in the AGGREGATED country × policy-issue stance.
     """
     count_factor = (
         event_count
@@ -859,8 +900,8 @@ def _assess_aggregated_stance(
     weights,
 ):
     """
-    Convert multiple explicit event-level signals into one cautious country
-    stance assessment for one topic.
+    Convert multiple explicit event-level policy-issue signals into one cautious
+    country-level position.
     """
     classified_events = sum(
         int(
@@ -883,30 +924,13 @@ def _assess_aggregated_stance(
     )
 
     directional_weights = {
-        "support": float(
+        label: float(
             weights.get(
-                "support",
+                label,
                 0.0,
             )
-        ),
-        "oppose": float(
-            weights.get(
-                "oppose",
-                0.0,
-            )
-        ),
-        "conditional": float(
-            weights.get(
-                "conditional",
-                0.0,
-            )
-        ),
-        "mixed": float(
-            weights.get(
-                "mixed",
-                0.0,
-            )
-        ),
+        )
+        for label in STANCE_LABELS
     }
 
     if (
@@ -927,8 +951,6 @@ def _assess_aggregated_stance(
     conditional = directional_weights["conditional"]
     mixed = directional_weights["mixed"]
 
-    # Mixed event classifications contribute to ambiguity rather than being
-    # redistributed into support/opposition.
     effective_total = max(
         total_weight,
         1e-9,
@@ -1011,24 +1033,36 @@ def _assess_aggregated_stance(
 
 def build_stance_matrix(events, mode="all"):
     """
-    Aggregate explicit event-level stance evidence into country × topic rows.
+    Aggregate explicit COUNTRY × POLICY-ISSUE stance evidence.
 
-    Output semantics:
-      support / oppose / conditional / mixed
-          only when at least two classified events and sufficient weighted
-          evidence exist;
+    Output hierarchy:
+        country
+        parent topic
+        policy issue
+        stance
 
-      insufficient_evidence
-          explicit stance evidence exists but is too sparse;
+    Example:
+        PL
+        ukraine_russia
+        sanctions_on_russia
+        support
 
-      unknown
-          no explicit stance evidence exists.
+    No broad topic stance is inferred.
 
-    Topic salience NEVER determines the stance label.
+    Labels:
+        support
+        oppose
+        conditional
+        mixed
+        insufficient_evidence
+
+    Topic salience NEVER determines stance.
     """
     bucket = defaultdict(
         lambda: defaultdict(
             lambda: {
+                "parent_topic": None,
+                "policy_issue_label": None,
                 "counts": defaultdict(int),
                 "weights": defaultdict(float),
                 "confidence_sum": 0.0,
@@ -1043,7 +1077,7 @@ def build_stance_matrix(events, mode="all"):
     classified_event_count = 0
 
     for event in events:
-        stance_map = _event_stance_map(
+        stance_map = _event_policy_stance_map(
             event
         )
 
@@ -1063,7 +1097,7 @@ def build_stance_matrix(events, mode="all"):
         relevant_event_count += 1
         event_contributed = False
 
-        for country, topic_map in stance_map.items():
+        for country, issue_map in stance_map.items():
             country = str(
                 country
             ).upper()
@@ -1072,15 +1106,12 @@ def build_stance_matrix(events, mode="all"):
                 continue
 
             if not isinstance(
-                topic_map,
+                issue_map,
                 dict,
             ):
                 continue
 
-            for topic, record in topic_map.items():
-                if topic not in TOPICS:
-                    continue
-
+            for policy_issue, record in issue_map.items():
                 if not isinstance(
                     record,
                     dict,
@@ -1097,9 +1128,35 @@ def build_stance_matrix(events, mode="all"):
                 if stance not in STANCE_LABELS:
                     continue
 
+                parent_topic = record.get(
+                    "topic"
+                )
+
+                if parent_topic not in TOPICS:
+                    # No safe semantic parent -> ignore rather than guess.
+                    continue
+
+                policy_issue = str(
+                    record.get(
+                        "policy_issue"
+                    )
+                    or policy_issue
+                ).strip()
+
+                if not policy_issue:
+                    continue
+
                 data = bucket[
                     country
-                ][topic]
+                ][policy_issue]
+
+                data["parent_topic"] = parent_topic
+                data["policy_issue_label"] = (
+                    record.get(
+                        "policy_issue_label"
+                    )
+                    or policy_issue
+                )
 
                 weight = _stance_event_weight(
                     event,
@@ -1109,6 +1166,7 @@ def build_stance_matrix(events, mode="all"):
                 data["counts"][
                     stance
                 ] += 1
+
                 data["weights"][
                     stance
                 ] += weight
@@ -1152,7 +1210,6 @@ def build_stance_matrix(events, mode="all"):
 
                 data["events"] += 1
 
-                # Keep only compact provenance, never full article bodies.
                 data["source_events"].append(
                     {
                         "published_at": event.get(
@@ -1164,6 +1221,7 @@ def build_stance_matrix(events, mode="all"):
                         "url": event.get(
                             "url"
                         ),
+                        "policy_issue": policy_issue,
                         "stance": stance,
                         "confidence": round(
                             confidence,
@@ -1182,15 +1240,12 @@ def build_stance_matrix(events, mode="all"):
     for country in sorted(
         bucket.keys()
     ):
-        for topic in TOPICS:
-            if topic not in bucket[
-                country
-            ]:
-                continue
-
+        for policy_issue in sorted(
+            bucket[country].keys()
+        ):
             data = bucket[
                 country
-            ][topic]
+            ][policy_issue]
 
             counts = {
                 label: int(
@@ -1238,7 +1293,13 @@ def build_stance_matrix(events, mode="all"):
             rows.append(
                 {
                     "country": country,
-                    "topic": topic,
+                    "topic": data[
+                        "parent_topic"
+                    ],
+                    "policy_issue": policy_issue,
+                    "policy_issue_label": data[
+                        "policy_issue_label"
+                    ],
                     "stance": assessment[
                         "stance"
                     ],
@@ -1286,23 +1347,57 @@ def build_stance_matrix(events, mode="all"):
     insufficient = [
         row
         for row in rows
-        if (
-            not row[
-                "evidence_sufficient"
-            ]
-        )
+        if not row[
+            "evidence_sufficient"
+        ]
     ]
+
+    # Helpful nested representation for the dashboard.
+    countries = {}
+
+    for row in rows:
+        country = row["country"]
+        topic = row["topic"]
+        issue = row["policy_issue"]
+
+        countries.setdefault(
+            country,
+            {},
+        ).setdefault(
+            topic,
+            {},
+        )[issue] = {
+            "label": row[
+                "policy_issue_label"
+            ],
+            "stance": row[
+                "stance"
+            ],
+            "confidence": row[
+                "confidence"
+            ],
+            "confidence_level": row[
+                "confidence_level"
+            ],
+            "classified_events": row[
+                "classified_events"
+            ],
+            "evidence_sufficient": row[
+                "evidence_sufficient"
+            ],
+        }
 
     return {
         "rows": rows,
+        "countries": countries,
         "assessed": assessed,
         "insufficient": insufficient,
         "event_count": len(events),
         "events_with_stance_schema": relevant_event_count,
         "events_with_classified_stance": classified_event_count,
         "mode": mode,
-        "method": "country_topic_stance_aggregation_v1",
-        "semantic_dimension": "stance",
+        "method": "country_policy_issue_stance_aggregation_v2",
+        "semantic_dimension": "policy_issue_stance",
         "salience_inferred": False,
         "thresholds": {
             "minimum_classified_events": STANCE_MIN_CLASSIFIED_EVENTS,
@@ -1316,12 +1411,11 @@ def build_stance_matrix(events, mode="all"):
             "conditional",
             "mixed",
             "insufficient_evidence",
-            "unknown",
         ],
         "note": (
-            "Country-level stance is aggregated only from explicit event-level "
-            "country-topic stance evidence. Topic salience and relationship "
-            "tone are never used to infer stance."
+            "Country-level stance is aggregated only from explicit policy-issue "
+            "evidence. Broad topic salience and relationship tone are never "
+            "used to infer policy position."
         ),
     }
 
