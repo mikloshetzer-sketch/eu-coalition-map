@@ -22,7 +22,7 @@
     },
     {
       "id": "DE",
-      "weight": 166.99
+      "weight": 165.99
     },
     {
       "id": "DK",
@@ -42,11 +42,11 @@
     },
     {
       "id": "FR",
-      "weight": 163.8
+      "weight": 162.8
     },
     {
       "id": "GR",
-      "weight": 46.3
+      "weight": 49.6
     },
     {
       "id": "HR",
@@ -62,7 +62,7 @@
     },
     {
       "id": "IT",
-      "weight": 69.57
+      "weight": 72.87
     },
     {
       "id": "LT",
@@ -1395,13 +1395,13 @@
     {
       "source": "DE",
       "target": "FR",
-      "weight": 60.85,
-      "interaction_weight": 60.85,
-      "interaction_count": 39,
+      "weight": 59.85,
+      "interaction_weight": 59.85,
+      "interaction_count": 38,
       "topics": {
         "trade": 16.633,
-        "defence": 10.917,
         "ukraine_russia": 10.917,
+        "defence": 9.917,
         "rule_of_law": 8.95,
         "fiscal": 8.35,
         "migration": 3.833,
@@ -1416,11 +1416,11 @@
         "conflictual": 0,
         "neutral": 1,
         "mixed": 0,
-        "unclassified": 37
+        "unclassified": 36
       },
       "classified_events": 2,
-      "unclassified_events": 37,
-      "classification_coverage": 0.051,
+      "unclassified_events": 36,
+      "classification_coverage": 0.053,
       "relationship_label": "insufficient_evidence",
       "assessed_relationship": "insufficient_evidence",
       "evidence_status": "below_assessment_threshold",
@@ -3072,11 +3072,11 @@
     {
       "source": "GR",
       "target": "IT",
-      "weight": 1.97,
-      "interaction_weight": 1.97,
-      "interaction_count": 1,
+      "weight": 5.27,
+      "interaction_weight": 5.27,
+      "interaction_count": 2,
       "topics": {
-        "defence": 1.97
+        "defence": 5.27
       },
       "relationship_score": null,
       "dominant_relation": "unclassified",
@@ -3087,10 +3087,10 @@
         "conflictual": 0,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 1
+        "unclassified": 2
       },
       "classified_events": 0,
-      "unclassified_events": 1,
+      "unclassified_events": 2,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -3783,7 +3783,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 1823,
+  "event_count": 1807,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -3796,7 +3796,7 @@
     "stance_inferred": false,
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
-      "equal_legacy_topic_share_fallback": 1823
+      "equal_legacy_topic_share_fallback": 1807
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
     "note": "Topic prominence does not imply support, opposition or shared policy position."

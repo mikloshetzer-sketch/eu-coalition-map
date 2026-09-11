@@ -5,10 +5,6 @@
       "weight": 1
     },
     {
-      "id": "DK",
-      "weight": 1
-    },
-    {
       "id": "ES",
       "weight": 1
     },
@@ -25,15 +21,7 @@
       "weight": 1
     },
     {
-      "id": "PL",
-      "weight": 1
-    },
-    {
       "id": "RU",
-      "weight": 1
-    },
-    {
-      "id": "SE",
       "weight": 1
     },
     {
@@ -43,62 +31,23 @@
     {
       "id": "UA",
       "weight": 1
-    },
-    {
-      "id": "US",
-      "weight": 1
     }
   ],
   "edges": [
     {
       "source": "DE",
-      "target": "DK",
-      "weight": 0.808
-    },
-    {
-      "source": "DE",
       "target": "IT",
-      "weight": 0.889
-    },
-    {
-      "source": "DE",
-      "target": "PL",
-      "weight": 0.924
+      "weight": 0.981
     },
     {
       "source": "DE",
       "target": "RU",
-      "weight": 0.96
+      "weight": 1.0
     },
     {
       "source": "DE",
       "target": "UA",
-      "weight": 0.922
-    },
-    {
-      "source": "DE",
-      "target": "US",
-      "weight": 0.381
-    },
-    {
-      "source": "DK",
-      "target": "IT",
-      "weight": 0.707
-    },
-    {
-      "source": "DK",
-      "target": "PL",
-      "weight": 0.894
-    },
-    {
-      "source": "DK",
-      "target": "RU",
-      "weight": 0.904
-    },
-    {
-      "source": "DK",
-      "target": "UA",
-      "weight": 0.832
+      "weight": 0.981
     },
     {
       "source": "ES",
@@ -112,11 +61,6 @@
     },
     {
       "source": "ES",
-      "target": "SE",
-      "weight": 1.0
-    },
-    {
-      "source": "ES",
       "target": "TR",
       "weight": 1.0
     },
@@ -127,61 +71,31 @@
     },
     {
       "source": "FR",
-      "target": "SE",
-      "weight": 1.0
-    },
-    {
-      "source": "FR",
       "target": "TR",
-      "weight": 1.0
-    },
-    {
-      "source": "GB",
-      "target": "SE",
       "weight": 1.0
     },
     {
       "source": "GB",
       "target": "TR",
       "weight": 1.0
-    },
-    {
-      "source": "IT",
-      "target": "PL",
-      "weight": 0.949
     },
     {
       "source": "IT",
       "target": "RU",
-      "weight": 0.93
-    },
-    {
-      "source": "IT",
-      "target": "UA",
       "weight": 0.981
     },
     {
-      "source": "PL",
-      "target": "RU",
-      "weight": 0.993
-    },
-    {
-      "source": "PL",
+      "source": "IT",
       "target": "UA",
-      "weight": 0.992
+      "weight": 1.0
     },
     {
       "source": "RU",
       "target": "UA",
-      "weight": 0.98
-    },
-    {
-      "source": "SE",
-      "target": "TR",
-      "weight": 1.0
+      "weight": 0.981
     }
   ],
-  "event_count": 41,
+  "event_count": 16,
   "mode": "external",
   "method": "topic_salience_cosine_similarity_v2",
   "semantic_dimension": "salience_similarity",

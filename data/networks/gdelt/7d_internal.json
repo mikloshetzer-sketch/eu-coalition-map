@@ -14,7 +14,7 @@
     },
     {
       "id": "GR",
-      "weight": 4.23
+      "weight": 7.53
     },
     {
       "id": "IE",
@@ -22,7 +22,7 @@
     },
     {
       "id": "IT",
-      "weight": 6.31
+      "weight": 9.61
     },
     {
       "id": "PL",
@@ -183,11 +183,11 @@
     {
       "source": "GR",
       "target": "IT",
-      "weight": 1.97,
-      "interaction_weight": 1.97,
-      "interaction_count": 1,
+      "weight": 5.27,
+      "interaction_weight": 5.27,
+      "interaction_count": 2,
       "topics": {
-        "defence": 1.97
+        "defence": 5.27
       },
       "relationship_score": null,
       "dominant_relation": "unclassified",
@@ -198,10 +198,10 @@
         "conflictual": 0,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 1
+        "unclassified": 2
       },
       "classified_events": 0,
-      "unclassified_events": 1,
+      "unclassified_events": 2,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -211,7 +211,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 23,
+  "event_count": 20,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -224,7 +224,7 @@
     "stance_inferred": false,
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
-      "equal_legacy_topic_share_fallback": 23
+      "equal_legacy_topic_share_fallback": 20
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
     "note": "Topic prominence does not imply support, opposition or shared policy position."
