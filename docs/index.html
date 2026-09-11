@@ -55,7 +55,7 @@ button,select{font:inherit}
 .toolbar{
   display:flex;flex-wrap:wrap;align-items:end;gap:12px;padding:13px 15px;
   background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);
-  position:sticky;top:8px;z-index:30
+  position:relative;z-index:10
 }
 .control{display:grid;gap:5px}
 .control label{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:800}
@@ -242,6 +242,28 @@ button,select{font:inherit}
 .matrix td.cell{border:1px solid rgba(15,79,112,.08);font-weight:800}
 .matrix td.cell.zero{background:#f5f8fa!important;color:#a2b1ba!important}
 .matrix td.cell.low{color:#37677d!important}
+
+/* Interest intelligence v3 — confidence adjusted */
+.interest-layout{grid-template-columns:minmax(0,1.45fr) minmax(390px,.85fr)}
+.interest-pairs-card{overflow:hidden}
+.interest-pairs-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:16px 18px 4px}
+.interest-pairs-head h3{margin:0;font-size:18px;color:#104967}
+.interest-pairs-head p{margin:5px 0 0;color:var(--muted);font-size:10px}
+.evidence-rule{display:flex;align-items:center;gap:6px;font-size:8px;color:var(--muted);font-weight:800;white-space:nowrap}
+.evidence-rule select{padding:5px 7px;border:1px solid #cbd9e1;border-radius:7px;background:#fff;color:var(--text);font-size:9px}
+.conf-pair-list{padding:4px 18px 8px}
+.conf-pair{display:grid;grid-template-columns:28px minmax(0,1fr) 48px 68px 88px;gap:9px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.conf-pair:last-child{border-bottom:0}.conf-rank{font-size:9px;color:var(--muted)}
+.conf-main strong{display:block;font-size:10px;color:#104967}.conf-main small{display:block;margin-top:3px;font-size:8px;color:var(--muted)}
+.conf-main .bar{height:5px;margin-top:6px}.conf-score{font-size:14px;font-weight:900;color:#0f4666;text-align:right}
+.conf-badge{display:inline-flex;justify-content:center;padding:4px 6px;border-radius:8px;border:1px solid;font-size:7px;font-weight:900}
+.conf-high{color:#087357;background:#eefaf5;border-color:#a9dfcd}.conf-medium{color:#8a5d0b;background:#fff7e6;border-color:#edce91}.conf-low{color:#a24b25;background:#fff3ed;border-color:#efc1ad}
+.conf-events{font-size:8px;color:var(--muted);text-align:right;white-space:nowrap}
+.interest-confidence-note{margin:8px 18px 16px;padding:10px 12px;border:1px solid #efd49b;background:#fff9eb;border-radius:10px;color:#805d16;font-size:8px;line-height:1.5}
+.matrix-legend{display:flex;justify-content:flex-end;align-items:center;gap:6px;padding:0 17px 12px;color:var(--muted);font-size:8px}
+.matrix-gradient{width:92px;height:8px;border-radius:5px;background:linear-gradient(90deg,#edf7fb,#1b8fc7)}
+@media(max-width:1050px){.interest-layout{grid-template-columns:1fr}.conf-pair{grid-template-columns:25px minmax(0,1fr) 45px 65px 82px}}
+
 @media(max-width:1200px){.country-intel-grid,.interest-summary{grid-template-columns:1fr 1fr}}
 @media(max-width:760px){.country-intel-grid,.interest-summary{grid-template-columns:1fr}.stance-grid{grid-template-columns:1fr}}
 
@@ -436,21 +458,29 @@ button,select{font:inherit}
   </section>
 
   <section class="view" id="view-interests">
-    <div class="card" style="margin-bottom:14px">
+    <div class="card interests-shell" style="margin-bottom:14px">
       <div class="section-head"><div><h3>EU interest landscape</h3><p>Country-level topic salience in the selected source and time window</p></div><span class="badge good">SALIENCE · NOT STANCE</span></div>
       <div id="interestSummary" class="interest-summary"></div>
-      <div class="salience-note"><strong>Interpretation:</strong> the matrix compares the relative prominence of policy topics around each EU member state. It is designed to identify potential shared agendas and structural differences. It does not yet classify whether countries agree on those topics.</div>
+      <div class="salience-note"><strong>Interpretation:</strong> the matrix compares the relative prominence of policy topics around each EU member state. It identifies potential shared agendas and structural differences, but does not classify whether countries agree on those topics.</div>
     </div>
-    <div class="grid two-equal" style="margin-bottom:14px">
-      <div class="card"><div class="section-head"><div><h3>Country × policy matrix</h3><p>Each row is normalized to the country's own observed topic profile</p></div></div><div class="matrix-wrap"><table id="interestMatrix" class="matrix"></table></div></div>
-      <div class="card"><div class="section-head"><div><h3>Closest interest profiles</h3><p>EU country pairs with similar salience distributions</p></div></div><div id="interestPairs" class="list"></div><div class="warning">High similarity = similar topic mix, not necessarily common policy position or coalition membership.</div></div>
+    <div class="grid interest-layout" style="margin-bottom:14px">
+      <div class="card">
+        <div class="section-head"><div><h3>Country × policy matrix</h3><p>Each row is normalized to the country's own observed topic profile (%)</p></div></div>
+        <div class="matrix-wrap"><table id="interestMatrix" class="matrix"></table></div>
+        <div class="matrix-legend"><span>Lower share</span><span class="matrix-gradient"></span><span>Higher share</span></div>
+      </div>
+      <div class="card interest-pairs-card">
+        <div class="interest-pairs-head"><div><h3>Closest interest profiles (confidence adjusted)</h3><p>EU country pairs with similar topic distributions, adjusted for evidence strength</p></div>
+          <label class="evidence-rule">Min. events / country <select id="interestMinEvents"><option value="1">1</option><option value="3">3</option><option value="5" selected>5</option><option value="10">10</option></select></label>
+        </div>
+        <div id="interestPairs" class="conf-pair-list"></div>
+        <div class="interest-confidence-note"><strong>Evidence adjustment:</strong> raw cosine similarity is down-weighted when either country has few observed events. This prevents sparse one-topic profiles from automatically dominating the ranking.</div>
+      </div>
     </div>
     <div class="card stance-card">
       <div class="section-head"><div><h3>Policy stance layer</h3><p>Next analytical layer: support, opposition, conditional or mixed position by country and topic</p></div><span class="badge warn">NOT YET AVAILABLE</span></div>
-      <div class="stance-grid">
-        <div class="stance-status"><strong>Stance pending</strong><span>salience is already operational</span></div>
-        <div class="stance-copy">A következő fejlesztési réteg választja majd szét a <strong>téma fontosságát</strong> és az <strong>ország álláspontját</strong>. Csak ezután érdemes a hasonló érdektémákat tényleges policy alignmentként értelmezni, majd a szavazási adatokkal együtt tartós koalíciókat keresni.</div>
-      </div>
+      <div class="stance-grid"><div class="stance-status"><strong>Stance pending</strong><span>salience is already operational</span></div>
+        <div class="stance-copy">A következő fejlesztési réteg választja majd szét a <strong>téma fontosságát</strong> és az <strong>ország álláspontját</strong>. Csak ezután érdemes a hasonló érdektémákat tényleges policy alignmentként értelmezni, majd a szavazási adatokkal együtt tartós koalíciókat keresni.</div></div>
     </div>
   </section>
 
@@ -817,47 +847,48 @@ function renderCountryTopics(ct){
   const arr=Object.entries(ct||{}).sort((a,b)=>b[1]-a[1]),max=Math.max(...arr.map(x=>+x[1]||0),1),sum=arr.reduce((a,x)=>a+(+x[1]||0),0)||1;
   $('countryTopics').innerHTML=arr.length?arr.map(([t,v])=>`<div class="topic-line"><label>${esc(topicName(t))}<span class="topic-meta">salience ${fmt(v,2)}</span></label><div class="track"><div class="fill" style="width:${(+v||0)/max*100}%"></div></div><b>${Math.round((+v||0)/sum*100)}%</b></div>`).join(''):`<div class="empty">No topic profile available.</div>`
 }
+function evidenceConfidence(events){
+  const n=Math.max(0,+events||0);
+  return n/(n+5)
+}
+function confidenceLabel(aEvents,bEvents){
+  const m=Math.min(+aEvents||0,+bEvents||0);
+  if(m>=15)return 'HIGH';
+  if(m>=5)return 'MEDIUM';
+  return 'LOW'
+}
 function interestSimilaritiesEffective(g){
   const ids=(g.nodes||[]).map(n=>n.id).filter(id=>EU27.has(id));
-  const prof=Object.fromEntries(ids.map(id=>[id,profileFor(g,id)]));
-  const pairs=[];
+  const prof=Object.fromEntries(ids.map(id=>[id,profileFor(g,id)])),pairs=[];
   for(let i=0;i<ids.length;i++)for(let j=i+1;j<ids.length;j++){
-    const score=cosine(prof[ids[i]],prof[ids[j]]);
-    if(score>0)pairs.push({a:ids[i],b:ids[j],score})
+    const a=ids[i],b=ids[j],raw=cosine(prof[a],prof[b]);if(raw<=0)continue;
+    const aEvents=countryEventCount(a),bEvents=countryEventCount(b);
+    const evidence=Math.sqrt(evidenceConfidence(aEvents)*evidenceConfidence(bEvents));
+    pairs.push({a,b,raw,adjusted:raw*evidence,aEvents,bEvents,confidence:confidenceLabel(aEvents,bEvents)})
   }
-  return pairs.sort((a,b)=>b.score-a.score)
+  return pairs.sort((x,y)=>y.adjusted-x.adjusted||y.raw-x.raw)
 }
 function renderInterests(g){
   const ids=(g.nodes||[]).map(n=>n.id).filter(id=>EU27.has(id)).sort((a,b)=>nameOf(a).localeCompare(nameOf(b))),topics=Object.keys(TOPIC_LABELS),vals={};
   ids.forEach(id=>vals[id]=profileFor(g,id));
-  const aggregate={};
-  ids.forEach(id=>topics.forEach(t=>aggregate[t]=(aggregate[t]||0)+(vals[id][t]||0)));
-  const dom=Object.entries(aggregate).sort((a,b)=>b[1]-a[1])[0];
-  const sims=interestSimilaritiesEffective(g);
+  const aggregate={};ids.forEach(id=>topics.forEach(t=>aggregate[t]=(aggregate[t]||0)+(vals[id][t]||0)));
+  const dom=Object.entries(aggregate).sort((a,b)=>b[1]-a[1])[0],sims=interestSimilaritiesEffective(g);
   const profiled=ids.filter(id=>Object.values(vals[id]).some(v=>v>0)).length;
-  const concentrated=ids.filter(id=>Math.max(...Object.values(vals[id]),0)>=.5).length;
+  const concentrated=ids.filter(id=>Math.max(...Object.values(vals[id]),0)>=.5).length,top=sims[0];
   $('interestSummary').innerHTML=[
     `<div><small>EU profiles</small><strong>${fmt(profiled)}</strong><span>member states with topic evidence</span></div>`,
     `<div><small>Dominant EU-wide topic</small><strong>${dom?esc(topicName(dom[0])):'—'}</strong><span>aggregate normalized salience</span></div>`,
     `<div><small>Highly concentrated</small><strong>${fmt(concentrated)}</strong><span>countries with ≥50% in one topic</span></div>`,
-    `<div><small>Closest pair</small><strong>${sims[0]?`${esc(sims[0].a)} ↔ ${esc(sims[0].b)}`:'—'}</strong><span>${sims[0]?Math.round(sims[0].score*100)+'% topic similarity':'insufficient data'}</span></div>`
+    `<div><small>Closest pair · adjusted</small><strong>${top?`${esc(top.a)} ↔ ${esc(top.b)}`:'—'}</strong><span>${top?Math.round(top.adjusted*100)+'% adjusted · '+top.confidence+' confidence':'insufficient data'}</span></div>`
   ].join('');
   let html='<thead><tr><th>Country</th>'+topics.map(t=>`<th>${esc(topicName(t))}</th>`).join('')+'</tr></thead><tbody>';
-  for(const id of ids){
-    html+=`<tr><td>${esc(nameOf(id))}</td>`+topics.map(t=>{
-      const v=vals[id][t]||0,a=.06+v*.88,cls=v===0?'zero':v<.18?'low':'';
-      const bg=v===0?'#f5f8fa':`rgba(32,152,207,${a.toFixed(2)})`;
-      const color=v>=.18?'#fff':'#37677d';
-      return `<td class="cell ${cls}" title="${esc(nameOf(id))} · ${esc(topicName(t))}: ${Math.round(v*100)}%" style="background:${bg};color:${color}">${Math.round(v*100)}</td>`
-    }).join('')+'</tr>'
-  }
-  html+='</tbody>';
-  $('interestMatrix').innerHTML=ids.length?html:'<tbody><tr><td class="empty">No EU country topic profiles.</td></tr></tbody>';
-  $('interestPairs').innerHTML=sims.length?sims.slice(0,12).map((x,i)=>{
-    const pa=profileFor(g,x.a),pb=profileFor(g,x.b);
-    const common=topics.map(t=>({t,v:(pa[t]||0)+(pb[t]||0)})).sort((a,b)=>b.v-a.v)[0]?.t;
-    return `<div class="row"><div class="rank">#${i+1}</div><div><strong>${esc(nameOf(x.a))} ↔ ${esc(nameOf(x.b))}</strong><small>closest shared profile${common?' · '+esc(topicName(common)):''}</small><div class="bar"><i style="width:${x.score*100}%"></i></div><span class="sim-tag">salience similarity · not stance</span></div><div class="score">${Math.round(x.score*100)}%</div></div>`
-  }).join(''):`<div class="empty">Not enough topic-profile data.</div>`
+  for(const id of ids){html+=`<tr><td>${esc(nameOf(id))}</td>`+topics.map(t=>{const v=vals[id][t]||0,a=.06+v*.88,cls=v===0?'zero':v<.18?'low':'',bg=v===0?'#f5f8fa':`rgba(32,152,207,${a.toFixed(2)})`,color=v>=.18?'#fff':'#37677d';return `<td class="cell ${cls}" title="${esc(nameOf(id))} · ${esc(topicName(t))}: ${Math.round(v*100)}%" style="background:${bg};color:${color}">${Math.round(v*100)}</td>`}).join('')+'</tr>'}
+  html+='</tbody>';$('interestMatrix').innerHTML=ids.length?html:'<tbody><tr><td class="empty">No EU country topic profiles.</td></tr></tbody>';
+  renderInterestPairs(g,sims)
+}
+function renderInterestPairs(g,sims){
+  const minEvents=Math.max(1,+($('interestMinEvents')?.value||5)),topics=Object.keys(TOPIC_LABELS),eligible=sims.filter(x=>x.aEvents>=minEvents&&x.bEvents>=minEvents);
+  $('interestPairs').innerHTML=eligible.length?eligible.slice(0,10).map((x,i)=>{const pa=profileFor(g,x.a),pb=profileFor(g,x.b),common=topics.map(t=>({t,v:(pa[t]||0)+(pb[t]||0)})).sort((a,b)=>b.v-a.v)[0]?.t,cls=x.confidence==='HIGH'?'conf-high':x.confidence==='MEDIUM'?'conf-medium':'conf-low';return `<div class="conf-pair"><div class="conf-rank">#${i+1}</div><div class="conf-main"><strong>${esc(nameOf(x.a))} ↔ ${esc(nameOf(x.b))}</strong><small>${common?'closest shared profile · '+esc(topicName(common)):''} · raw ${Math.round(x.raw*100)}%</small><div class="bar"><i style="width:${Math.max(2,x.adjusted*100)}%"></i></div></div><div class="conf-score">${Math.round(x.adjusted*100)}%</div><div class="conf-badge ${cls}">${x.confidence}</div><div class="conf-events">${fmt(x.aEvents)} / ${fmt(x.bEvents)} events</div></div>`}).join(''):`<div class="empty">No country pair meets the current minimum evidence threshold.</div>`
 }
 function renderVoting(){
   const g=state.votes;
@@ -942,4 +973,6 @@ loadAll();
 </script>
 </body>
 </html>
+
+
 
