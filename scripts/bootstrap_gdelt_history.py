@@ -1,404 +1,405 @@
 # scripts/bootstrap_gdelt_history.py
 
-import sys
-import io
-import csv
+"""
+Reprocess stored GDELT history with the CURRENT event builder.
+
+Purpose
+-------
+Historical GDELT JSONL records may still contain only the legacy `topics`
+field. This migration rebuilds records stored under:
+
+    data/events/gdelt/*.jsonl
+
+through the current pipeline.event_builder.build_event(), so historical GDELT
+events receive topic_scores, topic_salience, topic_details and the current
+topic detector metadata.
+
+Important
+---------
+This script DOES NOT download new GDELT data. It only migrates already stored
+history. The normal GDELT collector remains responsible for new events.
+
+Safety
+------
+- Existing JSONL files are rewritten atomically through a temporary file.
+- Original event order is preserved.
+- Invalid JSON lines are kept unchanged.
+- Unknown/source-specific legacy fields are preserved.
+- Existing timestamps, URL and metadata are retained where available.
+"""
+
+from __future__ import annotations
+
 import json
-import zipfile
-import urllib3
+import sys
+from collections import Counter
 from pathlib import Path
-from datetime import datetime, timedelta, timezone
-from typing import Dict, List, Any, Set, Optional
-from collections import defaultdict
-
-import requests
-
-urllib3.disable_warnings()
+from typing import Any, Dict, List
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
-sys.path.append(str(ROOT_DIR))
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
 
-from config.countries import COUNTRIES, EU_COUNTRY_CODES
+from pipeline.event_builder import build_event
 
 
 GDELT_EVENTS_DIR = ROOT_DIR / "data" / "events" / "gdelt"
-GDELT_EVENTS_DIR.mkdir(parents=True, exist_ok=True)
-
-MASTERFILELIST_URL = "https://data.gdeltproject.org/gdeltv2/masterfilelist.txt"
-
-REQUEST_TIMEOUT = 90
-DAYS_BACK = 14
-FILES_PER_DAY = 2
-MAX_EVENTS_PER_DAY = 2000
-
-EU_SET = set(EU_COUNTRY_CODES)
-
-COUNTRY_CODE_MAP = {
-    "AUT": "AT", "AU": "AT",
-    "BEL": "BE", "BE": "BE",
-    "BGR": "BG", "BU": "BG",
-    "HRV": "HR", "HR": "HR",
-    "CYP": "CY", "CY": "CY",
-    "CZE": "CZ", "CZR": "CZ", "EZ": "CZ",
-    "DNK": "DK", "DNM": "DK", "DA": "DK",
-    "EST": "EE", "EN": "EE",
-    "FIN": "FI", "FI": "FI",
-    "FRA": "FR", "FR": "FR",
-    "DEU": "DE", "GER": "DE", "GM": "DE",
-    "GRC": "GR", "GRE": "GR", "GR": "GR",
-    "HUN": "HU", "HU": "HU",
-    "IRL": "IE", "IRE": "IE", "EI": "IE",
-    "ITA": "IT", "IT": "IT",
-    "LVA": "LV", "LAT": "LV", "LG": "LV",
-    "LTU": "LT", "LIT": "LT", "LH": "LT",
-    "LUX": "LU", "LU": "LU",
-    "MLT": "MT", "MT": "MT",
-    "NLD": "NL", "NET": "NL", "NL": "NL",
-    "POL": "PL", "PL": "PL",
-    "PRT": "PT", "POR": "PT", "PO": "PT",
-    "ROU": "RO", "ROM": "RO", "RO": "RO",
-    "SVK": "SK", "SLO": "SK", "LO": "SK",
-    "SVN": "SI", "SLV": "SI", "SI": "SI",
-    "ESP": "ES", "SPN": "ES", "SP": "ES",
-    "SWE": "SE", "SWD": "SE", "SW": "SE",
-    "USA": "US", "US": "US",
-    "GBR": "GB", "UK": "GB", "GB": "GB",
-    "RUS": "RU", "RS": "RU",
-    "UKR": "UA", "UP": "UA",
-    "CHN": "CN", "CH": "CN",
-    "TUR": "TR", "TU": "TR",
-}
-
-DEBUG_STATS = defaultdict(int)
+EXPECTED_TOPIC_METHOD = "rule_based_topic_salience_v2"
 
 
-def utc_now_iso() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+def _string(value: Any) -> str:
+    return "" if value is None else str(value)
 
 
-def get_daily_output_path(date_str: str) -> Path:
-    return GDELT_EVENTS_DIR / f"{date_str}.jsonl"
-
-
-def fetch_masterfile_lines() -> List[str]:
-    response = requests.get(MASTERFILELIST_URL, timeout=REQUEST_TIMEOUT, verify=False)
-    response.raise_for_status()
-    return [line.strip() for line in response.text.splitlines() if line.strip()]
-
-
-def extract_export_urls(lines: List[str]) -> List[str]:
-    urls: List[str] = []
-
-    for line in lines:
-        parts = line.split()
-        if len(parts) < 3:
-            continue
-
-        url = parts[-1]
-        if url.endswith(".export.CSV.zip"):
-            urls.append(url)
-
-    return urls
-
-
-def parse_export_datetime_from_url(url: str) -> Optional[datetime]:
-    name = url.split("/")[-1]
-    # példa: 20260316151500.export.CSV.zip
-    timestamp = name.split(".")[0]
-
-    if len(timestamp) != 14 or not timestamp.isdigit():
-        return None
-
-    try:
-        return datetime.strptime(timestamp, "%Y%m%d%H%M%S").replace(tzinfo=timezone.utc)
-    except Exception:
-        return None
-
-
-def select_urls_for_history(urls: List[str], days_back: int, files_per_day: int) -> Dict[str, List[str]]:
-    today = datetime.now(timezone.utc).date()
-    wanted_dates = {
-        (today - timedelta(days=offset)).strftime("%Y-%m-%d")
-        for offset in range(days_back)
-    }
-
-    grouped: Dict[str, List[str]] = defaultdict(list)
-
-    for url in urls:
-        dt = parse_export_datetime_from_url(url)
-        if not dt:
-            continue
-
-        day_str = dt.strftime("%Y-%m-%d")
-        if day_str not in wanted_dates:
-            continue
-
-        grouped[day_str].append(url)
-
-    selected: Dict[str, List[str]] = {}
-
-    for day_str, day_urls in grouped.items():
-        # legfrissebb exportok az adott napon
-        day_urls_sorted = sorted(
-            day_urls,
-            key=lambda u: parse_export_datetime_from_url(u) or datetime.min.replace(tzinfo=timezone.utc),
-            reverse=True,
-        )
-        selected[day_str] = day_urls_sorted[:files_per_day]
-
-    return dict(sorted(selected.items()))
-
-
-def download_zip_bytes(url: str) -> bytes:
-    response = requests.get(url, timeout=REQUEST_TIMEOUT, verify=False)
-    response.raise_for_status()
-    return response.content
-
-
-def parse_export_zip(content: bytes) -> List[Dict[str, Any]]:
-    rows: List[Dict[str, Any]] = []
-
-    with zipfile.ZipFile(io.BytesIO(content)) as zf:
-        names = zf.namelist()
-        if not names:
-            return rows
-
-        with zf.open(names[0]) as f:
-            text = io.TextIOWrapper(f, encoding="utf-8", errors="replace")
-            reader = csv.reader(text, delimiter="\t")
-
-            for row in reader:
-                rows.append(
-                    {
-                        "GlobalEventID": row[0],
-                        "Actor1Name": row[6],
-                        "Actor1CountryCode": row[7],
-                        "Actor2Name": row[16],
-                        "Actor2CountryCode": row[17],
-                        "EventCode": row[26],
-                        "EventBaseCode": row[27],
-                        "EventRootCode": row[28],
-                        "GoldsteinScale": row[30],
-                        "NumMentions": row[31],
-                        "NumSources": row[32],
-                        "NumArticles": row[33],
-                        "AvgTone": row[34],
-                        "Actor1Geo_CountryCode": row[40],
-                        "Actor2Geo_CountryCode": row[47],
-                        "ActionGeo_CountryCode": row[54],
-                        "SOURCEURL": row[58] if len(row) > 58 else "",
-                    }
-                )
-
-    return rows
-
-
-def map_country(code: str) -> Optional[str]:
-    code = (code or "").strip().upper()
-    if not code:
-        return None
-
-    if code in COUNTRY_CODE_MAP:
-        return COUNTRY_CODE_MAP[code]
-
-    if code in COUNTRIES:
-        return code
-
+def _first(event: Dict[str, Any], *keys: str) -> Any:
+    for key in keys:
+        value = event.get(key)
+        if value not in (None, ""):
+            return value
     return None
 
 
-def infer_topics(event_root_code: str, event_code: str) -> List[str]:
-    topics: List[str] = []
+def rebuild_event(old_event: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Rebuild one stored GDELT event with the current event schema.
 
-    if event_root_code in {"19", "20"}:
-        topics.extend(["defence", "ukraine_russia"])
+    Common legacy GDELT aliases are accepted defensively. Any source-specific
+    top-level fields not generated by build_event() are copied back afterwards.
+    """
+    old_metadata = old_event.get("metadata")
+    if not isinstance(old_metadata, dict):
+        old_metadata = {}
 
-    if event_root_code in {"13", "14", "17"}:
-        topics.append("rule_of_law")
-
-    if event_root_code in {"05", "06", "07", "08"}:
-        topics.append("trade")
-
-    if event_code.startswith(("112", "113", "120", "121", "122", "123")):
-        topics.extend(["trade", "fiscal"])
-
-    return sorted(set(topics))
-
-
-def normalize_countries_from_row(row: Dict[str, Any]) -> List[str]:
-    c1 = map_country(row.get("Actor1CountryCode", ""))
-    c2 = map_country(row.get("Actor2CountryCode", ""))
-    cg = map_country(row.get("ActionGeo_CountryCode", ""))
-
-    if c1:
-        DEBUG_STATS["rows_actor1_mapped"] += 1
-    if c2:
-        DEBUG_STATS["rows_actor2_mapped"] += 1
-    if cg:
-        DEBUG_STATS["rows_actiongeo_mapped"] += 1
-
-    countries = []
-    for code in [c1, c2, cg]:
-        if code and code not in countries:
-            countries.append(code)
-
-    if countries:
-        DEBUG_STATS["rows_with_any_country"] += 1
-
-    return sorted(countries)
-
-
-def is_relevant_countries(countries: List[str]) -> bool:
-    if len(countries) < 2:
-        return False
-
-    DEBUG_STATS["rows_with_pair"] += 1
-
-    if any(c in EU_SET for c in countries):
-        DEBUG_STATS["rows_relevant_pair"] += 1
-        return True
-
-    return False
-
-
-def build_event_from_row(row: Dict[str, Any], collected_at: str) -> Optional[Dict[str, Any]]:
-    countries = normalize_countries_from_row(row)
-
-    if not is_relevant_countries(countries):
-        return None
-
-    event_root = (row.get("EventRootCode") or "").strip()
-    event_code = (row.get("EventCode") or "").strip()
-
-    topics = infer_topics(event_root, event_code)
-    if not topics:
-        topics = ["defence"]
-
-    country_pairs: List[List[str]] = []
-    for i in range(len(countries)):
-        for j in range(i + 1, len(countries)):
-            country_pairs.append([countries[i], countries[j]])
-
-    eu_countries = [c for c in countries if c in EU_SET]
-    external_countries = [c for c in countries if c not in EU_SET]
-
-    title = (
-        f"GDELT event "
-        f"{row.get('Actor1Name','') or countries[0]} - "
-        f"{row.get('Actor2Name','') or countries[1]} "
-        f"code {event_code}"
+    metadata = dict(old_metadata)
+    metadata["history_reprocessed"] = True
+    metadata["history_reprocess_source_schema"] = old_event.get(
+        "schema_version",
+        "legacy_or_unknown",
     )
 
-    DEBUG_STATS["events_built"] += 1
+    # Keep useful GDELT identifiers inside metadata as well, while original
+    # top-level fields are preserved below.
+    for source_key in (
+        "GlobalEventID",
+        "global_event_id",
+        "globaleventid",
+        "gdelt_event_id",
+        "event_id",
+    ):
+        if old_event.get(source_key) not in (None, ""):
+            metadata.setdefault(
+                "gdelt_event_id",
+                old_event.get(source_key),
+            )
+            break
 
-    return {
-        "layer": "gdelt",
-        "source_name": "GDELT",
-        "source_type": "gdelt",
-        "title": title,
-        "summary": "",
-        "body": "",
-        "url": row.get("SOURCEURL", "") or "",
-        "published_at": None,
-        "collected_at": collected_at,
-        "topics": topics,
-        "primary_topic": topics[0],
-        "countries": countries,
-        "country_groups": {
-            "eu": eu_countries,
-            "external": external_countries,
-        },
-        "country_pairs": country_pairs,
-        "metadata": {
-            "GlobalEventID": row.get("GlobalEventID", ""),
-            "EventCode": event_code,
-            "EventBaseCode": row.get("EventBaseCode", ""),
-            "EventRootCode": event_root,
-            "GoldsteinScale": row.get("GoldsteinScale", ""),
-            "NumMentions": row.get("NumMentions", ""),
-            "NumSources": row.get("NumSources", ""),
-            "NumArticles": row.get("NumArticles", ""),
-            "AvgTone": row.get("AvgTone", ""),
-            "Actor1Name": row.get("Actor1Name", ""),
-            "Actor2Name": row.get("Actor2Name", ""),
-            "Actor1CountryCode_raw": row.get("Actor1CountryCode", ""),
-            "Actor2CountryCode_raw": row.get("Actor2CountryCode", ""),
-            "ActionGeo_CountryCode_raw": row.get("ActionGeo_CountryCode", ""),
-            "gdelt_mode": "event_export_backfill",
-        },
-    }
+    source_name = _first(
+        old_event,
+        "source_name",
+        "source",
+        "publisher",
+        "domain",
+        "source_domain",
+    )
+
+    title = _first(
+        old_event,
+        "title",
+        "headline",
+        "name",
+    )
+
+    summary = _first(
+        old_event,
+        "summary",
+        "description",
+        "snippet",
+        "seendescription",
+    )
+
+    body = _first(
+        old_event,
+        "body",
+        "content",
+        "text",
+        "article_text",
+    )
+
+    url = _first(
+        old_event,
+        "url",
+        "link",
+        "article_url",
+        "source_url",
+        "DocumentIdentifier",
+        "document_identifier",
+    )
+
+    published_at = _first(
+        old_event,
+        "published_at",
+        "published",
+        "publication_date",
+        "date",
+        "datetime",
+        "timestamp",
+        "SQLDATE",
+        "sqldate",
+    )
+
+    collected_at = _first(
+        old_event,
+        "collected_at",
+        "ingested_at",
+        "fetched_at",
+        "created_at",
+    )
+
+    rebuilt = build_event(
+        layer="gdelt",
+        source_name=_string(source_name or "GDELT"),
+        title=_string(title),
+        summary=_string(summary),
+        body=_string(body),
+        url=_string(url),
+        published_at=published_at,
+        collected_at=collected_at,
+        source_type=_string(
+            old_event.get("source_type")
+            or "gdelt"
+        ),
+        metadata=metadata,
+    )
+
+    # Preserve all GDELT/source-specific fields that are not part of the
+    # current generic event schema. Freshly rebuilt fields always win.
+    for key, value in old_event.items():
+        if key not in rebuilt:
+            rebuilt[key] = value
+
+    return rebuilt
 
 
-def deduplicate_events(events: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    seen: Set[str] = set()
-    deduped: List[Dict[str, Any]] = []
+def migrate_file(path: Path) -> Dict[str, int]:
+    output_lines: List[str] = []
+    stats = Counter()
 
-    for event in events:
-        gid = event.get("metadata", {}).get("GlobalEventID", "")
-        key = gid or f"{event.get('title','')}|{event.get('url','')}"
-        if key in seen:
-            continue
-        seen.add(key)
-        deduped.append(event)
+    with path.open("r", encoding="utf-8") as handle:
+        for line_number, raw_line in enumerate(handle, start=1):
+            stripped = raw_line.strip()
 
-    return deduped
+            if not stripped:
+                continue
+
+            stats["lines_seen"] += 1
+
+            try:
+                old_event = json.loads(stripped)
+            except json.JSONDecodeError:
+                output_lines.append(stripped)
+                stats["invalid_json_preserved"] += 1
+                continue
+
+            if not isinstance(old_event, dict):
+                output_lines.append(
+                    json.dumps(
+                        old_event,
+                        ensure_ascii=False,
+                    )
+                )
+                stats["non_object_preserved"] += 1
+                continue
+
+            try:
+                rebuilt = rebuild_event(old_event)
+            except Exception as exc:
+                print(
+                    f"WARNING: {path.name}:{line_number} rebuild failed: "
+                    f"{type(exc).__name__}: {exc}"
+                )
+                output_lines.append(
+                    json.dumps(
+                        old_event,
+                        ensure_ascii=False,
+                    )
+                )
+                stats["rebuild_failed_preserved"] += 1
+                continue
+
+            output_lines.append(
+                json.dumps(
+                    rebuilt,
+                    ensure_ascii=False,
+                )
+            )
+            stats["rebuilt"] += 1
+
+            if rebuilt.get("topic_salience"):
+                stats["with_topic_salience"] += 1
+            else:
+                stats["without_topic_salience"] += 1
+
+            method = str(
+                rebuilt.get("topic_method")
+                or "missing"
+            )
+            stats[f"method::{method}"] += 1
+
+    temp_path = path.with_suffix(
+        path.suffix + ".tmp"
+    )
+
+    with temp_path.open(
+        "w",
+        encoding="utf-8",
+        newline="\n",
+    ) as handle:
+        for line in output_lines:
+            handle.write(line + "\n")
+
+    # Atomic replacement on the same filesystem.
+    temp_path.replace(path)
+
+    return dict(stats)
 
 
-def overwrite_daily_events(date_str: str, events: List[Dict[str, Any]]) -> None:
-    output_file = get_daily_output_path(date_str)
+def find_history_files() -> List[Path]:
+    if not GDELT_EVENTS_DIR.exists():
+        return []
 
-    with open(output_file, "w", encoding="utf-8") as f:
-        for event in events[:MAX_EVENTS_PER_DAY]:
-            f.write(json.dumps(event, ensure_ascii=False) + "\n")
-
-    print(f"  saved {min(len(events), MAX_EVENTS_PER_DAY)} events -> {output_file}")
+    return sorted(
+        path
+        for path in GDELT_EVENTS_DIR.glob("*.jsonl")
+        if path.is_file()
+    )
 
 
 def main() -> None:
-    print("Starting GDELT history bootstrap")
+    print("Starting GDELT historical event reprocessing...")
+    print(f"GDELT history directory: {GDELT_EVENTS_DIR}")
 
-    lines = fetch_masterfile_lines()
-    urls = extract_export_urls(lines)
+    files = find_history_files()
 
-    selected = select_urls_for_history(urls, DAYS_BACK, FILES_PER_DAY)
-    print(f"Selected days: {len(selected)}")
+    if not files:
+        print("No GDELT history JSONL files found. Nothing to reprocess.")
+        return
 
-    for day_str, day_urls in selected.items():
-        print(f"\nDay: {day_str} | exports: {len(day_urls)}")
+    print(f"History files found: {len(files)}")
 
-        raw_rows: List[Dict[str, Any]] = []
+    total = Counter()
 
-        for url in day_urls:
-            print(f"  downloading: {url}")
-            try:
-                content = download_zip_bytes(url)
-                rows = parse_export_zip(content)
-                print(f"    rows parsed: {len(rows)}")
-                raw_rows.extend(rows)
-            except Exception as exc:
-                print(f"    failed: {exc}")
+    for index, path in enumerate(files, start=1):
+        print(
+            f"[{index}/{len(files)}] "
+            f"Reprocessing {path.name}..."
+        )
 
-        day_events: List[Dict[str, Any]] = []
+        result = migrate_file(path)
+        total.update(result)
 
-        for row in raw_rows:
-            event = build_event_from_row(
-                row=row,
-                collected_at=f"{day_str}T12:00:00+00:00",
+        print(
+            "  rebuilt={rebuilt} | salience={salience} | "
+            "without_salience={without} | invalid_preserved={invalid}".format(
+                rebuilt=result.get("rebuilt", 0),
+                salience=result.get(
+                    "with_topic_salience",
+                    0,
+                ),
+                without=result.get(
+                    "without_topic_salience",
+                    0,
+                ),
+                invalid=result.get(
+                    "invalid_json_preserved",
+                    0,
+                ),
             )
-            if event:
-                day_events.append(event)
+        )
 
-        day_events = deduplicate_events(day_events)
-        print(f"  relevant events after dedupe: {len(day_events)}")
+    print("\nGDELT history migration summary")
+    print("-------------------------------")
+    print(f"Files processed: {len(files)}")
+    print(
+        f"JSON records seen: "
+        f"{total.get('lines_seen', 0)}"
+    )
+    print(
+        f"Events rebuilt: "
+        f"{total.get('rebuilt', 0)}"
+    )
+    print(
+        "Events with topic_salience: "
+        f"{total.get('with_topic_salience', 0)}"
+    )
+    print(
+        "Events without topic_salience: "
+        f"{total.get('without_topic_salience', 0)}"
+    )
+    print(
+        "Invalid JSON lines preserved: "
+        f"{total.get('invalid_json_preserved', 0)}"
+    )
+    print(
+        "Rebuild failures preserved: "
+        f"{total.get('rebuild_failed_preserved', 0)}"
+    )
 
-        overwrite_daily_events(day_str, day_events)
+    method_counts = {
+        key.split("method::", 1)[1]: value
+        for key, value in total.items()
+        if key.startswith("method::")
+    }
 
-    print("\nDEBUG STATS")
-    for key, value in DEBUG_STATS.items():
-        print(f"  {key}: {value}")
+    print("\nTopic methods after migration:")
 
-    print("GDELT history bootstrap finished")
+    if method_counts:
+        for method, count in sorted(
+            method_counts.items(),
+            key=lambda item: (
+                -item[1],
+                item[0],
+            ),
+        ):
+            print(
+                f"  {method}: {count}"
+            )
+    else:
+        print("  none")
+
+    expected_count = method_counts.get(
+        EXPECTED_TOPIC_METHOD,
+        0,
+    )
+
+    print("\nValidation")
+    print("----------")
+
+    if expected_count:
+        print(
+            f"OK: {expected_count} events use "
+            f"{EXPECTED_TOPIC_METHOD}."
+        )
+    else:
+        print(
+            "WARNING: no event reports the expected topic method "
+            f"{EXPECTED_TOPIC_METHOD}."
+        )
+
+    if total.get("without_topic_salience", 0):
+        print(
+            "NOTE: events without topic_salience may contain no configured "
+            "topic keyword or may have too little source text."
+        )
+
+    print(
+        "\nGDELT historical reprocessing finished successfully."
+    )
+    print(
+        "Next: run scripts/build_window_networks.py and inspect "
+        "topic_metadata.event_topic_method_counts in combined/30d outputs."
+    )
 
 
 if __name__ == "__main__":
     main()
+
