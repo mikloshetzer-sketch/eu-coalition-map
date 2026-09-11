@@ -3,6 +3,8 @@
     {
       "country": "DE",
       "topic": "ukraine_russia",
+      "policy_issue": "ukraine_russia",
+      "policy_issue_label": "ukraine_russia",
       "stance": "insufficient_evidence",
       "confidence": 0.0,
       "confidence_level": "none",
@@ -28,6 +30,7 @@
           "published_at": null,
           "source_name": "DW Europe",
           "url": "https://www.dw.com/en/german-army-helps-poland-construct-a-defensive-barrier-against-russia/a-78464726?maca=en-rss-en-eu-2092-rdf",
+          "policy_issue": "ukraine_russia",
           "stance": "oppose",
           "confidence": 0.418
         },
@@ -35,6 +38,7 @@
           "published_at": null,
           "source_name": "DW Europe",
           "url": "https://www.dw.com/en/german-army-helps-poland-protect-itself-against-russia/a-78464726?maca=en-rss-en-eu-2092-rdf",
+          "policy_issue": "ukraine_russia",
           "stance": "oppose",
           "confidence": 0.444
         }
@@ -43,6 +47,8 @@
     {
       "country": "DK",
       "topic": "migration",
+      "policy_issue": "migration",
+      "policy_issue_label": "migration",
       "stance": "insufficient_evidence",
       "confidence": 0.0,
       "confidence_level": "none",
@@ -68,6 +74,7 @@
           "published_at": "Fri, 04 Sep 2026 12:26:17 +0200",
           "source_name": "Le Monde Europe",
           "url": "https://www.lemonde.fr/en/international/article/2026/09/04/denmark-aims-to-send-rejected-migrants-to-return-hubs-by-2027_6757159_4.html",
+          "policy_issue": "migration",
           "stance": "oppose",
           "confidence": 0.651
         }
@@ -75,40 +82,9 @@
     },
     {
       "country": "ES",
-      "topic": "migration",
-      "stance": "insufficient_evidence",
-      "confidence": 0.0,
-      "confidence_level": "none",
-      "evidence_sufficient": false,
-      "dominant_share": 0.0,
-      "classified_events": 1,
-      "stance_counts": {
-        "support": 0,
-        "oppose": 1,
-        "conditional": 0,
-        "mixed": 0
-      },
-      "stance_weights": {
-        "support": 0.0,
-        "oppose": 0.709,
-        "conditional": 0.0,
-        "mixed": 0.0
-      },
-      "average_detector_confidence": 0.552,
-      "explicit_signal_score": 1.931,
-      "evidence": [
-        {
-          "published_at": "Mon, 31 Aug 2026 13:26:36 +0200",
-          "source_name": "Le Monde Europe",
-          "url": "https://www.lemonde.fr/en/international/article/2026/08/31/spain-s-sanchez-rules-out-responsibility-of-morocco-in-migrant-surge_6757010_4.html",
-          "stance": "oppose",
-          "confidence": 0.552
-        }
-      ]
-    },
-    {
-      "country": "ES",
       "topic": "energy",
+      "policy_issue": "energy",
+      "policy_issue_label": "energy",
       "stance": "insufficient_evidence",
       "confidence": 0.0,
       "confidence_level": "none",
@@ -134,14 +110,53 @@
           "published_at": "Fri, 04 Sep 2026 04:00:27 GMT",
           "source_name": "Financial Times Europe",
           "url": "https://www.ft.com/content/86da564e-aec7-4d53-b7b8-93bbdd240061?syn-25a6b1a6=1",
+          "policy_issue": "energy",
           "stance": "support",
           "confidence": 0.584
         }
       ]
     },
     {
+      "country": "ES",
+      "topic": "migration",
+      "policy_issue": "migration",
+      "policy_issue_label": "migration",
+      "stance": "insufficient_evidence",
+      "confidence": 0.0,
+      "confidence_level": "none",
+      "evidence_sufficient": false,
+      "dominant_share": 0.0,
+      "classified_events": 1,
+      "stance_counts": {
+        "support": 0,
+        "oppose": 1,
+        "conditional": 0,
+        "mixed": 0
+      },
+      "stance_weights": {
+        "support": 0.0,
+        "oppose": 0.709,
+        "conditional": 0.0,
+        "mixed": 0.0
+      },
+      "average_detector_confidence": 0.552,
+      "explicit_signal_score": 1.931,
+      "evidence": [
+        {
+          "published_at": "Mon, 31 Aug 2026 13:26:36 +0200",
+          "source_name": "Le Monde Europe",
+          "url": "https://www.lemonde.fr/en/international/article/2026/08/31/spain-s-sanchez-rules-out-responsibility-of-morocco-in-migrant-surge_6757010_4.html",
+          "policy_issue": "migration",
+          "stance": "oppose",
+          "confidence": 0.552
+        }
+      ]
+    },
+    {
       "country": "FI",
       "topic": "ukraine_russia",
+      "policy_issue": "ukraine_russia",
+      "policy_issue_label": "ukraine_russia",
       "stance": "insufficient_evidence",
       "confidence": 0.0,
       "confidence_level": "none",
@@ -167,6 +182,7 @@
           "published_at": "Mon, 17 Aug 2026 14:04:25 GMT",
           "source_name": "Guardian Europe",
           "url": "https://www.theguardian.com/world/2026/aug/17/finland-halts-deportation-russian-family-opposed-ukraine-invasion",
+          "policy_issue": "ukraine_russia",
           "stance": "oppose",
           "confidence": 0.658
         }
@@ -174,54 +190,9 @@
     },
     {
       "country": "GB",
-      "topic": "ukraine_russia",
-      "stance": "mixed",
-      "confidence": 0.534,
-      "confidence_level": "medium",
-      "evidence_sufficient": true,
-      "dominant_share": 0.713,
-      "classified_events": 3,
-      "stance_counts": {
-        "support": 1,
-        "oppose": 2,
-        "conditional": 0,
-        "mixed": 0
-      },
-      "stance_weights": {
-        "support": 0.583,
-        "oppose": 1.448,
-        "conditional": 0.0,
-        "mixed": 0.0
-      },
-      "average_detector_confidence": 0.503,
-      "explicit_signal_score": 6.376,
-      "evidence": [
-        {
-          "published_at": "Tue, 18 Aug 2026 16:13:17 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/news/video/2026/aug/18/how-credible-is-russias-threat-against-uk-the-latest",
-          "stance": "oppose",
-          "confidence": 0.7
-        },
-        {
-          "published_at": "Sun, 23 Aug 2026 13:01:11 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/world/2026/aug/23/russia-withdraws-ambassador-uk-kremlin-pressure-ukraine-andrey-kelin",
-          "stance": "support",
-          "confidence": 0.359
-        },
-        {
-          "published_at": "Thu, 27 Aug 2026 16:56:31 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/world/2026/aug/27/britain-ukraine-war-russia",
-          "stance": "oppose",
-          "confidence": 0.45
-        }
-      ]
-    },
-    {
-      "country": "GB",
       "topic": "defence",
+      "policy_issue": "defence",
+      "policy_issue_label": "defence",
       "stance": "insufficient_evidence",
       "confidence": 0.0,
       "confidence_level": "none",
@@ -247,675 +218,17 @@
           "published_at": "Thu, 27 Aug 2026 16:56:31 GMT",
           "source_name": "Guardian Europe",
           "url": "https://www.theguardian.com/world/2026/aug/27/britain-ukraine-war-russia",
+          "policy_issue": "defence",
           "stance": "oppose",
           "confidence": 0.358
         }
       ]
     },
     {
-      "country": "PL",
-      "topic": "ukraine_russia",
-      "stance": "mixed",
-      "confidence": 0.603,
-      "confidence_level": "medium",
-      "evidence_sufficient": true,
-      "dominant_share": 0.747,
-      "classified_events": 4,
-      "stance_counts": {
-        "support": 1,
-        "oppose": 3,
-        "conditional": 0,
-        "mixed": 0
-      },
-      "stance_weights": {
-        "support": 0.683,
-        "oppose": 2.018,
-        "conditional": 0.0,
-        "mixed": 0.0
-      },
-      "average_detector_confidence": 0.501,
-      "explicit_signal_score": 7.01,
-      "evidence": [
-        {
-          "published_at": null,
-          "source_name": "DW Europe",
-          "url": "https://www.dw.com/en/german-army-helps-poland-construct-a-defensive-barrier-against-russia/a-78464726?maca=en-rss-en-eu-2092-rdf",
-          "stance": "oppose",
-          "confidence": 0.449
-        },
-        {
-          "published_at": null,
-          "source_name": "DW Europe",
-          "url": "https://www.dw.com/en/german-army-helps-poland-protect-itself-against-russia/a-78464726?maca=en-rss-en-eu-2092-rdf",
-          "stance": "oppose",
-          "confidence": 0.474
-        },
-        {
-          "published_at": "Thu, 27 Aug 2026 15:49:44 +0000",
-          "source_name": "Politico Europe",
-          "url": "https://www.politico.eu/article/poland-rules-out-hosting-nuclear-weapons-despite-russian-threat/?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
-          "stance": "oppose",
-          "confidence": 0.567
-        },
-        {
-          "published_at": "Wed, 02 Sep 2026 16:58:10 +0000",
-          "source_name": "EUobserver",
-          "url": "https://euobserver.com/235021/poland-calls-for-eu-to-expel-more-russian-diplomats-after-leipzig-bomb-plot/",
-          "stance": "support",
-          "confidence": 0.513
-        }
-      ]
-    },
-    {
-      "country": "RU",
-      "topic": "migration",
-      "stance": "insufficient_evidence",
-      "confidence": 0.0,
-      "confidence_level": "none",
-      "evidence_sufficient": false,
-      "dominant_share": 0.0,
-      "classified_events": 1,
-      "stance_counts": {
-        "support": 0,
-        "oppose": 1,
-        "conditional": 0,
-        "mixed": 0
-      },
-      "stance_weights": {
-        "support": 0.0,
-        "oppose": 0.611,
-        "conditional": 0.0,
-        "mixed": 0.0
-      },
-      "average_detector_confidence": 0.401,
-      "explicit_signal_score": 1.404,
-      "evidence": [
-        {
-          "published_at": "Mon, 17 Aug 2026 14:04:25 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/world/2026/aug/17/finland-halts-deportation-russian-family-opposed-ukraine-invasion",
-          "stance": "oppose",
-          "confidence": 0.401
-        }
-      ]
-    },
-    {
-      "country": "RU",
-      "topic": "ukraine_russia",
-      "stance": "oppose",
-      "confidence": 0.904,
-      "confidence_level": "high",
-      "evidence_sufficient": true,
-      "dominant_share": 0.868,
-      "classified_events": 21,
-      "stance_counts": {
-        "support": 3,
-        "oppose": 18,
-        "conditional": 0,
-        "mixed": 0
-      },
-      "stance_weights": {
-        "support": 1.993,
-        "oppose": 13.122,
-        "conditional": 0.0,
-        "mixed": 0.0
-      },
-      "average_detector_confidence": 0.569,
-      "explicit_signal_score": 44.34,
-      "evidence": [
-        {
-          "published_at": "Sun, 16 Aug 2026 02:22:46 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/world/2026/aug/16/ukraine-war-briefing-kyiv-faces-missile-barrage-after-zelenskyy-targets-russian-satellite-network",
-          "stance": "support",
-          "confidence": 0.423
-        },
-        {
-          "published_at": "Mon, 17 Aug 2026 00:51:23 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/world/2026/aug/17/ukraine-war-briefing-kyiv-capable-ballistic-missiles-russia-in-months",
-          "stance": "oppose",
-          "confidence": 0.937
-        },
-        {
-          "published_at": "Mon, 17 Aug 2026 14:04:25 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/world/2026/aug/17/finland-halts-deportation-russian-family-opposed-ukraine-invasion",
-          "stance": "oppose",
-          "confidence": 0.818
-        },
-        {
-          "published_at": "Tue, 18 Aug 2026 16:13:17 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/news/video/2026/aug/18/how-credible-is-russias-threat-against-uk-the-latest",
-          "stance": "oppose",
-          "confidence": 0.579
-        },
-        {
-          "published_at": null,
-          "source_name": "DW Europe",
-          "url": "https://www.dw.com/en/german-army-helps-poland-construct-a-defensive-barrier-against-russia/a-78464726?maca=en-rss-en-eu-2092-rdf",
-          "stance": "oppose",
-          "confidence": 0.499
-        },
-        {
-          "published_at": null,
-          "source_name": "DW Europe",
-          "url": "https://www.dw.com/en/german-army-helps-poland-protect-itself-against-russia/a-78464726?maca=en-rss-en-eu-2092-rdf",
-          "stance": "oppose",
-          "confidence": 0.499
-        },
-        {
-          "published_at": "Sun, 23 Aug 2026 01:04:23 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/world/2026/aug/23/ukraine-war-briefing-macron-focuses-on-delivery-of-missile-interceptors-as-russian-attacks-intensify",
-          "stance": "oppose",
-          "confidence": 0.509
-        },
-        {
-          "published_at": "Mon, 24 Aug 2026 05:00:04 GMT",
-          "source_name": "Financial Times Europe",
-          "url": "https://www.ft.com/content/680b2d66-5f69-497f-9cb8-9d010ae64f69?syn-25a6b1a6=1",
-          "stance": "oppose",
-          "confidence": 0.499
-        },
-        {
-          "published_at": "Mon, 24 Aug 2026 17:00:17 +0000",
-          "source_name": "Politico Europe",
-          "url": "https://www.politico.eu/article/british-prime-minister-andy-burnham-ukraine-ups-ante-against-russia/?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
-          "stance": "oppose",
-          "confidence": 0.499
-        },
-        {
-          "published_at": "Wed, 26 Aug 2026 02:05:52 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/world/2026/aug/26/ukraine-war-briefing-small-batch-of-patriots-arrives-as-zelenskyy-pleads-for-more",
-          "stance": "oppose",
-          "confidence": 0.731
-        },
-        {
-          "published_at": "Thu, 27 Aug 2026 15:49:44 +0000",
-          "source_name": "Politico Europe",
-          "url": "https://www.politico.eu/article/poland-rules-out-hosting-nuclear-weapons-despite-russian-threat/?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
-          "stance": "oppose",
-          "confidence": 0.498
-        },
-        {
-          "published_at": "Thu, 27 Aug 2026 16:56:31 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/world/2026/aug/27/britain-ukraine-war-russia",
-          "stance": "oppose",
-          "confidence": 0.499
-        },
-        {
-          "published_at": "Sun, 30 Aug 2026 09:33:27 +0000",
-          "source_name": "Politico Europe",
-          "url": "https://www.politico.eu/article/russia-preparing-massive-strikes-against-ukraines-energy-facilities/?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
-          "stance": "oppose",
-          "confidence": 0.713
-        },
-        {
-          "published_at": "Sun, 30 Aug 2026 21:11:58 GMT",
-          "source_name": "Financial Times Europe",
-          "url": "https://www.ft.com/content/c9d10aeb-163e-46a3-b7ca-376ce6be9f8e?syn-25a6b1a6=1",
-          "stance": "oppose",
-          "confidence": 0.499
-        },
-        {
-          "published_at": "Tue, 01 Sep 2026 07:03:27 +0000",
-          "source_name": "Politico Europe",
-          "url": "https://www.politico.com/news/2026/08/31/bessent-welcomes-russia-back-to-g20-as-europe-pushes-back-01058296?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
-          "stance": "support",
-          "confidence": 0.545
-        },
-        {
-          "published_at": "Wed, 02 Sep 2026 06:00:25 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/film/2026/sep/02/ukrainian-film-maker-sergei-loznitsa-criticises-eu-cuts-venice-biennale-funding-russia-controversy",
-          "stance": "oppose",
-          "confidence": 0.712
-        },
-        {
-          "published_at": "Wed, 02 Sep 2026 16:58:10 +0000",
-          "source_name": "EUobserver",
-          "url": "https://euobserver.com/235021/poland-calls-for-eu-to-expel-more-russian-diplomats-after-leipzig-bomb-plot/",
-          "stance": "support",
-          "confidence": 0.482
-        },
-        {
-          "published_at": "Thu, 03 Sep 2026 00:24:02 +0200",
-          "source_name": "Le Monde Europe",
-          "url": "https://www.lemonde.fr/en/international/article/2026/09/03/ukraine-says-told-un-aviation-watchdog-that-russian-airspace-not-safe_6757102_4.html",
-          "stance": "oppose",
-          "confidence": 0.581
-        },
-        {
-          "published_at": "Fri, 04 Sep 2026 12:28:21 +0200",
-          "source_name": "Le Monde Europe",
-          "url": "https://www.lemonde.fr/en/opinion/article/2026/09/04/the-need-for-european-deterrence-against-russia_6757160_23.html",
-          "stance": "oppose",
-          "confidence": 0.499
-        },
-        {
-          "published_at": "Sat, 05 Sep 2026 07:36:26 +0000",
-          "source_name": "Politico Europe",
-          "url": "https://www.politico.com/news/2026/09/04/trump-russia-nato-espionage-allegations-01066120?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
-          "stance": "oppose",
-          "confidence": 0.469
-        }
-      ]
-    },
-    {
-      "country": "RU",
-      "topic": "defence",
-      "stance": "oppose",
-      "confidence": 0.684,
-      "confidence_level": "medium",
-      "evidence_sufficient": true,
-      "dominant_share": 1.0,
-      "classified_events": 4,
-      "stance_counts": {
-        "support": 0,
-        "oppose": 4,
-        "conditional": 0,
-        "mixed": 0
-      },
-      "stance_weights": {
-        "support": 0.0,
-        "oppose": 2.524,
-        "conditional": 0.0,
-        "mixed": 0.0
-      },
-      "average_detector_confidence": 0.432,
-      "explicit_signal_score": 6.049,
-      "evidence": [
-        {
-          "published_at": "Wed, 26 Aug 2026 02:05:52 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/world/2026/aug/26/ukraine-war-briefing-small-batch-of-patriots-arrives-as-zelenskyy-pleads-for-more",
-          "stance": "oppose",
-          "confidence": 0.394
-        },
-        {
-          "published_at": "Thu, 27 Aug 2026 16:56:31 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/world/2026/aug/27/britain-ukraine-war-russia",
-          "stance": "oppose",
-          "confidence": 0.412
-        },
-        {
-          "published_at": "Sun, 30 Aug 2026 21:11:58 GMT",
-          "source_name": "Financial Times Europe",
-          "url": "https://www.ft.com/content/c9d10aeb-163e-46a3-b7ca-376ce6be9f8e?syn-25a6b1a6=1",
-          "stance": "oppose",
-          "confidence": 0.439
-        },
-        {
-          "published_at": "Sat, 05 Sep 2026 07:36:26 +0000",
-          "source_name": "Politico Europe",
-          "url": "https://www.politico.com/news/2026/09/04/trump-russia-nato-espionage-allegations-01066120?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
-          "stance": "oppose",
-          "confidence": 0.484
-        }
-      ]
-    },
-    {
-      "country": "RU",
-      "topic": "energy",
-      "stance": "insufficient_evidence",
-      "confidence": 0.0,
-      "confidence_level": "none",
-      "evidence_sufficient": false,
-      "dominant_share": 0.0,
-      "classified_events": 1,
-      "stance_counts": {
-        "support": 0,
-        "oppose": 1,
-        "conditional": 0,
-        "mixed": 0
-      },
-      "stance_weights": {
-        "support": 0.0,
-        "oppose": 0.634,
-        "conditional": 0.0,
-        "mixed": 0.0
-      },
-      "average_detector_confidence": 0.437,
-      "explicit_signal_score": 1.529,
-      "evidence": [
-        {
-          "published_at": "Sun, 30 Aug 2026 09:33:27 +0000",
-          "source_name": "Politico Europe",
-          "url": "https://www.politico.eu/article/russia-preparing-massive-strikes-against-ukraines-energy-facilities/?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
-          "stance": "oppose",
-          "confidence": 0.437
-        }
-      ]
-    },
-    {
-      "country": "SE",
-      "topic": "ukraine_russia",
-      "stance": "insufficient_evidence",
-      "confidence": 0.0,
-      "confidence_level": "none",
-      "evidence_sufficient": false,
-      "dominant_share": 0.0,
-      "classified_events": 1,
-      "stance_counts": {
-        "support": 0,
-        "oppose": 1,
-        "conditional": 0,
-        "mixed": 0
-      },
-      "stance_weights": {
-        "support": 0.0,
-        "oppose": 0.636,
-        "conditional": 0.0,
-        "mixed": 0.0
-      },
-      "average_detector_confidence": 0.44,
-      "explicit_signal_score": 1.541,
-      "evidence": [
-        {
-          "published_at": "Wed, 26 Aug 2026 02:05:52 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/world/2026/aug/26/ukraine-war-briefing-small-batch-of-patriots-arrives-as-zelenskyy-pleads-for-more",
-          "stance": "oppose",
-          "confidence": 0.44
-        }
-      ]
-    },
-    {
-      "country": "UA",
-      "topic": "ukraine_russia",
-      "stance": "mixed",
-      "confidence": 0.78,
-      "confidence_level": "high",
-      "evidence_sufficient": true,
-      "dominant_share": 0.49,
-      "classified_events": 26,
-      "stance_counts": {
-        "support": 13,
-        "oppose": 12,
-        "conditional": 0,
-        "mixed": 1
-      },
-      "stance_weights": {
-        "support": 8.728,
-        "oppose": 9.005,
-        "conditional": 0.0,
-        "mixed": 0.663
-      },
-      "average_detector_confidence": 0.55,
-      "explicit_signal_score": 54.886,
-      "evidence": [
-        {
-          "published_at": "Tue, 18 Aug 2026 22:21:59 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/world/2026/aug/18/ukraines-dismissed-defence-minister-calls-for-wartime-presidential-election",
-          "stance": "support",
-          "confidence": 0.438
-        },
-        {
-          "published_at": "Wed, 19 Aug 2026 10:26:06 +0200",
-          "source_name": "Le Monde Europe",
-          "url": "https://www.lemonde.fr/en/international/article/2026/08/19/ukraine-s-former-defense-minister-calls-for-elections-and-denounces-corruption-defying-zelensky_6756661_4.html",
-          "stance": "support",
-          "confidence": 0.449
-        },
-        {
-          "published_at": "Sun, 23 Aug 2026 01:04:23 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/world/2026/aug/23/ukraine-war-briefing-macron-focuses-on-delivery-of-missile-interceptors-as-russian-attacks-intensify",
-          "stance": "mixed",
-          "confidence": 0.481
-        },
-        {
-          "published_at": "Sun, 23 Aug 2026 22:00:00 GMT",
-          "source_name": "European Commission",
-          "url": "https://ec.europa.eu/commission/presscorner/detail/en/ip_26_1750",
-          "stance": "support",
-          "confidence": 0.701
-        },
-        {
-          "published_at": "Mon, 24 Aug 2026 05:00:04 GMT",
-          "source_name": "Financial Times Europe",
-          "url": "https://www.ft.com/content/680b2d66-5f69-497f-9cb8-9d010ae64f69?syn-25a6b1a6=1",
-          "stance": "oppose",
-          "confidence": 0.459
-        },
-        {
-          "published_at": "Sun, 23 Aug 2026 23:01:01 GMT",
-          "source_name": "Financial Times Europe",
-          "url": "https://www.ft.com/content/4e3c99fe-1a8d-4fb2-b99a-da1c1da4db8e?syn-25a6b1a6=1",
-          "stance": "support",
-          "confidence": 0.45
-        },
-        {
-          "published_at": null,
-          "source_name": "DW Europe",
-          "url": "https://www.dw.com/en/ukraine-zelenskyy-rejects-wartime-elections/a-78475087?maca=en-rss-en-eu-2092-rdf",
-          "stance": "oppose",
-          "confidence": 0.672
-        },
-        {
-          "published_at": "Sun, 23 Aug 2026 13:01:11 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/world/2026/aug/23/russia-withdraws-ambassador-uk-kremlin-pressure-ukraine-andrey-kelin",
-          "stance": "support",
-          "confidence": 0.37
-        },
-        {
-          "published_at": "Mon, 24 Aug 2026 10:45:24 +0000",
-          "source_name": "EUobserver",
-          "url": "https://euobserver.com/233219/seize-russias-frozen-e210bn-for-ukraine-now-while-eu-unity-lasts/",
-          "stance": "support",
-          "confidence": 0.37
-        },
-        {
-          "published_at": "Mon, 24 Aug 2026 16:33:22 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/politics/2026/aug/24/burnham-visit-kyiv-support-for-ukraine",
-          "stance": "support",
-          "confidence": 1.0
-        },
-        {
-          "published_at": "Tue, 25 Aug 2026 01:38:58 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/world/2026/aug/25/ukraine-war-briefing-ozon-next-in-kyivs-sights-as-sheds-of-wildberries-rival-burn",
-          "stance": "support",
-          "confidence": 0.37
-        },
-        {
-          "published_at": "Mon, 24 Aug 2026 13:58:48 +0200",
-          "source_name": "Le Monde Europe",
-          "url": "https://www.lemonde.fr/en/international/article/2026/08/24/andy-burnham-insists-the-uk-will-continue-defending-ukraine_6756799_4.html",
-          "stance": "support",
-          "confidence": 0.37
-        },
-        {
-          "published_at": "Wed, 26 Aug 2026 02:05:52 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/world/2026/aug/26/ukraine-war-briefing-small-batch-of-patriots-arrives-as-zelenskyy-pleads-for-more",
-          "stance": "oppose",
-          "confidence": 0.769
-        },
-        {
-          "published_at": "Tue, 25 Aug 2026 13:20:37 +0200",
-          "source_name": "Le Monde Europe",
-          "url": "https://www.lemonde.fr/en/opinion/article/2026/08/25/europe-must-step-up-its-support-for-ukraine_6756828_23.html",
-          "stance": "support",
-          "confidence": 0.592
-        },
-        {
-          "published_at": "Thu, 27 Aug 2026 16:56:31 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/world/2026/aug/27/britain-ukraine-war-russia",
-          "stance": "oppose",
-          "confidence": 0.436
-        },
-        {
-          "published_at": "Sun, 30 Aug 2026 09:33:27 +0000",
-          "source_name": "Politico Europe",
-          "url": "https://www.politico.eu/article/russia-preparing-massive-strikes-against-ukraines-energy-facilities/?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
-          "stance": "oppose",
-          "confidence": 0.812
-        },
-        {
-          "published_at": "Sun, 30 Aug 2026 21:11:58 GMT",
-          "source_name": "Financial Times Europe",
-          "url": "https://www.ft.com/content/c9d10aeb-163e-46a3-b7ca-376ce6be9f8e?syn-25a6b1a6=1",
-          "stance": "oppose",
-          "confidence": 0.417
-        },
-        {
-          "published_at": "Mon, 31 Aug 2026 20:00:08 +0200",
-          "source_name": "Le Monde Europe",
-          "url": "https://www.lemonde.fr/en/international/article/2026/08/31/ukraine-s-farmers-struggle-to-survive-amid-blocked-grain-shipments-and-bombed-farms_6757023_4.html",
-          "stance": "oppose",
-          "confidence": 0.519
-        },
-        {
-          "published_at": "Wed, 02 Sep 2026 06:00:25 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/film/2026/sep/02/ukrainian-film-maker-sergei-loznitsa-criticises-eu-cuts-venice-biennale-funding-russia-controversy",
-          "stance": "oppose",
-          "confidence": 0.783
-        },
-        {
-          "published_at": "Thu, 03 Sep 2026 00:24:02 +0200",
-          "source_name": "Le Monde Europe",
-          "url": "https://www.lemonde.fr/en/international/article/2026/09/03/ukraine-says-told-un-aviation-watchdog-that-russian-airspace-not-safe_6757102_4.html",
-          "stance": "oppose",
-          "confidence": 0.542
-        }
-      ]
-    },
-    {
-      "country": "UA",
-      "topic": "defence",
-      "stance": "support",
-      "confidence": 0.695,
-      "confidence_level": "medium",
-      "evidence_sufficient": true,
-      "dominant_share": 1.0,
-      "classified_events": 4,
-      "stance_counts": {
-        "support": 4,
-        "oppose": 0,
-        "conditional": 0,
-        "mixed": 0
-      },
-      "stance_weights": {
-        "support": 2.793,
-        "oppose": 0.0,
-        "conditional": 0.0,
-        "mixed": 0.0
-      },
-      "average_detector_confidence": 0.536,
-      "explicit_signal_score": 8.446,
-      "evidence": [
-        {
-          "published_at": "Tue, 18 Aug 2026 21:24:20 GMT",
-          "source_name": "Financial Times Europe",
-          "url": "https://www.ft.com/content/7bf79169-f84f-44a2-b64d-c1a3d1fb7d08?syn-25a6b1a6=1",
-          "stance": "support",
-          "confidence": 0.48
-        },
-        {
-          "published_at": "Tue, 18 Aug 2026 22:21:59 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/world/2026/aug/18/ukraines-dismissed-defence-minister-calls-for-wartime-presidential-election",
-          "stance": "support",
-          "confidence": 0.475
-        },
-        {
-          "published_at": "Wed, 19 Aug 2026 10:26:06 +0200",
-          "source_name": "Le Monde Europe",
-          "url": "https://www.lemonde.fr/en/international/article/2026/08/19/ukraine-s-former-defense-minister-calls-for-elections-and-denounces-corruption-defying-zelensky_6756661_4.html",
-          "stance": "support",
-          "confidence": 0.48
-        },
-        {
-          "published_at": "Sun, 23 Aug 2026 22:00:00 GMT",
-          "source_name": "European Commission",
-          "url": "https://ec.europa.eu/commission/presscorner/detail/en/ip_26_1750",
-          "stance": "support",
-          "confidence": 0.708
-        }
-      ]
-    },
-    {
-      "country": "UA",
-      "topic": "energy",
-      "stance": "insufficient_evidence",
-      "confidence": 0.0,
-      "confidence_level": "none",
-      "evidence_sufficient": false,
-      "dominant_share": 0.0,
-      "classified_events": 1,
-      "stance_counts": {
-        "support": 0,
-        "oppose": 1,
-        "conditional": 0,
-        "mixed": 0
-      },
-      "stance_weights": {
-        "support": 0.0,
-        "oppose": 0.664,
-        "conditional": 0.0,
-        "mixed": 0.0
-      },
-      "average_detector_confidence": 0.483,
-      "explicit_signal_score": 1.689,
-      "evidence": [
-        {
-          "published_at": "Sun, 30 Aug 2026 09:33:27 +0000",
-          "source_name": "Politico Europe",
-          "url": "https://www.politico.eu/article/russia-preparing-massive-strikes-against-ukraines-energy-facilities/?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
-          "stance": "oppose",
-          "confidence": 0.483
-        }
-      ]
-    },
-    {
-      "country": "UA",
-      "topic": "rule_of_law",
-      "stance": "insufficient_evidence",
-      "confidence": 0.0,
-      "confidence_level": "none",
-      "evidence_sufficient": false,
-      "dominant_share": 0.0,
-      "classified_events": 1,
-      "stance_counts": {
-        "support": 1,
-        "oppose": 0,
-        "conditional": 0,
-        "mixed": 0
-      },
-      "stance_weights": {
-        "support": 0.644,
-        "oppose": 0.0,
-        "conditional": 0.0,
-        "mixed": 0.0
-      },
-      "average_detector_confidence": 0.453,
-      "explicit_signal_score": 1.584,
-      "evidence": [
-        {
-          "published_at": "Wed, 19 Aug 2026 10:26:06 +0200",
-          "source_name": "Le Monde Europe",
-          "url": "https://www.lemonde.fr/en/international/article/2026/08/19/ukraine-s-former-defense-minister-calls-for-elections-and-denounces-corruption-defying-zelensky_6756661_4.html",
-          "stance": "support",
-          "confidence": 0.453
-        }
-      ]
-    }
-  ],
-  "assessed": [
-    {
       "country": "GB",
       "topic": "ukraine_russia",
+      "policy_issue": "ukraine_russia",
+      "policy_issue_label": "ukraine_russia",
       "stance": "mixed",
       "confidence": 0.534,
       "confidence_level": "medium",
@@ -941,6 +254,7 @@
           "published_at": "Tue, 18 Aug 2026 16:13:17 GMT",
           "source_name": "Guardian Europe",
           "url": "https://www.theguardian.com/news/video/2026/aug/18/how-credible-is-russias-threat-against-uk-the-latest",
+          "policy_issue": "ukraine_russia",
           "stance": "oppose",
           "confidence": 0.7
         },
@@ -948,6 +262,7 @@
           "published_at": "Sun, 23 Aug 2026 13:01:11 GMT",
           "source_name": "Guardian Europe",
           "url": "https://www.theguardian.com/world/2026/aug/23/russia-withdraws-ambassador-uk-kremlin-pressure-ukraine-andrey-kelin",
+          "policy_issue": "ukraine_russia",
           "stance": "support",
           "confidence": 0.359
         },
@@ -955,6 +270,7 @@
           "published_at": "Thu, 27 Aug 2026 16:56:31 GMT",
           "source_name": "Guardian Europe",
           "url": "https://www.theguardian.com/world/2026/aug/27/britain-ukraine-war-russia",
+          "policy_issue": "ukraine_russia",
           "stance": "oppose",
           "confidence": 0.45
         }
@@ -963,6 +279,8 @@
     {
       "country": "PL",
       "topic": "ukraine_russia",
+      "policy_issue": "ukraine_russia",
+      "policy_issue_label": "ukraine_russia",
       "stance": "mixed",
       "confidence": 0.603,
       "confidence_level": "medium",
@@ -988,6 +306,7 @@
           "published_at": null,
           "source_name": "DW Europe",
           "url": "https://www.dw.com/en/german-army-helps-poland-construct-a-defensive-barrier-against-russia/a-78464726?maca=en-rss-en-eu-2092-rdf",
+          "policy_issue": "ukraine_russia",
           "stance": "oppose",
           "confidence": 0.449
         },
@@ -995,6 +314,7 @@
           "published_at": null,
           "source_name": "DW Europe",
           "url": "https://www.dw.com/en/german-army-helps-poland-protect-itself-against-russia/a-78464726?maca=en-rss-en-eu-2092-rdf",
+          "policy_issue": "ukraine_russia",
           "stance": "oppose",
           "confidence": 0.474
         },
@@ -1002,6 +322,7 @@
           "published_at": "Thu, 27 Aug 2026 15:49:44 +0000",
           "source_name": "Politico Europe",
           "url": "https://www.politico.eu/article/poland-rules-out-hosting-nuclear-weapons-despite-russian-threat/?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
+          "policy_issue": "ukraine_russia",
           "stance": "oppose",
           "confidence": 0.567
         },
@@ -1009,6 +330,7 @@
           "published_at": "Wed, 02 Sep 2026 16:58:10 +0000",
           "source_name": "EUobserver",
           "url": "https://euobserver.com/235021/poland-calls-for-eu-to-expel-more-russian-diplomats-after-leipzig-bomb-plot/",
+          "policy_issue": "ukraine_russia",
           "stance": "support",
           "confidence": 0.513
         }
@@ -1016,173 +338,9 @@
     },
     {
       "country": "RU",
-      "topic": "ukraine_russia",
-      "stance": "oppose",
-      "confidence": 0.904,
-      "confidence_level": "high",
-      "evidence_sufficient": true,
-      "dominant_share": 0.868,
-      "classified_events": 21,
-      "stance_counts": {
-        "support": 3,
-        "oppose": 18,
-        "conditional": 0,
-        "mixed": 0
-      },
-      "stance_weights": {
-        "support": 1.993,
-        "oppose": 13.122,
-        "conditional": 0.0,
-        "mixed": 0.0
-      },
-      "average_detector_confidence": 0.569,
-      "explicit_signal_score": 44.34,
-      "evidence": [
-        {
-          "published_at": "Sun, 16 Aug 2026 02:22:46 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/world/2026/aug/16/ukraine-war-briefing-kyiv-faces-missile-barrage-after-zelenskyy-targets-russian-satellite-network",
-          "stance": "support",
-          "confidence": 0.423
-        },
-        {
-          "published_at": "Mon, 17 Aug 2026 00:51:23 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/world/2026/aug/17/ukraine-war-briefing-kyiv-capable-ballistic-missiles-russia-in-months",
-          "stance": "oppose",
-          "confidence": 0.937
-        },
-        {
-          "published_at": "Mon, 17 Aug 2026 14:04:25 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/world/2026/aug/17/finland-halts-deportation-russian-family-opposed-ukraine-invasion",
-          "stance": "oppose",
-          "confidence": 0.818
-        },
-        {
-          "published_at": "Tue, 18 Aug 2026 16:13:17 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/news/video/2026/aug/18/how-credible-is-russias-threat-against-uk-the-latest",
-          "stance": "oppose",
-          "confidence": 0.579
-        },
-        {
-          "published_at": null,
-          "source_name": "DW Europe",
-          "url": "https://www.dw.com/en/german-army-helps-poland-construct-a-defensive-barrier-against-russia/a-78464726?maca=en-rss-en-eu-2092-rdf",
-          "stance": "oppose",
-          "confidence": 0.499
-        },
-        {
-          "published_at": null,
-          "source_name": "DW Europe",
-          "url": "https://www.dw.com/en/german-army-helps-poland-protect-itself-against-russia/a-78464726?maca=en-rss-en-eu-2092-rdf",
-          "stance": "oppose",
-          "confidence": 0.499
-        },
-        {
-          "published_at": "Sun, 23 Aug 2026 01:04:23 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/world/2026/aug/23/ukraine-war-briefing-macron-focuses-on-delivery-of-missile-interceptors-as-russian-attacks-intensify",
-          "stance": "oppose",
-          "confidence": 0.509
-        },
-        {
-          "published_at": "Mon, 24 Aug 2026 05:00:04 GMT",
-          "source_name": "Financial Times Europe",
-          "url": "https://www.ft.com/content/680b2d66-5f69-497f-9cb8-9d010ae64f69?syn-25a6b1a6=1",
-          "stance": "oppose",
-          "confidence": 0.499
-        },
-        {
-          "published_at": "Mon, 24 Aug 2026 17:00:17 +0000",
-          "source_name": "Politico Europe",
-          "url": "https://www.politico.eu/article/british-prime-minister-andy-burnham-ukraine-ups-ante-against-russia/?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
-          "stance": "oppose",
-          "confidence": 0.499
-        },
-        {
-          "published_at": "Wed, 26 Aug 2026 02:05:52 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/world/2026/aug/26/ukraine-war-briefing-small-batch-of-patriots-arrives-as-zelenskyy-pleads-for-more",
-          "stance": "oppose",
-          "confidence": 0.731
-        },
-        {
-          "published_at": "Thu, 27 Aug 2026 15:49:44 +0000",
-          "source_name": "Politico Europe",
-          "url": "https://www.politico.eu/article/poland-rules-out-hosting-nuclear-weapons-despite-russian-threat/?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
-          "stance": "oppose",
-          "confidence": 0.498
-        },
-        {
-          "published_at": "Thu, 27 Aug 2026 16:56:31 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/world/2026/aug/27/britain-ukraine-war-russia",
-          "stance": "oppose",
-          "confidence": 0.499
-        },
-        {
-          "published_at": "Sun, 30 Aug 2026 09:33:27 +0000",
-          "source_name": "Politico Europe",
-          "url": "https://www.politico.eu/article/russia-preparing-massive-strikes-against-ukraines-energy-facilities/?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
-          "stance": "oppose",
-          "confidence": 0.713
-        },
-        {
-          "published_at": "Sun, 30 Aug 2026 21:11:58 GMT",
-          "source_name": "Financial Times Europe",
-          "url": "https://www.ft.com/content/c9d10aeb-163e-46a3-b7ca-376ce6be9f8e?syn-25a6b1a6=1",
-          "stance": "oppose",
-          "confidence": 0.499
-        },
-        {
-          "published_at": "Tue, 01 Sep 2026 07:03:27 +0000",
-          "source_name": "Politico Europe",
-          "url": "https://www.politico.com/news/2026/08/31/bessent-welcomes-russia-back-to-g20-as-europe-pushes-back-01058296?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
-          "stance": "support",
-          "confidence": 0.545
-        },
-        {
-          "published_at": "Wed, 02 Sep 2026 06:00:25 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/film/2026/sep/02/ukrainian-film-maker-sergei-loznitsa-criticises-eu-cuts-venice-biennale-funding-russia-controversy",
-          "stance": "oppose",
-          "confidence": 0.712
-        },
-        {
-          "published_at": "Wed, 02 Sep 2026 16:58:10 +0000",
-          "source_name": "EUobserver",
-          "url": "https://euobserver.com/235021/poland-calls-for-eu-to-expel-more-russian-diplomats-after-leipzig-bomb-plot/",
-          "stance": "support",
-          "confidence": 0.482
-        },
-        {
-          "published_at": "Thu, 03 Sep 2026 00:24:02 +0200",
-          "source_name": "Le Monde Europe",
-          "url": "https://www.lemonde.fr/en/international/article/2026/09/03/ukraine-says-told-un-aviation-watchdog-that-russian-airspace-not-safe_6757102_4.html",
-          "stance": "oppose",
-          "confidence": 0.581
-        },
-        {
-          "published_at": "Fri, 04 Sep 2026 12:28:21 +0200",
-          "source_name": "Le Monde Europe",
-          "url": "https://www.lemonde.fr/en/opinion/article/2026/09/04/the-need-for-european-deterrence-against-russia_6757160_23.html",
-          "stance": "oppose",
-          "confidence": 0.499
-        },
-        {
-          "published_at": "Sat, 05 Sep 2026 07:36:26 +0000",
-          "source_name": "Politico Europe",
-          "url": "https://www.politico.com/news/2026/09/04/trump-russia-nato-espionage-allegations-01066120?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
-          "stance": "oppose",
-          "confidence": 0.469
-        }
-      ]
-    },
-    {
-      "country": "RU",
       "topic": "defence",
+      "policy_issue": "defence",
+      "policy_issue_label": "defence",
       "stance": "oppose",
       "confidence": 0.684,
       "confidence_level": "medium",
@@ -1208,6 +366,7 @@
           "published_at": "Wed, 26 Aug 2026 02:05:52 GMT",
           "source_name": "Guardian Europe",
           "url": "https://www.theguardian.com/world/2026/aug/26/ukraine-war-briefing-small-batch-of-patriots-arrives-as-zelenskyy-pleads-for-more",
+          "policy_issue": "defence",
           "stance": "oppose",
           "confidence": 0.394
         },
@@ -1215,6 +374,7 @@
           "published_at": "Thu, 27 Aug 2026 16:56:31 GMT",
           "source_name": "Guardian Europe",
           "url": "https://www.theguardian.com/world/2026/aug/27/britain-ukraine-war-russia",
+          "policy_issue": "defence",
           "stance": "oppose",
           "confidence": 0.412
         },
@@ -1222,6 +382,7 @@
           "published_at": "Sun, 30 Aug 2026 21:11:58 GMT",
           "source_name": "Financial Times Europe",
           "url": "https://www.ft.com/content/c9d10aeb-163e-46a3-b7ca-376ce6be9f8e?syn-25a6b1a6=1",
+          "policy_issue": "defence",
           "stance": "oppose",
           "confidence": 0.439
         },
@@ -1229,180 +390,313 @@
           "published_at": "Sat, 05 Sep 2026 07:36:26 +0000",
           "source_name": "Politico Europe",
           "url": "https://www.politico.com/news/2026/09/04/trump-russia-nato-espionage-allegations-01066120?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
+          "policy_issue": "defence",
           "stance": "oppose",
           "confidence": 0.484
         }
       ]
     },
     {
-      "country": "UA",
-      "topic": "ukraine_russia",
-      "stance": "mixed",
-      "confidence": 0.78,
-      "confidence_level": "high",
-      "evidence_sufficient": true,
-      "dominant_share": 0.49,
-      "classified_events": 26,
+      "country": "RU",
+      "topic": "energy",
+      "policy_issue": "energy",
+      "policy_issue_label": "energy",
+      "stance": "insufficient_evidence",
+      "confidence": 0.0,
+      "confidence_level": "none",
+      "evidence_sufficient": false,
+      "dominant_share": 0.0,
+      "classified_events": 1,
       "stance_counts": {
-        "support": 13,
-        "oppose": 12,
+        "support": 0,
+        "oppose": 1,
         "conditional": 0,
-        "mixed": 1
+        "mixed": 0
       },
       "stance_weights": {
-        "support": 8.728,
-        "oppose": 9.005,
+        "support": 0.0,
+        "oppose": 0.634,
         "conditional": 0.0,
-        "mixed": 0.663
+        "mixed": 0.0
       },
-      "average_detector_confidence": 0.55,
-      "explicit_signal_score": 54.886,
+      "average_detector_confidence": 0.437,
+      "explicit_signal_score": 1.529,
       "evidence": [
         {
-          "published_at": "Tue, 18 Aug 2026 22:21:59 GMT",
+          "published_at": "Sun, 30 Aug 2026 09:33:27 +0000",
+          "source_name": "Politico Europe",
+          "url": "https://www.politico.eu/article/russia-preparing-massive-strikes-against-ukraines-energy-facilities/?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
+          "policy_issue": "energy",
+          "stance": "oppose",
+          "confidence": 0.437
+        }
+      ]
+    },
+    {
+      "country": "RU",
+      "topic": "migration",
+      "policy_issue": "migration",
+      "policy_issue_label": "migration",
+      "stance": "insufficient_evidence",
+      "confidence": 0.0,
+      "confidence_level": "none",
+      "evidence_sufficient": false,
+      "dominant_share": 0.0,
+      "classified_events": 1,
+      "stance_counts": {
+        "support": 0,
+        "oppose": 1,
+        "conditional": 0,
+        "mixed": 0
+      },
+      "stance_weights": {
+        "support": 0.0,
+        "oppose": 0.611,
+        "conditional": 0.0,
+        "mixed": 0.0
+      },
+      "average_detector_confidence": 0.401,
+      "explicit_signal_score": 1.404,
+      "evidence": [
+        {
+          "published_at": "Mon, 17 Aug 2026 14:04:25 GMT",
           "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/world/2026/aug/18/ukraines-dismissed-defence-minister-calls-for-wartime-presidential-election",
+          "url": "https://www.theguardian.com/world/2026/aug/17/finland-halts-deportation-russian-family-opposed-ukraine-invasion",
+          "policy_issue": "migration",
+          "stance": "oppose",
+          "confidence": 0.401
+        }
+      ]
+    },
+    {
+      "country": "RU",
+      "topic": "ukraine_russia",
+      "policy_issue": "ukraine_russia",
+      "policy_issue_label": "ukraine_russia",
+      "stance": "oppose",
+      "confidence": 0.904,
+      "confidence_level": "high",
+      "evidence_sufficient": true,
+      "dominant_share": 0.868,
+      "classified_events": 21,
+      "stance_counts": {
+        "support": 3,
+        "oppose": 18,
+        "conditional": 0,
+        "mixed": 0
+      },
+      "stance_weights": {
+        "support": 1.993,
+        "oppose": 13.122,
+        "conditional": 0.0,
+        "mixed": 0.0
+      },
+      "average_detector_confidence": 0.569,
+      "explicit_signal_score": 44.34,
+      "evidence": [
+        {
+          "published_at": "Sun, 16 Aug 2026 02:22:46 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/world/2026/aug/16/ukraine-war-briefing-kyiv-faces-missile-barrage-after-zelenskyy-targets-russian-satellite-network",
+          "policy_issue": "ukraine_russia",
           "stance": "support",
-          "confidence": 0.438
+          "confidence": 0.423
         },
         {
-          "published_at": "Wed, 19 Aug 2026 10:26:06 +0200",
-          "source_name": "Le Monde Europe",
-          "url": "https://www.lemonde.fr/en/international/article/2026/08/19/ukraine-s-former-defense-minister-calls-for-elections-and-denounces-corruption-defying-zelensky_6756661_4.html",
-          "stance": "support",
-          "confidence": 0.449
+          "published_at": "Mon, 17 Aug 2026 00:51:23 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/world/2026/aug/17/ukraine-war-briefing-kyiv-capable-ballistic-missiles-russia-in-months",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.937
+        },
+        {
+          "published_at": "Mon, 17 Aug 2026 14:04:25 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/world/2026/aug/17/finland-halts-deportation-russian-family-opposed-ukraine-invasion",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.818
+        },
+        {
+          "published_at": "Tue, 18 Aug 2026 16:13:17 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/news/video/2026/aug/18/how-credible-is-russias-threat-against-uk-the-latest",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.579
+        },
+        {
+          "published_at": null,
+          "source_name": "DW Europe",
+          "url": "https://www.dw.com/en/german-army-helps-poland-construct-a-defensive-barrier-against-russia/a-78464726?maca=en-rss-en-eu-2092-rdf",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.499
+        },
+        {
+          "published_at": null,
+          "source_name": "DW Europe",
+          "url": "https://www.dw.com/en/german-army-helps-poland-protect-itself-against-russia/a-78464726?maca=en-rss-en-eu-2092-rdf",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.499
         },
         {
           "published_at": "Sun, 23 Aug 2026 01:04:23 GMT",
           "source_name": "Guardian Europe",
           "url": "https://www.theguardian.com/world/2026/aug/23/ukraine-war-briefing-macron-focuses-on-delivery-of-missile-interceptors-as-russian-attacks-intensify",
-          "stance": "mixed",
-          "confidence": 0.481
-        },
-        {
-          "published_at": "Sun, 23 Aug 2026 22:00:00 GMT",
-          "source_name": "European Commission",
-          "url": "https://ec.europa.eu/commission/presscorner/detail/en/ip_26_1750",
-          "stance": "support",
-          "confidence": 0.701
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.509
         },
         {
           "published_at": "Mon, 24 Aug 2026 05:00:04 GMT",
           "source_name": "Financial Times Europe",
           "url": "https://www.ft.com/content/680b2d66-5f69-497f-9cb8-9d010ae64f69?syn-25a6b1a6=1",
+          "policy_issue": "ukraine_russia",
           "stance": "oppose",
-          "confidence": 0.459
+          "confidence": 0.499
         },
         {
-          "published_at": "Sun, 23 Aug 2026 23:01:01 GMT",
-          "source_name": "Financial Times Europe",
-          "url": "https://www.ft.com/content/4e3c99fe-1a8d-4fb2-b99a-da1c1da4db8e?syn-25a6b1a6=1",
-          "stance": "support",
-          "confidence": 0.45
-        },
-        {
-          "published_at": null,
-          "source_name": "DW Europe",
-          "url": "https://www.dw.com/en/ukraine-zelenskyy-rejects-wartime-elections/a-78475087?maca=en-rss-en-eu-2092-rdf",
+          "published_at": "Mon, 24 Aug 2026 17:00:17 +0000",
+          "source_name": "Politico Europe",
+          "url": "https://www.politico.eu/article/british-prime-minister-andy-burnham-ukraine-ups-ante-against-russia/?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
+          "policy_issue": "ukraine_russia",
           "stance": "oppose",
-          "confidence": 0.672
-        },
-        {
-          "published_at": "Sun, 23 Aug 2026 13:01:11 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/world/2026/aug/23/russia-withdraws-ambassador-uk-kremlin-pressure-ukraine-andrey-kelin",
-          "stance": "support",
-          "confidence": 0.37
-        },
-        {
-          "published_at": "Mon, 24 Aug 2026 10:45:24 +0000",
-          "source_name": "EUobserver",
-          "url": "https://euobserver.com/233219/seize-russias-frozen-e210bn-for-ukraine-now-while-eu-unity-lasts/",
-          "stance": "support",
-          "confidence": 0.37
-        },
-        {
-          "published_at": "Mon, 24 Aug 2026 16:33:22 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/politics/2026/aug/24/burnham-visit-kyiv-support-for-ukraine",
-          "stance": "support",
-          "confidence": 1.0
-        },
-        {
-          "published_at": "Tue, 25 Aug 2026 01:38:58 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/world/2026/aug/25/ukraine-war-briefing-ozon-next-in-kyivs-sights-as-sheds-of-wildberries-rival-burn",
-          "stance": "support",
-          "confidence": 0.37
-        },
-        {
-          "published_at": "Mon, 24 Aug 2026 13:58:48 +0200",
-          "source_name": "Le Monde Europe",
-          "url": "https://www.lemonde.fr/en/international/article/2026/08/24/andy-burnham-insists-the-uk-will-continue-defending-ukraine_6756799_4.html",
-          "stance": "support",
-          "confidence": 0.37
+          "confidence": 0.499
         },
         {
           "published_at": "Wed, 26 Aug 2026 02:05:52 GMT",
           "source_name": "Guardian Europe",
           "url": "https://www.theguardian.com/world/2026/aug/26/ukraine-war-briefing-small-batch-of-patriots-arrives-as-zelenskyy-pleads-for-more",
+          "policy_issue": "ukraine_russia",
           "stance": "oppose",
-          "confidence": 0.769
+          "confidence": 0.731
         },
         {
-          "published_at": "Tue, 25 Aug 2026 13:20:37 +0200",
-          "source_name": "Le Monde Europe",
-          "url": "https://www.lemonde.fr/en/opinion/article/2026/08/25/europe-must-step-up-its-support-for-ukraine_6756828_23.html",
-          "stance": "support",
-          "confidence": 0.592
+          "published_at": "Thu, 27 Aug 2026 15:49:44 +0000",
+          "source_name": "Politico Europe",
+          "url": "https://www.politico.eu/article/poland-rules-out-hosting-nuclear-weapons-despite-russian-threat/?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.498
         },
         {
           "published_at": "Thu, 27 Aug 2026 16:56:31 GMT",
           "source_name": "Guardian Europe",
           "url": "https://www.theguardian.com/world/2026/aug/27/britain-ukraine-war-russia",
+          "policy_issue": "ukraine_russia",
           "stance": "oppose",
-          "confidence": 0.436
+          "confidence": 0.499
         },
         {
           "published_at": "Sun, 30 Aug 2026 09:33:27 +0000",
           "source_name": "Politico Europe",
           "url": "https://www.politico.eu/article/russia-preparing-massive-strikes-against-ukraines-energy-facilities/?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
+          "policy_issue": "ukraine_russia",
           "stance": "oppose",
-          "confidence": 0.812
+          "confidence": 0.713
         },
         {
           "published_at": "Sun, 30 Aug 2026 21:11:58 GMT",
           "source_name": "Financial Times Europe",
           "url": "https://www.ft.com/content/c9d10aeb-163e-46a3-b7ca-376ce6be9f8e?syn-25a6b1a6=1",
+          "policy_issue": "ukraine_russia",
           "stance": "oppose",
-          "confidence": 0.417
+          "confidence": 0.499
         },
         {
-          "published_at": "Mon, 31 Aug 2026 20:00:08 +0200",
-          "source_name": "Le Monde Europe",
-          "url": "https://www.lemonde.fr/en/international/article/2026/08/31/ukraine-s-farmers-struggle-to-survive-amid-blocked-grain-shipments-and-bombed-farms_6757023_4.html",
-          "stance": "oppose",
-          "confidence": 0.519
+          "published_at": "Tue, 01 Sep 2026 07:03:27 +0000",
+          "source_name": "Politico Europe",
+          "url": "https://www.politico.com/news/2026/08/31/bessent-welcomes-russia-back-to-g20-as-europe-pushes-back-01058296?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
+          "policy_issue": "ukraine_russia",
+          "stance": "support",
+          "confidence": 0.545
         },
         {
           "published_at": "Wed, 02 Sep 2026 06:00:25 GMT",
           "source_name": "Guardian Europe",
           "url": "https://www.theguardian.com/film/2026/sep/02/ukrainian-film-maker-sergei-loznitsa-criticises-eu-cuts-venice-biennale-funding-russia-controversy",
+          "policy_issue": "ukraine_russia",
           "stance": "oppose",
-          "confidence": 0.783
+          "confidence": 0.712
+        },
+        {
+          "published_at": "Wed, 02 Sep 2026 16:58:10 +0000",
+          "source_name": "EUobserver",
+          "url": "https://euobserver.com/235021/poland-calls-for-eu-to-expel-more-russian-diplomats-after-leipzig-bomb-plot/",
+          "policy_issue": "ukraine_russia",
+          "stance": "support",
+          "confidence": 0.482
         },
         {
           "published_at": "Thu, 03 Sep 2026 00:24:02 +0200",
           "source_name": "Le Monde Europe",
           "url": "https://www.lemonde.fr/en/international/article/2026/09/03/ukraine-says-told-un-aviation-watchdog-that-russian-airspace-not-safe_6757102_4.html",
+          "policy_issue": "ukraine_russia",
           "stance": "oppose",
-          "confidence": 0.542
+          "confidence": 0.581
+        },
+        {
+          "published_at": "Fri, 04 Sep 2026 12:28:21 +0200",
+          "source_name": "Le Monde Europe",
+          "url": "https://www.lemonde.fr/en/opinion/article/2026/09/04/the-need-for-european-deterrence-against-russia_6757160_23.html",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.499
+        },
+        {
+          "published_at": "Sat, 05 Sep 2026 07:36:26 +0000",
+          "source_name": "Politico Europe",
+          "url": "https://www.politico.com/news/2026/09/04/trump-russia-nato-espionage-allegations-01066120?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.469
+        }
+      ]
+    },
+    {
+      "country": "SE",
+      "topic": "ukraine_russia",
+      "policy_issue": "ukraine_russia",
+      "policy_issue_label": "ukraine_russia",
+      "stance": "insufficient_evidence",
+      "confidence": 0.0,
+      "confidence_level": "none",
+      "evidence_sufficient": false,
+      "dominant_share": 0.0,
+      "classified_events": 1,
+      "stance_counts": {
+        "support": 0,
+        "oppose": 1,
+        "conditional": 0,
+        "mixed": 0
+      },
+      "stance_weights": {
+        "support": 0.0,
+        "oppose": 0.636,
+        "conditional": 0.0,
+        "mixed": 0.0
+      },
+      "average_detector_confidence": 0.44,
+      "explicit_signal_score": 1.541,
+      "evidence": [
+        {
+          "published_at": "Wed, 26 Aug 2026 02:05:52 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/world/2026/aug/26/ukraine-war-briefing-small-batch-of-patriots-arrives-as-zelenskyy-pleads-for-more",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.44
         }
       ]
     },
     {
       "country": "UA",
       "topic": "defence",
+      "policy_issue": "defence",
+      "policy_issue_label": "defence",
       "stance": "support",
       "confidence": 0.695,
       "confidence_level": "medium",
@@ -1428,6 +722,7 @@
           "published_at": "Tue, 18 Aug 2026 21:24:20 GMT",
           "source_name": "Financial Times Europe",
           "url": "https://www.ft.com/content/7bf79169-f84f-44a2-b64d-c1a3d1fb7d08?syn-25a6b1a6=1",
+          "policy_issue": "defence",
           "stance": "support",
           "confidence": 0.48
         },
@@ -1435,6 +730,7 @@
           "published_at": "Tue, 18 Aug 2026 22:21:59 GMT",
           "source_name": "Guardian Europe",
           "url": "https://www.theguardian.com/world/2026/aug/18/ukraines-dismissed-defence-minister-calls-for-wartime-presidential-election",
+          "policy_issue": "defence",
           "stance": "support",
           "confidence": 0.475
         },
@@ -1442,6 +738,7 @@
           "published_at": "Wed, 19 Aug 2026 10:26:06 +0200",
           "source_name": "Le Monde Europe",
           "url": "https://www.lemonde.fr/en/international/article/2026/08/19/ukraine-s-former-defense-minister-calls-for-elections-and-denounces-corruption-defying-zelensky_6756661_4.html",
+          "policy_issue": "defence",
           "stance": "support",
           "confidence": 0.48
         },
@@ -1449,8 +746,1069 @@
           "published_at": "Sun, 23 Aug 2026 22:00:00 GMT",
           "source_name": "European Commission",
           "url": "https://ec.europa.eu/commission/presscorner/detail/en/ip_26_1750",
+          "policy_issue": "defence",
           "stance": "support",
           "confidence": 0.708
+        }
+      ]
+    },
+    {
+      "country": "UA",
+      "topic": "energy",
+      "policy_issue": "energy",
+      "policy_issue_label": "energy",
+      "stance": "insufficient_evidence",
+      "confidence": 0.0,
+      "confidence_level": "none",
+      "evidence_sufficient": false,
+      "dominant_share": 0.0,
+      "classified_events": 1,
+      "stance_counts": {
+        "support": 0,
+        "oppose": 1,
+        "conditional": 0,
+        "mixed": 0
+      },
+      "stance_weights": {
+        "support": 0.0,
+        "oppose": 0.664,
+        "conditional": 0.0,
+        "mixed": 0.0
+      },
+      "average_detector_confidence": 0.483,
+      "explicit_signal_score": 1.689,
+      "evidence": [
+        {
+          "published_at": "Sun, 30 Aug 2026 09:33:27 +0000",
+          "source_name": "Politico Europe",
+          "url": "https://www.politico.eu/article/russia-preparing-massive-strikes-against-ukraines-energy-facilities/?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
+          "policy_issue": "energy",
+          "stance": "oppose",
+          "confidence": 0.483
+        }
+      ]
+    },
+    {
+      "country": "UA",
+      "topic": "rule_of_law",
+      "policy_issue": "rule_of_law",
+      "policy_issue_label": "rule_of_law",
+      "stance": "insufficient_evidence",
+      "confidence": 0.0,
+      "confidence_level": "none",
+      "evidence_sufficient": false,
+      "dominant_share": 0.0,
+      "classified_events": 1,
+      "stance_counts": {
+        "support": 1,
+        "oppose": 0,
+        "conditional": 0,
+        "mixed": 0
+      },
+      "stance_weights": {
+        "support": 0.644,
+        "oppose": 0.0,
+        "conditional": 0.0,
+        "mixed": 0.0
+      },
+      "average_detector_confidence": 0.453,
+      "explicit_signal_score": 1.584,
+      "evidence": [
+        {
+          "published_at": "Wed, 19 Aug 2026 10:26:06 +0200",
+          "source_name": "Le Monde Europe",
+          "url": "https://www.lemonde.fr/en/international/article/2026/08/19/ukraine-s-former-defense-minister-calls-for-elections-and-denounces-corruption-defying-zelensky_6756661_4.html",
+          "policy_issue": "rule_of_law",
+          "stance": "support",
+          "confidence": 0.453
+        }
+      ]
+    },
+    {
+      "country": "UA",
+      "topic": "ukraine_russia",
+      "policy_issue": "ukraine_russia",
+      "policy_issue_label": "ukraine_russia",
+      "stance": "mixed",
+      "confidence": 0.78,
+      "confidence_level": "high",
+      "evidence_sufficient": true,
+      "dominant_share": 0.49,
+      "classified_events": 26,
+      "stance_counts": {
+        "support": 13,
+        "oppose": 12,
+        "conditional": 0,
+        "mixed": 1
+      },
+      "stance_weights": {
+        "support": 8.728,
+        "oppose": 9.005,
+        "conditional": 0.0,
+        "mixed": 0.663
+      },
+      "average_detector_confidence": 0.55,
+      "explicit_signal_score": 54.886,
+      "evidence": [
+        {
+          "published_at": "Tue, 18 Aug 2026 22:21:59 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/world/2026/aug/18/ukraines-dismissed-defence-minister-calls-for-wartime-presidential-election",
+          "policy_issue": "ukraine_russia",
+          "stance": "support",
+          "confidence": 0.438
+        },
+        {
+          "published_at": "Wed, 19 Aug 2026 10:26:06 +0200",
+          "source_name": "Le Monde Europe",
+          "url": "https://www.lemonde.fr/en/international/article/2026/08/19/ukraine-s-former-defense-minister-calls-for-elections-and-denounces-corruption-defying-zelensky_6756661_4.html",
+          "policy_issue": "ukraine_russia",
+          "stance": "support",
+          "confidence": 0.449
+        },
+        {
+          "published_at": "Sun, 23 Aug 2026 01:04:23 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/world/2026/aug/23/ukraine-war-briefing-macron-focuses-on-delivery-of-missile-interceptors-as-russian-attacks-intensify",
+          "policy_issue": "ukraine_russia",
+          "stance": "mixed",
+          "confidence": 0.481
+        },
+        {
+          "published_at": "Sun, 23 Aug 2026 22:00:00 GMT",
+          "source_name": "European Commission",
+          "url": "https://ec.europa.eu/commission/presscorner/detail/en/ip_26_1750",
+          "policy_issue": "ukraine_russia",
+          "stance": "support",
+          "confidence": 0.701
+        },
+        {
+          "published_at": "Mon, 24 Aug 2026 05:00:04 GMT",
+          "source_name": "Financial Times Europe",
+          "url": "https://www.ft.com/content/680b2d66-5f69-497f-9cb8-9d010ae64f69?syn-25a6b1a6=1",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.459
+        },
+        {
+          "published_at": "Sun, 23 Aug 2026 23:01:01 GMT",
+          "source_name": "Financial Times Europe",
+          "url": "https://www.ft.com/content/4e3c99fe-1a8d-4fb2-b99a-da1c1da4db8e?syn-25a6b1a6=1",
+          "policy_issue": "ukraine_russia",
+          "stance": "support",
+          "confidence": 0.45
+        },
+        {
+          "published_at": null,
+          "source_name": "DW Europe",
+          "url": "https://www.dw.com/en/ukraine-zelenskyy-rejects-wartime-elections/a-78475087?maca=en-rss-en-eu-2092-rdf",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.672
+        },
+        {
+          "published_at": "Sun, 23 Aug 2026 13:01:11 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/world/2026/aug/23/russia-withdraws-ambassador-uk-kremlin-pressure-ukraine-andrey-kelin",
+          "policy_issue": "ukraine_russia",
+          "stance": "support",
+          "confidence": 0.37
+        },
+        {
+          "published_at": "Mon, 24 Aug 2026 10:45:24 +0000",
+          "source_name": "EUobserver",
+          "url": "https://euobserver.com/233219/seize-russias-frozen-e210bn-for-ukraine-now-while-eu-unity-lasts/",
+          "policy_issue": "ukraine_russia",
+          "stance": "support",
+          "confidence": 0.37
+        },
+        {
+          "published_at": "Mon, 24 Aug 2026 16:33:22 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/politics/2026/aug/24/burnham-visit-kyiv-support-for-ukraine",
+          "policy_issue": "ukraine_russia",
+          "stance": "support",
+          "confidence": 1.0
+        },
+        {
+          "published_at": "Tue, 25 Aug 2026 01:38:58 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/world/2026/aug/25/ukraine-war-briefing-ozon-next-in-kyivs-sights-as-sheds-of-wildberries-rival-burn",
+          "policy_issue": "ukraine_russia",
+          "stance": "support",
+          "confidence": 0.37
+        },
+        {
+          "published_at": "Mon, 24 Aug 2026 13:58:48 +0200",
+          "source_name": "Le Monde Europe",
+          "url": "https://www.lemonde.fr/en/international/article/2026/08/24/andy-burnham-insists-the-uk-will-continue-defending-ukraine_6756799_4.html",
+          "policy_issue": "ukraine_russia",
+          "stance": "support",
+          "confidence": 0.37
+        },
+        {
+          "published_at": "Wed, 26 Aug 2026 02:05:52 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/world/2026/aug/26/ukraine-war-briefing-small-batch-of-patriots-arrives-as-zelenskyy-pleads-for-more",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.769
+        },
+        {
+          "published_at": "Tue, 25 Aug 2026 13:20:37 +0200",
+          "source_name": "Le Monde Europe",
+          "url": "https://www.lemonde.fr/en/opinion/article/2026/08/25/europe-must-step-up-its-support-for-ukraine_6756828_23.html",
+          "policy_issue": "ukraine_russia",
+          "stance": "support",
+          "confidence": 0.592
+        },
+        {
+          "published_at": "Thu, 27 Aug 2026 16:56:31 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/world/2026/aug/27/britain-ukraine-war-russia",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.436
+        },
+        {
+          "published_at": "Sun, 30 Aug 2026 09:33:27 +0000",
+          "source_name": "Politico Europe",
+          "url": "https://www.politico.eu/article/russia-preparing-massive-strikes-against-ukraines-energy-facilities/?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.812
+        },
+        {
+          "published_at": "Sun, 30 Aug 2026 21:11:58 GMT",
+          "source_name": "Financial Times Europe",
+          "url": "https://www.ft.com/content/c9d10aeb-163e-46a3-b7ca-376ce6be9f8e?syn-25a6b1a6=1",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.417
+        },
+        {
+          "published_at": "Mon, 31 Aug 2026 20:00:08 +0200",
+          "source_name": "Le Monde Europe",
+          "url": "https://www.lemonde.fr/en/international/article/2026/08/31/ukraine-s-farmers-struggle-to-survive-amid-blocked-grain-shipments-and-bombed-farms_6757023_4.html",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.519
+        },
+        {
+          "published_at": "Wed, 02 Sep 2026 06:00:25 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/film/2026/sep/02/ukrainian-film-maker-sergei-loznitsa-criticises-eu-cuts-venice-biennale-funding-russia-controversy",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.783
+        },
+        {
+          "published_at": "Thu, 03 Sep 2026 00:24:02 +0200",
+          "source_name": "Le Monde Europe",
+          "url": "https://www.lemonde.fr/en/international/article/2026/09/03/ukraine-says-told-un-aviation-watchdog-that-russian-airspace-not-safe_6757102_4.html",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.542
+        }
+      ]
+    }
+  ],
+  "countries": {
+    "DE": {
+      "ukraine_russia": {
+        "ukraine_russia": {
+          "label": "ukraine_russia",
+          "stance": "insufficient_evidence",
+          "confidence": 0.0,
+          "confidence_level": "none",
+          "classified_events": 2,
+          "evidence_sufficient": false
+        }
+      }
+    },
+    "DK": {
+      "migration": {
+        "migration": {
+          "label": "migration",
+          "stance": "insufficient_evidence",
+          "confidence": 0.0,
+          "confidence_level": "none",
+          "classified_events": 1,
+          "evidence_sufficient": false
+        }
+      }
+    },
+    "ES": {
+      "energy": {
+        "energy": {
+          "label": "energy",
+          "stance": "insufficient_evidence",
+          "confidence": 0.0,
+          "confidence_level": "none",
+          "classified_events": 1,
+          "evidence_sufficient": false
+        }
+      },
+      "migration": {
+        "migration": {
+          "label": "migration",
+          "stance": "insufficient_evidence",
+          "confidence": 0.0,
+          "confidence_level": "none",
+          "classified_events": 1,
+          "evidence_sufficient": false
+        }
+      }
+    },
+    "FI": {
+      "ukraine_russia": {
+        "ukraine_russia": {
+          "label": "ukraine_russia",
+          "stance": "insufficient_evidence",
+          "confidence": 0.0,
+          "confidence_level": "none",
+          "classified_events": 1,
+          "evidence_sufficient": false
+        }
+      }
+    },
+    "GB": {
+      "defence": {
+        "defence": {
+          "label": "defence",
+          "stance": "insufficient_evidence",
+          "confidence": 0.0,
+          "confidence_level": "none",
+          "classified_events": 1,
+          "evidence_sufficient": false
+        }
+      },
+      "ukraine_russia": {
+        "ukraine_russia": {
+          "label": "ukraine_russia",
+          "stance": "mixed",
+          "confidence": 0.534,
+          "confidence_level": "medium",
+          "classified_events": 3,
+          "evidence_sufficient": true
+        }
+      }
+    },
+    "PL": {
+      "ukraine_russia": {
+        "ukraine_russia": {
+          "label": "ukraine_russia",
+          "stance": "mixed",
+          "confidence": 0.603,
+          "confidence_level": "medium",
+          "classified_events": 4,
+          "evidence_sufficient": true
+        }
+      }
+    },
+    "RU": {
+      "defence": {
+        "defence": {
+          "label": "defence",
+          "stance": "oppose",
+          "confidence": 0.684,
+          "confidence_level": "medium",
+          "classified_events": 4,
+          "evidence_sufficient": true
+        }
+      },
+      "energy": {
+        "energy": {
+          "label": "energy",
+          "stance": "insufficient_evidence",
+          "confidence": 0.0,
+          "confidence_level": "none",
+          "classified_events": 1,
+          "evidence_sufficient": false
+        }
+      },
+      "migration": {
+        "migration": {
+          "label": "migration",
+          "stance": "insufficient_evidence",
+          "confidence": 0.0,
+          "confidence_level": "none",
+          "classified_events": 1,
+          "evidence_sufficient": false
+        }
+      },
+      "ukraine_russia": {
+        "ukraine_russia": {
+          "label": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.904,
+          "confidence_level": "high",
+          "classified_events": 21,
+          "evidence_sufficient": true
+        }
+      }
+    },
+    "SE": {
+      "ukraine_russia": {
+        "ukraine_russia": {
+          "label": "ukraine_russia",
+          "stance": "insufficient_evidence",
+          "confidence": 0.0,
+          "confidence_level": "none",
+          "classified_events": 1,
+          "evidence_sufficient": false
+        }
+      }
+    },
+    "UA": {
+      "defence": {
+        "defence": {
+          "label": "defence",
+          "stance": "support",
+          "confidence": 0.695,
+          "confidence_level": "medium",
+          "classified_events": 4,
+          "evidence_sufficient": true
+        }
+      },
+      "energy": {
+        "energy": {
+          "label": "energy",
+          "stance": "insufficient_evidence",
+          "confidence": 0.0,
+          "confidence_level": "none",
+          "classified_events": 1,
+          "evidence_sufficient": false
+        }
+      },
+      "rule_of_law": {
+        "rule_of_law": {
+          "label": "rule_of_law",
+          "stance": "insufficient_evidence",
+          "confidence": 0.0,
+          "confidence_level": "none",
+          "classified_events": 1,
+          "evidence_sufficient": false
+        }
+      },
+      "ukraine_russia": {
+        "ukraine_russia": {
+          "label": "ukraine_russia",
+          "stance": "mixed",
+          "confidence": 0.78,
+          "confidence_level": "high",
+          "classified_events": 26,
+          "evidence_sufficient": true
+        }
+      }
+    }
+  },
+  "assessed": [
+    {
+      "country": "GB",
+      "topic": "ukraine_russia",
+      "policy_issue": "ukraine_russia",
+      "policy_issue_label": "ukraine_russia",
+      "stance": "mixed",
+      "confidence": 0.534,
+      "confidence_level": "medium",
+      "evidence_sufficient": true,
+      "dominant_share": 0.713,
+      "classified_events": 3,
+      "stance_counts": {
+        "support": 1,
+        "oppose": 2,
+        "conditional": 0,
+        "mixed": 0
+      },
+      "stance_weights": {
+        "support": 0.583,
+        "oppose": 1.448,
+        "conditional": 0.0,
+        "mixed": 0.0
+      },
+      "average_detector_confidence": 0.503,
+      "explicit_signal_score": 6.376,
+      "evidence": [
+        {
+          "published_at": "Tue, 18 Aug 2026 16:13:17 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/news/video/2026/aug/18/how-credible-is-russias-threat-against-uk-the-latest",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.7
+        },
+        {
+          "published_at": "Sun, 23 Aug 2026 13:01:11 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/world/2026/aug/23/russia-withdraws-ambassador-uk-kremlin-pressure-ukraine-andrey-kelin",
+          "policy_issue": "ukraine_russia",
+          "stance": "support",
+          "confidence": 0.359
+        },
+        {
+          "published_at": "Thu, 27 Aug 2026 16:56:31 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/world/2026/aug/27/britain-ukraine-war-russia",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.45
+        }
+      ]
+    },
+    {
+      "country": "PL",
+      "topic": "ukraine_russia",
+      "policy_issue": "ukraine_russia",
+      "policy_issue_label": "ukraine_russia",
+      "stance": "mixed",
+      "confidence": 0.603,
+      "confidence_level": "medium",
+      "evidence_sufficient": true,
+      "dominant_share": 0.747,
+      "classified_events": 4,
+      "stance_counts": {
+        "support": 1,
+        "oppose": 3,
+        "conditional": 0,
+        "mixed": 0
+      },
+      "stance_weights": {
+        "support": 0.683,
+        "oppose": 2.018,
+        "conditional": 0.0,
+        "mixed": 0.0
+      },
+      "average_detector_confidence": 0.501,
+      "explicit_signal_score": 7.01,
+      "evidence": [
+        {
+          "published_at": null,
+          "source_name": "DW Europe",
+          "url": "https://www.dw.com/en/german-army-helps-poland-construct-a-defensive-barrier-against-russia/a-78464726?maca=en-rss-en-eu-2092-rdf",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.449
+        },
+        {
+          "published_at": null,
+          "source_name": "DW Europe",
+          "url": "https://www.dw.com/en/german-army-helps-poland-protect-itself-against-russia/a-78464726?maca=en-rss-en-eu-2092-rdf",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.474
+        },
+        {
+          "published_at": "Thu, 27 Aug 2026 15:49:44 +0000",
+          "source_name": "Politico Europe",
+          "url": "https://www.politico.eu/article/poland-rules-out-hosting-nuclear-weapons-despite-russian-threat/?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.567
+        },
+        {
+          "published_at": "Wed, 02 Sep 2026 16:58:10 +0000",
+          "source_name": "EUobserver",
+          "url": "https://euobserver.com/235021/poland-calls-for-eu-to-expel-more-russian-diplomats-after-leipzig-bomb-plot/",
+          "policy_issue": "ukraine_russia",
+          "stance": "support",
+          "confidence": 0.513
+        }
+      ]
+    },
+    {
+      "country": "RU",
+      "topic": "defence",
+      "policy_issue": "defence",
+      "policy_issue_label": "defence",
+      "stance": "oppose",
+      "confidence": 0.684,
+      "confidence_level": "medium",
+      "evidence_sufficient": true,
+      "dominant_share": 1.0,
+      "classified_events": 4,
+      "stance_counts": {
+        "support": 0,
+        "oppose": 4,
+        "conditional": 0,
+        "mixed": 0
+      },
+      "stance_weights": {
+        "support": 0.0,
+        "oppose": 2.524,
+        "conditional": 0.0,
+        "mixed": 0.0
+      },
+      "average_detector_confidence": 0.432,
+      "explicit_signal_score": 6.049,
+      "evidence": [
+        {
+          "published_at": "Wed, 26 Aug 2026 02:05:52 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/world/2026/aug/26/ukraine-war-briefing-small-batch-of-patriots-arrives-as-zelenskyy-pleads-for-more",
+          "policy_issue": "defence",
+          "stance": "oppose",
+          "confidence": 0.394
+        },
+        {
+          "published_at": "Thu, 27 Aug 2026 16:56:31 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/world/2026/aug/27/britain-ukraine-war-russia",
+          "policy_issue": "defence",
+          "stance": "oppose",
+          "confidence": 0.412
+        },
+        {
+          "published_at": "Sun, 30 Aug 2026 21:11:58 GMT",
+          "source_name": "Financial Times Europe",
+          "url": "https://www.ft.com/content/c9d10aeb-163e-46a3-b7ca-376ce6be9f8e?syn-25a6b1a6=1",
+          "policy_issue": "defence",
+          "stance": "oppose",
+          "confidence": 0.439
+        },
+        {
+          "published_at": "Sat, 05 Sep 2026 07:36:26 +0000",
+          "source_name": "Politico Europe",
+          "url": "https://www.politico.com/news/2026/09/04/trump-russia-nato-espionage-allegations-01066120?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
+          "policy_issue": "defence",
+          "stance": "oppose",
+          "confidence": 0.484
+        }
+      ]
+    },
+    {
+      "country": "RU",
+      "topic": "ukraine_russia",
+      "policy_issue": "ukraine_russia",
+      "policy_issue_label": "ukraine_russia",
+      "stance": "oppose",
+      "confidence": 0.904,
+      "confidence_level": "high",
+      "evidence_sufficient": true,
+      "dominant_share": 0.868,
+      "classified_events": 21,
+      "stance_counts": {
+        "support": 3,
+        "oppose": 18,
+        "conditional": 0,
+        "mixed": 0
+      },
+      "stance_weights": {
+        "support": 1.993,
+        "oppose": 13.122,
+        "conditional": 0.0,
+        "mixed": 0.0
+      },
+      "average_detector_confidence": 0.569,
+      "explicit_signal_score": 44.34,
+      "evidence": [
+        {
+          "published_at": "Sun, 16 Aug 2026 02:22:46 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/world/2026/aug/16/ukraine-war-briefing-kyiv-faces-missile-barrage-after-zelenskyy-targets-russian-satellite-network",
+          "policy_issue": "ukraine_russia",
+          "stance": "support",
+          "confidence": 0.423
+        },
+        {
+          "published_at": "Mon, 17 Aug 2026 00:51:23 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/world/2026/aug/17/ukraine-war-briefing-kyiv-capable-ballistic-missiles-russia-in-months",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.937
+        },
+        {
+          "published_at": "Mon, 17 Aug 2026 14:04:25 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/world/2026/aug/17/finland-halts-deportation-russian-family-opposed-ukraine-invasion",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.818
+        },
+        {
+          "published_at": "Tue, 18 Aug 2026 16:13:17 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/news/video/2026/aug/18/how-credible-is-russias-threat-against-uk-the-latest",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.579
+        },
+        {
+          "published_at": null,
+          "source_name": "DW Europe",
+          "url": "https://www.dw.com/en/german-army-helps-poland-construct-a-defensive-barrier-against-russia/a-78464726?maca=en-rss-en-eu-2092-rdf",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.499
+        },
+        {
+          "published_at": null,
+          "source_name": "DW Europe",
+          "url": "https://www.dw.com/en/german-army-helps-poland-protect-itself-against-russia/a-78464726?maca=en-rss-en-eu-2092-rdf",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.499
+        },
+        {
+          "published_at": "Sun, 23 Aug 2026 01:04:23 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/world/2026/aug/23/ukraine-war-briefing-macron-focuses-on-delivery-of-missile-interceptors-as-russian-attacks-intensify",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.509
+        },
+        {
+          "published_at": "Mon, 24 Aug 2026 05:00:04 GMT",
+          "source_name": "Financial Times Europe",
+          "url": "https://www.ft.com/content/680b2d66-5f69-497f-9cb8-9d010ae64f69?syn-25a6b1a6=1",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.499
+        },
+        {
+          "published_at": "Mon, 24 Aug 2026 17:00:17 +0000",
+          "source_name": "Politico Europe",
+          "url": "https://www.politico.eu/article/british-prime-minister-andy-burnham-ukraine-ups-ante-against-russia/?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.499
+        },
+        {
+          "published_at": "Wed, 26 Aug 2026 02:05:52 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/world/2026/aug/26/ukraine-war-briefing-small-batch-of-patriots-arrives-as-zelenskyy-pleads-for-more",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.731
+        },
+        {
+          "published_at": "Thu, 27 Aug 2026 15:49:44 +0000",
+          "source_name": "Politico Europe",
+          "url": "https://www.politico.eu/article/poland-rules-out-hosting-nuclear-weapons-despite-russian-threat/?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.498
+        },
+        {
+          "published_at": "Thu, 27 Aug 2026 16:56:31 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/world/2026/aug/27/britain-ukraine-war-russia",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.499
+        },
+        {
+          "published_at": "Sun, 30 Aug 2026 09:33:27 +0000",
+          "source_name": "Politico Europe",
+          "url": "https://www.politico.eu/article/russia-preparing-massive-strikes-against-ukraines-energy-facilities/?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.713
+        },
+        {
+          "published_at": "Sun, 30 Aug 2026 21:11:58 GMT",
+          "source_name": "Financial Times Europe",
+          "url": "https://www.ft.com/content/c9d10aeb-163e-46a3-b7ca-376ce6be9f8e?syn-25a6b1a6=1",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.499
+        },
+        {
+          "published_at": "Tue, 01 Sep 2026 07:03:27 +0000",
+          "source_name": "Politico Europe",
+          "url": "https://www.politico.com/news/2026/08/31/bessent-welcomes-russia-back-to-g20-as-europe-pushes-back-01058296?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
+          "policy_issue": "ukraine_russia",
+          "stance": "support",
+          "confidence": 0.545
+        },
+        {
+          "published_at": "Wed, 02 Sep 2026 06:00:25 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/film/2026/sep/02/ukrainian-film-maker-sergei-loznitsa-criticises-eu-cuts-venice-biennale-funding-russia-controversy",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.712
+        },
+        {
+          "published_at": "Wed, 02 Sep 2026 16:58:10 +0000",
+          "source_name": "EUobserver",
+          "url": "https://euobserver.com/235021/poland-calls-for-eu-to-expel-more-russian-diplomats-after-leipzig-bomb-plot/",
+          "policy_issue": "ukraine_russia",
+          "stance": "support",
+          "confidence": 0.482
+        },
+        {
+          "published_at": "Thu, 03 Sep 2026 00:24:02 +0200",
+          "source_name": "Le Monde Europe",
+          "url": "https://www.lemonde.fr/en/international/article/2026/09/03/ukraine-says-told-un-aviation-watchdog-that-russian-airspace-not-safe_6757102_4.html",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.581
+        },
+        {
+          "published_at": "Fri, 04 Sep 2026 12:28:21 +0200",
+          "source_name": "Le Monde Europe",
+          "url": "https://www.lemonde.fr/en/opinion/article/2026/09/04/the-need-for-european-deterrence-against-russia_6757160_23.html",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.499
+        },
+        {
+          "published_at": "Sat, 05 Sep 2026 07:36:26 +0000",
+          "source_name": "Politico Europe",
+          "url": "https://www.politico.com/news/2026/09/04/trump-russia-nato-espionage-allegations-01066120?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.469
+        }
+      ]
+    },
+    {
+      "country": "UA",
+      "topic": "defence",
+      "policy_issue": "defence",
+      "policy_issue_label": "defence",
+      "stance": "support",
+      "confidence": 0.695,
+      "confidence_level": "medium",
+      "evidence_sufficient": true,
+      "dominant_share": 1.0,
+      "classified_events": 4,
+      "stance_counts": {
+        "support": 4,
+        "oppose": 0,
+        "conditional": 0,
+        "mixed": 0
+      },
+      "stance_weights": {
+        "support": 2.793,
+        "oppose": 0.0,
+        "conditional": 0.0,
+        "mixed": 0.0
+      },
+      "average_detector_confidence": 0.536,
+      "explicit_signal_score": 8.446,
+      "evidence": [
+        {
+          "published_at": "Tue, 18 Aug 2026 21:24:20 GMT",
+          "source_name": "Financial Times Europe",
+          "url": "https://www.ft.com/content/7bf79169-f84f-44a2-b64d-c1a3d1fb7d08?syn-25a6b1a6=1",
+          "policy_issue": "defence",
+          "stance": "support",
+          "confidence": 0.48
+        },
+        {
+          "published_at": "Tue, 18 Aug 2026 22:21:59 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/world/2026/aug/18/ukraines-dismissed-defence-minister-calls-for-wartime-presidential-election",
+          "policy_issue": "defence",
+          "stance": "support",
+          "confidence": 0.475
+        },
+        {
+          "published_at": "Wed, 19 Aug 2026 10:26:06 +0200",
+          "source_name": "Le Monde Europe",
+          "url": "https://www.lemonde.fr/en/international/article/2026/08/19/ukraine-s-former-defense-minister-calls-for-elections-and-denounces-corruption-defying-zelensky_6756661_4.html",
+          "policy_issue": "defence",
+          "stance": "support",
+          "confidence": 0.48
+        },
+        {
+          "published_at": "Sun, 23 Aug 2026 22:00:00 GMT",
+          "source_name": "European Commission",
+          "url": "https://ec.europa.eu/commission/presscorner/detail/en/ip_26_1750",
+          "policy_issue": "defence",
+          "stance": "support",
+          "confidence": 0.708
+        }
+      ]
+    },
+    {
+      "country": "UA",
+      "topic": "ukraine_russia",
+      "policy_issue": "ukraine_russia",
+      "policy_issue_label": "ukraine_russia",
+      "stance": "mixed",
+      "confidence": 0.78,
+      "confidence_level": "high",
+      "evidence_sufficient": true,
+      "dominant_share": 0.49,
+      "classified_events": 26,
+      "stance_counts": {
+        "support": 13,
+        "oppose": 12,
+        "conditional": 0,
+        "mixed": 1
+      },
+      "stance_weights": {
+        "support": 8.728,
+        "oppose": 9.005,
+        "conditional": 0.0,
+        "mixed": 0.663
+      },
+      "average_detector_confidence": 0.55,
+      "explicit_signal_score": 54.886,
+      "evidence": [
+        {
+          "published_at": "Tue, 18 Aug 2026 22:21:59 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/world/2026/aug/18/ukraines-dismissed-defence-minister-calls-for-wartime-presidential-election",
+          "policy_issue": "ukraine_russia",
+          "stance": "support",
+          "confidence": 0.438
+        },
+        {
+          "published_at": "Wed, 19 Aug 2026 10:26:06 +0200",
+          "source_name": "Le Monde Europe",
+          "url": "https://www.lemonde.fr/en/international/article/2026/08/19/ukraine-s-former-defense-minister-calls-for-elections-and-denounces-corruption-defying-zelensky_6756661_4.html",
+          "policy_issue": "ukraine_russia",
+          "stance": "support",
+          "confidence": 0.449
+        },
+        {
+          "published_at": "Sun, 23 Aug 2026 01:04:23 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/world/2026/aug/23/ukraine-war-briefing-macron-focuses-on-delivery-of-missile-interceptors-as-russian-attacks-intensify",
+          "policy_issue": "ukraine_russia",
+          "stance": "mixed",
+          "confidence": 0.481
+        },
+        {
+          "published_at": "Sun, 23 Aug 2026 22:00:00 GMT",
+          "source_name": "European Commission",
+          "url": "https://ec.europa.eu/commission/presscorner/detail/en/ip_26_1750",
+          "policy_issue": "ukraine_russia",
+          "stance": "support",
+          "confidence": 0.701
+        },
+        {
+          "published_at": "Mon, 24 Aug 2026 05:00:04 GMT",
+          "source_name": "Financial Times Europe",
+          "url": "https://www.ft.com/content/680b2d66-5f69-497f-9cb8-9d010ae64f69?syn-25a6b1a6=1",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.459
+        },
+        {
+          "published_at": "Sun, 23 Aug 2026 23:01:01 GMT",
+          "source_name": "Financial Times Europe",
+          "url": "https://www.ft.com/content/4e3c99fe-1a8d-4fb2-b99a-da1c1da4db8e?syn-25a6b1a6=1",
+          "policy_issue": "ukraine_russia",
+          "stance": "support",
+          "confidence": 0.45
+        },
+        {
+          "published_at": null,
+          "source_name": "DW Europe",
+          "url": "https://www.dw.com/en/ukraine-zelenskyy-rejects-wartime-elections/a-78475087?maca=en-rss-en-eu-2092-rdf",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.672
+        },
+        {
+          "published_at": "Sun, 23 Aug 2026 13:01:11 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/world/2026/aug/23/russia-withdraws-ambassador-uk-kremlin-pressure-ukraine-andrey-kelin",
+          "policy_issue": "ukraine_russia",
+          "stance": "support",
+          "confidence": 0.37
+        },
+        {
+          "published_at": "Mon, 24 Aug 2026 10:45:24 +0000",
+          "source_name": "EUobserver",
+          "url": "https://euobserver.com/233219/seize-russias-frozen-e210bn-for-ukraine-now-while-eu-unity-lasts/",
+          "policy_issue": "ukraine_russia",
+          "stance": "support",
+          "confidence": 0.37
+        },
+        {
+          "published_at": "Mon, 24 Aug 2026 16:33:22 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/politics/2026/aug/24/burnham-visit-kyiv-support-for-ukraine",
+          "policy_issue": "ukraine_russia",
+          "stance": "support",
+          "confidence": 1.0
+        },
+        {
+          "published_at": "Tue, 25 Aug 2026 01:38:58 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/world/2026/aug/25/ukraine-war-briefing-ozon-next-in-kyivs-sights-as-sheds-of-wildberries-rival-burn",
+          "policy_issue": "ukraine_russia",
+          "stance": "support",
+          "confidence": 0.37
+        },
+        {
+          "published_at": "Mon, 24 Aug 2026 13:58:48 +0200",
+          "source_name": "Le Monde Europe",
+          "url": "https://www.lemonde.fr/en/international/article/2026/08/24/andy-burnham-insists-the-uk-will-continue-defending-ukraine_6756799_4.html",
+          "policy_issue": "ukraine_russia",
+          "stance": "support",
+          "confidence": 0.37
+        },
+        {
+          "published_at": "Wed, 26 Aug 2026 02:05:52 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/world/2026/aug/26/ukraine-war-briefing-small-batch-of-patriots-arrives-as-zelenskyy-pleads-for-more",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.769
+        },
+        {
+          "published_at": "Tue, 25 Aug 2026 13:20:37 +0200",
+          "source_name": "Le Monde Europe",
+          "url": "https://www.lemonde.fr/en/opinion/article/2026/08/25/europe-must-step-up-its-support-for-ukraine_6756828_23.html",
+          "policy_issue": "ukraine_russia",
+          "stance": "support",
+          "confidence": 0.592
+        },
+        {
+          "published_at": "Thu, 27 Aug 2026 16:56:31 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/world/2026/aug/27/britain-ukraine-war-russia",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.436
+        },
+        {
+          "published_at": "Sun, 30 Aug 2026 09:33:27 +0000",
+          "source_name": "Politico Europe",
+          "url": "https://www.politico.eu/article/russia-preparing-massive-strikes-against-ukraines-energy-facilities/?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.812
+        },
+        {
+          "published_at": "Sun, 30 Aug 2026 21:11:58 GMT",
+          "source_name": "Financial Times Europe",
+          "url": "https://www.ft.com/content/c9d10aeb-163e-46a3-b7ca-376ce6be9f8e?syn-25a6b1a6=1",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.417
+        },
+        {
+          "published_at": "Mon, 31 Aug 2026 20:00:08 +0200",
+          "source_name": "Le Monde Europe",
+          "url": "https://www.lemonde.fr/en/international/article/2026/08/31/ukraine-s-farmers-struggle-to-survive-amid-blocked-grain-shipments-and-bombed-farms_6757023_4.html",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.519
+        },
+        {
+          "published_at": "Wed, 02 Sep 2026 06:00:25 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/film/2026/sep/02/ukrainian-film-maker-sergei-loznitsa-criticises-eu-cuts-venice-biennale-funding-russia-controversy",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.783
+        },
+        {
+          "published_at": "Thu, 03 Sep 2026 00:24:02 +0200",
+          "source_name": "Le Monde Europe",
+          "url": "https://www.lemonde.fr/en/international/article/2026/09/03/ukraine-says-told-un-aviation-watchdog-that-russian-airspace-not-safe_6757102_4.html",
+          "policy_issue": "ukraine_russia",
+          "stance": "oppose",
+          "confidence": 0.542
         }
       ]
     }
@@ -1459,6 +1817,8 @@
     {
       "country": "DE",
       "topic": "ukraine_russia",
+      "policy_issue": "ukraine_russia",
+      "policy_issue_label": "ukraine_russia",
       "stance": "insufficient_evidence",
       "confidence": 0.0,
       "confidence_level": "none",
@@ -1484,6 +1844,7 @@
           "published_at": null,
           "source_name": "DW Europe",
           "url": "https://www.dw.com/en/german-army-helps-poland-construct-a-defensive-barrier-against-russia/a-78464726?maca=en-rss-en-eu-2092-rdf",
+          "policy_issue": "ukraine_russia",
           "stance": "oppose",
           "confidence": 0.418
         },
@@ -1491,6 +1852,7 @@
           "published_at": null,
           "source_name": "DW Europe",
           "url": "https://www.dw.com/en/german-army-helps-poland-protect-itself-against-russia/a-78464726?maca=en-rss-en-eu-2092-rdf",
+          "policy_issue": "ukraine_russia",
           "stance": "oppose",
           "confidence": 0.444
         }
@@ -1499,6 +1861,8 @@
     {
       "country": "DK",
       "topic": "migration",
+      "policy_issue": "migration",
+      "policy_issue_label": "migration",
       "stance": "insufficient_evidence",
       "confidence": 0.0,
       "confidence_level": "none",
@@ -1524,6 +1888,7 @@
           "published_at": "Fri, 04 Sep 2026 12:26:17 +0200",
           "source_name": "Le Monde Europe",
           "url": "https://www.lemonde.fr/en/international/article/2026/09/04/denmark-aims-to-send-rejected-migrants-to-return-hubs-by-2027_6757159_4.html",
+          "policy_issue": "migration",
           "stance": "oppose",
           "confidence": 0.651
         }
@@ -1531,40 +1896,9 @@
     },
     {
       "country": "ES",
-      "topic": "migration",
-      "stance": "insufficient_evidence",
-      "confidence": 0.0,
-      "confidence_level": "none",
-      "evidence_sufficient": false,
-      "dominant_share": 0.0,
-      "classified_events": 1,
-      "stance_counts": {
-        "support": 0,
-        "oppose": 1,
-        "conditional": 0,
-        "mixed": 0
-      },
-      "stance_weights": {
-        "support": 0.0,
-        "oppose": 0.709,
-        "conditional": 0.0,
-        "mixed": 0.0
-      },
-      "average_detector_confidence": 0.552,
-      "explicit_signal_score": 1.931,
-      "evidence": [
-        {
-          "published_at": "Mon, 31 Aug 2026 13:26:36 +0200",
-          "source_name": "Le Monde Europe",
-          "url": "https://www.lemonde.fr/en/international/article/2026/08/31/spain-s-sanchez-rules-out-responsibility-of-morocco-in-migrant-surge_6757010_4.html",
-          "stance": "oppose",
-          "confidence": 0.552
-        }
-      ]
-    },
-    {
-      "country": "ES",
       "topic": "energy",
+      "policy_issue": "energy",
+      "policy_issue_label": "energy",
       "stance": "insufficient_evidence",
       "confidence": 0.0,
       "confidence_level": "none",
@@ -1590,14 +1924,53 @@
           "published_at": "Fri, 04 Sep 2026 04:00:27 GMT",
           "source_name": "Financial Times Europe",
           "url": "https://www.ft.com/content/86da564e-aec7-4d53-b7b8-93bbdd240061?syn-25a6b1a6=1",
+          "policy_issue": "energy",
           "stance": "support",
           "confidence": 0.584
         }
       ]
     },
     {
+      "country": "ES",
+      "topic": "migration",
+      "policy_issue": "migration",
+      "policy_issue_label": "migration",
+      "stance": "insufficient_evidence",
+      "confidence": 0.0,
+      "confidence_level": "none",
+      "evidence_sufficient": false,
+      "dominant_share": 0.0,
+      "classified_events": 1,
+      "stance_counts": {
+        "support": 0,
+        "oppose": 1,
+        "conditional": 0,
+        "mixed": 0
+      },
+      "stance_weights": {
+        "support": 0.0,
+        "oppose": 0.709,
+        "conditional": 0.0,
+        "mixed": 0.0
+      },
+      "average_detector_confidence": 0.552,
+      "explicit_signal_score": 1.931,
+      "evidence": [
+        {
+          "published_at": "Mon, 31 Aug 2026 13:26:36 +0200",
+          "source_name": "Le Monde Europe",
+          "url": "https://www.lemonde.fr/en/international/article/2026/08/31/spain-s-sanchez-rules-out-responsibility-of-morocco-in-migrant-surge_6757010_4.html",
+          "policy_issue": "migration",
+          "stance": "oppose",
+          "confidence": 0.552
+        }
+      ]
+    },
+    {
       "country": "FI",
       "topic": "ukraine_russia",
+      "policy_issue": "ukraine_russia",
+      "policy_issue_label": "ukraine_russia",
       "stance": "insufficient_evidence",
       "confidence": 0.0,
       "confidence_level": "none",
@@ -1623,6 +1996,7 @@
           "published_at": "Mon, 17 Aug 2026 14:04:25 GMT",
           "source_name": "Guardian Europe",
           "url": "https://www.theguardian.com/world/2026/aug/17/finland-halts-deportation-russian-family-opposed-ukraine-invasion",
+          "policy_issue": "ukraine_russia",
           "stance": "oppose",
           "confidence": 0.658
         }
@@ -1631,6 +2005,8 @@
     {
       "country": "GB",
       "topic": "defence",
+      "policy_issue": "defence",
+      "policy_issue_label": "defence",
       "stance": "insufficient_evidence",
       "confidence": 0.0,
       "confidence_level": "none",
@@ -1656,6 +2032,7 @@
           "published_at": "Thu, 27 Aug 2026 16:56:31 GMT",
           "source_name": "Guardian Europe",
           "url": "https://www.theguardian.com/world/2026/aug/27/britain-ukraine-war-russia",
+          "policy_issue": "defence",
           "stance": "oppose",
           "confidence": 0.358
         }
@@ -1663,40 +2040,9 @@
     },
     {
       "country": "RU",
-      "topic": "migration",
-      "stance": "insufficient_evidence",
-      "confidence": 0.0,
-      "confidence_level": "none",
-      "evidence_sufficient": false,
-      "dominant_share": 0.0,
-      "classified_events": 1,
-      "stance_counts": {
-        "support": 0,
-        "oppose": 1,
-        "conditional": 0,
-        "mixed": 0
-      },
-      "stance_weights": {
-        "support": 0.0,
-        "oppose": 0.611,
-        "conditional": 0.0,
-        "mixed": 0.0
-      },
-      "average_detector_confidence": 0.401,
-      "explicit_signal_score": 1.404,
-      "evidence": [
-        {
-          "published_at": "Mon, 17 Aug 2026 14:04:25 GMT",
-          "source_name": "Guardian Europe",
-          "url": "https://www.theguardian.com/world/2026/aug/17/finland-halts-deportation-russian-family-opposed-ukraine-invasion",
-          "stance": "oppose",
-          "confidence": 0.401
-        }
-      ]
-    },
-    {
-      "country": "RU",
       "topic": "energy",
+      "policy_issue": "energy",
+      "policy_issue_label": "energy",
       "stance": "insufficient_evidence",
       "confidence": 0.0,
       "confidence_level": "none",
@@ -1722,14 +2068,53 @@
           "published_at": "Sun, 30 Aug 2026 09:33:27 +0000",
           "source_name": "Politico Europe",
           "url": "https://www.politico.eu/article/russia-preparing-massive-strikes-against-ukraines-energy-facilities/?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
+          "policy_issue": "energy",
           "stance": "oppose",
           "confidence": 0.437
         }
       ]
     },
     {
+      "country": "RU",
+      "topic": "migration",
+      "policy_issue": "migration",
+      "policy_issue_label": "migration",
+      "stance": "insufficient_evidence",
+      "confidence": 0.0,
+      "confidence_level": "none",
+      "evidence_sufficient": false,
+      "dominant_share": 0.0,
+      "classified_events": 1,
+      "stance_counts": {
+        "support": 0,
+        "oppose": 1,
+        "conditional": 0,
+        "mixed": 0
+      },
+      "stance_weights": {
+        "support": 0.0,
+        "oppose": 0.611,
+        "conditional": 0.0,
+        "mixed": 0.0
+      },
+      "average_detector_confidence": 0.401,
+      "explicit_signal_score": 1.404,
+      "evidence": [
+        {
+          "published_at": "Mon, 17 Aug 2026 14:04:25 GMT",
+          "source_name": "Guardian Europe",
+          "url": "https://www.theguardian.com/world/2026/aug/17/finland-halts-deportation-russian-family-opposed-ukraine-invasion",
+          "policy_issue": "migration",
+          "stance": "oppose",
+          "confidence": 0.401
+        }
+      ]
+    },
+    {
       "country": "SE",
       "topic": "ukraine_russia",
+      "policy_issue": "ukraine_russia",
+      "policy_issue_label": "ukraine_russia",
       "stance": "insufficient_evidence",
       "confidence": 0.0,
       "confidence_level": "none",
@@ -1755,6 +2140,7 @@
           "published_at": "Wed, 26 Aug 2026 02:05:52 GMT",
           "source_name": "Guardian Europe",
           "url": "https://www.theguardian.com/world/2026/aug/26/ukraine-war-briefing-small-batch-of-patriots-arrives-as-zelenskyy-pleads-for-more",
+          "policy_issue": "ukraine_russia",
           "stance": "oppose",
           "confidence": 0.44
         }
@@ -1763,6 +2149,8 @@
     {
       "country": "UA",
       "topic": "energy",
+      "policy_issue": "energy",
+      "policy_issue_label": "energy",
       "stance": "insufficient_evidence",
       "confidence": 0.0,
       "confidence_level": "none",
@@ -1788,6 +2176,7 @@
           "published_at": "Sun, 30 Aug 2026 09:33:27 +0000",
           "source_name": "Politico Europe",
           "url": "https://www.politico.eu/article/russia-preparing-massive-strikes-against-ukraines-energy-facilities/?utm_source=RSS_Feed&utm_medium=RSS&utm_campaign=RSS_Syndication",
+          "policy_issue": "energy",
           "stance": "oppose",
           "confidence": 0.483
         }
@@ -1796,6 +2185,8 @@
     {
       "country": "UA",
       "topic": "rule_of_law",
+      "policy_issue": "rule_of_law",
+      "policy_issue_label": "rule_of_law",
       "stance": "insufficient_evidence",
       "confidence": 0.0,
       "confidence_level": "none",
@@ -1821,6 +2212,7 @@
           "published_at": "Wed, 19 Aug 2026 10:26:06 +0200",
           "source_name": "Le Monde Europe",
           "url": "https://www.lemonde.fr/en/international/article/2026/08/19/ukraine-s-former-defense-minister-calls-for-elections-and-denounces-corruption-defying-zelensky_6756661_4.html",
+          "policy_issue": "rule_of_law",
           "stance": "support",
           "confidence": 0.453
         }
@@ -1831,8 +2223,8 @@
   "events_with_stance_schema": 40,
   "events_with_classified_stance": 40,
   "mode": "all",
-  "method": "country_topic_stance_aggregation_v1",
-  "semantic_dimension": "stance",
+  "method": "country_policy_issue_stance_aggregation_v2",
+  "semantic_dimension": "policy_issue_stance",
   "salience_inferred": false,
   "thresholds": {
     "minimum_classified_events": 2,
@@ -1845,8 +2237,7 @@
     "oppose",
     "conditional",
     "mixed",
-    "insufficient_evidence",
-    "unknown"
+    "insufficient_evidence"
   ],
-  "note": "Country-level stance is aggregated only from explicit event-level country-topic stance evidence. Topic salience and relationship tone are never used to infer stance."
+  "note": "Country-level stance is aggregated only from explicit policy-issue evidence. Broad topic salience and relationship tone are never used to infer policy position."
 }

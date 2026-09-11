@@ -1,13 +1,14 @@
 {
   "rows": [],
+  "countries": {},
   "assessed": [],
   "insufficient": [],
   "event_count": 20,
   "events_with_stance_schema": 0,
   "events_with_classified_stance": 0,
   "mode": "external",
-  "method": "country_topic_stance_aggregation_v1",
-  "semantic_dimension": "stance",
+  "method": "country_policy_issue_stance_aggregation_v2",
+  "semantic_dimension": "policy_issue_stance",
   "salience_inferred": false,
   "thresholds": {
     "minimum_classified_events": 2,
@@ -20,8 +21,7 @@
     "oppose",
     "conditional",
     "mixed",
-    "insufficient_evidence",
-    "unknown"
+    "insufficient_evidence"
   ],
-  "note": "Country-level stance is aggregated only from explicit event-level country-topic stance evidence. Topic salience and relationship tone are never used to infer stance."
+  "note": "Country-level stance is aggregated only from explicit policy-issue evidence. Broad topic salience and relationship tone are never used to infer policy position."
 }
