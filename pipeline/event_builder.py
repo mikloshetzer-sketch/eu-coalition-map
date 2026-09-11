@@ -30,6 +30,7 @@ from typing import Any, Dict, List, Optional
 
 from detectors.topic_detector import analyze_topic_salience_from_parts
 from detectors.relationship_detector import detect_relationship_from_parts
+from detectors.stance_detector import analyze_country_stances_from_parts
 from detectors.country_detector import (
     detect_countries_from_parts,
     split_country_groups,
@@ -37,7 +38,7 @@ from detectors.country_detector import (
 )
 
 
-EVENT_SCHEMA_VERSION = "event_v3_topic_salience"
+EVENT_SCHEMA_VERSION = "event_v4_topic_salience_stance"
 
 
 def utc_now_iso() -> str:
@@ -163,6 +164,175 @@ def _relationship_score(
         return 0.0
 
 
+
+def _safe_stance_analysis(
+    *,
+    countries: List[str],
+    topics: List[str],
+    title: str,
+    summary: str,
+    body: str,
+) -> Dict[str, Any]:
+    """
+    Run the country × topic stance detector defensively.
+
+    This layer is event-level evidence only. The network builder must later
+    aggregate multiple explicit event-level stance signals before assigning a
+    country-level policy stance.
+
+    Unknown stance is preferred over guessing.
+    """
+    if not countries or not topics:
+        return {
+            "all": {},
+            "classified": {},
+            "method": "country_topic_stance_rule_v1",
+            "semantic_dimension": "stance",
+            "labels": [
+                "support",
+                "oppose",
+                "conditional",
+                "mixed",
+                "unknown",
+            ],
+            "note": (
+                "No stance analysis was possible because the event had no "
+                "detected country or topic."
+            ),
+        }
+
+    try:
+        result = analyze_country_stances_from_parts(
+            countries=countries,
+            topics=topics,
+            title=title,
+            summary=summary,
+            body=body,
+        )
+
+        if isinstance(result, dict):
+            return result
+
+    except Exception as exc:
+        return {
+            "all": {},
+            "classified": {},
+            "method": "country_topic_stance_rule_v1",
+            "semantic_dimension": "stance",
+            "labels": [
+                "support",
+                "oppose",
+                "conditional",
+                "mixed",
+                "unknown",
+            ],
+            "error": (
+                f"{type(exc).__name__}: {exc}"
+            ),
+            "note": (
+                "Stance detector failed defensively; the event remains usable "
+                "for salience, country and relationship analysis."
+            ),
+        }
+
+    return {
+        "all": {},
+        "classified": {},
+        "method": "country_topic_stance_rule_v1",
+        "semantic_dimension": "stance",
+        "labels": [
+            "support",
+            "oppose",
+            "conditional",
+            "mixed",
+            "unknown",
+        ],
+        "note": "No stance result returned.",
+    }
+
+
+def _compact_classified_stances(
+    stance_result: Dict[str, Any],
+) -> Dict[str, Dict[str, Dict[str, Any]]]:
+    """
+    Keep only fields required by downstream aggregation.
+
+    The full evidence matrix remains available separately under
+    `stance_analysis` for diagnostics.
+    """
+    classified = stance_result.get(
+        "classified",
+        {},
+    )
+
+    if not isinstance(classified, dict):
+        return {}
+
+    output: Dict[str, Dict[str, Dict[str, Any]]] = {}
+
+    for country, topic_map in classified.items():
+        if not isinstance(topic_map, dict):
+            continue
+
+        country_out: Dict[str, Dict[str, Any]] = {}
+
+        for topic, result in topic_map.items():
+            if not isinstance(result, dict):
+                continue
+
+            stance = str(
+                result.get(
+                    "stance",
+                    "unknown",
+                )
+            )
+
+            if stance == "unknown":
+                continue
+
+            country_out[topic] = {
+                "stance": stance,
+                "confidence": float(
+                    result.get(
+                        "confidence",
+                        0.0,
+                    )
+                    or 0.0
+                ),
+                "confidence_level": str(
+                    result.get(
+                        "confidence_level",
+                        "none",
+                    )
+                ),
+                "explicit_signal_score": float(
+                    result.get(
+                        "explicit_signal_score",
+                        0.0,
+                    )
+                    or 0.0
+                ),
+                "evidence_count": int(
+                    result.get(
+                        "evidence_count",
+                        0,
+                    )
+                    or 0
+                ),
+                "scores": result.get(
+                    "scores",
+                    {},
+                ),
+                "reason": result.get(
+                    "reason",
+                ),
+            }
+
+        if country_out:
+            output[str(country).upper()] = country_out
+
+    return output
+
 def build_event(
     *,
     layer: str,
@@ -266,6 +436,18 @@ def build_event(
         countries
     )
 
+    stance_analysis = _safe_stance_analysis(
+        countries=countries,
+        topics=topics,
+        title=title,
+        summary=summary,
+        body=body,
+    )
+
+    classified_stances = _compact_classified_stances(
+        stance_analysis
+    )
+
     relationship = _safe_relationship_from_parts(
         title=title,
         summary=summary,
@@ -321,6 +503,25 @@ def build_event(
         "countries": countries,
         "country_groups": country_groups,
         "country_pairs": country_pairs,
+
+        # Country × topic stance layer — event-level explicit evidence.
+        #
+        # `stances` contains only classified country-topic positions.
+        # `stance_analysis` keeps the full diagnostic result, including
+        # unknown combinations and evidence snippets.
+        #
+        # These fields must NOT be interpreted as final country policy stance.
+        # Downstream aggregation must require multiple consistent observations.
+        "stances": classified_stances,
+        "stance_analysis": stance_analysis,
+        "stance_method": stance_analysis.get(
+            "method"
+        ),
+        "stance_semantic_dimension": stance_analysis.get(
+            "semantic_dimension",
+            "stance",
+        ),
+        "stance_inferred_from_salience": False,
 
         # Event-level semantic context.
         #
@@ -418,6 +619,30 @@ def event_has_relationship(
         "none",
         "null",
     }
+
+
+
+def event_has_classified_stance(
+    event: Dict[str, Any],
+) -> bool:
+    """
+    True when at least one explicit country × topic stance was classified.
+
+    This is event-level evidence only, not a final country stance.
+    """
+    stances = event.get(
+        "stances",
+        {},
+    )
+
+    if not isinstance(stances, dict):
+        return False
+
+    return any(
+        isinstance(topic_map, dict)
+        and bool(topic_map)
+        for topic_map in stances.values()
+    )
 
 
 def event_is_relevant(
