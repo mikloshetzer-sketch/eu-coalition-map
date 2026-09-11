@@ -22,7 +22,7 @@ if str(ROOT) not in sys.path:
 
 from detectors.relationship_detector import detect_pair_relationship_from_parts
 
-NETWORK_BUILDER_VERSION = "v6_topic_salience"
+NETWORK_BUILDER_VERSION = "v7_topic_salience_stance"
 
 
 EVENTS_DIR = ROOT / "data" / "events"
@@ -80,6 +80,16 @@ MIN_EDGE_COUNT = 5
 MIN_EDGE_WEIGHT = 0.60
 MIN_SIMILARITY_EDGE = 0.20
 DIVISIVE_VOTE_MIN_UNIQUE_POSITIONS = 2
+
+# Country × topic stance aggregation.
+#
+# Final country-level stance is intentionally conservative. A single article
+# is never enough for a final policy classification.
+STANCE_LABELS = ("support", "oppose", "conditional", "mixed")
+STANCE_MIN_CLASSIFIED_EVENTS = 2
+STANCE_MIN_WEIGHT = 1.50
+STANCE_DOMINANCE_SHARE = 0.65
+STANCE_MIXED_MIN_SHARE = 0.25
 
 VOTE_TOPIC_SCORE = {
     "for": 1.0,
@@ -712,6 +722,608 @@ def topic_method_counts(events):
             key=lambda item: item[0],
         )
     )
+
+
+
+def _event_stance_map(event):
+    """
+    Return compact event-level country × topic stance evidence.
+
+    Preferred schema:
+        event["stances"][COUNTRY][topic]
+
+    Events without the stance v4 schema simply contribute no stance evidence.
+    We do not infer stance from topic salience or relationship tone.
+    """
+    stances = event.get("stances", {})
+
+    if not isinstance(stances, dict):
+        return {}
+
+    return stances
+
+
+def _stance_event_weight(event, stance_record):
+    """
+    Weight one explicit stance observation.
+
+    Event importance is moderated by detector confidence. This preserves source
+    weighting while preventing a weak semantic classification from receiving
+    full GDELT/RSS event weight.
+    """
+    base = compute_weight(event)
+
+    try:
+        confidence = float(
+            stance_record.get(
+                "confidence",
+                0.0,
+            )
+            or 0.0
+        )
+    except Exception:
+        confidence = 0.0
+
+    confidence = max(
+        0.0,
+        min(
+            1.0,
+            confidence,
+        ),
+    )
+
+    # Classified evidence should have some minimum contribution, while stronger
+    # detector confidence scales toward the event's full weight.
+    confidence_factor = (
+        0.35
+        + 0.65 * confidence
+    )
+
+    return max(
+        0.0,
+        base * confidence_factor,
+    )
+
+
+def _stance_confidence(
+    *,
+    event_count,
+    dominant_share,
+    total_weight,
+):
+    """
+    Confidence in the AGGREGATED country-topic stance.
+
+    Combines:
+      - number of independent classified events,
+      - directional consistency,
+      - accumulated weighted evidence.
+
+    This is evidence confidence, not probability that the policy is "true".
+    """
+    count_factor = (
+        event_count
+        / (
+            event_count
+            + 3.0
+        )
+    )
+
+    weight_factor = min(
+        1.0,
+        total_weight / 6.0,
+    )
+
+    consistency_factor = max(
+        0.0,
+        min(
+            1.0,
+            dominant_share,
+        ),
+    )
+
+    score = (
+        0.40 * count_factor
+        + 0.35 * consistency_factor
+        + 0.25 * weight_factor
+    )
+
+    return round(
+        max(
+            0.0,
+            min(
+                1.0,
+                score,
+            ),
+        ),
+        3,
+    )
+
+
+def _stance_confidence_level(score):
+    if score >= 0.72:
+        return "high"
+
+    if score >= 0.50:
+        return "medium"
+
+    if score > 0:
+        return "low"
+
+    return "none"
+
+
+def _assess_aggregated_stance(
+    *,
+    counts,
+    weights,
+):
+    """
+    Convert multiple explicit event-level signals into one cautious country
+    stance assessment for one topic.
+    """
+    classified_events = sum(
+        int(
+            counts.get(
+                label,
+                0,
+            )
+        )
+        for label in STANCE_LABELS
+    )
+
+    total_weight = sum(
+        float(
+            weights.get(
+                label,
+                0.0,
+            )
+        )
+        for label in STANCE_LABELS
+    )
+
+    directional_weights = {
+        "support": float(
+            weights.get(
+                "support",
+                0.0,
+            )
+        ),
+        "oppose": float(
+            weights.get(
+                "oppose",
+                0.0,
+            )
+        ),
+        "conditional": float(
+            weights.get(
+                "conditional",
+                0.0,
+            )
+        ),
+        "mixed": float(
+            weights.get(
+                "mixed",
+                0.0,
+            )
+        ),
+    }
+
+    if (
+        classified_events
+        < STANCE_MIN_CLASSIFIED_EVENTS
+        or total_weight < STANCE_MIN_WEIGHT
+    ):
+        return {
+            "stance": "insufficient_evidence",
+            "evidence_sufficient": False,
+            "dominant_share": 0.0,
+            "confidence": 0.0,
+            "confidence_level": "none",
+        }
+
+    support = directional_weights["support"]
+    oppose = directional_weights["oppose"]
+    conditional = directional_weights["conditional"]
+    mixed = directional_weights["mixed"]
+
+    # Mixed event classifications contribute to ambiguity rather than being
+    # redistributed into support/opposition.
+    effective_total = max(
+        total_weight,
+        1e-9,
+    )
+
+    shares = {
+        label: value / effective_total
+        for label, value in directional_weights.items()
+    }
+
+    support_share = shares["support"]
+    oppose_share = shares["oppose"]
+    conditional_share = shares["conditional"]
+    mixed_share = shares["mixed"]
+
+    if (
+        support_share >= STANCE_MIXED_MIN_SHARE
+        and oppose_share >= STANCE_MIXED_MIN_SHARE
+    ):
+        stance = "mixed"
+        dominant_share = max(
+            support_share,
+            oppose_share,
+        )
+
+    elif mixed_share >= 0.40:
+        stance = "mixed"
+        dominant_share = mixed_share
+
+    elif (
+        conditional_share >= 0.40
+        and conditional >= max(
+            support,
+            oppose,
+        )
+    ):
+        stance = "conditional"
+        dominant_share = conditional_share
+
+    else:
+        dominant_label, dominant_weight = max(
+            (
+                ("support", support),
+                ("oppose", oppose),
+                ("conditional", conditional),
+                ("mixed", mixed),
+            ),
+            key=lambda item: item[1],
+        )
+
+        dominant_share = (
+            dominant_weight
+            / effective_total
+        )
+
+        if dominant_share < STANCE_DOMINANCE_SHARE:
+            stance = "mixed"
+        else:
+            stance = dominant_label
+
+    confidence = _stance_confidence(
+        event_count=classified_events,
+        dominant_share=dominant_share,
+        total_weight=total_weight,
+    )
+
+    return {
+        "stance": stance,
+        "evidence_sufficient": True,
+        "dominant_share": round(
+            dominant_share,
+            3,
+        ),
+        "confidence": confidence,
+        "confidence_level": _stance_confidence_level(
+            confidence
+        ),
+    }
+
+
+def build_stance_matrix(events, mode="all"):
+    """
+    Aggregate explicit event-level stance evidence into country × topic rows.
+
+    Output semantics:
+      support / oppose / conditional / mixed
+          only when at least two classified events and sufficient weighted
+          evidence exist;
+
+      insufficient_evidence
+          explicit stance evidence exists but is too sparse;
+
+      unknown
+          no explicit stance evidence exists.
+
+    Topic salience NEVER determines the stance label.
+    """
+    bucket = defaultdict(
+        lambda: defaultdict(
+            lambda: {
+                "counts": defaultdict(int),
+                "weights": defaultdict(float),
+                "confidence_sum": 0.0,
+                "explicit_signal_score": 0.0,
+                "events": 0,
+                "source_events": [],
+            }
+        )
+    )
+
+    relevant_event_count = 0
+    classified_event_count = 0
+
+    for event in events:
+        stance_map = _event_stance_map(
+            event
+        )
+
+        if not stance_map:
+            continue
+
+        allowed_countries = set(
+            countries_for_heatmap(
+                event,
+                mode,
+            )
+        )
+
+        if not allowed_countries:
+            continue
+
+        relevant_event_count += 1
+        event_contributed = False
+
+        for country, topic_map in stance_map.items():
+            country = str(
+                country
+            ).upper()
+
+            if country not in allowed_countries:
+                continue
+
+            if not isinstance(
+                topic_map,
+                dict,
+            ):
+                continue
+
+            for topic, record in topic_map.items():
+                if topic not in TOPICS:
+                    continue
+
+                if not isinstance(
+                    record,
+                    dict,
+                ):
+                    continue
+
+                stance = str(
+                    record.get(
+                        "stance",
+                        "unknown",
+                    )
+                ).lower()
+
+                if stance not in STANCE_LABELS:
+                    continue
+
+                data = bucket[
+                    country
+                ][topic]
+
+                weight = _stance_event_weight(
+                    event,
+                    record,
+                )
+
+                data["counts"][
+                    stance
+                ] += 1
+                data["weights"][
+                    stance
+                ] += weight
+
+                try:
+                    confidence = float(
+                        record.get(
+                            "confidence",
+                            0.0,
+                        )
+                        or 0.0
+                    )
+                except Exception:
+                    confidence = 0.0
+
+                data["confidence_sum"] += max(
+                    0.0,
+                    min(
+                        1.0,
+                        confidence,
+                    ),
+                )
+
+                try:
+                    explicit_score = float(
+                        record.get(
+                            "explicit_signal_score",
+                            0.0,
+                        )
+                        or 0.0
+                    )
+                except Exception:
+                    explicit_score = 0.0
+
+                data[
+                    "explicit_signal_score"
+                ] += max(
+                    0.0,
+                    explicit_score,
+                )
+
+                data["events"] += 1
+
+                # Keep only compact provenance, never full article bodies.
+                data["source_events"].append(
+                    {
+                        "published_at": event.get(
+                            "published_at"
+                        ),
+                        "source_name": event.get(
+                            "source_name"
+                        ),
+                        "url": event.get(
+                            "url"
+                        ),
+                        "stance": stance,
+                        "confidence": round(
+                            confidence,
+                            3,
+                        ),
+                    }
+                )
+
+                event_contributed = True
+
+        if event_contributed:
+            classified_event_count += 1
+
+    rows = []
+
+    for country in sorted(
+        bucket.keys()
+    ):
+        for topic in TOPICS:
+            if topic not in bucket[
+                country
+            ]:
+                continue
+
+            data = bucket[
+                country
+            ][topic]
+
+            counts = {
+                label: int(
+                    data["counts"].get(
+                        label,
+                        0,
+                    )
+                )
+                for label in STANCE_LABELS
+            }
+
+            weights = {
+                label: round(
+                    float(
+                        data["weights"].get(
+                            label,
+                            0.0,
+                        )
+                    ),
+                    3,
+                )
+                for label in STANCE_LABELS
+            }
+
+            assessment = (
+                _assess_aggregated_stance(
+                    counts=counts,
+                    weights=weights,
+                )
+            )
+
+            events_n = int(
+                data["events"]
+            )
+
+            avg_detector_conf = (
+                data[
+                    "confidence_sum"
+                ]
+                / events_n
+                if events_n
+                else 0.0
+            )
+
+            rows.append(
+                {
+                    "country": country,
+                    "topic": topic,
+                    "stance": assessment[
+                        "stance"
+                    ],
+                    "confidence": assessment[
+                        "confidence"
+                    ],
+                    "confidence_level": assessment[
+                        "confidence_level"
+                    ],
+                    "evidence_sufficient": assessment[
+                        "evidence_sufficient"
+                    ],
+                    "dominant_share": assessment[
+                        "dominant_share"
+                    ],
+                    "classified_events": events_n,
+                    "stance_counts": counts,
+                    "stance_weights": weights,
+                    "average_detector_confidence": round(
+                        avg_detector_conf,
+                        3,
+                    ),
+                    "explicit_signal_score": round(
+                        float(
+                            data[
+                                "explicit_signal_score"
+                            ]
+                        ),
+                        3,
+                    ),
+                    "evidence": data[
+                        "source_events"
+                    ][-20:],
+                }
+            )
+
+    assessed = [
+        row
+        for row in rows
+        if row[
+            "evidence_sufficient"
+        ]
+    ]
+
+    insufficient = [
+        row
+        for row in rows
+        if (
+            not row[
+                "evidence_sufficient"
+            ]
+        )
+    ]
+
+    return {
+        "rows": rows,
+        "assessed": assessed,
+        "insufficient": insufficient,
+        "event_count": len(events),
+        "events_with_stance_schema": relevant_event_count,
+        "events_with_classified_stance": classified_event_count,
+        "mode": mode,
+        "method": "country_topic_stance_aggregation_v1",
+        "semantic_dimension": "stance",
+        "salience_inferred": False,
+        "thresholds": {
+            "minimum_classified_events": STANCE_MIN_CLASSIFIED_EVENTS,
+            "minimum_weight": STANCE_MIN_WEIGHT,
+            "dominance_share": STANCE_DOMINANCE_SHARE,
+            "mixed_min_share": STANCE_MIXED_MIN_SHARE,
+        },
+        "labels": [
+            "support",
+            "oppose",
+            "conditional",
+            "mixed",
+            "insufficient_evidence",
+            "unknown",
+        ],
+        "note": (
+            "Country-level stance is aggregated only from explicit event-level "
+            "country-topic stance evidence. Topic salience and relationship "
+            "tone are never used to infer stance."
+        ),
+    }
 
 
 def normalize_heatmap_rows(rows):
@@ -3501,6 +4113,15 @@ def main():
                         layer,
                         f"{window_name}_similarity{suffix}.json",
                         build_similarity(
+                            filtered,
+                            mode=mode,
+                        ),
+                    )
+
+                    save_json(
+                        layer,
+                        f"{window_name}_stance{suffix}.json",
+                        build_stance_matrix(
                             filtered,
                             mode=mode,
                         ),
