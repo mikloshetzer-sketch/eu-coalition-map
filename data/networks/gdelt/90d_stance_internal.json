@@ -1,0 +1,27 @@
+{
+  "rows": [],
+  "assessed": [],
+  "insufficient": [],
+  "event_count": 232,
+  "events_with_stance_schema": 0,
+  "events_with_classified_stance": 0,
+  "mode": "internal",
+  "method": "country_topic_stance_aggregation_v1",
+  "semantic_dimension": "stance",
+  "salience_inferred": false,
+  "thresholds": {
+    "minimum_classified_events": 2,
+    "minimum_weight": 1.5,
+    "dominance_share": 0.65,
+    "mixed_min_share": 0.25
+  },
+  "labels": [
+    "support",
+    "oppose",
+    "conditional",
+    "mixed",
+    "insufficient_evidence",
+    "unknown"
+  ],
+  "note": "Country-level stance is aggregated only from explicit event-level country-topic stance evidence. Topic salience and relationship tone are never used to infer stance."
+}
