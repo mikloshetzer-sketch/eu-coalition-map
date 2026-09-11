@@ -217,6 +217,34 @@ button,select{font:inherit}
 .rel-empty{padding:34px 20px;text-align:center;color:var(--muted);font-size:10px}
 .rel-footnote{padding:10px 14px;border-top:1px solid var(--line);background:#f8fbfd;color:var(--muted);font-size:8px;line-height:1.5}
 
+
+/* Countries / Interests — salience intelligence */
+.salience-note{margin:0 20px 16px;padding:10px 12px;border:1px solid #b9dcec;background:#f1f9fd;border-radius:10px;color:#37657b;font-size:9px;line-height:1.55}
+.salience-note strong{color:#0f4666}
+.country-intel-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;padding:14px 20px 18px}
+.country-intel{border:1px solid #d8e5eb;background:#f8fbfd;border-radius:11px;padding:12px}
+.country-intel small{display:block;font-size:8px;text-transform:uppercase;letter-spacing:.65px;color:var(--muted);font-weight:800}
+.country-intel strong{display:block;margin-top:6px;font-size:17px;color:#0f4666}
+.country-intel span{display:block;margin-top:4px;font-size:8px;color:var(--muted);line-height:1.4}
+.topic-line .topic-meta{display:block;margin-top:3px;font-size:8px;color:var(--muted)}
+.interest-summary{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--line);background:#f8fbfd}
+.interest-summary>div{padding:12px 15px;border-right:1px solid var(--line)}
+.interest-summary>div:last-child{border-right:0}
+.interest-summary small{display:block;font-size:8px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.65px}
+.interest-summary strong{display:block;margin-top:5px;font-size:17px;color:#0f4666}
+.interest-summary span{display:block;margin-top:3px;font-size:8px;color:var(--muted)}
+.sim-tag{display:inline-flex;margin-top:4px;padding:3px 6px;border-radius:5px;background:#edf7fc;border:1px solid #c8e2ee;color:#38677d;font-size:7px;font-weight:800}
+.stance-card{border-top:3px solid var(--amber)}
+.stance-grid{display:grid;grid-template-columns:180px 1fr;gap:18px;padding:18px 20px 20px;align-items:center}
+.stance-status{border:1px solid #efd49b;background:#fff9eb;border-radius:11px;padding:14px;text-align:center}
+.stance-status strong{display:block;color:#906210;font-size:15px}.stance-status span{display:block;margin-top:5px;color:#98782c;font-size:8px}
+.stance-copy{font-size:10px;color:var(--text2);line-height:1.65}
+.matrix td.cell{border:1px solid rgba(15,79,112,.08);font-weight:800}
+.matrix td.cell.zero{background:#f5f8fa!important;color:#a2b1ba!important}
+.matrix td.cell.low{color:#37677d!important}
+@media(max-width:1200px){.country-intel-grid,.interest-summary{grid-template-columns:1fr 1fr}}
+@media(max-width:760px){.country-intel-grid,.interest-summary{grid-template-columns:1fr}.stance-grid{grid-template-columns:1fr}}
+
 @media(max-width:1200px){
   .kpis{grid-template-columns:repeat(3,1fr)}.two,.country-layout,.overview-top{grid-template-columns:1fr}.three{grid-template-columns:1fr 1fr}.party-grid{grid-template-columns:1fr 1fr}
   .site-header h1{font-size:39px}
@@ -383,13 +411,22 @@ button,select{font:inherit}
 
   <section class="view" id="view-countries">
     <div class="grid country-layout">
-      <div class="card country-side"><div class="control"><label>Country profile</label><select id="countrySelect" style="width:100%;margin-top:6px"></select></div><div id="countrySummary"></div></div>
+      <div class="card country-side">
+        <div class="control"><label>Country profile</label><select id="countrySelect" style="width:100%;margin-top:6px"></select></div>
+        <div id="countrySummary"></div>
+      </div>
       <div class="grid">
-        <div class="grid two-equal">
-          <div class="card"><div class="section-head"><div><h3>Main policy interests</h3><p>Topic salience derived from current network evidence</p></div></div><div id="countryTopics" class="topic-bars"></div></div>
-          <div class="card"><div class="section-head"><div><h3>Top partners</h3><p id="countryPartnerLabel">Strongest observed interaction</p></div></div><div id="countryPartners" class="list"></div></div>
+        <div class="card">
+          <div class="section-head"><div><h3>Country interest profile</h3><p>Observed policy salience · relative topic distribution for the selected country</p></div><span class="badge good">SALIENCE</span></div>
+          <div class="salience-note"><strong>Reading rule:</strong> a magas érték azt jelenti, hogy a téma erősen jelen van az adott országhoz kapcsolódó bizonyítékokban. Ez még nem jelenti azt, hogy az ország támogatja vagy ellenzi az adott politikát.</div>
+          <div id="countryIntel" class="country-intel-grid"></div>
+          <div id="countryTopics" class="topic-bars"></div>
         </div>
-        <div class="card"><div class="section-head"><div><h3>Country relationship map</h3><p>Selected country and its current first-degree network</p></div></div><div class="chart-wrap"><svg id="networkCountry" class="network"></svg></div></div>
+        <div class="grid two-equal">
+          <div class="card"><div class="section-head"><div><h3>Observed partners</h3><p id="countryPartnerLabel">Strongest observed interaction</p></div></div><div id="countryPartners" class="list"></div></div>
+          <div class="card"><div class="section-head"><div><h3>Similar EU interest profiles</h3><p>Cosine similarity of observed topic distributions</p></div></div><div id="countrySimilar" class="list"></div><div class="warning">Similar salience profiles do not prove policy agreement. Stance evidence is required before interpreting these pairs as aligned interests.</div></div>
+        </div>
+        <div class="card"><div class="section-head"><div><h3>Country relationship map</h3><p>Selected country and its current first-degree interaction network</p></div></div><div class="chart-wrap"><svg id="networkCountry" class="network"></svg></div></div>
       </div>
     </div>
   </section>
@@ -399,9 +436,21 @@ button,select{font:inherit}
   </section>
 
   <section class="view" id="view-interests">
+    <div class="card" style="margin-bottom:14px">
+      <div class="section-head"><div><h3>EU interest landscape</h3><p>Country-level topic salience in the selected source and time window</p></div><span class="badge good">SALIENCE · NOT STANCE</span></div>
+      <div id="interestSummary" class="interest-summary"></div>
+      <div class="salience-note"><strong>Interpretation:</strong> the matrix compares the relative prominence of policy topics around each EU member state. It is designed to identify potential shared agendas and structural differences. It does not yet classify whether countries agree on those topics.</div>
+    </div>
     <div class="grid two-equal" style="margin-bottom:14px">
-      <div class="card"><div class="section-head"><div><h3>Country × policy matrix</h3><p>Topic salience reconstructed from weighted country relationships</p></div></div><div class="matrix-wrap"><table id="interestMatrix" class="matrix"></table></div></div>
-      <div class="card"><div class="section-head"><div><h3>Interest similarity</h3><p>Countries with similar topic distributions</p></div></div><div id="interestPairs" class="list"></div><div class="warning">Similarity here means similar observed topic profiles. It does not yet prove identical policy positions. A stance layer is required for that.</div></div>
+      <div class="card"><div class="section-head"><div><h3>Country × policy matrix</h3><p>Each row is normalized to the country's own observed topic profile</p></div></div><div class="matrix-wrap"><table id="interestMatrix" class="matrix"></table></div></div>
+      <div class="card"><div class="section-head"><div><h3>Closest interest profiles</h3><p>EU country pairs with similar salience distributions</p></div></div><div id="interestPairs" class="list"></div><div class="warning">High similarity = similar topic mix, not necessarily common policy position or coalition membership.</div></div>
+    </div>
+    <div class="card stance-card">
+      <div class="section-head"><div><h3>Policy stance layer</h3><p>Next analytical layer: support, opposition, conditional or mixed position by country and topic</p></div><span class="badge warn">NOT YET AVAILABLE</span></div>
+      <div class="stance-grid">
+        <div class="stance-status"><strong>Stance pending</strong><span>salience is already operational</span></div>
+        <div class="stance-copy">A következő fejlesztési réteg választja majd szét a <strong>téma fontosságát</strong> és az <strong>ország álláspontját</strong>. Csak ezután érdemes a hasonló érdektémákat tényleges policy alignmentként értelmezni, majd a szavazási adatokkal együtt tartós koalíciókat keresni.</div>
+      </div>
     </div>
   </section>
 
@@ -705,32 +754,110 @@ function populateCountries(g){
   $('countrySelect').innerHTML=ids.map(id=>`<option value="${esc(id)}">${esc(nameOf(id))} (${esc(id)})</option>`).join('');
   if(ids.includes(prev))$('countrySelect').value=prev;else if(ids.length)$('countrySelect').value=ids[0]
 }
+function heatmapRows(){
+  const h=state.heatmap;
+  if(!h)return [];
+  if(Array.isArray(h))return h;
+  if(Array.isArray(h.rows))return h.rows;
+  if(Array.isArray(h.countries))return h.countries;
+  if(Array.isArray(h.data))return h.data;
+  return []
+}
+function heatmapCountry(c){
+  const rows=heatmapRows();
+  return rows.find(r=>(r.country||r.id||r.code)===c)||null
+}
+function heatmapTopicsFor(c){
+  const row=heatmapCountry(c);
+  if(!row)return null;
+  if(row.topics&&typeof row.topics==='object'&&!Array.isArray(row.topics))return row.topics;
+  const out={};
+  Object.keys(TOPIC_LABELS).forEach(t=>{
+    if(Number.isFinite(+row[t]))out[t]=+row[t]
+  });
+  return Object.keys(out).length?out:null
+}
+function effectiveCountryTopics(g,c){
+  return heatmapTopicsFor(c)||countryTopics(g,c)
+}
+function profileFor(g,c){return normalizeTopics(effectiveCountryTopics(g,c))}
+function countryEventCount(c){
+  const row=heatmapCountry(c);
+  return Number(row?.event_count??row?.events??row?.count??0)||0
+}
+function countrySimilarities(g,c){
+  if(!EU27.has(c))return [];
+  const base=profileFor(g,c);
+  return (g.nodes||[]).map(n=>n.id).filter(id=>EU27.has(id)&&id!==c).map(id=>({
+    id,score:cosine(base,profileFor(g,id))
+  })).filter(x=>x.score>0).sort((a,b)=>b.score-a.score)
+}
 function renderCountry(){
   const g=filteredGraph(state.graph),c=$('countrySelect').value;
   if(!c){$('countrySummary').innerHTML='<div class="empty">No country selected.</div>';return}
-  const n=(g.nodes||[]).find(x=>x.id===c),p=countryPartners(g,c),ct=countryTopics(g,c),sum=Object.values(ct).reduce((a,b)=>a+b,0),lead=Object.entries(ct).sort((a,b)=>b[1]-a[1])[0];
-  $('countrySummary').innerHTML=`<div class="country-title" style="margin-top:18px"><div class="flag">${esc(c)}</div><div><h3>${esc(nameOf(c))}</h3><p>${EU27.has(c)?'EU member state':'External partner / actor'}</p></div></div><div class="country-metric"><div class="lab">Network weight</div><div class="num">${fmt(n?.weight??0)}</div></div><div class="country-metric"><div class="lab">Observed partners</div><div class="num">${fmt(p.length)}</div></div><div class="country-metric"><div class="lab">Dominant topic</div><div class="num" style="font-size:18px">${lead?esc(topicName(lead[0])):'—'}</div></div><div class="country-metric"><div class="lab">Topic signal volume</div><div class="num">${fmt(sum)}</div></div>`;
+  const n=(g.nodes||[]).find(x=>x.id===c),p=countryPartners(g,c),ct=effectiveCountryTopics(g,c),sum=Object.values(ct).reduce((a,b)=>a+(+b||0),0),arr=Object.entries(ct).sort((a,b)=>b[1]-a[1]),lead=arr[0],events=countryEventCount(c);
+  const leadShare=sum&&lead?lead[1]/sum:0;
+  $('countrySummary').innerHTML=`<div class="country-title" style="margin-top:18px"><div class="flag">${esc(c)}</div><div><h3>${esc(nameOf(c))}</h3><p>${EU27.has(c)?'EU member state':'External partner / actor'}</p></div></div><div class="country-metric"><div class="lab">Observed events</div><div class="num">${events?fmt(events):'—'}</div></div><div class="country-metric"><div class="lab">Observed partners</div><div class="num">${fmt(p.length)}</div></div><div class="country-metric"><div class="lab">Dominant topic</div><div class="num" style="font-size:18px">${lead?esc(topicName(lead[0])):'—'}</div></div><div class="country-metric"><div class="lab">Dominant share</div><div class="num">${lead?pct(leadShare,0):'—'}</div></div>`;
+  const top3=arr.slice(0,3);
+  $('countryIntel').innerHTML=[
+    `<div class="country-intel"><small>Top policy signal</small><strong>${lead?esc(topicName(lead[0])):'—'}</strong><span>${lead?pct(leadShare,0)+' of observed topic salience':'no topic evidence'}</span></div>`,
+    `<div class="country-intel"><small>Second topic</small><strong>${top3[1]?esc(topicName(top3[1][0])):'—'}</strong><span>${top3[1]&&sum?pct(top3[1][1]/sum,0):'no second signal'}</span></div>`,
+    `<div class="country-intel"><small>Topic breadth</small><strong>${fmt(arr.filter(x=>+x[1]>0).length)}</strong><span>policy fields with observed salience</span></div>`,
+    `<div class="country-intel"><small>Evidence volume</small><strong>${events?fmt(events):fmt(sum,1)}</strong><span>${events?'country-linked events':'salience signal volume'}</span></div>`
+  ].join('');
   renderCountryTopics(ct);
-  $('countryPartnerLabel').textContent=state.source==='votes'?'Strongest available voting relations':'Strongest observed interaction';
+  $('countryPartnerLabel').textContent=state.source==='votes'?'Strongest available voting relations':'Observed interaction · not automatic agreement';
   $('countryPartners').innerHTML=p.length?p.slice(0,8).map((x,i)=>`<div class="row"><div class="rank">#${i+1}</div><div><strong>${esc(nameOf(x.id))}</strong><small>${esc(topicName(edgeTopTopic({topics:x.topics})||'—'))}</small></div><div class="score">${fmt(x.weight,1)}</div></div>`).join(''):`<div class="empty">No first-degree partners.</div>`;
+  const sims=countrySimilarities(g,c);
+  $('countrySimilar').innerHTML=sims.length?sims.slice(0,8).map((x,i)=>`<div class="row"><div class="rank">#${i+1}</div><div><strong>${esc(nameOf(x.id))}</strong><small>similar observed topic mix</small><div class="bar"><i style="width:${Math.max(2,x.score*100)}%"></i></div></div><div class="score">${Math.round(x.score*100)}%</div></div>`).join(''):`<div class="empty">Not enough EU topic-profile data.</div>`;
   const subset={nodes:[...(g.nodes||[])].filter(n=>n.id===c||p.slice(0,12).some(x=>x.id===n.id)),edges:[...(g.edges||[])].filter(e=>{const a=e.source?.id||e.source,b=e.target?.id||e.target;return a===c||b===c})};
   renderNetwork('#networkCountry',subset,{focus:c})
 }
 function renderCountryTopics(ct){
-  const arr=Object.entries(ct).sort((a,b)=>b[1]-a[1]),max=Math.max(...arr.map(x=>x[1]),1),sum=arr.reduce((a,x)=>a+x[1],0)||1;
-  $('countryTopics').innerHTML=arr.length?arr.map(([t,v])=>`<div class="topic-line"><label>${esc(topicName(t))}</label><div class="track"><div class="fill" style="width:${v/max*100}%"></div></div><b>${Math.round(v/sum*100)}%</b></div>`).join(''):`<div class="empty">No topic profile available.</div>`
+  const arr=Object.entries(ct||{}).sort((a,b)=>b[1]-a[1]),max=Math.max(...arr.map(x=>+x[1]||0),1),sum=arr.reduce((a,x)=>a+(+x[1]||0),0)||1;
+  $('countryTopics').innerHTML=arr.length?arr.map(([t,v])=>`<div class="topic-line"><label>${esc(topicName(t))}<span class="topic-meta">salience ${fmt(v,2)}</span></label><div class="track"><div class="fill" style="width:${(+v||0)/max*100}%"></div></div><b>${Math.round((+v||0)/sum*100)}%</b></div>`).join(''):`<div class="empty">No topic profile available.</div>`
+}
+function interestSimilaritiesEffective(g){
+  const ids=(g.nodes||[]).map(n=>n.id).filter(id=>EU27.has(id));
+  const prof=Object.fromEntries(ids.map(id=>[id,profileFor(g,id)]));
+  const pairs=[];
+  for(let i=0;i<ids.length;i++)for(let j=i+1;j<ids.length;j++){
+    const score=cosine(prof[ids[i]],prof[ids[j]]);
+    if(score>0)pairs.push({a:ids[i],b:ids[j],score})
+  }
+  return pairs.sort((a,b)=>b.score-a.score)
 }
 function renderInterests(g){
   const ids=(g.nodes||[]).map(n=>n.id).filter(id=>EU27.has(id)).sort((a,b)=>nameOf(a).localeCompare(nameOf(b))),topics=Object.keys(TOPIC_LABELS),vals={};
-  ids.forEach(id=>vals[id]=normalizeTopics(countryTopics(g,id)));
+  ids.forEach(id=>vals[id]=profileFor(g,id));
+  const aggregate={};
+  ids.forEach(id=>topics.forEach(t=>aggregate[t]=(aggregate[t]||0)+(vals[id][t]||0)));
+  const dom=Object.entries(aggregate).sort((a,b)=>b[1]-a[1])[0];
+  const sims=interestSimilaritiesEffective(g);
+  const profiled=ids.filter(id=>Object.values(vals[id]).some(v=>v>0)).length;
+  const concentrated=ids.filter(id=>Math.max(...Object.values(vals[id]),0)>=.5).length;
+  $('interestSummary').innerHTML=[
+    `<div><small>EU profiles</small><strong>${fmt(profiled)}</strong><span>member states with topic evidence</span></div>`,
+    `<div><small>Dominant EU-wide topic</small><strong>${dom?esc(topicName(dom[0])):'—'}</strong><span>aggregate normalized salience</span></div>`,
+    `<div><small>Highly concentrated</small><strong>${fmt(concentrated)}</strong><span>countries with ≥50% in one topic</span></div>`,
+    `<div><small>Closest pair</small><strong>${sims[0]?`${esc(sims[0].a)} ↔ ${esc(sims[0].b)}`:'—'}</strong><span>${sims[0]?Math.round(sims[0].score*100)+'% topic similarity':'insufficient data'}</span></div>`
+  ].join('');
   let html='<thead><tr><th>Country</th>'+topics.map(t=>`<th>${esc(topicName(t))}</th>`).join('')+'</tr></thead><tbody>';
   for(const id of ids){
-    html+=`<tr><td>${esc(nameOf(id))}</td>`+topics.map(t=>{const v=vals[id][t]||0,a=.08+v*.78;return `<td class="cell" style="background:rgba(49,195,224,${a.toFixed(2)})">${v?Math.round(v*100):0}</td>`}).join('')+'</tr>'
+    html+=`<tr><td>${esc(nameOf(id))}</td>`+topics.map(t=>{
+      const v=vals[id][t]||0,a=.06+v*.88,cls=v===0?'zero':v<.18?'low':'';
+      const bg=v===0?'#f5f8fa':`rgba(32,152,207,${a.toFixed(2)})`;
+      const color=v>=.18?'#fff':'#37677d';
+      return `<td class="cell ${cls}" title="${esc(nameOf(id))} · ${esc(topicName(t))}: ${Math.round(v*100)}%" style="background:${bg};color:${color}">${Math.round(v*100)}</td>`
+    }).join('')+'</tr>'
   }
   html+='</tbody>';
   $('interestMatrix').innerHTML=ids.length?html:'<tbody><tr><td class="empty">No EU country topic profiles.</td></tr></tbody>';
-  const sim=interestSimilarities(g);
-  $('interestPairs').innerHTML=sim.length?sim.slice(0,12).map((x,i)=>`<div class="row"><div class="rank">#${i+1}</div><div><strong>${esc(nameOf(x.a))} ↔ ${esc(nameOf(x.b))}</strong><small>topic-profile similarity</small><div class="bar"><i style="width:${x.score*100}%"></i></div></div><div class="score">${Math.round(x.score*100)}%</div></div>`).join(''):`<div class="empty">Not enough topic-profile data.</div>`
+  $('interestPairs').innerHTML=sims.length?sims.slice(0,12).map((x,i)=>{
+    const pa=profileFor(g,x.a),pb=profileFor(g,x.b);
+    const common=topics.map(t=>({t,v:(pa[t]||0)+(pb[t]||0)})).sort((a,b)=>b.v-a.v)[0]?.t;
+    return `<div class="row"><div class="rank">#${i+1}</div><div><strong>${esc(nameOf(x.a))} ↔ ${esc(nameOf(x.b))}</strong><small>closest shared profile${common?' · '+esc(topicName(common)):''}</small><div class="bar"><i style="width:${x.score*100}%"></i></div><span class="sim-tag">salience similarity · not stance</span></div><div class="score">${Math.round(x.score*100)}%</div></div>`
+  }).join(''):`<div class="empty">Not enough topic-profile data.</div>`
 }
 function renderVoting(){
   const g=state.votes;
