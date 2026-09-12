@@ -3,7 +3,7 @@
 """
 Country × policy-issue stance detector for the EU Political Alignment Monitor.
 
-Version: v3 — actor attribution
+Version: v4 — actor / beneficiary / target attribution
 
 Why v2 exists
 -------------
@@ -57,7 +57,7 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 from config.topics import TOPICS
 
 
-METHOD = "country_policy_issue_stance_actor_v3"
+METHOD = "country_policy_issue_stance_roles_v4"
 
 TITLE_WEIGHT = 1.60
 SUMMARY_WEIGHT = 1.00
@@ -657,6 +657,80 @@ POLICY_ISSUES: Dict[str, Dict[str, Any]] = {
 }
 
 
+# ---------------------------------------------------------------------------
+# INTRINSIC POLICY ROLES
+# ---------------------------------------------------------------------------
+#
+# Some policy issues already encode a beneficiary or target in their meaning.
+# A mere mention of that country must never make it the owner of the stance.
+#
+# Examples:
+#   "UK supports military aid to Ukraine"
+#       actor = GB, beneficiary = UA
+#
+#   "Poland supports sanctions on Russia"
+#       actor = PL, target = RU
+#
+# This block prevents the beneficiary/target from inheriting the actor's stance.
+POLICY_INTRINSIC_ROLES: Dict[str, Dict[str, Sequence[str]]] = {
+    "military_support_ukraine": {
+        "beneficiary": ("UA",),
+    },
+    "security_guarantees_ukraine": {
+        "beneficiary": ("UA",),
+    },
+    "ukraine_eu_membership": {
+        "beneficiary": ("UA",),
+    },
+    "sanctions_on_russia": {
+        "target": ("RU",),
+    },
+    "russian_energy_dependence": {
+        "target": ("RU",),
+    },
+    "serbia_eu_accession": {
+        "beneficiary": ("RS",),
+    },
+}
+
+
+def _intrinsic_policy_role(
+    country: str,
+    issue_id: str,
+) -> Optional[str]:
+    """
+    Return the country's built-in semantic role in the policy issue.
+
+    Returns:
+        "beneficiary"
+        "target"
+        None
+    """
+    code = str(
+        country or ""
+    ).upper()
+
+    cfg = POLICY_INTRINSIC_ROLES.get(
+        issue_id,
+        {},
+    )
+
+    for role in (
+        "beneficiary",
+        "target",
+    ):
+        if code in set(
+            cfg.get(
+                role,
+                (),
+            )
+        ):
+            return role
+
+    return None
+
+
+
 SUPPORT_CUES: Sequence[Tuple[str, float]] = (
     ("strongly supports", 2.0),
     ("supports", 1.5),
@@ -1017,17 +1091,47 @@ def _country_is_oblique_object(
 def _country_owns_cue(
     *,
     sentence: str,
+    country: str,
+    issue_id: str,
     country_hit: Sequence[Any],
     cue_hit: Sequence[Any],
     issue_hit: Sequence[Any],
 ) -> Tuple[bool, str, float]:
     """
-    Conservative actor attribution.
+    Conservative policy-actor attribution.
 
-    The target country must behave like the semantic subject/owner of the
-    stance cue. Mentions such as "against Russia", "support for Ukraine", or
-    "despite Russian threat" are rejected as background/object references.
+    A country can appear in a policy sentence in several roles:
+        actor       -> owns the stance
+        beneficiary -> receives the policy effect
+        target      -> is acted against / constrained
+        background  -> contextual mention only
+
+    Only the ACTOR receives the stance.
+
+    Intrinsic beneficiary/target roles encoded by the policy issue take
+    precedence over proximity. This specifically prevents:
+        UA inheriting "support" from military_support_ukraine
+        RU inheriting "support/oppose" from sanctions_on_russia
     """
+    intrinsic_role = _intrinsic_policy_role(
+        country,
+        issue_id,
+    )
+
+    if intrinsic_role == "beneficiary":
+        return (
+            False,
+            "country_is_intrinsic_policy_beneficiary",
+            0.0,
+        )
+
+    if intrinsic_role == "target":
+        return (
+            False,
+            "country_is_intrinsic_policy_target",
+            0.0,
+        )
+
     c_start, c_end = int(
         country_hit[0]
     ), int(
@@ -1102,7 +1206,9 @@ def _country_owns_cue(
             0.0,
         )
 
-    # Most English policy statements are actor-before-predicate.
+    # In the supported English-language sources, the policy actor normally
+    # precedes the predicate. A country after "support for", "against", etc.
+    # is much more likely beneficiary/target than actor.
     if c_start > q_start:
         return (
             False,
@@ -1116,9 +1222,27 @@ def _country_owns_cue(
         ]
     )
 
-    # If another named country appears between the candidate actor and the cue,
-    # ownership is ambiguous.
-    for aliases in COUNTRY_ALIASES.values():
+    # Reject possessive / object-like constructions between country and cue.
+    if re.search(
+        r"\b(?:threat|attack|war|invasion|pressure|sanctions?)\b",
+        between,
+    ):
+        return (
+            False,
+            "country_mention_is_contextual_not_policy_actor",
+            0.0,
+        )
+
+    # If another named country appears between the candidate actor and cue,
+    # ownership is ambiguous. Reject conservatively.
+    for other_code, aliases in COUNTRY_ALIASES.items():
+        if str(
+            other_code
+        ).upper() == str(
+            country
+        ).upper():
+            continue
+
         if any(
             _phrase_pattern(
                 alias
@@ -1252,49 +1376,81 @@ def _issue_context_matches(
     ):
         return []
 
-    specific_support = [
-        (
-            phrase,
-            2.1,
-        )
-        for phrase in cfg.get(
-            "support_phrases",
-            [],
-        )
-    ]
-
-    specific_oppose = [
-        (
-            phrase,
-            2.1,
-        )
-        for phrase in cfg.get(
-            "oppose_phrases",
-            [],
-        )
-    ]
-
-    support_hits = _dedupe_cue_hits(
+    # --------------------------------------------------------------
+    # ISSUE-SPECIFIC CUE PRECEDENCE
+    # --------------------------------------------------------------
+    # Specific phrases are authoritative for their policy issue.
+    #
+    # Example:
+    #   "Denmark aims to send rejected migrants to return hubs"
+    #
+    # "aims to send ... to return hubs" is a specific SUPPORT signal.
+    # The generic word "rejected" must NOT simultaneously create an
+    # OPPOSITION signal.
+    specific_support_hits = _dedupe_cue_hits(
         _cue_mentions(
             sentence,
-            specific_support,
+            [
+                (
+                    phrase,
+                    2.35,
+                )
+                for phrase in cfg.get(
+                    "support_phrases",
+                    [],
+                )
+            ],
         )
-        + _cue_mentions(
+    )
+
+    specific_oppose_hits = _dedupe_cue_hits(
+        _cue_mentions(
+            sentence,
+            [
+                (
+                    phrase,
+                    2.35,
+                )
+                for phrase in cfg.get(
+                    "oppose_phrases",
+                    [],
+                )
+            ],
+        )
+    )
+
+    generic_support_hits = _dedupe_cue_hits(
+        _cue_mentions(
             sentence,
             SUPPORT_CUES,
         )
     )
 
-    oppose_hits = _dedupe_cue_hits(
+    generic_oppose_hits = _dedupe_cue_hits(
         _cue_mentions(
-            sentence,
-            specific_oppose,
-        )
-        + _cue_mentions(
             sentence,
             OPPOSE_CUES,
         )
     )
+
+    # If an issue-specific cue exists, it takes precedence over generic cues
+    # in the opposite direction. Same-direction generic cues are also omitted
+    # to avoid double-counting.
+    if specific_support_hits:
+        support_hits = specific_support_hits
+        oppose_hits = (
+            specific_oppose_hits
+            if specific_oppose_hits
+            else []
+        )
+
+    elif specific_oppose_hits:
+        oppose_hits = specific_oppose_hits
+        support_hits = []
+
+    else:
+        support_hits = generic_support_hits
+        oppose_hits = generic_oppose_hits
 
     conditional_hits = _dedupe_cue_hits(
         _cue_mentions(
@@ -1317,6 +1473,7 @@ def _issue_context_matches(
                 float,
             ]
         ],
+        cue_specificity: str,
     ) -> None:
         for cue in hits:
             actor_candidates = []
@@ -1325,6 +1482,8 @@ def _issue_context_matches(
                 for issue_hit in issue_hits:
                     owns, reason, factor = _country_owns_cue(
                         sentence=sentence,
+                        country=country,
+                        issue_id=issue_id,
                         country_hit=country_hit,
                         cue_hit=cue,
                         issue_hit=issue_hit,
@@ -1389,6 +1548,12 @@ def _issue_context_matches(
                 ),
             )
 
+            specificity_factor = (
+                1.15
+                if cue_specificity == "issue_specific"
+                else 1.0
+            )
+
             weighted = (
                 float(
                     cue[3]
@@ -1396,13 +1561,16 @@ def _issue_context_matches(
                 * field_weight
                 * proximity
                 * attribution_factor
+                * specificity_factor
             )
 
             matches.append(
                 {
                     "label": label,
                     "cue": cue[2],
+                    "cue_specificity": cue_specificity,
                     "country_alias": closest_country[2],
+                    "country_role": "actor",
                     "policy_issue": issue_id,
                     "policy_issue_label": cfg.get(
                         "label",
@@ -1425,16 +1593,27 @@ def _issue_context_matches(
     collect(
         "support",
         support_hits,
+        (
+            "issue_specific"
+            if specific_support_hits
+            else "generic"
+        ),
     )
 
     collect(
         "oppose",
         oppose_hits,
+        (
+            "issue_specific"
+            if specific_oppose_hits
+            else "generic"
+        ),
     )
 
     collect(
         "conditional",
         conditional_hits,
+        "generic",
     )
 
     return matches
@@ -1643,6 +1822,7 @@ def _classify_matches(
             "policy_issue_stance"
         ),
         "actor_attribution": True,
+        "role_model": "actor_beneficiary_target_v1",
         "salience_inferred": False,
     }
 
