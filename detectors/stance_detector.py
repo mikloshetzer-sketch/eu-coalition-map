@@ -3,7 +3,7 @@
 """
 Country × policy-issue stance detector for the EU Political Alignment Monitor.
 
-Version: v2
+Version: v3 — actor attribution
 
 Why v2 exists
 -------------
@@ -57,7 +57,7 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 from config.topics import TOPICS
 
 
-METHOD = "country_policy_issue_stance_rule_v2"
+METHOD = "country_policy_issue_stance_actor_v3"
 
 TITLE_WEIGHT = 1.60
 SUMMARY_WEIGHT = 1.00
@@ -67,6 +67,27 @@ MIN_EXPLICIT_SCORE = 1.20
 HIGH_CONFIDENCE_SCORE = 3.50
 MEDIUM_CONFIDENCE_SCORE = 2.00
 MAX_CUE_DISTANCE = 220
+
+MAX_SUBJECT_DISTANCE = 95
+CLAUSE_SPLIT_RE = re.compile(
+    r"\s+(?:but|while|whereas|although|though|however|despite|because|as)\s+|[,;:]"
+)
+
+NON_SUBJECT_PREPOSITIONS: Sequence[str] = (
+    "against",
+    "for",
+    "to",
+    "from",
+    "with",
+    "over",
+    "on",
+    "about",
+    "regarding",
+    "despite",
+    "amid",
+    "after",
+    "before",
+)
 
 
 COUNTRY_ALIASES: Dict[str, List[str]] = {
@@ -188,6 +209,7 @@ POLICY_ISSUES: Dict[str, Dict[str, Any]] = {
             "supports return hubs",
             "backs return hubs",
             "plans return hubs",
+            "aims to send rejected migrants to return hubs",
             "aims to send rejected migrants",
         ],
         "oppose_phrases": [
@@ -875,6 +897,316 @@ def _distance(
     return 0
 
 
+
+def _clause_spans(sentence: str) -> List[Tuple[int, int, str]]:
+    normalized = _norm(sentence)
+
+    if not normalized:
+        return []
+
+    spans: List[Tuple[int, int, str]] = []
+    last = 0
+
+    for match in CLAUSE_SPLIT_RE.finditer(normalized):
+        end = match.start()
+
+        if end > last:
+            raw = normalized[last:end]
+            part = raw.strip()
+
+            if part:
+                left_trim = len(raw) - len(raw.lstrip())
+                start_pos = last + left_trim
+                spans.append(
+                    (
+                        start_pos,
+                        start_pos + len(part),
+                        part,
+                    )
+                )
+
+        last = match.end()
+
+    if last < len(normalized):
+        raw = normalized[last:]
+        part = raw.strip()
+
+        if part:
+            left_trim = len(raw) - len(raw.lstrip())
+            start_pos = last + left_trim
+            spans.append(
+                (
+                    start_pos,
+                    start_pos + len(part),
+                    part,
+                )
+            )
+
+    return spans or [
+        (
+            0,
+            len(normalized),
+            normalized,
+        )
+    ]
+
+
+def _containing_clause(
+    sentence: str,
+    pos_start: int,
+    pos_end: int,
+) -> Tuple[int, int, str]:
+    for start, end, clause in _clause_spans(
+        sentence
+    ):
+        if (
+            pos_start >= start
+            and pos_end <= end
+        ):
+            return (
+                start,
+                end,
+                clause,
+            )
+
+    normalized = _norm(sentence)
+
+    return (
+        0,
+        len(normalized),
+        normalized,
+    )
+
+
+def _preceding_token_window(
+    text: str,
+    start: int,
+    chars: int = 34,
+) -> str:
+    return _norm(
+        text[
+            max(
+                0,
+                start - chars,
+            ):start
+        ]
+    )
+
+
+def _country_is_oblique_object(
+    sentence: str,
+    country_hit: Sequence[Any],
+) -> bool:
+    before = _preceding_token_window(
+        sentence,
+        int(
+            country_hit[0]
+        ),
+    )
+
+    for prep in NON_SUBJECT_PREPOSITIONS:
+        if re.search(
+            rf"(?:^|\s){re.escape(prep)}\s+$",
+            before,
+        ):
+            return True
+
+    return False
+
+
+def _country_owns_cue(
+    *,
+    sentence: str,
+    country_hit: Sequence[Any],
+    cue_hit: Sequence[Any],
+    issue_hit: Sequence[Any],
+) -> Tuple[bool, str, float]:
+    """
+    Conservative actor attribution.
+
+    The target country must behave like the semantic subject/owner of the
+    stance cue. Mentions such as "against Russia", "support for Ukraine", or
+    "despite Russian threat" are rejected as background/object references.
+    """
+    c_start, c_end = int(
+        country_hit[0]
+    ), int(
+        country_hit[1]
+    )
+    q_start, q_end = int(
+        cue_hit[0]
+    ), int(
+        cue_hit[1]
+    )
+    i_start, i_end = int(
+        issue_hit[0]
+    ), int(
+        issue_hit[1]
+    )
+
+    c_clause = _containing_clause(
+        sentence,
+        c_start,
+        c_end,
+    )
+    q_clause = _containing_clause(
+        sentence,
+        q_start,
+        q_end,
+    )
+    i_clause = _containing_clause(
+        sentence,
+        i_start,
+        i_end,
+    )
+
+    if (
+        c_clause[0] != q_clause[0]
+        or c_clause[1] != q_clause[1]
+    ):
+        return (
+            False,
+            "country_and_stance_cue_in_different_clauses",
+            0.0,
+        )
+
+    if (
+        c_clause[0] != i_clause[0]
+        or c_clause[1] != i_clause[1]
+    ):
+        return (
+            False,
+            "country_and_policy_issue_in_different_clauses",
+            0.0,
+        )
+
+    if _country_is_oblique_object(
+        sentence,
+        country_hit,
+    ):
+        return (
+            False,
+            "country_is_background_or_object_reference",
+            0.0,
+        )
+
+    distance_to_cue = _distance(
+        country_hit,
+        cue_hit,
+    )
+
+    if distance_to_cue > MAX_SUBJECT_DISTANCE:
+        return (
+            False,
+            "country_too_far_from_stance_cue",
+            0.0,
+        )
+
+    # Most English policy statements are actor-before-predicate.
+    if c_start > q_start:
+        return (
+            False,
+            "country_appears_after_stance_cue",
+            0.0,
+        )
+
+    between = _norm(
+        sentence[
+            c_end:q_start
+        ]
+    )
+
+    # If another named country appears between the candidate actor and the cue,
+    # ownership is ambiguous.
+    for aliases in COUNTRY_ALIASES.values():
+        if any(
+            _phrase_pattern(
+                alias
+            ).search(
+                between
+            )
+            for alias in aliases
+        ):
+            return (
+                False,
+                "another_country_between_actor_and_cue",
+                0.0,
+            )
+
+    if distance_to_cue <= 28:
+        factor = 1.20
+    elif distance_to_cue <= 55:
+        factor = 1.10
+    else:
+        factor = 1.0
+
+    return (
+        True,
+        "country_attributed_as_policy_actor",
+        factor,
+    )
+
+
+def _dedupe_cue_hits(
+    hits: Sequence[Tuple[int, int, str, float]],
+) -> List[Tuple[int, int, str, float]]:
+    """
+    Keep the strongest/longest overlapping cue only.
+
+    This prevents an issue-specific phrase from being counted together with a
+    generic cue embedded inside it.
+    """
+    ordered = sorted(
+        hits,
+        key=lambda item: (
+            -float(
+                item[3]
+            ),
+            -(
+                int(
+                    item[1]
+                )
+                - int(
+                    item[0]
+                )
+            ),
+        ),
+    )
+
+    kept: List[
+        Tuple[int, int, str, float]
+    ] = []
+
+    for hit in ordered:
+        h0, h1 = int(
+            hit[0]
+        ), int(
+            hit[1]
+        )
+
+        overlaps = any(
+            not (
+                h1 <= int(
+                    existing[0]
+                )
+                or h0 >= int(
+                    existing[1]
+                )
+            )
+            for existing in kept
+        )
+
+        if not overlaps:
+            kept.append(
+                hit
+            )
+
+    return sorted(
+        kept,
+        key=lambda item: item[0],
+    )
+
+
 def policy_issues_for_topic(
     topic: str,
 ) -> List[str]:
@@ -920,7 +1252,6 @@ def _issue_context_matches(
     ):
         return []
 
-    # Issue-specific phrases are stronger than generic stance verbs.
     specific_support = [
         (
             phrase,
@@ -943,7 +1274,7 @@ def _issue_context_matches(
         )
     ]
 
-    support_hits = (
+    support_hits = _dedupe_cue_hits(
         _cue_mentions(
             sentence,
             specific_support,
@@ -954,7 +1285,7 @@ def _issue_context_matches(
         )
     )
 
-    oppose_hits = (
+    oppose_hits = _dedupe_cue_hits(
         _cue_mentions(
             sentence,
             specific_oppose,
@@ -965,9 +1296,11 @@ def _issue_context_matches(
         )
     )
 
-    conditional_hits = _cue_mentions(
-        sentence,
-        CONDITIONAL_CUES,
+    conditional_hits = _dedupe_cue_hits(
+        _cue_mentions(
+            sentence,
+            CONDITIONAL_CUES,
+        )
     )
 
     matches: List[
@@ -986,21 +1319,51 @@ def _issue_context_matches(
         ],
     ) -> None:
         for cue in hits:
-            closest_country = min(
-                country_hits,
-                key=lambda hit: _distance(
-                    cue,
-                    hit,
-                ),
+            actor_candidates = []
+
+            for country_hit in country_hits:
+                for issue_hit in issue_hits:
+                    owns, reason, factor = _country_owns_cue(
+                        sentence=sentence,
+                        country_hit=country_hit,
+                        cue_hit=cue,
+                        issue_hit=issue_hit,
+                    )
+
+                    if not owns:
+                        continue
+
+                    actor_candidates.append(
+                        (
+                            _distance(
+                                country_hit,
+                                cue,
+                            )
+                            + _distance(
+                                issue_hit,
+                                cue,
+                            ),
+                            country_hit,
+                            issue_hit,
+                            reason,
+                            factor,
+                        )
+                    )
+
+            if not actor_candidates:
+                continue
+
+            actor_candidates.sort(
+                key=lambda item: item[0]
             )
 
-            closest_issue = min(
-                issue_hits,
-                key=lambda hit: _distance(
-                    cue,
-                    hit,
-                ),
-            )
+            (
+                _,
+                closest_country,
+                closest_issue,
+                attribution_reason,
+                attribution_factor,
+            ) = actor_candidates[0]
 
             dc = _distance(
                 cue,
@@ -1010,12 +1373,6 @@ def _issue_context_matches(
                 cue,
                 closest_issue,
             )
-
-            if (
-                dc > MAX_CUE_DISTANCE
-                or di > MAX_CUE_DISTANCE
-            ):
-                continue
 
             proximity = max(
                 0.35,
@@ -1038,6 +1395,7 @@ def _issue_context_matches(
                 )
                 * field_weight
                 * proximity
+                * attribution_factor
             )
 
             matches.append(
@@ -1056,6 +1414,8 @@ def _issue_context_matches(
                         weighted,
                         3,
                     ),
+                    "actor_attributed": True,
+                    "attribution_reason": attribution_reason,
                     "sentence": sentence[
                         :500
                     ],
@@ -1282,6 +1642,7 @@ def _classify_matches(
         "semantic_dimension": (
             "policy_issue_stance"
         ),
+        "actor_attribution": True,
         "salience_inferred": False,
     }
 
