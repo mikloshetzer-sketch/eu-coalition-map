@@ -22,7 +22,7 @@ if str(ROOT) not in sys.path:
 
 from detectors.relationship_detector import detect_pair_relationship_from_parts
 
-NETWORK_BUILDER_VERSION = "v10_two_level_policy_alignment"
+NETWORK_BUILDER_VERSION = "v11_preliminary_stance_alignment"
 
 
 EVENTS_DIR = ROOT / "data" / "events"
@@ -1542,6 +1542,297 @@ def _alignment_direction(
     return "mixed"
 
 
+
+def _derive_alignment_stance(row):
+    """
+    Return the stance to use for policy-alignment comparison.
+
+    Two levels:
+      1. assessed stance:
+         use row["stance"] when evidence_sufficient=True.
+
+      2. preliminary stance:
+         when the aggregate row is "insufficient_evidence", derive the current
+         explicit direction from stance_weights / stance_counts WITHOUT
+         upgrading the underlying country stance to assessed.
+
+    This preserves the strict stance threshold while allowing provisional
+    country-pair comparison.
+
+    Returns:
+        {
+            "stance": <support|oppose|conditional|mixed|None>,
+            "status": <assessed|preliminary|none>,
+            "confidence": 0..1,
+            "dominant_share": 0..1,
+        }
+    """
+    if not isinstance(row, dict):
+        return {
+            "stance": None,
+            "status": "none",
+            "confidence": 0.0,
+            "dominant_share": 0.0,
+        }
+
+    aggregate_stance = str(
+        row.get(
+            "stance",
+            "",
+        )
+    ).lower()
+
+    evidence_sufficient = bool(
+        row.get(
+            "evidence_sufficient",
+            False,
+        )
+    )
+
+    if (
+        evidence_sufficient
+        and aggregate_stance in STANCE_LABELS
+    ):
+        try:
+            confidence = float(
+                row.get(
+                    "confidence",
+                    0.0,
+                )
+                or 0.0
+            )
+        except Exception:
+            confidence = 0.0
+
+        try:
+            dominant_share = float(
+                row.get(
+                    "dominant_share",
+                    0.0,
+                )
+                or 0.0
+            )
+        except Exception:
+            dominant_share = 0.0
+
+        return {
+            "stance": aggregate_stance,
+            "status": "assessed",
+            "confidence": max(
+                0.0,
+                min(
+                    1.0,
+                    confidence,
+                ),
+            ),
+            "dominant_share": max(
+                0.0,
+                min(
+                    1.0,
+                    dominant_share,
+                ),
+            ),
+        }
+
+    counts = row.get(
+        "stance_counts",
+        {},
+    )
+
+    weights = row.get(
+        "stance_weights",
+        {},
+    )
+
+    if not isinstance(counts, dict):
+        counts = {}
+
+    if not isinstance(weights, dict):
+        weights = {}
+
+    label_weights = {
+        label: max(
+            0.0,
+            float(
+                weights.get(
+                    label,
+                    0.0,
+                )
+                or 0.0
+            ),
+        )
+        for label in STANCE_LABELS
+    }
+
+    label_counts = {
+        label: max(
+            0,
+            int(
+                counts.get(
+                    label,
+                    0,
+                )
+                or 0
+            ),
+        )
+        for label in STANCE_LABELS
+    }
+
+    total_weight = sum(
+        label_weights.values()
+    )
+
+    total_count = sum(
+        label_counts.values()
+    )
+
+    if (
+        total_weight <= 0
+        or total_count <= 0
+    ):
+        return {
+            "stance": None,
+            "status": "none",
+            "confidence": 0.0,
+            "dominant_share": 0.0,
+        }
+
+    support = label_weights[
+        "support"
+    ]
+    oppose = label_weights[
+        "oppose"
+    ]
+    conditional = label_weights[
+        "conditional"
+    ]
+    mixed = label_weights[
+        "mixed"
+    ]
+
+    shares = {
+        label: (
+            value
+            / total_weight
+        )
+        for label, value
+        in label_weights.items()
+    }
+
+    # Explicit contradictory preliminary evidence should remain mixed.
+    if (
+        shares["support"] >= STANCE_MIXED_MIN_SHARE
+        and shares["oppose"] >= STANCE_MIXED_MIN_SHARE
+    ):
+        preliminary_stance = "mixed"
+        dominant_share = max(
+            shares["support"],
+            shares["oppose"],
+        )
+
+    elif shares["mixed"] >= 0.40:
+        preliminary_stance = "mixed"
+        dominant_share = shares[
+            "mixed"
+        ]
+
+    elif (
+        shares["conditional"] >= 0.40
+        and conditional >= max(
+            support,
+            oppose,
+        )
+    ):
+        preliminary_stance = "conditional"
+        dominant_share = shares[
+            "conditional"
+        ]
+
+    else:
+        preliminary_stance, dominant_weight = max(
+            label_weights.items(),
+            key=lambda item: item[1],
+        )
+
+        dominant_share = (
+            dominant_weight
+            / total_weight
+        )
+
+        # Preliminary evidence can still be too ambiguous for even a
+        # provisional directional comparison.
+        if dominant_share < 0.60:
+            preliminary_stance = "mixed"
+
+    try:
+        avg_detector_confidence = float(
+            row.get(
+                "average_detector_confidence",
+                0.0,
+            )
+            or 0.0
+        )
+    except Exception:
+        avg_detector_confidence = 0.0
+
+    avg_detector_confidence = max(
+        0.0,
+        min(
+            1.0,
+            avg_detector_confidence,
+        ),
+    )
+
+    # Preliminary confidence is intentionally conservative:
+    # detector confidence × directional dominance × small evidence-volume
+    # factor. It never becomes the country's assessed stance confidence.
+    count_factor = min(
+        1.0,
+        total_count / 2.0,
+    )
+
+    preliminary_confidence = (
+        avg_detector_confidence
+        * max(
+            0.0,
+            min(
+                1.0,
+                dominant_share,
+            ),
+        )
+        * (
+            0.65
+            + 0.35
+            * count_factor
+        )
+    )
+
+    return {
+        "stance": preliminary_stance,
+        "status": "preliminary",
+        "confidence": round(
+            max(
+                0.0,
+                min(
+                    1.0,
+                    preliminary_confidence,
+                ),
+            ),
+            3,
+        ),
+        "dominant_share": round(
+            max(
+                0.0,
+                min(
+                    1.0,
+                    dominant_share,
+                ),
+            ),
+            3,
+        ),
+    }
+
+
 def build_policy_alignment(
     stance_result,
     mode="all",
@@ -1620,18 +1911,32 @@ def build_policy_alignment(
             or 0
         )
 
+        alignment_stance = _derive_alignment_stance(
+            row
+        )
+
         if (
             not country
             or not policy_issue
-            or stance
-            not in STANCE_LABELS
             or classified_events <= 0
+            or alignment_stance.get(
+                "stance"
+            )
+            not in STANCE_LABELS
         ):
             continue
 
+        enriched_row = dict(
+            row
+        )
+
+        enriched_row[
+            "_alignment_stance"
+        ] = alignment_stance
+
         by_country[
             country
-        ][policy_issue] = row
+        ][policy_issue] = enriched_row
 
     countries = sorted(
         by_country.keys()
@@ -1682,15 +1987,25 @@ def build_policy_alignment(
                     b
                 ][policy_issue]
 
+                stance_info_a = ra.get(
+                    "_alignment_stance",
+                    {},
+                )
+
+                stance_info_b = rb.get(
+                    "_alignment_stance",
+                    {},
+                )
+
                 stance_a = str(
-                    ra.get(
+                    stance_info_a.get(
                         "stance",
                         "",
                     )
                 ).lower()
 
                 stance_b = str(
-                    rb.get(
+                    stance_info_b.get(
                         "stance",
                         "",
                     )
@@ -1708,7 +2023,7 @@ def build_policy_alignment(
 
                 try:
                     conf_a = float(
-                        ra.get(
+                        stance_info_a.get(
                             "confidence",
                             0.0,
                         )
@@ -1719,7 +2034,7 @@ def build_policy_alignment(
 
                 try:
                     conf_b = float(
-                        rb.get(
+                        stance_info_b.get(
                             "confidence",
                             0.0,
                         )
@@ -1846,17 +2161,25 @@ def build_policy_alignment(
                             )
                             or 0
                         ),
-                        "country_a_stance_assessed": bool(
-                            ra.get(
-                                "evidence_sufficient",
-                                False,
-                            )
+                        "country_a_stance_status": stance_info_a.get(
+                            "status",
+                            "none",
                         ),
-                        "country_b_stance_assessed": bool(
-                            rb.get(
-                                "evidence_sufficient",
-                                False,
+                        "country_b_stance_status": stance_info_b.get(
+                            "status",
+                            "none",
+                        ),
+                        "country_a_stance_assessed": (
+                            stance_info_a.get(
+                                "status"
                             )
+                            == "assessed"
+                        ),
+                        "country_b_stance_assessed": (
+                            stance_info_b.get(
+                                "status"
+                            )
+                            == "assessed"
                         ),
                     }
                 )
@@ -2078,7 +2401,7 @@ def build_policy_alignment(
             provisional_pairs
         ),
         "mode": mode,
-        "method": "country_policy_alignment_two_level_v2",
+        "method": "country_policy_alignment_preliminary_v3",
         "semantic_dimension": "policy_alignment",
         "score_range": {
             "minimum": 0,
@@ -2096,6 +2419,7 @@ def build_policy_alignment(
         "source_policy": {
             "uses_explicit_policy_stance": True,
             "allows_preliminary_stance_for_provisional_pairs": True,
+            "preliminary_stance_derived_from_counts_weights": True,
             "uses_topic_salience": False,
             "uses_relationship_tone": False,
             "uses_gdelt_goldstein": False,
