@@ -22,7 +22,7 @@ if str(ROOT) not in sys.path:
 
 from detectors.relationship_detector import detect_pair_relationship_from_parts
 
-NETWORK_BUILDER_VERSION = "v9_policy_alignment"
+NETWORK_BUILDER_VERSION = "v10_two_level_policy_alignment"
 
 
 EVENTS_DIR = ROOT / "data" / "events"
@@ -1550,12 +1550,13 @@ def build_policy_alignment(
     Compare country policy positions issue-by-issue.
 
     IMPORTANT:
-    - Uses ONLY stance_result["assessed"] rows.
+    - Uses explicit stance_result["rows"] evidence for provisional comparison.
     - Never uses topic salience.
     - Never uses relationship tone.
     - Never uses GDELT GoldsteinScale / AvgTone.
-    - One shared policy issue is retained as PROVISIONAL evidence but does not
-      qualify as a robust country-level alignment assessment.
+    - Preliminary explicit stance evidence may form a PROVISIONAL pair.
+    - ASSESSED status requires >=2 shared policy issues where BOTH countries'
+      stance rows are evidence-sufficient.
 
     Output score:
         0   = maximally divergent
@@ -1568,22 +1569,22 @@ def build_policy_alignment(
         confidence_level
         assessment_status
     """
-    assessed = stance_result.get(
-        "assessed",
+    stance_rows = stance_result.get(
+        "rows",
         [],
     )
 
     if not isinstance(
-        assessed,
+        stance_rows,
         list,
     ):
-        assessed = []
+        stance_rows = []
 
     by_country = defaultdict(
         dict
     )
 
-    for row in assessed:
+    for row in stance_rows:
         if not isinstance(
             row,
             dict,
@@ -1611,11 +1612,20 @@ def build_policy_alignment(
             )
         ).lower()
 
+        classified_events = int(
+            row.get(
+                "classified_events",
+                0,
+            )
+            or 0
+        )
+
         if (
             not country
             or not policy_issue
             or stance
             not in STANCE_LABELS
+            or classified_events <= 0
         ):
             continue
 
@@ -1836,6 +1846,18 @@ def build_policy_alignment(
                             )
                             or 0
                         ),
+                        "country_a_stance_assessed": bool(
+                            ra.get(
+                                "evidence_sufficient",
+                                False,
+                            )
+                        ),
+                        "country_b_stance_assessed": bool(
+                            rb.get(
+                                "evidence_sufficient",
+                                False,
+                            )
+                        ),
                     }
                 )
 
@@ -1883,8 +1905,23 @@ def build_policy_alignment(
                 weighted_issue_confidence=mean_issue_confidence,
             )
 
+            assessed_shared_n = sum(
+                1
+                for issue_row in issue_rows
+                if (
+                    issue_row[
+                        "country_a_stance_assessed"
+                    ]
+                    and issue_row[
+                        "country_b_stance_assessed"
+                    ]
+                )
+            )
+
             robust = (
                 shared_n
+                >= POLICY_ALIGNMENT_MIN_SHARED_ISSUES
+                and assessed_shared_n
                 >= POLICY_ALIGNMENT_MIN_SHARED_ISSUES
             )
 
@@ -1910,6 +1947,7 @@ def build_policy_alignment(
                         normalized
                     ),
                     "shared_policy_issues": shared_n,
+                    "assessed_shared_policy_issues": assessed_shared_n,
                     "aligned_issues": aligned_n,
                     "divergent_issues": divergent_n,
                     "mixed_issues": mixed_n,
@@ -2027,7 +2065,7 @@ def build_policy_alignment(
         "country_summary": dict(
             country_summary
         ),
-        "country_count_with_assessed_stance": len(
+        "country_count_with_explicit_stance_evidence": len(
             countries
         ),
         "pair_count": len(
@@ -2040,7 +2078,7 @@ def build_policy_alignment(
             provisional_pairs
         ),
         "mode": mode,
-        "method": "country_policy_alignment_v1",
+        "method": "country_policy_alignment_two_level_v2",
         "semantic_dimension": "policy_alignment",
         "score_range": {
             "minimum": 0,
@@ -2057,15 +2095,18 @@ def build_policy_alignment(
         },
         "source_policy": {
             "uses_explicit_policy_stance": True,
+            "allows_preliminary_stance_for_provisional_pairs": True,
             "uses_topic_salience": False,
             "uses_relationship_tone": False,
             "uses_gdelt_goldstein": False,
             "uses_gdelt_avg_tone": False,
         },
         "note": (
-            "Policy alignment compares only explicit, evidence-sufficient "
-            "country policy-issue stances. A one-issue country pair is retained "
-            "as provisional and must not be interpreted as a stable coalition."
+            "Two-level policy alignment: explicit preliminary stance evidence "
+            "may create a provisional country pair, but an assessed pair requires "
+            "at least two shared policy issues for which both countries have "
+            "evidence-sufficient stance assessments. Provisional pairs must not "
+            "be interpreted as stable coalitions."
         ),
     }
 
