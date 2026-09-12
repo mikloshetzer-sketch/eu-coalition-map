@@ -263,7 +263,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 89,
+  "event_count": 97,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -276,7 +276,8 @@
     "stance_inferred": false,
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
-      "no_topic_evidence": 77,
+      "equal_legacy_topic_share_fallback": 9,
+      "no_topic_evidence": 76,
       "rule_based_topic_salience_v2": 12
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",

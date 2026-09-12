@@ -22,7 +22,7 @@
     },
     {
       "id": "DE",
-      "weight": 148.39
+      "weight": 145.45
     },
     {
       "id": "DK",
@@ -66,7 +66,7 @@
     },
     {
       "id": "LT",
-      "weight": 8.94
+      "weight": 6.0
     },
     {
       "id": "LU",
@@ -1425,9 +1425,9 @@
     {
       "source": "DE",
       "target": "LT",
-      "weight": 3.94,
-      "interaction_weight": 3.94,
-      "interaction_count": 2,
+      "weight": 1.0,
+      "interaction_weight": 1.0,
+      "interaction_count": 1,
       "topics": {
         "ukraine_russia": 0.945,
         "defence": 0.028,
@@ -1442,10 +1442,10 @@
         "conflictual": 0,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 2
+        "unclassified": 1
       },
       "classified_events": 0,
-      "unclassified_events": 2,
+      "unclassified_events": 1,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -3541,7 +3541,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 1803,
+  "event_count": 1807,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -3554,8 +3554,9 @@
     "stance_inferred": false,
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
-      "no_topic_evidence": 251,
-      "rule_based_topic_salience_v2": 1552
+      "equal_legacy_topic_share_fallback": 9,
+      "no_topic_evidence": 250,
+      "rule_based_topic_salience_v2": 1548
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
     "note": "Topic prominence does not imply support, opposition or shared policy position."

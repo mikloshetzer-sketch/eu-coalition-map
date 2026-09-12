@@ -1,22 +1,164 @@
 {
   "nodes": [
     {
+      "id": "BG",
+      "weight": 1
+    },
+    {
+      "id": "ES",
+      "weight": 1
+    },
+    {
+      "id": "FR",
+      "weight": 1
+    },
+    {
+      "id": "GB",
+      "weight": 1
+    },
+    {
+      "id": "IE",
+      "weight": 1
+    },
+    {
+      "id": "IT",
+      "weight": 1
+    },
+    {
       "id": "PL",
+      "weight": 1
+    },
+    {
+      "id": "RU",
       "weight": 1
     },
     {
       "id": "UA",
       "weight": 1
+    },
+    {
+      "id": "US",
+      "weight": 1
     }
   ],
   "edges": [
     {
+      "source": "BG",
+      "target": "ES",
+      "weight": 0.952
+    },
+    {
+      "source": "BG",
+      "target": "GB",
+      "weight": 0.922
+    },
+    {
+      "source": "BG",
+      "target": "IE",
+      "weight": 0.952
+    },
+    {
+      "source": "BG",
+      "target": "IT",
+      "weight": 0.952
+    },
+    {
+      "source": "BG",
+      "target": "RU",
+      "weight": 1.0
+    },
+    {
+      "source": "BG",
+      "target": "US",
+      "weight": 0.952
+    },
+    {
+      "source": "ES",
+      "target": "GB",
+      "weight": 0.946
+    },
+    {
+      "source": "ES",
+      "target": "IE",
+      "weight": 1.0
+    },
+    {
+      "source": "ES",
+      "target": "IT",
+      "weight": 1.0
+    },
+    {
+      "source": "ES",
+      "target": "RU",
+      "weight": 0.952
+    },
+    {
+      "source": "ES",
+      "target": "US",
+      "weight": 1.0
+    },
+    {
+      "source": "FR",
+      "target": "GB",
+      "weight": 0.323
+    },
+    {
+      "source": "GB",
+      "target": "IE",
+      "weight": 0.946
+    },
+    {
+      "source": "GB",
+      "target": "IT",
+      "weight": 0.946
+    },
+    {
+      "source": "GB",
+      "target": "RU",
+      "weight": 0.922
+    },
+    {
+      "source": "GB",
+      "target": "US",
+      "weight": 0.946
+    },
+    {
+      "source": "IE",
+      "target": "IT",
+      "weight": 1.0
+    },
+    {
+      "source": "IE",
+      "target": "RU",
+      "weight": 0.952
+    },
+    {
+      "source": "IE",
+      "target": "US",
+      "weight": 1.0
+    },
+    {
+      "source": "IT",
+      "target": "RU",
+      "weight": 0.952
+    },
+    {
+      "source": "IT",
+      "target": "US",
+      "weight": 1.0
+    },
+    {
       "source": "PL",
       "target": "UA",
       "weight": 1.0
+    },
+    {
+      "source": "RU",
+      "target": "US",
+      "weight": 0.952
     }
   ],
-  "event_count": 20,
+  "event_count": 27,
   "mode": "external",
   "method": "topic_salience_cosine_similarity_v2",
   "semantic_dimension": "salience_similarity",
