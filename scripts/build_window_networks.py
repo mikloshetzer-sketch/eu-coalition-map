@@ -22,7 +22,7 @@ if str(ROOT) not in sys.path:
 
 from detectors.relationship_detector import detect_pair_relationship_from_parts
 
-NETWORK_BUILDER_VERSION = "v8_policy_issue_stance"
+NETWORK_BUILDER_VERSION = "v9_policy_alignment"
 
 
 EVENTS_DIR = ROOT / "data" / "events"
@@ -90,6 +90,37 @@ STANCE_MIN_CLASSIFIED_EVENTS = 2
 STANCE_MIN_WEIGHT = 1.50
 STANCE_DOMINANCE_SHARE = 0.65
 STANCE_MIXED_MIN_SHARE = 0.25
+
+
+# Country policy-alignment aggregation.
+#
+# Alignment is calculated ONLY from country × policy-issue stances that already
+# passed the stance evidence threshold. Topic salience and GDELT tone/Goldstein
+# never enter this score.
+POLICY_ALIGNMENT_MIN_SHARED_ISSUES = 2
+POLICY_ALIGNMENT_HIGH_SHARED_ISSUES = 4
+
+STANCE_COMPATIBILITY = {
+    ("support", "support"): 1.00,
+    ("oppose", "oppose"): 1.00,
+    ("conditional", "conditional"): 0.70,
+    ("mixed", "mixed"): 0.30,
+
+    ("support", "oppose"): -1.00,
+    ("oppose", "support"): -1.00,
+
+    ("support", "conditional"): 0.25,
+    ("conditional", "support"): 0.25,
+    ("oppose", "conditional"): 0.25,
+    ("conditional", "oppose"): 0.25,
+
+    ("support", "mixed"): 0.00,
+    ("mixed", "support"): 0.00,
+    ("oppose", "mixed"): 0.00,
+    ("mixed", "oppose"): 0.00,
+    ("conditional", "mixed"): 0.10,
+    ("mixed", "conditional"): 0.10,
+}
 
 VOTE_TOPIC_SCORE = {
     "for": 1.0,
@@ -1416,6 +1447,625 @@ def build_stance_matrix(events, mode="all"):
             "Country-level stance is aggregated only from explicit policy-issue "
             "evidence. Broad topic salience and relationship tone are never "
             "used to infer policy position."
+        ),
+    }
+
+
+
+def _alignment_pair_confidence(
+    *,
+    shared_issues,
+    weighted_issue_confidence,
+):
+    """
+    Confidence in the COUNTRY-PAIR alignment result.
+
+    It combines:
+      - breadth: how many policy issues both countries have assessed stances on;
+      - evidence strength: geometric mean of the two stance confidences.
+
+    One shared issue may be analytically interesting, but is still provisional.
+    """
+    n = int(
+        shared_issues
+    )
+
+    if n <= 0:
+        return (
+            0.0,
+            "none",
+        )
+
+    breadth = min(
+        1.0,
+        n
+        / float(
+            POLICY_ALIGNMENT_HIGH_SHARED_ISSUES
+        ),
+    )
+
+    score = (
+        0.55 * breadth
+        + 0.45 * max(
+            0.0,
+            min(
+                1.0,
+                weighted_issue_confidence,
+            ),
+        )
+    )
+
+    score = round(
+        max(
+            0.0,
+            min(
+                1.0,
+                score,
+            ),
+        ),
+        3,
+    )
+
+    if (
+        n >= POLICY_ALIGNMENT_MIN_SHARED_ISSUES
+        and score >= 0.72
+    ):
+        level = "high"
+
+    elif (
+        n >= POLICY_ALIGNMENT_MIN_SHARED_ISSUES
+        and score >= 0.50
+    ):
+        level = "medium"
+
+    else:
+        level = "low"
+
+    return (
+        score,
+        level,
+    )
+
+
+def _alignment_direction(
+    normalized_score,
+):
+    """
+    Convert -1..+1 policy compatibility to a readable category.
+    """
+    if normalized_score >= 0.45:
+        return "aligned"
+
+    if normalized_score <= -0.45:
+        return "divergent"
+
+    return "mixed"
+
+
+def build_policy_alignment(
+    stance_result,
+    mode="all",
+):
+    """
+    Compare country policy positions issue-by-issue.
+
+    IMPORTANT:
+    - Uses ONLY stance_result["assessed"] rows.
+    - Never uses topic salience.
+    - Never uses relationship tone.
+    - Never uses GDELT GoldsteinScale / AvgTone.
+    - One shared policy issue is retained as PROVISIONAL evidence but does not
+      qualify as a robust country-level alignment assessment.
+
+    Output score:
+        0   = maximally divergent
+        50  = mixed / neutral compatibility
+        100 = maximally aligned
+
+    The score is meaningful only together with:
+        shared_policy_issues
+        confidence
+        confidence_level
+        assessment_status
+    """
+    assessed = stance_result.get(
+        "assessed",
+        [],
+    )
+
+    if not isinstance(
+        assessed,
+        list,
+    ):
+        assessed = []
+
+    by_country = defaultdict(
+        dict
+    )
+
+    for row in assessed:
+        if not isinstance(
+            row,
+            dict,
+        ):
+            continue
+
+        country = str(
+            row.get(
+                "country",
+                "",
+            )
+        ).upper()
+
+        policy_issue = str(
+            row.get(
+                "policy_issue",
+                "",
+            )
+        ).strip()
+
+        stance = str(
+            row.get(
+                "stance",
+                "",
+            )
+        ).lower()
+
+        if (
+            not country
+            or not policy_issue
+            or stance
+            not in STANCE_LABELS
+        ):
+            continue
+
+        by_country[
+            country
+        ][policy_issue] = row
+
+    countries = sorted(
+        by_country.keys()
+    )
+
+    pairs = []
+
+    for i in range(
+        len(
+            countries
+        )
+    ):
+        for j in range(
+            i + 1,
+            len(
+                countries
+            ),
+        ):
+            a = countries[i]
+            b = countries[j]
+
+            shared = sorted(
+                set(
+                    by_country[a].keys()
+                )
+                & set(
+                    by_country[b].keys()
+                )
+            )
+
+            if not shared:
+                continue
+
+            issue_rows = []
+            weighted_sum = 0.0
+            total_weight = 0.0
+            issue_confidence_sum = 0.0
+
+            aligned_n = 0
+            divergent_n = 0
+            mixed_n = 0
+
+            for policy_issue in shared:
+                ra = by_country[
+                    a
+                ][policy_issue]
+                rb = by_country[
+                    b
+                ][policy_issue]
+
+                stance_a = str(
+                    ra.get(
+                        "stance",
+                        "",
+                    )
+                ).lower()
+
+                stance_b = str(
+                    rb.get(
+                        "stance",
+                        "",
+                    )
+                ).lower()
+
+                compatibility = float(
+                    STANCE_COMPATIBILITY.get(
+                        (
+                            stance_a,
+                            stance_b,
+                        ),
+                        0.0,
+                    )
+                )
+
+                try:
+                    conf_a = float(
+                        ra.get(
+                            "confidence",
+                            0.0,
+                        )
+                        or 0.0
+                    )
+                except Exception:
+                    conf_a = 0.0
+
+                try:
+                    conf_b = float(
+                        rb.get(
+                            "confidence",
+                            0.0,
+                        )
+                        or 0.0
+                    )
+                except Exception:
+                    conf_b = 0.0
+
+                conf_a = max(
+                    0.0,
+                    min(
+                        1.0,
+                        conf_a,
+                    ),
+                )
+                conf_b = max(
+                    0.0,
+                    min(
+                        1.0,
+                        conf_b,
+                    ),
+                )
+
+                issue_confidence = (
+                    conf_a
+                    * conf_b
+                ) ** 0.5
+
+                # Stronger shared evidence contributes more to pair score.
+                issue_weight = max(
+                    0.10,
+                    issue_confidence,
+                )
+
+                weighted_sum += (
+                    compatibility
+                    * issue_weight
+                )
+
+                total_weight += (
+                    issue_weight
+                )
+
+                issue_confidence_sum += (
+                    issue_confidence
+                )
+
+                issue_direction = (
+                    _alignment_direction(
+                        compatibility
+                    )
+                )
+
+                if (
+                    issue_direction
+                    == "aligned"
+                ):
+                    aligned_n += 1
+                elif (
+                    issue_direction
+                    == "divergent"
+                ):
+                    divergent_n += 1
+                else:
+                    mixed_n += 1
+
+                issue_rows.append(
+                    {
+                        "topic": (
+                            ra.get(
+                                "topic"
+                            )
+                            or rb.get(
+                                "topic"
+                            )
+                        ),
+                        "policy_issue": policy_issue,
+                        "policy_issue_label": (
+                            ra.get(
+                                "policy_issue_label"
+                            )
+                            or rb.get(
+                                "policy_issue_label"
+                            )
+                            or policy_issue
+                        ),
+                        "country_a_stance": stance_a,
+                        "country_b_stance": stance_b,
+                        "compatibility": round(
+                            compatibility,
+                            3,
+                        ),
+                        "issue_alignment_score": round(
+                            50.0
+                            * (
+                                compatibility
+                                + 1.0
+                            ),
+                            1,
+                        ),
+                        "issue_confidence": round(
+                            issue_confidence,
+                            3,
+                        ),
+                        "country_a_confidence": round(
+                            conf_a,
+                            3,
+                        ),
+                        "country_b_confidence": round(
+                            conf_b,
+                            3,
+                        ),
+                        "country_a_events": int(
+                            ra.get(
+                                "classified_events",
+                                0,
+                            )
+                            or 0
+                        ),
+                        "country_b_events": int(
+                            rb.get(
+                                "classified_events",
+                                0,
+                            )
+                            or 0
+                        ),
+                    }
+                )
+
+            if total_weight <= 0:
+                continue
+
+            normalized = (
+                weighted_sum
+                / total_weight
+            )
+
+            normalized = max(
+                -1.0,
+                min(
+                    1.0,
+                    normalized,
+                ),
+            )
+
+            alignment_score = round(
+                50.0
+                * (
+                    normalized
+                    + 1.0
+                ),
+                1,
+            )
+
+            shared_n = len(
+                issue_rows
+            )
+
+            mean_issue_confidence = (
+                issue_confidence_sum
+                / shared_n
+                if shared_n
+                else 0.0
+            )
+
+            (
+                pair_confidence,
+                pair_confidence_level,
+            ) = _alignment_pair_confidence(
+                shared_issues=shared_n,
+                weighted_issue_confidence=mean_issue_confidence,
+            )
+
+            robust = (
+                shared_n
+                >= POLICY_ALIGNMENT_MIN_SHARED_ISSUES
+            )
+
+            if robust:
+                assessment_status = (
+                    "assessed"
+                )
+            else:
+                assessment_status = (
+                    "provisional"
+                )
+
+            pairs.append(
+                {
+                    "country_a": a,
+                    "country_b": b,
+                    "alignment_score": alignment_score,
+                    "normalized_alignment": round(
+                        normalized,
+                        3,
+                    ),
+                    "direction": _alignment_direction(
+                        normalized
+                    ),
+                    "shared_policy_issues": shared_n,
+                    "aligned_issues": aligned_n,
+                    "divergent_issues": divergent_n,
+                    "mixed_issues": mixed_n,
+                    "confidence": pair_confidence,
+                    "confidence_level": pair_confidence_level,
+                    "assessment_status": assessment_status,
+                    "issues": sorted(
+                        issue_rows,
+                        key=lambda row: (
+                            -row[
+                                "issue_confidence"
+                            ],
+                            row[
+                                "policy_issue"
+                            ],
+                        ),
+                    ),
+                }
+            )
+
+    pairs.sort(
+        key=lambda row: (
+            row[
+                "assessment_status"
+            ]
+            != "assessed",
+            -row[
+                "confidence"
+            ],
+            -abs(
+                row[
+                    "normalized_alignment"
+                ]
+            ),
+            row[
+                "country_a"
+            ],
+            row[
+                "country_b"
+            ],
+        )
+    )
+
+    assessed_pairs = [
+        row
+        for row in pairs
+        if row[
+            "assessment_status"
+        ]
+        == "assessed"
+    ]
+
+    provisional_pairs = [
+        row
+        for row in pairs
+        if row[
+            "assessment_status"
+        ]
+        == "provisional"
+    ]
+
+    country_summary = defaultdict(
+        lambda: {
+            "assessed_pairs": 0,
+            "provisional_pairs": 0,
+            "aligned_pairs": 0,
+            "divergent_pairs": 0,
+            "mixed_pairs": 0,
+        }
+    )
+
+    for pair in pairs:
+        for country in (
+            pair["country_a"],
+            pair["country_b"],
+        ):
+            if (
+                pair[
+                    "assessment_status"
+                ]
+                == "assessed"
+            ):
+                country_summary[
+                    country
+                ][
+                    "assessed_pairs"
+                ] += 1
+            else:
+                country_summary[
+                    country
+                ][
+                    "provisional_pairs"
+                ] += 1
+
+            direction_key = (
+                f"{pair['direction']}_pairs"
+            )
+
+            if (
+                direction_key
+                in country_summary[
+                    country
+                ]
+            ):
+                country_summary[
+                    country
+                ][
+                    direction_key
+                ] += 1
+
+    return {
+        "pairs": pairs,
+        "assessed_pairs": assessed_pairs,
+        "provisional_pairs": provisional_pairs,
+        "country_summary": dict(
+            country_summary
+        ),
+        "country_count_with_assessed_stance": len(
+            countries
+        ),
+        "pair_count": len(
+            pairs
+        ),
+        "assessed_pair_count": len(
+            assessed_pairs
+        ),
+        "provisional_pair_count": len(
+            provisional_pairs
+        ),
+        "mode": mode,
+        "method": "country_policy_alignment_v1",
+        "semantic_dimension": "policy_alignment",
+        "score_range": {
+            "minimum": 0,
+            "neutral": 50,
+            "maximum": 100,
+        },
+        "thresholds": {
+            "minimum_shared_policy_issues_for_assessed_pair": (
+                POLICY_ALIGNMENT_MIN_SHARED_ISSUES
+            ),
+            "shared_policy_issues_for_high_breadth": (
+                POLICY_ALIGNMENT_HIGH_SHARED_ISSUES
+            ),
+        },
+        "source_policy": {
+            "uses_explicit_policy_stance": True,
+            "uses_topic_salience": False,
+            "uses_relationship_tone": False,
+            "uses_gdelt_goldstein": False,
+            "uses_gdelt_avg_tone": False,
+        },
+        "note": (
+            "Policy alignment compares only explicit, evidence-sufficient "
+            "country policy-issue stances. A one-issue country pair is retained "
+            "as provisional and must not be interpreted as a stable coalition."
         ),
     }
 
@@ -4212,11 +4862,22 @@ def main():
                         ),
                     )
 
+                    stance_result = build_stance_matrix(
+                        filtered,
+                        mode=mode,
+                    )
+
                     save_json(
                         layer,
                         f"{window_name}_stance{suffix}.json",
-                        build_stance_matrix(
-                            filtered,
+                        stance_result,
+                    )
+
+                    save_json(
+                        layer,
+                        f"{window_name}_policy_alignment{suffix}.json",
+                        build_policy_alignment(
+                            stance_result,
                             mode=mode,
                         ),
                     )
