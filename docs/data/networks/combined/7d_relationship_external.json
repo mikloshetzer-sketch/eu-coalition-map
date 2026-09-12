@@ -2,8 +2,8 @@
   "layer": "combined",
   "mode": "external",
   "window_days": 7,
-  "pair_count": 8,
-  "country_count": 10,
+  "pair_count": 7,
+  "country_count": 9,
   "weights": {
     "direct": 0.5,
     "similarity": 0.3,
@@ -166,38 +166,6 @@
       "similarity_score": 0.0,
       "topic_score": 0.0,
       "direct_weight": 1.4,
-      "similarity_weight": 0.0,
-      "score_meaning": "interaction_policy_affinity",
-      "semantic_relationship_score": null,
-      "dominant_relation": "unclassified",
-      "relationship_label": "unclassified",
-      "assessed_relationship": "unclassified",
-      "observed_relationship_label": "unclassified",
-      "evidence_status": "no_classified_evidence",
-      "evidence_level": "none",
-      "evidence_sufficient": false,
-      "directional_consistency": 0.0,
-      "relationship_confidence": null,
-      "classification_coverage": 0.0,
-      "interaction_count": 1,
-      "relationship_counts": {
-        "cooperative": 0,
-        "conflictual": 0,
-        "neutral": 0,
-        "mixed": 0,
-        "unclassified": 1
-      },
-      "topics": {}
-    },
-    {
-      "source": "ES",
-      "target": "TR",
-      "score": 12.2,
-      "band": "very_low",
-      "direct_score": 24.39,
-      "similarity_score": 0.0,
-      "topic_score": 0.0,
-      "direct_weight": 1.0,
       "similarity_weight": 0.0,
       "score_meaning": "interaction_policy_affinity",
       "semantic_relationship_score": null,
@@ -480,6 +448,32 @@
       ]
     },
     {
+      "country": "TR",
+      "relationship_count": 1,
+      "average_score": 17.07,
+      "strongest_partner": "FR",
+      "strongest_score": 17.07,
+      "top_partners": [
+        {
+          "partner": "FR",
+          "score": 17.07,
+          "band": "very_low",
+          "direct_score": 34.15,
+          "similarity_score": 0.0,
+          "topic_score": 0.0,
+          "semantic_relationship_score": null,
+          "dominant_relation": "unclassified",
+          "relationship_label": "unclassified",
+          "assessed_relationship": "unclassified",
+          "observed_relationship_label": "unclassified",
+          "evidence_level": "none",
+          "evidence_sufficient": false,
+          "relationship_confidence": null,
+          "classification_coverage": 0.0
+        }
+      ]
+    },
+    {
       "country": "FR",
       "relationship_count": 2,
       "average_score": 14.63,
@@ -505,75 +499,6 @@
         },
         {
           "partner": "GB",
-          "score": 12.2,
-          "band": "very_low",
-          "direct_score": 24.39,
-          "similarity_score": 0.0,
-          "topic_score": 0.0,
-          "semantic_relationship_score": null,
-          "dominant_relation": "unclassified",
-          "relationship_label": "unclassified",
-          "assessed_relationship": "unclassified",
-          "observed_relationship_label": "unclassified",
-          "evidence_level": "none",
-          "evidence_sufficient": false,
-          "relationship_confidence": null,
-          "classification_coverage": 0.0
-        }
-      ]
-    },
-    {
-      "country": "TR",
-      "relationship_count": 2,
-      "average_score": 14.63,
-      "strongest_partner": "FR",
-      "strongest_score": 17.07,
-      "top_partners": [
-        {
-          "partner": "FR",
-          "score": 17.07,
-          "band": "very_low",
-          "direct_score": 34.15,
-          "similarity_score": 0.0,
-          "topic_score": 0.0,
-          "semantic_relationship_score": null,
-          "dominant_relation": "unclassified",
-          "relationship_label": "unclassified",
-          "assessed_relationship": "unclassified",
-          "observed_relationship_label": "unclassified",
-          "evidence_level": "none",
-          "evidence_sufficient": false,
-          "relationship_confidence": null,
-          "classification_coverage": 0.0
-        },
-        {
-          "partner": "ES",
-          "score": 12.2,
-          "band": "very_low",
-          "direct_score": 24.39,
-          "similarity_score": 0.0,
-          "topic_score": 0.0,
-          "semantic_relationship_score": null,
-          "dominant_relation": "unclassified",
-          "relationship_label": "unclassified",
-          "assessed_relationship": "unclassified",
-          "observed_relationship_label": "unclassified",
-          "evidence_level": "none",
-          "evidence_sufficient": false,
-          "relationship_confidence": null,
-          "classification_coverage": 0.0
-        }
-      ]
-    },
-    {
-      "country": "ES",
-      "relationship_count": 1,
-      "average_score": 12.2,
-      "strongest_partner": "TR",
-      "strongest_score": 12.2,
-      "top_partners": [
-        {
-          "partner": "TR",
           "score": 12.2,
           "band": "very_low",
           "direct_score": 24.39,
@@ -619,7 +544,7 @@
     }
   ],
   "current": {
-    "event_count": 26,
-    "graph_event_count": 26
+    "event_count": 23,
+    "graph_event_count": 23
   }
 }

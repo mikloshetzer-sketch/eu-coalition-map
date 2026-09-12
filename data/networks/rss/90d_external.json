@@ -46,7 +46,7 @@
     },
     {
       "id": "FR",
-      "weight": 162.0
+      "weight": 160.0
     },
     {
       "id": "GB",
@@ -98,7 +98,7 @@
     },
     {
       "id": "RU",
-      "weight": 297.0
+      "weight": 296.0
     },
     {
       "id": "SE",
@@ -114,7 +114,7 @@
     },
     {
       "id": "UA",
-      "weight": 240.0
+      "weight": 239.0
     },
     {
       "id": "US",
@@ -1798,13 +1798,13 @@
     {
       "source": "FR",
       "target": "RU",
-      "weight": 74.0,
-      "interaction_weight": 74.0,
-      "interaction_count": 74,
+      "weight": 73.0,
+      "interaction_weight": 73.0,
+      "interaction_count": 73,
       "topics": {
-        "ukraine_russia": 66.742,
+        "ukraine_russia": 65.834,
         "defence": 3.586,
-        "energy": 2.427,
+        "energy": 2.334,
         "enlargement": 0.603,
         "migration": 0.379,
         "trade": 0.233,
@@ -1819,11 +1819,11 @@
         "conflictual": 8,
         "neutral": 1,
         "mixed": 0,
-        "unclassified": 65
+        "unclassified": 64
       },
       "classified_events": 9,
-      "unclassified_events": 65,
-      "classification_coverage": 0.122,
+      "unclassified_events": 64,
+      "classification_coverage": 0.123,
       "relationship_label": "conflictual",
       "assessed_relationship": "conflictual",
       "evidence_status": "assessment_threshold_met",
@@ -1866,38 +1866,38 @@
     {
       "source": "FR",
       "target": "UA",
-      "weight": 52.0,
-      "interaction_weight": 52.0,
-      "interaction_count": 52,
+      "weight": 51.0,
+      "interaction_weight": 51.0,
+      "interaction_count": 51,
       "topics": {
-        "ukraine_russia": 44.885,
+        "ukraine_russia": 43.978,
         "defence": 3.926,
         "enlargement": 1.108,
-        "energy": 0.824,
         "migration": 0.764,
+        "energy": 0.731,
         "trade": 0.465,
         "fiscal": 0.029
       },
-      "relationship_score": 0.244,
+      "relationship_score": 0.267,
       "dominant_relation": "cooperative",
       "observed_relationship_label": "cooperative",
-      "relationship_confidence": 0.583,
+      "relationship_confidence": 0.588,
       "relationship_counts": {
         "cooperative": 7,
         "conflictual": 3,
-        "neutral": 1,
+        "neutral": 0,
         "mixed": 0,
         "unclassified": 41
       },
-      "classified_events": 11,
+      "classified_events": 10,
       "unclassified_events": 41,
-      "classification_coverage": 0.212,
+      "classification_coverage": 0.196,
       "relationship_label": "cooperative",
       "assessed_relationship": "cooperative",
       "evidence_status": "assessment_threshold_met",
       "evidence_level": "moderate",
       "evidence_sufficient": true,
-      "directional_consistency": 0.636
+      "directional_consistency": 0.7
     },
     {
       "source": "FR",
@@ -3442,7 +3442,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 1573,
+  "event_count": 1571,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -3456,7 +3456,7 @@
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
       "no_topic_evidence": 44,
-      "rule_based_topic_salience_v2": 1529
+      "rule_based_topic_salience_v2": 1527
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
     "note": "Topic prominence does not imply support, opposition or shared policy position."
