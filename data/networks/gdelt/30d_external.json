@@ -17,6 +17,10 @@
       "weight": 21.09
     },
     {
+      "id": "DK",
+      "weight": 5.1
+    },
+    {
       "id": "ES",
       "weight": 14.0
     },
@@ -30,7 +34,7 @@
     },
     {
       "id": "GB",
-      "weight": 64.08
+      "weight": 77.08
     },
     {
       "id": "IE",
@@ -38,7 +42,7 @@
     },
     {
       "id": "IT",
-      "weight": 13.4
+      "weight": 25.0
     },
     {
       "id": "LV",
@@ -50,7 +54,7 @@
     },
     {
       "id": "RU",
-      "weight": 36.21
+      "weight": 39.91
     },
     {
       "id": "TR",
@@ -233,6 +237,67 @@
       },
       "classified_events": 0,
       "unclassified_events": 3,
+      "classification_coverage": 0.0,
+      "relationship_label": "unclassified",
+      "assessed_relationship": "unclassified",
+      "evidence_status": "no_classified_evidence",
+      "evidence_level": "none",
+      "evidence_sufficient": false,
+      "directional_consistency": 0.0
+    },
+    {
+      "source": "DK",
+      "target": "GB",
+      "weight": 1.4,
+      "interaction_weight": 1.4,
+      "interaction_count": 1,
+      "topics": {
+        "defence": 1.4
+      },
+      "relationship_score": null,
+      "dominant_relation": "unclassified",
+      "observed_relationship_label": "unclassified",
+      "relationship_confidence": null,
+      "relationship_counts": {
+        "cooperative": 0,
+        "conflictual": 0,
+        "neutral": 0,
+        "mixed": 0,
+        "unclassified": 1
+      },
+      "classified_events": 0,
+      "unclassified_events": 1,
+      "classification_coverage": 0.0,
+      "relationship_label": "unclassified",
+      "assessed_relationship": "unclassified",
+      "evidence_status": "no_classified_evidence",
+      "evidence_level": "none",
+      "evidence_sufficient": false,
+      "directional_consistency": 0.0
+    },
+    {
+      "source": "DK",
+      "target": "RU",
+      "weight": 3.7,
+      "interaction_weight": 3.7,
+      "interaction_count": 1,
+      "topics": {
+        "defence": 1.85,
+        "ukraine_russia": 1.85
+      },
+      "relationship_score": null,
+      "dominant_relation": "unclassified",
+      "observed_relationship_label": "unclassified",
+      "relationship_confidence": null,
+      "relationship_counts": {
+        "cooperative": 0,
+        "conflictual": 0,
+        "neutral": 0,
+        "mixed": 0,
+        "unclassified": 1
+      },
+      "classified_events": 0,
+      "unclassified_events": 1,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -446,6 +511,37 @@
       "directional_consistency": 0.0
     },
     {
+      "source": "GB",
+      "target": "IT",
+      "weight": 11.6,
+      "interaction_weight": 11.6,
+      "interaction_count": 2,
+      "topics": {
+        "defence": 5.8,
+        "ukraine_russia": 5.8
+      },
+      "relationship_score": null,
+      "dominant_relation": "unclassified",
+      "observed_relationship_label": "unclassified",
+      "relationship_confidence": null,
+      "relationship_counts": {
+        "cooperative": 0,
+        "conflictual": 0,
+        "neutral": 0,
+        "mixed": 0,
+        "unclassified": 2
+      },
+      "classified_events": 0,
+      "unclassified_events": 2,
+      "classification_coverage": 0.0,
+      "relationship_label": "unclassified",
+      "assessed_relationship": "unclassified",
+      "evidence_status": "no_classified_evidence",
+      "evidence_level": "none",
+      "evidence_sufficient": false,
+      "directional_consistency": 0.0
+    },
+    {
       "source": "IE",
       "target": "US",
       "weight": 3.7,
@@ -596,7 +692,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 92,
+  "event_count": 96,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -609,7 +705,7 @@
     "stance_inferred": false,
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
-      "equal_legacy_topic_share_fallback": 11,
+      "equal_legacy_topic_share_fallback": 15,
       "no_topic_evidence": 70,
       "rule_based_topic_salience_v2": 11
     },

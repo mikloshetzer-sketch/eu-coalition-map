@@ -5,6 +5,10 @@
       "weight": 1
     },
     {
+      "id": "DK",
+      "weight": 1
+    },
+    {
       "id": "ES",
       "weight": 1
     },
@@ -28,6 +32,11 @@
   "edges": [
     {
       "source": "BG",
+      "target": "DK",
+      "weight": 0.827
+    },
+    {
+      "source": "BG",
       "target": "ES",
       "weight": 0.952
     },
@@ -39,7 +48,22 @@
     {
       "source": "BG",
       "target": "IT",
-      "weight": 0.952
+      "weight": 0.808
+    },
+    {
+      "source": "DK",
+      "target": "ES",
+      "weight": 0.869
+    },
+    {
+      "source": "DK",
+      "target": "IE",
+      "weight": 0.869
+    },
+    {
+      "source": "DK",
+      "target": "IT",
+      "weight": 0.999
     },
     {
       "source": "ES",
@@ -49,7 +73,7 @@
     {
       "source": "ES",
       "target": "IT",
-      "weight": 1.0
+      "weight": 0.849
     },
     {
       "source": "FR",
@@ -59,10 +83,10 @@
     {
       "source": "IE",
       "target": "IT",
-      "weight": 1.0
+      "weight": 0.849
     }
   ],
-  "event_count": 21,
+  "event_count": 24,
   "mode": "internal",
   "method": "topic_salience_cosine_similarity_v2",
   "semantic_dimension": "salience_similarity",
