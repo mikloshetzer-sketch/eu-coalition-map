@@ -37,6 +37,14 @@
       "weight": 77.08
     },
     {
+      "id": "GR",
+      "weight": 5.04
+    },
+    {
+      "id": "HU",
+      "weight": 2.8
+    },
+    {
       "id": "IE",
       "weight": 17.52
     },
@@ -66,7 +74,7 @@
     },
     {
       "id": "US",
-      "weight": 39.31
+      "weight": 47.15
     }
   ],
   "edges": [
@@ -542,6 +550,66 @@
       "directional_consistency": 0.0
     },
     {
+      "source": "GR",
+      "target": "US",
+      "weight": 5.04,
+      "interaction_weight": 5.04,
+      "interaction_count": 1,
+      "topics": {
+        "defence": 5.04
+      },
+      "relationship_score": null,
+      "dominant_relation": "unclassified",
+      "observed_relationship_label": "unclassified",
+      "relationship_confidence": null,
+      "relationship_counts": {
+        "cooperative": 0,
+        "conflictual": 0,
+        "neutral": 0,
+        "mixed": 0,
+        "unclassified": 1
+      },
+      "classified_events": 0,
+      "unclassified_events": 1,
+      "classification_coverage": 0.0,
+      "relationship_label": "unclassified",
+      "assessed_relationship": "unclassified",
+      "evidence_status": "no_classified_evidence",
+      "evidence_level": "none",
+      "evidence_sufficient": false,
+      "directional_consistency": 0.0
+    },
+    {
+      "source": "HU",
+      "target": "US",
+      "weight": 2.8,
+      "interaction_weight": 2.8,
+      "interaction_count": 2,
+      "topics": {
+        "defence": 2.8
+      },
+      "relationship_score": null,
+      "dominant_relation": "unclassified",
+      "observed_relationship_label": "unclassified",
+      "relationship_confidence": null,
+      "relationship_counts": {
+        "cooperative": 0,
+        "conflictual": 0,
+        "neutral": 0,
+        "mixed": 0,
+        "unclassified": 2
+      },
+      "classified_events": 0,
+      "unclassified_events": 2,
+      "classification_coverage": 0.0,
+      "relationship_label": "unclassified",
+      "assessed_relationship": "unclassified",
+      "evidence_status": "no_classified_evidence",
+      "evidence_level": "none",
+      "evidence_sufficient": false,
+      "directional_consistency": 0.0
+    },
+    {
       "source": "IE",
       "target": "US",
       "weight": 3.7,
@@ -692,7 +760,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 96,
+  "event_count": 98,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -705,8 +773,8 @@
     "stance_inferred": false,
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
-      "equal_legacy_topic_share_fallback": 15,
-      "no_topic_evidence": 70,
+      "equal_legacy_topic_share_fallback": 20,
+      "no_topic_evidence": 67,
       "rule_based_topic_salience_v2": 11
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
