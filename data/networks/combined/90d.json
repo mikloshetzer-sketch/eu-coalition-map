@@ -50,7 +50,7 @@
     },
     {
       "id": "GB",
-      "weight": 220.44
+      "weight": 228.94
     },
     {
       "id": "GR",
@@ -66,7 +66,7 @@
     },
     {
       "id": "IE",
-      "weight": 79.27
+      "weight": 87.77
     },
     {
       "id": "IT",
@@ -94,7 +94,7 @@
     },
     {
       "id": "PL",
-      "weight": 155.54
+      "weight": 153.54
     },
     {
       "id": "PT",
@@ -110,7 +110,7 @@
     },
     {
       "id": "SE",
-      "weight": 43.15
+      "weight": 48.35
     },
     {
       "id": "SK",
@@ -122,11 +122,11 @@
     },
     {
       "id": "UA",
-      "weight": 240.88
+      "weight": 238.88
     },
     {
       "id": "US",
-      "weight": 117.26
+      "weight": 122.46
     }
   ],
   "edges": [
@@ -4690,10 +4690,11 @@
     {
       "source": "GB",
       "target": "IE",
-      "weight": 39.65,
-      "interaction_weight": 39.65,
-      "interaction_count": 14,
+      "weight": 48.15,
+      "interaction_weight": 48.15,
+      "interaction_count": 15,
       "topics": {
+        "rule_of_law": 8.5,
         "defence": 1.72
       },
       "relationship_score": null,
@@ -4705,10 +4706,10 @@
         "conflictual": 0,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 14
+        "unclassified": 15
       },
       "classified_events": 0,
-      "unclassified_events": 14,
+      "unclassified_events": 15,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -6525,15 +6526,15 @@
     {
       "source": "PL",
       "target": "UA",
-      "weight": 59.44,
-      "interaction_weight": 59.44,
-      "interaction_count": 47,
+      "weight": 57.44,
+      "interaction_weight": 57.44,
+      "interaction_count": 45,
       "topics": {
-        "ukraine_russia": 51.153,
+        "ukraine_russia": 49.607,
         "defence": 5.827,
         "energy": 1.186,
         "migration": 0.725,
-        "enlargement": 0.529,
+        "enlargement": 0.075,
         "trade": 0.02
       },
       "relationship_score": -0.646,
@@ -6545,11 +6546,11 @@
         "conflictual": 6,
         "neutral": 1,
         "mixed": 0,
-        "unclassified": 39
+        "unclassified": 37
       },
       "classified_events": 8,
-      "unclassified_events": 39,
-      "classification_coverage": 0.17,
+      "unclassified_events": 37,
+      "classification_coverage": 0.178,
       "relationship_label": "conflictual",
       "assessed_relationship": "conflictual",
       "evidence_status": "assessment_threshold_met",
@@ -6855,10 +6856,12 @@
     {
       "source": "SE",
       "target": "US",
-      "weight": 3.45,
-      "interaction_weight": 3.45,
-      "interaction_count": 2,
+      "weight": 8.65,
+      "interaction_weight": 8.65,
+      "interaction_count": 4,
       "topics": {
+        "fiscal": 2.6,
+        "trade": 2.6,
         "ukraine_russia": 1.0
       },
       "relationship_score": null,
@@ -6870,10 +6873,10 @@
         "conflictual": 0,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 2
+        "unclassified": 4
       },
       "classified_events": 0,
-      "unclassified_events": 2,
+      "unclassified_events": 4,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -6945,7 +6948,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 1599,
+  "event_count": 1586,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -6958,9 +6961,9 @@
     "stance_inferred": false,
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
-      "equal_legacy_topic_share_fallback": 29,
-      "no_topic_evidence": 230,
-      "rule_based_topic_salience_v2": 1340
+      "equal_legacy_topic_share_fallback": 32,
+      "no_topic_evidence": 229,
+      "rule_based_topic_salience_v2": 1325
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
     "note": "Topic prominence does not imply support, opposition or shared policy position."
