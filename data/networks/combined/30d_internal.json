@@ -14,7 +14,7 @@
     },
     {
       "id": "DE",
-      "weight": 31.06
+      "weight": 30.06
     },
     {
       "id": "DK",
@@ -67,10 +67,6 @@
     {
       "id": "SE",
       "weight": 7.0
-    },
-    {
-      "id": "SK",
-      "weight": 1.0
     }
   ],
   "edges": [
@@ -544,36 +540,6 @@
         "defence": 0.158,
         "energy": 0.118,
         "fiscal": 0.029
-      },
-      "relationship_score": null,
-      "dominant_relation": "unclassified",
-      "observed_relationship_label": "unclassified",
-      "relationship_confidence": null,
-      "relationship_counts": {
-        "cooperative": 0,
-        "conflictual": 0,
-        "neutral": 0,
-        "mixed": 0,
-        "unclassified": 1
-      },
-      "classified_events": 0,
-      "unclassified_events": 1,
-      "classification_coverage": 0.0,
-      "relationship_label": "unclassified",
-      "assessed_relationship": "unclassified",
-      "evidence_status": "no_classified_evidence",
-      "evidence_level": "none",
-      "evidence_sufficient": false,
-      "directional_consistency": 0.0
-    },
-    {
-      "source": "DE",
-      "target": "SK",
-      "weight": 1.0,
-      "interaction_weight": 1.0,
-      "interaction_count": 1,
-      "topics": {
-        "fiscal": 1.0
       },
       "relationship_score": null,
       "dominant_relation": "unclassified",
@@ -1139,7 +1105,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 339,
+  "event_count": 315,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -1153,8 +1119,8 @@
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
       "equal_legacy_topic_share_fallback": 44,
-      "no_topic_evidence": 65,
-      "rule_based_topic_salience_v2": 230
+      "no_topic_evidence": 63,
+      "rule_based_topic_salience_v2": 208
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
     "note": "Topic prominence does not imply support, opposition or shared policy position."
