@@ -2,11 +2,11 @@
   "nodes": [
     {
       "id": "BE",
-      "weight": 19.91
+      "weight": 17.61
     },
     {
       "id": "CN",
-      "weight": 10.27
+      "weight": 11.99
     },
     {
       "id": "DE",
@@ -21,12 +21,16 @@
       "weight": 2.2
     },
     {
+      "id": "FI",
+      "weight": 4.52
+    },
+    {
       "id": "FR",
-      "weight": 20.16
+      "weight": 12.12
     },
     {
       "id": "GB",
-      "weight": 34.21
+      "weight": 31.91
     },
     {
       "id": "GR",
@@ -41,32 +45,20 @@
       "weight": 5.7
     },
     {
-      "id": "LT",
-      "weight": 1.4
-    },
-    {
       "id": "NL",
       "weight": 4.34
     },
     {
       "id": "PL",
-      "weight": 14.84
-    },
-    {
-      "id": "RU",
-      "weight": 8.36
+      "weight": 6.74
     },
     {
       "id": "SE",
       "weight": 5.2
     },
     {
-      "id": "UA",
-      "weight": 8.1
-    },
-    {
       "id": "US",
-      "weight": 31.98
+      "weight": 36.5
     }
   ],
   "edges": [
@@ -103,11 +95,11 @@
     {
       "source": "BE",
       "target": "GB",
-      "weight": 17.71,
-      "interaction_weight": 17.71,
-      "interaction_count": 3,
+      "weight": 15.41,
+      "interaction_weight": 15.41,
+      "interaction_count": 2,
       "topics": {
-        "defence": 17.71
+        "defence": 15.41
       },
       "relationship_score": null,
       "dominant_relation": "unclassified",
@@ -118,10 +110,10 @@
         "conflictual": 0,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 3
+        "unclassified": 2
       },
       "classified_events": 0,
-      "unclassified_events": 3,
+      "unclassified_events": 2,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -138,6 +130,36 @@
       "interaction_count": 1,
       "topics": {
         "defence": 8.3
+      },
+      "relationship_score": null,
+      "dominant_relation": "unclassified",
+      "observed_relationship_label": "unclassified",
+      "relationship_confidence": null,
+      "relationship_counts": {
+        "cooperative": 0,
+        "conflictual": 0,
+        "neutral": 0,
+        "mixed": 0,
+        "unclassified": 1
+      },
+      "classified_events": 0,
+      "unclassified_events": 1,
+      "classification_coverage": 0.0,
+      "relationship_label": "unclassified",
+      "assessed_relationship": "unclassified",
+      "evidence_status": "no_classified_evidence",
+      "evidence_level": "none",
+      "evidence_sufficient": false,
+      "directional_consistency": 0.0
+    },
+    {
+      "source": "CN",
+      "target": "FR",
+      "weight": 1.72,
+      "interaction_weight": 1.72,
+      "interaction_count": 1,
+      "topics": {
+        "trade": 1.72
       },
       "relationship_score": null,
       "dominant_relation": "unclassified",
@@ -251,6 +273,36 @@
       "directional_consistency": 0.0
     },
     {
+      "source": "FI",
+      "target": "US",
+      "weight": 4.52,
+      "interaction_weight": 4.52,
+      "interaction_count": 1,
+      "topics": {
+        "trade": 4.52
+      },
+      "relationship_score": null,
+      "dominant_relation": "unclassified",
+      "observed_relationship_label": "unclassified",
+      "relationship_confidence": null,
+      "relationship_counts": {
+        "cooperative": 0,
+        "conflictual": 0,
+        "neutral": 0,
+        "mixed": 0,
+        "unclassified": 1
+      },
+      "classified_events": 0,
+      "unclassified_events": 1,
+      "classification_coverage": 0.0,
+      "relationship_label": "unclassified",
+      "assessed_relationship": "unclassified",
+      "evidence_status": "no_classified_evidence",
+      "evidence_level": "none",
+      "evidence_sufficient": false,
+      "directional_consistency": 0.0
+    },
+    {
       "source": "FR",
       "target": "GB",
       "weight": 2.8,
@@ -258,66 +310,6 @@
       "interaction_count": 1,
       "topics": {
         "defence": 2.8
-      },
-      "relationship_score": null,
-      "dominant_relation": "unclassified",
-      "observed_relationship_label": "unclassified",
-      "relationship_confidence": null,
-      "relationship_counts": {
-        "cooperative": 0,
-        "conflictual": 0,
-        "neutral": 0,
-        "mixed": 0,
-        "unclassified": 1
-      },
-      "classified_events": 0,
-      "unclassified_events": 1,
-      "classification_coverage": 0.0,
-      "relationship_label": "unclassified",
-      "assessed_relationship": "unclassified",
-      "evidence_status": "no_classified_evidence",
-      "evidence_level": "none",
-      "evidence_sufficient": false,
-      "directional_consistency": 0.0
-    },
-    {
-      "source": "FR",
-      "target": "LT",
-      "weight": 1.4,
-      "interaction_weight": 1.4,
-      "interaction_count": 1,
-      "topics": {
-        "defence": 1.4
-      },
-      "relationship_score": null,
-      "dominant_relation": "unclassified",
-      "observed_relationship_label": "unclassified",
-      "relationship_confidence": null,
-      "relationship_counts": {
-        "cooperative": 0,
-        "conflictual": 0,
-        "neutral": 0,
-        "mixed": 0,
-        "unclassified": 1
-      },
-      "classified_events": 0,
-      "unclassified_events": 1,
-      "classification_coverage": 0.0,
-      "relationship_label": "unclassified",
-      "assessed_relationship": "unclassified",
-      "evidence_status": "no_classified_evidence",
-      "evidence_level": "none",
-      "evidence_sufficient": false,
-      "directional_consistency": 0.0
-    },
-    {
-      "source": "FR",
-      "target": "RU",
-      "weight": 8.36,
-      "interaction_weight": 8.36,
-      "interaction_count": 1,
-      "topics": {
-        "rule_of_law": 8.36
       },
       "relationship_score": null,
       "dominant_relation": "unclassified",
@@ -493,37 +485,6 @@
     },
     {
       "source": "PL",
-      "target": "UA",
-      "weight": 8.1,
-      "interaction_weight": 8.1,
-      "interaction_count": 2,
-      "topics": {
-        "defence": 4.05,
-        "ukraine_russia": 4.05
-      },
-      "relationship_score": null,
-      "dominant_relation": "unclassified",
-      "observed_relationship_label": "unclassified",
-      "relationship_confidence": null,
-      "relationship_counts": {
-        "cooperative": 0,
-        "conflictual": 0,
-        "neutral": 0,
-        "mixed": 0,
-        "unclassified": 2
-      },
-      "classified_events": 0,
-      "unclassified_events": 2,
-      "classification_coverage": 0.0,
-      "relationship_label": "unclassified",
-      "assessed_relationship": "unclassified",
-      "evidence_status": "no_classified_evidence",
-      "evidence_level": "none",
-      "evidence_sufficient": false,
-      "directional_consistency": 0.0
-    },
-    {
-      "source": "PL",
       "target": "US",
       "weight": 6.74,
       "interaction_weight": 6.74,
@@ -584,7 +545,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 24,
+  "event_count": 21,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -597,7 +558,7 @@
     "stance_inferred": false,
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
-      "equal_legacy_topic_share_fallback": 24
+      "equal_legacy_topic_share_fallback": 21
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
     "note": "Topic prominence does not imply support, opposition or shared policy position."

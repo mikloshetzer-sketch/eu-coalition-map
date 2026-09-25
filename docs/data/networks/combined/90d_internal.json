@@ -18,7 +18,7 @@
     },
     {
       "id": "DE",
-      "weight": 123.95
+      "weight": 121.95
     },
     {
       "id": "DK",
@@ -38,7 +38,7 @@
     },
     {
       "id": "FR",
-      "weight": 111.87
+      "weight": 108.87
     },
     {
       "id": "GR",
@@ -78,7 +78,7 @@
     },
     {
       "id": "PL",
-      "weight": 34.6
+      "weight": 31.6
     },
     {
       "id": "PT",
@@ -1192,14 +1192,14 @@
     {
       "source": "DE",
       "target": "FR",
-      "weight": 46.15,
-      "interaction_weight": 46.15,
-      "interaction_count": 30,
+      "weight": 45.15,
+      "interaction_weight": 45.15,
+      "interaction_count": 29,
       "topics": {
         "ukraine_russia": 11.672,
         "defence": 4.983,
         "trade": 4.0,
-        "migration": 3.031,
+        "migration": 2.031,
         "fiscal": 2.03,
         "energy": 0.284
       },
@@ -1212,11 +1212,11 @@
         "conflictual": 0,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 29
+        "unclassified": 28
       },
       "classified_events": 1,
-      "unclassified_events": 29,
-      "classification_coverage": 0.033,
+      "unclassified_events": 28,
+      "classification_coverage": 0.034,
       "relationship_label": "insufficient_evidence",
       "assessed_relationship": "insufficient_evidence",
       "evidence_status": "below_assessment_threshold",
@@ -1416,13 +1416,13 @@
     {
       "source": "DE",
       "target": "PL",
-      "weight": 15.6,
-      "interaction_weight": 15.6,
-      "interaction_count": 13,
+      "weight": 14.6,
+      "interaction_weight": 14.6,
+      "interaction_count": 12,
       "topics": {
         "ukraine_russia": 5.374,
-        "migration": 2.028,
         "defence": 1.159,
+        "migration": 1.028,
         "energy": 0.439
       },
       "relationship_score": null,
@@ -1434,10 +1434,10 @@
         "conflictual": 0,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 13
+        "unclassified": 12
       },
       "classified_events": 0,
-      "unclassified_events": 13,
+      "unclassified_events": 12,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -2632,15 +2632,13 @@
     {
       "source": "FR",
       "target": "PL",
-      "weight": 5.0,
-      "interaction_weight": 5.0,
-      "interaction_count": 5,
+      "weight": 3.0,
+      "interaction_weight": 3.0,
+      "interaction_count": 3,
       "topics": {
-        "ukraine_russia": 3.453,
-        "migration": 1.052,
-        "defence": 0.413,
-        "energy": 0.061,
-        "trade": 0.02
+        "ukraine_russia": 2.636,
+        "defence": 0.332,
+        "migration": 0.032
       },
       "relationship_score": null,
       "dominant_relation": "unclassified",
@@ -2651,10 +2649,10 @@
         "conflictual": 0,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 5
+        "unclassified": 3
       },
       "classified_events": 0,
-      "unclassified_events": 5,
+      "unclassified_events": 3,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -3370,7 +3368,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 1494,
+  "event_count": 1479,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -3383,9 +3381,9 @@
     "stance_inferred": false,
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
-      "equal_legacy_topic_share_fallback": 44,
-      "no_topic_evidence": 217,
-      "rule_based_topic_salience_v2": 1233
+      "equal_legacy_topic_share_fallback": 46,
+      "no_topic_evidence": 214,
+      "rule_based_topic_salience_v2": 1219
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
     "note": "Topic prominence does not imply support, opposition or shared policy position."
