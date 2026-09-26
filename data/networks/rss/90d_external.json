@@ -38,7 +38,7 @@
     },
     {
       "id": "ES",
-      "weight": 36.0
+      "weight": 35.0
     },
     {
       "id": "FI",
@@ -98,7 +98,7 @@
     },
     {
       "id": "RU",
-      "weight": 243.0
+      "weight": 242.0
     },
     {
       "id": "SE",
@@ -1371,14 +1371,14 @@
     {
       "source": "ES",
       "target": "RU",
-      "weight": 14.0,
-      "interaction_weight": 14.0,
-      "interaction_count": 14,
+      "weight": 13.0,
+      "interaction_weight": 13.0,
+      "interaction_count": 13,
       "topics": {
-        "ukraine_russia": 10.965,
+        "ukraine_russia": 10.584,
         "defence": 1.193,
         "migration": 0.993,
-        "energy": 0.85
+        "energy": 0.231
       },
       "relationship_score": -1.0,
       "dominant_relation": "conflictual",
@@ -1389,11 +1389,11 @@
         "conflictual": 1,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 13
+        "unclassified": 12
       },
       "classified_events": 1,
-      "unclassified_events": 13,
-      "classification_coverage": 0.071,
+      "unclassified_events": 12,
+      "classification_coverage": 0.077,
       "relationship_label": "insufficient_evidence",
       "assessed_relationship": "insufficient_evidence",
       "evidence_status": "below_assessment_threshold",
@@ -3234,7 +3234,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 1235,
+  "event_count": 1228,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -3248,7 +3248,7 @@
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
       "no_topic_evidence": 37,
-      "rule_based_topic_salience_v2": 1198
+      "rule_based_topic_salience_v2": 1191
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
     "note": "Topic prominence does not imply support, opposition or shared policy position."

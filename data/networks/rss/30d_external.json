@@ -2,11 +2,11 @@
   "nodes": [
     {
       "id": "CN",
-      "weight": 4.0
+      "weight": 3.0
     },
     {
       "id": "DE",
-      "weight": 29.0
+      "weight": 28.0
     },
     {
       "id": "DK",
@@ -26,7 +26,7 @@
     },
     {
       "id": "FR",
-      "weight": 11.0
+      "weight": 10.0
     },
     {
       "id": "GB",
@@ -42,7 +42,7 @@
     },
     {
       "id": "NL",
-      "weight": 3.0
+      "weight": 2.0
     },
     {
       "id": "PL",
@@ -50,7 +50,7 @@
     },
     {
       "id": "RU",
-      "weight": 44.0
+      "weight": 42.0
     },
     {
       "id": "SE",
@@ -108,36 +108,6 @@
       "interaction_count": 1,
       "topics": {
         "ukraine_russia": 1.0
-      },
-      "relationship_score": null,
-      "dominant_relation": "unclassified",
-      "observed_relationship_label": "unclassified",
-      "relationship_confidence": null,
-      "relationship_counts": {
-        "cooperative": 0,
-        "conflictual": 0,
-        "neutral": 0,
-        "mixed": 0,
-        "unclassified": 1
-      },
-      "classified_events": 0,
-      "unclassified_events": 1,
-      "classification_coverage": 0.0,
-      "relationship_label": "unclassified",
-      "assessed_relationship": "unclassified",
-      "evidence_status": "no_classified_evidence",
-      "evidence_level": "none",
-      "evidence_sufficient": false,
-      "directional_consistency": 0.0
-    },
-    {
-      "source": "CN",
-      "target": "NL",
-      "weight": 1.0,
-      "interaction_weight": 1.0,
-      "interaction_count": 1,
-      "topics": {
-        "trade": 1.0
       },
       "relationship_score": null,
       "dominant_relation": "unclassified",
@@ -224,11 +194,11 @@
     {
       "source": "DE",
       "target": "RU",
-      "weight": 20.0,
-      "interaction_weight": 20.0,
-      "interaction_count": 20,
+      "weight": 19.0,
+      "interaction_weight": 19.0,
+      "interaction_count": 19,
       "topics": {
-        "ukraine_russia": 17.652,
+        "ukraine_russia": 16.652,
         "defence": 2.211,
         "migration": 0.102,
         "energy": 0.036
@@ -242,11 +212,11 @@
         "conflictual": 3,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 17
+        "unclassified": 16
       },
       "classified_events": 3,
-      "unclassified_events": 17,
-      "classification_coverage": 0.15,
+      "unclassified_events": 16,
+      "classification_coverage": 0.158,
       "relationship_label": "conflictual",
       "assessed_relationship": "conflictual",
       "evidence_status": "assessment_threshold_met",
@@ -600,11 +570,11 @@
     {
       "source": "FR",
       "target": "RU",
-      "weight": 6.0,
-      "interaction_weight": 6.0,
-      "interaction_count": 6,
+      "weight": 5.0,
+      "interaction_weight": 5.0,
+      "interaction_count": 5,
       "topics": {
-        "ukraine_russia": 5.129,
+        "ukraine_russia": 4.129,
         "energy": 0.639,
         "defence": 0.232
       },
@@ -617,10 +587,10 @@
         "conflictual": 0,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 6
+        "unclassified": 5
       },
       "classified_events": 0,
-      "unclassified_events": 6,
+      "unclassified_events": 5,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -1035,7 +1005,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 189,
+  "event_count": 175,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -1049,7 +1019,7 @@
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
       "no_topic_evidence": 8,
-      "rule_based_topic_salience_v2": 181
+      "rule_based_topic_salience_v2": 167
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
     "note": "Topic prominence does not imply support, opposition or shared policy position."

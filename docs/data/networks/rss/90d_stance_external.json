@@ -1,42 +1,6 @@
 {
   "rows": [
     {
-      "country": "ES",
-      "topic": "energy",
-      "policy_issue": "russian_energy_dependence",
-      "policy_issue_label": "Reducing Russian energy dependence",
-      "stance": "insufficient_evidence",
-      "confidence": 0.0,
-      "confidence_level": "none",
-      "evidence_sufficient": false,
-      "dominant_share": 0.0,
-      "classified_events": 1,
-      "stance_counts": {
-        "support": 1,
-        "oppose": 0,
-        "conditional": 0,
-        "mixed": 0
-      },
-      "stance_weights": {
-        "support": 0.684,
-        "oppose": 0.0,
-        "conditional": 0.0,
-        "mixed": 0.0
-      },
-      "average_detector_confidence": 0.514,
-      "explicit_signal_score": 1.799,
-      "evidence": [
-        {
-          "published_at": "Sun, 28 Jun 2026 04:00:21 GMT",
-          "source_name": "Financial Times Europe",
-          "url": "https://www.ft.com/content/8606fc3c-6576-4ab2-8d28-9e8a46515a2c",
-          "policy_issue": "russian_energy_dependence",
-          "stance": "support",
-          "confidence": 0.514
-        }
-      ]
-    },
-    {
       "country": "PL",
       "topic": "defence",
       "policy_issue": "nuclear_deployment",
@@ -74,18 +38,6 @@
     }
   ],
   "countries": {
-    "ES": {
-      "energy": {
-        "russian_energy_dependence": {
-          "label": "Reducing Russian energy dependence",
-          "stance": "insufficient_evidence",
-          "confidence": 0.0,
-          "confidence_level": "none",
-          "classified_events": 1,
-          "evidence_sufficient": false
-        }
-      }
-    },
     "PL": {
       "defence": {
         "nuclear_deployment": {
@@ -101,42 +53,6 @@
   },
   "assessed": [],
   "insufficient": [
-    {
-      "country": "ES",
-      "topic": "energy",
-      "policy_issue": "russian_energy_dependence",
-      "policy_issue_label": "Reducing Russian energy dependence",
-      "stance": "insufficient_evidence",
-      "confidence": 0.0,
-      "confidence_level": "none",
-      "evidence_sufficient": false,
-      "dominant_share": 0.0,
-      "classified_events": 1,
-      "stance_counts": {
-        "support": 1,
-        "oppose": 0,
-        "conditional": 0,
-        "mixed": 0
-      },
-      "stance_weights": {
-        "support": 0.684,
-        "oppose": 0.0,
-        "conditional": 0.0,
-        "mixed": 0.0
-      },
-      "average_detector_confidence": 0.514,
-      "explicit_signal_score": 1.799,
-      "evidence": [
-        {
-          "published_at": "Sun, 28 Jun 2026 04:00:21 GMT",
-          "source_name": "Financial Times Europe",
-          "url": "https://www.ft.com/content/8606fc3c-6576-4ab2-8d28-9e8a46515a2c",
-          "policy_issue": "russian_energy_dependence",
-          "stance": "support",
-          "confidence": 0.514
-        }
-      ]
-    },
     {
       "country": "PL",
       "topic": "defence",
@@ -174,9 +90,9 @@
       ]
     }
   ],
-  "event_count": 1235,
-  "events_with_stance_schema": 2,
-  "events_with_classified_stance": 2,
+  "event_count": 1228,
+  "events_with_stance_schema": 1,
+  "events_with_classified_stance": 1,
   "mode": "external",
   "method": "country_policy_issue_stance_aggregation_v2",
   "semantic_dimension": "policy_issue_stance",
