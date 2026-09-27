@@ -3,7 +3,7 @@
   "mode": "external",
   "window_days": 30,
   "current": {
-    "event_count": 107,
+    "event_count": 103,
     "relationship_index": {
       "layer": "gdelt",
       "mode": "external",
@@ -745,38 +745,6 @@
         },
         {
           "source": "DE",
-          "target": "US",
-          "score": 41.69,
-          "band": "medium",
-          "direct_score": 16.55,
-          "similarity_score": 75.7,
-          "topic_score": 53.53,
-          "direct_weight": 5.94,
-          "similarity_weight": 0.757,
-          "score_meaning": "interaction_policy_affinity",
-          "semantic_relationship_score": null,
-          "dominant_relation": "unclassified",
-          "relationship_label": "unclassified",
-          "assessed_relationship": "unclassified",
-          "observed_relationship_label": "unclassified",
-          "evidence_status": "no_classified_evidence",
-          "evidence_level": "none",
-          "evidence_sufficient": false,
-          "directional_consistency": 0.0,
-          "relationship_confidence": null,
-          "classification_coverage": 0.0,
-          "interaction_count": 2,
-          "relationship_counts": {
-            "cooperative": 0,
-            "conflictual": 0,
-            "neutral": 0,
-            "mixed": 0,
-            "unclassified": 2
-          },
-          "topics": {}
-        },
-        {
-          "source": "DE",
           "target": "RU",
           "score": 41.53,
           "band": "medium",
@@ -1175,6 +1143,18 @@
           "topics": {
             "defence": 1.97
           }
+        },
+        {
+          "source": "DE",
+          "target": "US",
+          "score": 33.42,
+          "band": "low",
+          "direct_score": 0.0,
+          "similarity_score": 75.7,
+          "topic_score": 53.53,
+          "direct_weight": 0.0,
+          "similarity_weight": 0.757,
+          "score_meaning": "interaction_policy_affinity"
         },
         {
           "source": "SE",
@@ -1861,7 +1841,7 @@
         {
           "country": "DE",
           "relationship_count": 5,
-          "average_score": 45.52,
+          "average_score": 43.87,
           "strongest_partner": "CN",
           "strongest_score": 56.75,
           "top_partners": [
@@ -1917,23 +1897,6 @@
               "classification_coverage": 0.0
             },
             {
-              "partner": "US",
-              "score": 41.69,
-              "band": "medium",
-              "direct_score": 16.55,
-              "similarity_score": 75.7,
-              "topic_score": 53.53,
-              "semantic_relationship_score": null,
-              "dominant_relation": "unclassified",
-              "relationship_label": "unclassified",
-              "assessed_relationship": "unclassified",
-              "observed_relationship_label": "unclassified",
-              "evidence_level": "none",
-              "evidence_sufficient": false,
-              "relationship_confidence": null,
-              "classification_coverage": 0.0
-            },
-            {
               "partner": "RU",
               "score": 41.53,
               "band": "medium",
@@ -1949,13 +1912,30 @@
               "evidence_sufficient": false,
               "relationship_confidence": null,
               "classification_coverage": 0.0
+            },
+            {
+              "partner": "US",
+              "score": 33.42,
+              "band": "low",
+              "direct_score": 0.0,
+              "similarity_score": 75.7,
+              "topic_score": 53.53,
+              "semantic_relationship_score": null,
+              "dominant_relation": "unclassified",
+              "relationship_label": "unclassified",
+              "assessed_relationship": "unclassified",
+              "observed_relationship_label": "unclassified",
+              "evidence_level": "none",
+              "evidence_sufficient": false,
+              "relationship_confidence": null,
+              "classification_coverage": 0.0
             }
           ]
         },
         {
           "country": "US",
           "relationship_count": 14,
-          "average_score": 41.81,
+          "average_score": 41.22,
           "strongest_partner": "IT",
           "strongest_score": 59.75,
           "top_partners": [
@@ -2062,23 +2042,6 @@
               "classification_coverage": 0.0
             },
             {
-              "partner": "DE",
-              "score": 41.69,
-              "band": "medium",
-              "direct_score": 16.55,
-              "similarity_score": 75.7,
-              "topic_score": 53.53,
-              "semantic_relationship_score": null,
-              "dominant_relation": "unclassified",
-              "relationship_label": "unclassified",
-              "assessed_relationship": "unclassified",
-              "observed_relationship_label": "unclassified",
-              "evidence_level": "none",
-              "evidence_sufficient": false,
-              "relationship_confidence": null,
-              "classification_coverage": 0.0
-            },
-            {
               "partner": "FR",
               "score": 40.64,
               "band": "medium",
@@ -2119,6 +2082,23 @@
               "direct_score": 10.31,
               "similarity_score": 73.2,
               "topic_score": 61.18,
+              "semantic_relationship_score": null,
+              "dominant_relation": "unclassified",
+              "relationship_label": "unclassified",
+              "assessed_relationship": "unclassified",
+              "observed_relationship_label": "unclassified",
+              "evidence_level": "none",
+              "evidence_sufficient": false,
+              "relationship_confidence": null,
+              "classification_coverage": 0.0
+            },
+            {
+              "partner": "FI",
+              "score": 38.7,
+              "band": "low",
+              "direct_score": 39.89,
+              "similarity_score": 42.7,
+              "topic_score": 29.71,
               "semantic_relationship_score": null,
               "dominant_relation": "unclassified",
               "relationship_label": "unclassified",
@@ -3912,13 +3892,13 @@
     }
   },
   "previous": {
-    "event_count": 60,
+    "event_count": 63,
     "relationship_index": {
       "layer": "gdelt",
       "mode": "external",
       "window_days": 30,
-      "pair_count": 17,
-      "country_count": 14,
+      "pair_count": 18,
+      "country_count": 13,
       "weights": {
         "direct": 0.5,
         "similarity": 0.3,
@@ -4310,6 +4290,38 @@
           "topics": {}
         },
         {
+          "source": "DE",
+          "target": "US",
+          "score": 14.2,
+          "band": "very_low",
+          "direct_score": 28.39,
+          "similarity_score": 0.0,
+          "topic_score": 0.0,
+          "direct_weight": 7.91,
+          "similarity_weight": 0.0,
+          "score_meaning": "interaction_policy_affinity",
+          "semantic_relationship_score": null,
+          "dominant_relation": "unclassified",
+          "relationship_label": "unclassified",
+          "assessed_relationship": "unclassified",
+          "observed_relationship_label": "unclassified",
+          "evidence_status": "no_classified_evidence",
+          "evidence_level": "none",
+          "evidence_sufficient": false,
+          "directional_consistency": 0.0,
+          "relationship_confidence": null,
+          "classification_coverage": 0.0,
+          "interaction_count": 3,
+          "relationship_counts": {
+            "cooperative": 0,
+            "conflictual": 0,
+            "neutral": 0,
+            "mixed": 0,
+            "unclassified": 3
+          },
+          "topics": {}
+        },
+        {
           "source": "BG",
           "target": "TR",
           "score": 7.82,
@@ -4648,49 +4660,6 @@
           ]
         },
         {
-          "country": "DE",
-          "relationship_count": 2,
-          "average_score": 53.78,
-          "strongest_partner": "RU",
-          "strongest_score": 57.56,
-          "top_partners": [
-            {
-              "partner": "RU",
-              "score": 57.56,
-              "band": "medium",
-              "direct_score": 15.11,
-              "similarity_score": 100.0,
-              "topic_score": 100.0,
-              "semantic_relationship_score": null,
-              "dominant_relation": "unclassified",
-              "relationship_label": "unclassified",
-              "assessed_relationship": "unclassified",
-              "observed_relationship_label": "unclassified",
-              "evidence_level": "none",
-              "evidence_sufficient": false,
-              "relationship_confidence": null,
-              "classification_coverage": 0.0
-            },
-            {
-              "partner": "UA",
-              "score": 50.0,
-              "band": "medium",
-              "direct_score": 0.0,
-              "similarity_score": 100.0,
-              "topic_score": 100.0,
-              "semantic_relationship_score": null,
-              "dominant_relation": "unclassified",
-              "relationship_label": "unclassified",
-              "assessed_relationship": "unclassified",
-              "observed_relationship_label": "unclassified",
-              "evidence_level": "none",
-              "evidence_sufficient": false,
-              "relationship_confidence": null,
-              "classification_coverage": 0.0
-            }
-          ]
-        },
-        {
           "country": "RU",
           "relationship_count": 6,
           "average_score": 53.02,
@@ -4905,6 +4874,66 @@
           ]
         },
         {
+          "country": "DE",
+          "relationship_count": 3,
+          "average_score": 40.59,
+          "strongest_partner": "RU",
+          "strongest_score": 57.56,
+          "top_partners": [
+            {
+              "partner": "RU",
+              "score": 57.56,
+              "band": "medium",
+              "direct_score": 15.11,
+              "similarity_score": 100.0,
+              "topic_score": 100.0,
+              "semantic_relationship_score": null,
+              "dominant_relation": "unclassified",
+              "relationship_label": "unclassified",
+              "assessed_relationship": "unclassified",
+              "observed_relationship_label": "unclassified",
+              "evidence_level": "none",
+              "evidence_sufficient": false,
+              "relationship_confidence": null,
+              "classification_coverage": 0.0
+            },
+            {
+              "partner": "UA",
+              "score": 50.0,
+              "band": "medium",
+              "direct_score": 0.0,
+              "similarity_score": 100.0,
+              "topic_score": 100.0,
+              "semantic_relationship_score": null,
+              "dominant_relation": "unclassified",
+              "relationship_label": "unclassified",
+              "assessed_relationship": "unclassified",
+              "observed_relationship_label": "unclassified",
+              "evidence_level": "none",
+              "evidence_sufficient": false,
+              "relationship_confidence": null,
+              "classification_coverage": 0.0
+            },
+            {
+              "partner": "US",
+              "score": 14.2,
+              "band": "very_low",
+              "direct_score": 28.39,
+              "similarity_score": 0.0,
+              "topic_score": 0.0,
+              "semantic_relationship_score": null,
+              "dominant_relation": "unclassified",
+              "relationship_label": "unclassified",
+              "assessed_relationship": "unclassified",
+              "observed_relationship_label": "unclassified",
+              "evidence_level": "none",
+              "evidence_sufficient": false,
+              "relationship_confidence": null,
+              "classification_coverage": 0.0
+            }
+          ]
+        },
+        {
           "country": "BG",
           "relationship_count": 3,
           "average_score": 36.96,
@@ -5008,6 +5037,49 @@
           ]
         },
         {
+          "country": "US",
+          "relationship_count": 2,
+          "average_score": 10.53,
+          "strongest_partner": "DE",
+          "strongest_score": 14.2,
+          "top_partners": [
+            {
+              "partner": "DE",
+              "score": 14.2,
+              "band": "very_low",
+              "direct_score": 28.39,
+              "similarity_score": 0.0,
+              "topic_score": 0.0,
+              "semantic_relationship_score": null,
+              "dominant_relation": "unclassified",
+              "relationship_label": "unclassified",
+              "assessed_relationship": "unclassified",
+              "observed_relationship_label": "unclassified",
+              "evidence_level": "none",
+              "evidence_sufficient": false,
+              "relationship_confidence": null,
+              "classification_coverage": 0.0
+            },
+            {
+              "partner": "IE",
+              "score": 6.86,
+              "band": "very_low",
+              "direct_score": 13.71,
+              "similarity_score": 0.0,
+              "topic_score": 0.0,
+              "semantic_relationship_score": null,
+              "dominant_relation": "unclassified",
+              "relationship_label": "unclassified",
+              "assessed_relationship": "unclassified",
+              "observed_relationship_label": "unclassified",
+              "evidence_level": "none",
+              "evidence_sufficient": false,
+              "relationship_confidence": null,
+              "classification_coverage": 0.0
+            }
+          ]
+        },
+        {
           "country": "TR",
           "relationship_count": 2,
           "average_score": 7.68,
@@ -5075,40 +5147,6 @@
               "classification_coverage": 0.0
             }
           ]
-        },
-        {
-          "country": "US",
-          "relationship_count": 1,
-          "average_score": 6.86,
-          "strongest_partner": "IE",
-          "strongest_score": 6.86,
-          "top_partners": [
-            {
-              "partner": "IE",
-              "score": 6.86,
-              "band": "very_low",
-              "direct_score": 13.71,
-              "similarity_score": 0.0,
-              "topic_score": 0.0,
-              "semantic_relationship_score": null,
-              "dominant_relation": "unclassified",
-              "relationship_label": "unclassified",
-              "assessed_relationship": "unclassified",
-              "observed_relationship_label": "unclassified",
-              "evidence_level": "none",
-              "evidence_sufficient": false,
-              "relationship_confidence": null,
-              "classification_coverage": 0.0
-            }
-          ]
-        },
-        {
-          "country": "CN",
-          "relationship_count": 0,
-          "average_score": 0.0,
-          "strongest_partner": null,
-          "strongest_score": null,
-          "top_partners": []
         }
       ]
     }
@@ -5462,20 +5500,6 @@
       "current_semantic_relationship_score": null,
       "previous_semantic_relationship_score": null,
       "current_relation": null,
-      "previous_relation": null
-    },
-    {
-      "source": "DE",
-      "target": "US",
-      "current_score": 41.69,
-      "previous_score": 0.0,
-      "delta": 41.69,
-      "status": "gained",
-      "current_band": "medium",
-      "previous_band": null,
-      "current_semantic_relationship_score": null,
-      "previous_semantic_relationship_score": null,
-      "current_relation": "unclassified",
       "previous_relation": null
     },
     {
@@ -5981,6 +6005,20 @@
       "previous_semantic_relationship_score": null,
       "current_relation": null,
       "previous_relation": null
+    },
+    {
+      "source": "DE",
+      "target": "US",
+      "current_score": 33.42,
+      "previous_score": 14.2,
+      "delta": 19.22,
+      "status": "improved",
+      "current_band": "low",
+      "previous_band": "very_low",
+      "current_semantic_relationship_score": null,
+      "previous_semantic_relationship_score": null,
+      "current_relation": null,
+      "previous_relation": "unclassified"
     },
     {
       "source": "FR",
@@ -7201,11 +7239,11 @@
     {
       "country": "US",
       "relationship_count_current": 14,
-      "relationship_count_previous": 1,
-      "relationship_count_delta": 13,
-      "average_score_current": 41.81,
-      "average_score_previous": 6.86,
-      "average_score_delta": 34.95,
+      "relationship_count_previous": 2,
+      "relationship_count_delta": 12,
+      "average_score_current": 41.22,
+      "average_score_previous": 10.53,
+      "average_score_delta": 30.69,
       "gained_relationships": [
         {
           "partner": "IT",
@@ -7274,17 +7312,6 @@
           "previous_relation": null
         },
         {
-          "partner": "DE",
-          "current_score": 41.69,
-          "previous_score": 0.0,
-          "delta": 41.69,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": "unclassified",
-          "previous_relation": null
-        },
-        {
           "partner": "FR",
           "current_score": 40.64,
           "previous_score": 0.0,
@@ -7316,6 +7343,17 @@
           "previous_semantic_relationship_score": null,
           "current_relation": "unclassified",
           "previous_relation": null
+        },
+        {
+          "partner": "BE",
+          "current_score": 36.39,
+          "previous_score": 0.0,
+          "delta": 36.39,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
         }
       ],
       "lost_relationships": [],
@@ -7329,6 +7367,17 @@
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
           "current_relation": "unclassified",
+          "previous_relation": "unclassified"
+        },
+        {
+          "partner": "DE",
+          "current_score": 33.42,
+          "previous_score": 14.2,
+          "delta": 19.22,
+          "status": "improved",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
           "previous_relation": "unclassified"
         }
       ],
@@ -7401,17 +7450,6 @@
           "previous_relation": null
         },
         {
-          "partner": "DE",
-          "current_score": 41.69,
-          "previous_score": 0.0,
-          "delta": 41.69,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": "unclassified",
-          "previous_relation": null
-        },
-        {
           "partner": "FR",
           "current_score": 40.64,
           "previous_score": 0.0,
@@ -7465,6 +7503,17 @@
           "previous_semantic_relationship_score": null,
           "current_relation": "unclassified",
           "previous_relation": null
+        },
+        {
+          "partner": "IE",
+          "current_score": 39.35,
+          "previous_score": 6.86,
+          "delta": 32.49,
+          "status": "improved",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": "unclassified"
         }
       ]
     },
@@ -9226,133 +9275,6 @@
       ]
     },
     {
-      "country": "DE",
-      "relationship_count_current": 5,
-      "relationship_count_previous": 2,
-      "relationship_count_delta": 3,
-      "average_score_current": 45.52,
-      "average_score_previous": 53.78,
-      "average_score_delta": -8.26,
-      "gained_relationships": [
-        {
-          "partner": "CN",
-          "current_score": 56.75,
-          "previous_score": 0.0,
-          "delta": 56.75,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": "unclassified",
-          "previous_relation": null
-        },
-        {
-          "partner": "GB",
-          "current_score": 45.37,
-          "previous_score": 0.0,
-          "delta": 45.37,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": "unclassified",
-          "previous_relation": null
-        },
-        {
-          "partner": "US",
-          "current_score": 41.69,
-          "previous_score": 0.0,
-          "delta": 41.69,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": "unclassified",
-          "previous_relation": null
-        }
-      ],
-      "lost_relationships": [],
-      "improved_relationships": [],
-      "declined_relationships": [
-        {
-          "partner": "RU",
-          "current_score": 41.53,
-          "previous_score": 57.56,
-          "delta": -16.03,
-          "status": "declined",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": "unclassified",
-          "previous_relation": "unclassified"
-        },
-        {
-          "partner": "UA",
-          "current_score": 42.27,
-          "previous_score": 50.0,
-          "delta": -7.73,
-          "status": "declined",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        }
-      ],
-      "top_changes": [
-        {
-          "partner": "CN",
-          "current_score": 56.75,
-          "previous_score": 0.0,
-          "delta": 56.75,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": "unclassified",
-          "previous_relation": null
-        },
-        {
-          "partner": "GB",
-          "current_score": 45.37,
-          "previous_score": 0.0,
-          "delta": 45.37,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": "unclassified",
-          "previous_relation": null
-        },
-        {
-          "partner": "US",
-          "current_score": 41.69,
-          "previous_score": 0.0,
-          "delta": 41.69,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": "unclassified",
-          "previous_relation": null
-        },
-        {
-          "partner": "RU",
-          "current_score": 41.53,
-          "previous_score": 57.56,
-          "delta": -16.03,
-          "status": "declined",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": "unclassified",
-          "previous_relation": "unclassified"
-        },
-        {
-          "partner": "UA",
-          "current_score": 42.27,
-          "previous_score": 50.0,
-          "delta": -7.73,
-          "status": "declined",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        }
-      ]
-    },
-    {
       "country": "CY",
       "relationship_count_current": 1,
       "relationship_count_previous": 1,
@@ -9536,6 +9458,134 @@
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
           "current_relation": "unclassified",
+          "previous_relation": null
+        }
+      ]
+    },
+    {
+      "country": "DE",
+      "relationship_count_current": 5,
+      "relationship_count_previous": 3,
+      "relationship_count_delta": 2,
+      "average_score_current": 43.87,
+      "average_score_previous": 40.59,
+      "average_score_delta": 3.28,
+      "gained_relationships": [
+        {
+          "partner": "CN",
+          "current_score": 56.75,
+          "previous_score": 0.0,
+          "delta": 56.75,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": null
+        },
+        {
+          "partner": "GB",
+          "current_score": 45.37,
+          "previous_score": 0.0,
+          "delta": 45.37,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": null
+        }
+      ],
+      "lost_relationships": [],
+      "improved_relationships": [
+        {
+          "partner": "US",
+          "current_score": 33.42,
+          "previous_score": 14.2,
+          "delta": 19.22,
+          "status": "improved",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": "unclassified"
+        }
+      ],
+      "declined_relationships": [
+        {
+          "partner": "RU",
+          "current_score": 41.53,
+          "previous_score": 57.56,
+          "delta": -16.03,
+          "status": "declined",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": "unclassified"
+        },
+        {
+          "partner": "UA",
+          "current_score": 42.27,
+          "previous_score": 50.0,
+          "delta": -7.73,
+          "status": "declined",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        }
+      ],
+      "top_changes": [
+        {
+          "partner": "CN",
+          "current_score": 56.75,
+          "previous_score": 0.0,
+          "delta": 56.75,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": null
+        },
+        {
+          "partner": "GB",
+          "current_score": 45.37,
+          "previous_score": 0.0,
+          "delta": 45.37,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": null
+        },
+        {
+          "partner": "US",
+          "current_score": 33.42,
+          "previous_score": 14.2,
+          "delta": 19.22,
+          "status": "improved",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": "unclassified"
+        },
+        {
+          "partner": "RU",
+          "current_score": 41.53,
+          "previous_score": 57.56,
+          "delta": -16.03,
+          "status": "declined",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": "unclassified"
+        },
+        {
+          "partner": "UA",
+          "current_score": 42.27,
+          "previous_score": 50.0,
+          "delta": -7.73,
+          "status": "declined",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
           "previous_relation": null
         }
       ]
