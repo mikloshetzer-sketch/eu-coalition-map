@@ -10,7 +10,7 @@
     },
     {
       "id": "DE",
-      "weight": 40.0
+      "weight": 39.0
     },
     {
       "id": "DK",
@@ -58,7 +58,7 @@
     },
     {
       "id": "RU",
-      "weight": 32.0
+      "weight": 31.0
     },
     {
       "id": "SE",
@@ -568,11 +568,11 @@
     {
       "source": "DE",
       "target": "RU",
-      "weight": 18.0,
-      "interaction_weight": 18.0,
-      "interaction_count": 18,
+      "weight": 17.0,
+      "interaction_weight": 17.0,
+      "interaction_count": 17,
       "topics": {
-        "ukraine_russia": 15.652,
+        "ukraine_russia": 14.652,
         "defence": 2.211,
         "migration": 0.102,
         "energy": 0.036
@@ -580,22 +580,22 @@
       "relationship_score": -1.0,
       "dominant_relation": "conflictual",
       "observed_relationship_label": "conflictual",
-      "relationship_confidence": 0.713,
+      "relationship_confidence": 0.69,
       "relationship_counts": {
         "cooperative": 0,
-        "conflictual": 3,
+        "conflictual": 2,
         "neutral": 0,
         "mixed": 0,
         "unclassified": 15
       },
-      "classified_events": 3,
+      "classified_events": 2,
       "unclassified_events": 15,
-      "classification_coverage": 0.167,
-      "relationship_label": "conflictual",
-      "assessed_relationship": "conflictual",
-      "evidence_status": "assessment_threshold_met",
-      "evidence_level": "limited",
-      "evidence_sufficient": true,
+      "classification_coverage": 0.118,
+      "relationship_label": "insufficient_evidence",
+      "assessed_relationship": "insufficient_evidence",
+      "evidence_status": "below_assessment_threshold",
+      "evidence_level": "insufficient",
+      "evidence_sufficient": false,
       "directional_consistency": 1.0
     },
     {
@@ -1464,7 +1464,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 143,
+  "event_count": 139,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -1478,7 +1478,7 @@
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
       "no_topic_evidence": 7,
-      "rule_based_topic_salience_v2": 136
+      "rule_based_topic_salience_v2": 132
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
     "note": "Topic prominence does not imply support, opposition or shared policy position."

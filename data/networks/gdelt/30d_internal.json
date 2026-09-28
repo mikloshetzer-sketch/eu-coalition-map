@@ -10,7 +10,7 @@
     },
     {
       "id": "DE",
-      "weight": 9.06
+      "weight": 16.63
     },
     {
       "id": "ES",
@@ -39,6 +39,10 @@
     {
       "id": "LT",
       "weight": 1.4
+    },
+    {
+      "id": "LV",
+      "weight": 7.57
     },
     {
       "id": "NL",
@@ -86,6 +90,36 @@
       "interaction_count": 1,
       "topics": {
         "defence": 2.2
+      },
+      "relationship_score": null,
+      "dominant_relation": "unclassified",
+      "observed_relationship_label": "unclassified",
+      "relationship_confidence": null,
+      "relationship_counts": {
+        "cooperative": 0,
+        "conflictual": 0,
+        "neutral": 0,
+        "mixed": 0,
+        "unclassified": 1
+      },
+      "classified_events": 0,
+      "unclassified_events": 1,
+      "classification_coverage": 0.0,
+      "relationship_label": "unclassified",
+      "assessed_relationship": "unclassified",
+      "evidence_status": "no_classified_evidence",
+      "evidence_level": "none",
+      "evidence_sufficient": false,
+      "directional_consistency": 0.0
+    },
+    {
+      "source": "DE",
+      "target": "LV",
+      "weight": 7.57,
+      "interaction_weight": 7.57,
+      "interaction_count": 1,
+      "topics": {
+        "defence": 7.57
       },
       "relationship_score": null,
       "dominant_relation": "unclassified",
@@ -311,7 +345,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 98,
+  "event_count": 101,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -324,8 +358,8 @@
     "stance_inferred": false,
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
-      "equal_legacy_topic_share_fallback": 46,
-      "no_topic_evidence": 46,
+      "equal_legacy_topic_share_fallback": 52,
+      "no_topic_evidence": 43,
       "rule_based_topic_salience_v2": 6
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",

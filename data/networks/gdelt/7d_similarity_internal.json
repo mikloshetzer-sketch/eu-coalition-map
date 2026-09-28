@@ -5,6 +5,10 @@
       "weight": 1
     },
     {
+      "id": "DE",
+      "weight": 1
+    },
+    {
       "id": "DK",
       "weight": 1
     },
@@ -21,10 +25,6 @@
       "weight": 1
     },
     {
-      "id": "GR",
-      "weight": 1
-    },
-    {
       "id": "IE",
       "weight": 1
     },
@@ -33,7 +33,11 @@
       "weight": 1
     },
     {
-      "id": "NL",
+      "id": "LT",
+      "weight": 1
+    },
+    {
+      "id": "LV",
       "weight": 1
     },
     {
@@ -44,121 +48,161 @@
   "edges": [
     {
       "source": "BE",
+      "target": "DE",
+      "weight": 1.0
+    },
+    {
+      "source": "BE",
       "target": "DK",
       "weight": 1.0
     },
     {
       "source": "BE",
       "target": "FR",
-      "weight": 0.852
-    },
-    {
-      "source": "BE",
-      "target": "GR",
-      "weight": 1.0
+      "weight": 0.985
     },
     {
       "source": "BE",
       "target": "IE",
+      "weight": 0.47
+    },
+    {
+      "source": "BE",
+      "target": "LT",
       "weight": 1.0
     },
     {
       "source": "BE",
-      "target": "NL",
+      "target": "LV",
       "weight": 1.0
     },
     {
       "source": "BE",
+      "target": "PL",
+      "weight": 1.0
+    },
+    {
+      "source": "DE",
+      "target": "DK",
+      "weight": 1.0
+    },
+    {
+      "source": "DE",
+      "target": "FR",
+      "weight": 0.985
+    },
+    {
+      "source": "DE",
+      "target": "IE",
+      "weight": 0.47
+    },
+    {
+      "source": "DE",
+      "target": "LT",
+      "weight": 1.0
+    },
+    {
+      "source": "DE",
+      "target": "LV",
+      "weight": 1.0
+    },
+    {
+      "source": "DE",
       "target": "PL",
       "weight": 1.0
     },
     {
       "source": "DK",
       "target": "FR",
-      "weight": 0.852
-    },
-    {
-      "source": "DK",
-      "target": "GR",
-      "weight": 1.0
+      "weight": 0.985
     },
     {
       "source": "DK",
       "target": "IE",
+      "weight": 0.47
+    },
+    {
+      "source": "DK",
+      "target": "LT",
       "weight": 1.0
     },
     {
       "source": "DK",
-      "target": "NL",
+      "target": "LV",
       "weight": 1.0
     },
     {
       "source": "DK",
       "target": "PL",
-      "weight": 1.0
-    },
-    {
-      "source": "ES",
-      "target": "IT",
       "weight": 1.0
     },
     {
       "source": "FI",
-      "target": "FR",
-      "weight": 0.523
+      "target": "IE",
+      "weight": 0.883
     },
     {
-      "source": "FR",
-      "target": "GR",
-      "weight": 0.852
+      "source": "FI",
+      "target": "IT",
+      "weight": 1.0
     },
     {
       "source": "FR",
       "target": "IE",
-      "weight": 0.852
+      "weight": 0.615
     },
     {
       "source": "FR",
-      "target": "NL",
-      "weight": 0.852
+      "target": "LT",
+      "weight": 0.985
+    },
+    {
+      "source": "FR",
+      "target": "LV",
+      "weight": 0.985
     },
     {
       "source": "FR",
       "target": "PL",
-      "weight": 0.852
-    },
-    {
-      "source": "GR",
-      "target": "IE",
-      "weight": 1.0
-    },
-    {
-      "source": "GR",
-      "target": "NL",
-      "weight": 1.0
-    },
-    {
-      "source": "GR",
-      "target": "PL",
-      "weight": 1.0
+      "weight": 0.985
     },
     {
       "source": "IE",
-      "target": "NL",
-      "weight": 1.0
+      "target": "IT",
+      "weight": 0.883
+    },
+    {
+      "source": "IE",
+      "target": "LT",
+      "weight": 0.47
+    },
+    {
+      "source": "IE",
+      "target": "LV",
+      "weight": 0.47
     },
     {
       "source": "IE",
       "target": "PL",
+      "weight": 0.47
+    },
+    {
+      "source": "LT",
+      "target": "LV",
       "weight": 1.0
     },
     {
-      "source": "NL",
+      "source": "LT",
+      "target": "PL",
+      "weight": 1.0
+    },
+    {
+      "source": "LV",
       "target": "PL",
       "weight": 1.0
     }
   ],
-  "event_count": 14,
+  "event_count": 15,
   "mode": "internal",
   "method": "topic_salience_cosine_similarity_v2",
   "semantic_dimension": "salience_similarity",
