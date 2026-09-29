@@ -17,10 +17,6 @@
       "weight": 16.29
     },
     {
-      "id": "CY",
-      "weight": 11.08
-    },
-    {
       "id": "DE",
       "weight": 35.87
     },
@@ -38,11 +34,11 @@
     },
     {
       "id": "FR",
-      "weight": 71.73
+      "weight": 59.03
     },
     {
       "id": "GB",
-      "weight": 113.72
+      "weight": 101.02
     },
     {
       "id": "GR",
@@ -86,7 +82,7 @@
     },
     {
       "id": "TR",
-      "weight": 19.18
+      "weight": 8.1
     },
     {
       "id": "UA",
@@ -301,34 +297,6 @@
       },
       "classified_events": 0,
       "unclassified_events": 1,
-      "classification_coverage": 0.0,
-      "relationship_label": "unclassified",
-      "assessed_relationship": "unclassified",
-      "evidence_status": "no_classified_evidence",
-      "evidence_level": "none",
-      "evidence_sufficient": false,
-      "directional_consistency": 0.0
-    },
-    {
-      "source": "CY",
-      "target": "TR",
-      "weight": 11.08,
-      "interaction_weight": 11.08,
-      "interaction_count": 3,
-      "topics": {},
-      "relationship_score": null,
-      "dominant_relation": "unclassified",
-      "observed_relationship_label": "unclassified",
-      "relationship_confidence": null,
-      "relationship_counts": {
-        "cooperative": 0,
-        "conflictual": 0,
-        "neutral": 0,
-        "mixed": 0,
-        "unclassified": 3
-      },
-      "classified_events": 0,
-      "unclassified_events": 3,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -724,9 +692,9 @@
     {
       "source": "FR",
       "target": "GB",
-      "weight": 45.75,
-      "interaction_weight": 45.75,
-      "interaction_count": 6,
+      "weight": 33.05,
+      "interaction_weight": 33.05,
+      "interaction_count": 5,
       "topics": {
         "defence": 12.65,
         "trade": 2.8
@@ -740,10 +708,10 @@
         "conflictual": 0,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 6
+        "unclassified": 5
       },
       "classified_events": 0,
-      "unclassified_events": 6,
+      "unclassified_events": 5,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -1324,7 +1292,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 101,
+  "event_count": 97,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -1338,7 +1306,7 @@
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
       "equal_legacy_topic_share_fallback": 52,
-      "no_topic_evidence": 43,
+      "no_topic_evidence": 39,
       "rule_based_topic_salience_v2": 6
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
