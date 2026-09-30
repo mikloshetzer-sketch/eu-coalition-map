@@ -6,7 +6,7 @@
     },
     {
       "id": "BE",
-      "weight": 2.2
+      "weight": 6.0
     },
     {
       "id": "DE",
@@ -18,7 +18,7 @@
     },
     {
       "id": "FR",
-      "weight": 6.9
+      "weight": 10.7
     },
     {
       "id": "GR",
@@ -104,6 +104,37 @@
       },
       "classified_events": 0,
       "unclassified_events": 1,
+      "classification_coverage": 0.0,
+      "relationship_label": "unclassified",
+      "assessed_relationship": "unclassified",
+      "evidence_status": "no_classified_evidence",
+      "evidence_level": "none",
+      "evidence_sufficient": false,
+      "directional_consistency": 0.0
+    },
+    {
+      "source": "BE",
+      "target": "FR",
+      "weight": 3.8,
+      "interaction_weight": 3.8,
+      "interaction_count": 2,
+      "topics": {
+        "fiscal": 1.9,
+        "trade": 1.9
+      },
+      "relationship_score": null,
+      "dominant_relation": "unclassified",
+      "observed_relationship_label": "unclassified",
+      "relationship_confidence": null,
+      "relationship_counts": {
+        "cooperative": 0,
+        "conflictual": 0,
+        "neutral": 0,
+        "mixed": 0,
+        "unclassified": 2
+      },
+      "classified_events": 0,
+      "unclassified_events": 2,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -345,7 +376,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 97,
+  "event_count": 106,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -358,7 +389,7 @@
     "stance_inferred": false,
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
-      "equal_legacy_topic_share_fallback": 52,
+      "equal_legacy_topic_share_fallback": 61,
       "no_topic_evidence": 39,
       "rule_based_topic_salience_v2": 6
     },
