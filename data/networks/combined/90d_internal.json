@@ -38,7 +38,7 @@
     },
     {
       "id": "FR",
-      "weight": 104.27
+      "weight": 108.37
     },
     {
       "id": "GR",
@@ -58,7 +58,7 @@
     },
     {
       "id": "IT",
-      "weight": 49.53
+      "weight": 53.63
     },
     {
       "id": "LT",
@@ -2490,14 +2490,14 @@
     {
       "source": "FR",
       "target": "IT",
-      "weight": 6.0,
-      "interaction_weight": 6.0,
-      "interaction_count": 6,
+      "weight": 10.1,
+      "interaction_weight": 10.1,
+      "interaction_count": 7,
       "topics": {
+        "defence": 4.378,
         "migration": 2.0,
         "ukraine_russia": 1.722,
-        "fiscal": 1.0,
-        "defence": 0.278
+        "fiscal": 1.0
       },
       "relationship_score": null,
       "dominant_relation": "unclassified",
@@ -2508,10 +2508,10 @@
         "conflictual": 0,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 6
+        "unclassified": 7
       },
       "classified_events": 0,
-      "unclassified_events": 6,
+      "unclassified_events": 7,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -3260,7 +3260,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 1402,
+  "event_count": 1389,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -3273,9 +3273,9 @@
     "stance_inferred": false,
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
-      "equal_legacy_topic_share_fallback": 61,
-      "no_topic_evidence": 209,
-      "rule_based_topic_salience_v2": 1132
+      "equal_legacy_topic_share_fallback": 66,
+      "no_topic_evidence": 206,
+      "rule_based_topic_salience_v2": 1117
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
     "note": "Topic prominence does not imply support, opposition or shared policy position."
