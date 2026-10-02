@@ -18,7 +18,7 @@
     },
     {
       "id": "DE",
-      "weight": 124.72
+      "weight": 122.72
     },
     {
       "id": "DK",
@@ -62,7 +62,7 @@
     },
     {
       "id": "LT",
-      "weight": 6.4
+      "weight": 4.4
     },
     {
       "id": "LV",
@@ -78,7 +78,7 @@
     },
     {
       "id": "PL",
-      "weight": 30.6
+      "weight": 28.6
     },
     {
       "id": "PT",
@@ -1282,38 +1282,6 @@
     },
     {
       "source": "DE",
-      "target": "LT",
-      "weight": 1.0,
-      "interaction_weight": 1.0,
-      "interaction_count": 1,
-      "topics": {
-        "ukraine_russia": 0.945,
-        "defence": 0.028,
-        "migration": 0.028
-      },
-      "relationship_score": null,
-      "dominant_relation": "unclassified",
-      "observed_relationship_label": "unclassified",
-      "relationship_confidence": null,
-      "relationship_counts": {
-        "cooperative": 0,
-        "conflictual": 0,
-        "neutral": 0,
-        "mixed": 0,
-        "unclassified": 1
-      },
-      "classified_events": 0,
-      "unclassified_events": 1,
-      "classification_coverage": 0.0,
-      "relationship_label": "unclassified",
-      "assessed_relationship": "unclassified",
-      "evidence_status": "no_classified_evidence",
-      "evidence_level": "none",
-      "evidence_sufficient": false,
-      "directional_consistency": 0.0
-    },
-    {
-      "source": "DE",
       "target": "LV",
       "weight": 7.57,
       "interaction_weight": 7.57,
@@ -1377,13 +1345,13 @@
     {
       "source": "DE",
       "target": "PL",
-      "weight": 14.6,
-      "interaction_weight": 14.6,
-      "interaction_count": 12,
+      "weight": 13.6,
+      "interaction_weight": 13.6,
+      "interaction_count": 11,
       "topics": {
-        "ukraine_russia": 5.374,
-        "defence": 1.159,
-        "migration": 1.028,
+        "ukraine_russia": 4.429,
+        "defence": 1.131,
+        "migration": 1.0,
         "energy": 0.439
       },
       "relationship_score": null,
@@ -1395,10 +1363,10 @@
         "conflictual": 0,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 12
+        "unclassified": 11
       },
       "classified_events": 0,
-      "unclassified_events": 12,
+      "unclassified_events": 11,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -3011,14 +2979,12 @@
     {
       "source": "LT",
       "target": "PL",
-      "weight": 3.0,
-      "interaction_weight": 3.0,
-      "interaction_count": 3,
+      "weight": 2.0,
+      "interaction_weight": 2.0,
+      "interaction_count": 2,
       "topics": {
-        "ukraine_russia": 2.56,
-        "energy": 0.385,
-        "defence": 0.028,
-        "migration": 0.028
+        "ukraine_russia": 1.615,
+        "energy": 0.385
       },
       "relationship_score": null,
       "dominant_relation": "unclassified",
@@ -3029,10 +2995,10 @@
         "conflictual": 0,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 3
+        "unclassified": 2
       },
       "classified_events": 0,
-      "unclassified_events": 3,
+      "unclassified_events": 2,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -3260,7 +3226,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 1389,
+  "event_count": 1377,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -3273,9 +3239,9 @@
     "stance_inferred": false,
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
-      "equal_legacy_topic_share_fallback": 66,
-      "no_topic_evidence": 206,
-      "rule_based_topic_salience_v2": 1117
+      "equal_legacy_topic_share_fallback": 69,
+      "no_topic_evidence": 204,
+      "rule_based_topic_salience_v2": 1104
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
     "note": "Topic prominence does not imply support, opposition or shared policy position."

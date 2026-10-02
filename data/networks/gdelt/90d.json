@@ -6,7 +6,7 @@
     },
     {
       "id": "BE",
-      "weight": 26.65
+      "weight": 27.65
     },
     {
       "id": "BG",
@@ -46,7 +46,7 @@
     },
     {
       "id": "GB",
-      "weight": 223.2
+      "weight": 227.1
     },
     {
       "id": "GR",
@@ -58,11 +58,11 @@
     },
     {
       "id": "IE",
-      "weight": 96.14
+      "weight": 99.04
     },
     {
       "id": "IT",
-      "weight": 59.45
+      "weight": 59.78
     },
     {
       "id": "LT",
@@ -106,7 +106,7 @@
     },
     {
       "id": "US",
-      "weight": 150.62
+      "weight": 150.95
     }
   ],
   "edges": [
@@ -202,11 +202,11 @@
     {
       "source": "BE",
       "target": "GB",
-      "weight": 19.25,
-      "interaction_weight": 19.25,
-      "interaction_count": 4,
+      "weight": 20.25,
+      "interaction_weight": 20.25,
+      "interaction_count": 5,
       "topics": {
-        "defence": 17.71
+        "defence": 18.71
       },
       "relationship_score": null,
       "dominant_relation": "unclassified",
@@ -217,10 +217,10 @@
         "conflictual": 0,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 4
+        "unclassified": 5
       },
       "classified_events": 0,
-      "unclassified_events": 4,
+      "unclassified_events": 5,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -1465,12 +1465,12 @@
     {
       "source": "GB",
       "target": "IE",
-      "weight": 68.85,
-      "interaction_weight": 68.85,
-      "interaction_count": 19,
+      "weight": 71.75,
+      "interaction_weight": 71.75,
+      "interaction_count": 20,
       "topics": {
         "defence": 19.12,
-        "rule_of_law": 8.5,
+        "rule_of_law": 11.4,
         "ukraine_russia": 4.3
       },
       "relationship_score": null,
@@ -1482,10 +1482,10 @@
         "conflictual": 0,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 19
+        "unclassified": 20
       },
       "classified_events": 0,
-      "unclassified_events": 19,
+      "unclassified_events": 20,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -1875,11 +1875,11 @@
     {
       "source": "IT",
       "target": "US",
-      "weight": 36.22,
-      "interaction_weight": 36.22,
+      "weight": 36.55,
+      "interaction_weight": 36.55,
       "interaction_count": 10,
       "topics": {
-        "defence": 7.44,
+        "defence": 9.74,
         "rule_of_law": 5.7,
         "trade": 5.6
       },
@@ -2118,7 +2118,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 257,
+  "event_count": 259,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -2131,8 +2131,8 @@
     "stance_inferred": false,
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
-      "equal_legacy_topic_share_fallback": 66,
-      "no_topic_evidence": 171,
+      "equal_legacy_topic_share_fallback": 69,
+      "no_topic_evidence": 170,
       "rule_based_topic_salience_v2": 20
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
