@@ -3,7 +3,7 @@
   "mode": "internal",
   "window_days": 30,
   "current": {
-    "event_count": 98,
+    "event_count": 93,
     "relationship_index": {
       "layer": "gdelt",
       "mode": "internal",
@@ -4182,12 +4182,12 @@
     }
   },
   "previous": {
-    "event_count": 79,
+    "event_count": 81,
     "relationship_index": {
       "layer": "gdelt",
       "mode": "internal",
       "window_days": 30,
-      "pair_count": 16,
+      "pair_count": 17,
       "country_count": 12,
       "weights": {
         "direct": 0.5,
@@ -4285,7 +4285,7 @@
           "direct_score": 100.0,
           "similarity_score": 0.0,
           "topic_score": 0.0,
-          "direct_weight": 16.55,
+          "direct_weight": 8.95,
           "similarity_weight": 0.0,
           "score_meaning": "interaction_policy_affinity",
           "semantic_relationship_score": null,
@@ -4299,13 +4299,13 @@
           "directional_consistency": 0.0,
           "relationship_confidence": null,
           "classification_coverage": 0.0,
-          "interaction_count": 2,
+          "interaction_count": 1,
           "relationship_counts": {
             "cooperative": 0,
             "conflictual": 0,
             "neutral": 0,
             "mixed": 0,
-            "unclassified": 2
+            "unclassified": 1
           },
           "topics": {}
         },
@@ -4372,9 +4372,9 @@
         {
           "source": "DE",
           "target": "ES",
-          "score": 17.52,
-          "band": "very_low",
-          "direct_score": 35.05,
+          "score": 32.4,
+          "band": "low",
+          "direct_score": 64.8,
           "similarity_score": 0.0,
           "topic_score": 0.0,
           "direct_weight": 5.8,
@@ -4404,9 +4404,9 @@
         {
           "source": "IT",
           "target": "MT",
-          "score": 16.8,
-          "band": "very_low",
-          "direct_score": 33.6,
+          "score": 31.06,
+          "band": "low",
+          "direct_score": 62.12,
           "similarity_score": 0.0,
           "topic_score": 0.0,
           "direct_weight": 5.56,
@@ -4436,9 +4436,9 @@
         {
           "source": "FR",
           "target": "IE",
-          "score": 7.85,
+          "score": 14.53,
           "band": "very_low",
-          "direct_score": 15.71,
+          "direct_score": 29.05,
           "similarity_score": 0.0,
           "topic_score": 0.0,
           "direct_weight": 2.6,
@@ -4468,9 +4468,9 @@
         {
           "source": "DE",
           "target": "IE",
-          "score": 5.2,
+          "score": 9.61,
           "band": "very_low",
-          "direct_score": 10.39,
+          "direct_score": 19.22,
           "similarity_score": 0.0,
           "topic_score": 0.0,
           "direct_weight": 1.72,
@@ -4500,12 +4500,44 @@
         {
           "source": "DE",
           "target": "PL",
-          "score": 5.14,
+          "score": 9.5,
           "band": "very_low",
-          "direct_score": 10.27,
+          "direct_score": 18.99,
           "similarity_score": 0.0,
           "topic_score": 0.0,
           "direct_weight": 1.7,
+          "similarity_weight": 0.0,
+          "score_meaning": "interaction_policy_affinity",
+          "semantic_relationship_score": null,
+          "dominant_relation": "unclassified",
+          "relationship_label": "unclassified",
+          "assessed_relationship": "unclassified",
+          "observed_relationship_label": "unclassified",
+          "evidence_status": "no_classified_evidence",
+          "evidence_level": "none",
+          "evidence_sufficient": false,
+          "directional_consistency": 0.0,
+          "relationship_confidence": null,
+          "classification_coverage": 0.0,
+          "interaction_count": 1,
+          "relationship_counts": {
+            "cooperative": 0,
+            "conflictual": 0,
+            "neutral": 0,
+            "mixed": 0,
+            "unclassified": 1
+          },
+          "topics": {}
+        },
+        {
+          "source": "DE",
+          "target": "NL",
+          "score": 8.6,
+          "band": "very_low",
+          "direct_score": 17.21,
+          "similarity_score": 0.0,
+          "topic_score": 0.0,
+          "direct_weight": 1.54,
           "similarity_weight": 0.0,
           "score_meaning": "interaction_policy_affinity",
           "semantic_relationship_score": null,
@@ -4841,8 +4873,8 @@
         },
         {
           "country": "DE",
-          "relationship_count": 8,
-          "average_score": 34.73,
+          "relationship_count": 9,
+          "average_score": 34.46,
           "strongest_partner": "BG",
           "strongest_score": 50.0,
           "top_partners": [
@@ -4933,9 +4965,9 @@
             },
             {
               "partner": "ES",
-              "score": 17.52,
-              "band": "very_low",
-              "direct_score": 35.05,
+              "score": 32.4,
+              "band": "low",
+              "direct_score": 64.8,
               "similarity_score": 0.0,
               "topic_score": 0.0,
               "semantic_relationship_score": null,
@@ -4950,9 +4982,9 @@
             },
             {
               "partner": "IE",
-              "score": 5.2,
+              "score": 9.61,
               "band": "very_low",
-              "direct_score": 10.39,
+              "direct_score": 19.22,
               "similarity_score": 0.0,
               "topic_score": 0.0,
               "semantic_relationship_score": null,
@@ -4967,9 +4999,52 @@
             },
             {
               "partner": "PL",
-              "score": 5.14,
+              "score": 9.5,
               "band": "very_low",
-              "direct_score": 10.27,
+              "direct_score": 18.99,
+              "similarity_score": 0.0,
+              "topic_score": 0.0,
+              "semantic_relationship_score": null,
+              "dominant_relation": "unclassified",
+              "relationship_label": "unclassified",
+              "assessed_relationship": "unclassified",
+              "observed_relationship_label": "unclassified",
+              "evidence_level": "none",
+              "evidence_sufficient": false,
+              "relationship_confidence": null,
+              "classification_coverage": 0.0
+            },
+            {
+              "partner": "NL",
+              "score": 8.6,
+              "band": "very_low",
+              "direct_score": 17.21,
+              "similarity_score": 0.0,
+              "topic_score": 0.0,
+              "semantic_relationship_score": null,
+              "dominant_relation": "unclassified",
+              "relationship_label": "unclassified",
+              "assessed_relationship": "unclassified",
+              "observed_relationship_label": "unclassified",
+              "evidence_level": "none",
+              "evidence_sufficient": false,
+              "relationship_confidence": null,
+              "classification_coverage": 0.0
+            }
+          ]
+        },
+        {
+          "country": "ES",
+          "relationship_count": 1,
+          "average_score": 32.4,
+          "strongest_partner": "DE",
+          "strongest_score": 32.4,
+          "top_partners": [
+            {
+              "partner": "DE",
+              "score": 32.4,
+              "band": "low",
+              "direct_score": 64.8,
               "similarity_score": 0.0,
               "topic_score": 0.0,
               "semantic_relationship_score": null,
@@ -4987,7 +5062,7 @@
         {
           "country": "FR",
           "relationship_count": 2,
-          "average_score": 28.93,
+          "average_score": 32.27,
           "strongest_partner": "DE",
           "strongest_score": 50.0,
           "top_partners": [
@@ -5010,35 +5085,9 @@
             },
             {
               "partner": "IE",
-              "score": 7.85,
+              "score": 14.53,
               "band": "very_low",
-              "direct_score": 15.71,
-              "similarity_score": 0.0,
-              "topic_score": 0.0,
-              "semantic_relationship_score": null,
-              "dominant_relation": "unclassified",
-              "relationship_label": "unclassified",
-              "assessed_relationship": "unclassified",
-              "observed_relationship_label": "unclassified",
-              "evidence_level": "none",
-              "evidence_sufficient": false,
-              "relationship_confidence": null,
-              "classification_coverage": 0.0
-            }
-          ]
-        },
-        {
-          "country": "ES",
-          "relationship_count": 1,
-          "average_score": 17.52,
-          "strongest_partner": "DE",
-          "strongest_score": 17.52,
-          "top_partners": [
-            {
-              "partner": "DE",
-              "score": 17.52,
-              "band": "very_low",
-              "direct_score": 35.05,
+              "direct_score": 29.05,
               "similarity_score": 0.0,
               "topic_score": 0.0,
               "semantic_relationship_score": null,
@@ -5056,15 +5105,15 @@
         {
           "country": "IT",
           "relationship_count": 1,
-          "average_score": 16.8,
+          "average_score": 31.06,
           "strongest_partner": "MT",
-          "strongest_score": 16.8,
+          "strongest_score": 31.06,
           "top_partners": [
             {
               "partner": "MT",
-              "score": 16.8,
-              "band": "very_low",
-              "direct_score": 33.6,
+              "score": 31.06,
+              "band": "low",
+              "direct_score": 62.12,
               "similarity_score": 0.0,
               "topic_score": 0.0,
               "semantic_relationship_score": null,
@@ -5082,15 +5131,15 @@
         {
           "country": "MT",
           "relationship_count": 1,
-          "average_score": 16.8,
+          "average_score": 31.06,
           "strongest_partner": "IT",
-          "strongest_score": 16.8,
+          "strongest_score": 31.06,
           "top_partners": [
             {
               "partner": "IT",
-              "score": 16.8,
-              "band": "very_low",
-              "direct_score": 33.6,
+              "score": 31.06,
+              "band": "low",
+              "direct_score": 62.12,
               "similarity_score": 0.0,
               "topic_score": 0.0,
               "semantic_relationship_score": null,
@@ -5108,15 +5157,15 @@
         {
           "country": "IE",
           "relationship_count": 2,
-          "average_score": 6.53,
+          "average_score": 12.07,
           "strongest_partner": "FR",
-          "strongest_score": 7.85,
+          "strongest_score": 14.53,
           "top_partners": [
             {
               "partner": "FR",
-              "score": 7.85,
+              "score": 14.53,
               "band": "very_low",
-              "direct_score": 15.71,
+              "direct_score": 29.05,
               "similarity_score": 0.0,
               "topic_score": 0.0,
               "semantic_relationship_score": null,
@@ -5131,9 +5180,9 @@
             },
             {
               "partner": "DE",
-              "score": 5.2,
+              "score": 9.61,
               "band": "very_low",
-              "direct_score": 10.39,
+              "direct_score": 19.22,
               "similarity_score": 0.0,
               "topic_score": 0.0,
               "semantic_relationship_score": null,
@@ -5151,15 +5200,15 @@
         {
           "country": "PL",
           "relationship_count": 1,
-          "average_score": 5.14,
+          "average_score": 9.5,
           "strongest_partner": "DE",
-          "strongest_score": 5.14,
+          "strongest_score": 9.5,
           "top_partners": [
             {
               "partner": "DE",
-              "score": 5.14,
+              "score": 9.5,
               "band": "very_low",
-              "direct_score": 10.27,
+              "direct_score": 18.99,
               "similarity_score": 0.0,
               "topic_score": 0.0,
               "semantic_relationship_score": null,
@@ -5176,11 +5225,29 @@
         },
         {
           "country": "NL",
-          "relationship_count": 0,
-          "average_score": 0.0,
-          "strongest_partner": null,
-          "strongest_score": null,
-          "top_partners": []
+          "relationship_count": 1,
+          "average_score": 8.6,
+          "strongest_partner": "DE",
+          "strongest_score": 8.6,
+          "top_partners": [
+            {
+              "partner": "DE",
+              "score": 8.6,
+              "band": "very_low",
+              "direct_score": 17.21,
+              "similarity_score": 0.0,
+              "topic_score": 0.0,
+              "semantic_relationship_score": null,
+              "dominant_relation": "unclassified",
+              "relationship_label": "unclassified",
+              "assessed_relationship": "unclassified",
+              "observed_relationship_label": "unclassified",
+              "evidence_level": "none",
+              "evidence_sufficient": false,
+              "relationship_confidence": null,
+              "classification_coverage": 0.0
+            }
+          ]
         }
       ]
     }
@@ -5523,20 +5590,6 @@
       "previous_relation": null
     },
     {
-      "source": "DE",
-      "target": "PL",
-      "current_score": 51.84,
-      "previous_score": 5.14,
-      "delta": 46.7,
-      "status": "improved",
-      "current_band": "medium",
-      "previous_band": "very_low",
-      "current_semantic_relationship_score": null,
-      "previous_semantic_relationship_score": null,
-      "current_relation": "unclassified",
-      "previous_relation": "unclassified"
-    },
-    {
       "source": "BE",
       "target": "ES",
       "current_score": 46.58,
@@ -5789,6 +5842,20 @@
       "previous_relation": null
     },
     {
+      "source": "DE",
+      "target": "PL",
+      "current_score": 51.84,
+      "previous_score": 9.5,
+      "delta": 42.34,
+      "status": "improved",
+      "current_band": "medium",
+      "previous_band": "very_low",
+      "current_semantic_relationship_score": null,
+      "previous_semantic_relationship_score": null,
+      "current_relation": "unclassified",
+      "previous_relation": "unclassified"
+    },
+    {
       "source": "DK",
       "target": "IT",
       "current_score": 41.78,
@@ -6027,20 +6094,6 @@
       "previous_relation": null
     },
     {
-      "source": "DE",
-      "target": "NL",
-      "current_score": 37.36,
-      "previous_score": 0.0,
-      "delta": 37.36,
-      "status": "gained",
-      "current_band": "low",
-      "previous_band": null,
-      "current_semantic_relationship_score": null,
-      "previous_semantic_relationship_score": null,
-      "current_relation": null,
-      "previous_relation": null
-    },
-    {
       "source": "GR",
       "target": "NL",
       "current_score": 37.36,
@@ -6137,20 +6190,6 @@
       "previous_semantic_relationship_score": null,
       "current_relation": null,
       "previous_relation": null
-    },
-    {
-      "source": "FR",
-      "target": "IE",
-      "current_score": 44.6,
-      "previous_score": 7.85,
-      "delta": 36.75,
-      "status": "improved",
-      "current_band": "medium",
-      "previous_band": "very_low",
-      "current_semantic_relationship_score": null,
-      "previous_semantic_relationship_score": null,
-      "current_relation": null,
-      "previous_relation": "unclassified"
     },
     {
       "source": "DK",
@@ -6321,20 +6360,6 @@
       "previous_relation": null
     },
     {
-      "source": "DE",
-      "target": "IE",
-      "current_score": 36.99,
-      "previous_score": 5.2,
-      "delta": 31.79,
-      "status": "improved",
-      "current_band": "low",
-      "previous_band": "very_low",
-      "current_semantic_relationship_score": null,
-      "previous_semantic_relationship_score": null,
-      "current_relation": null,
-      "previous_relation": "unclassified"
-    },
-    {
       "source": "FI",
       "target": "SE",
       "current_score": 31.21,
@@ -6349,13 +6374,41 @@
       "previous_relation": null
     },
     {
-      "source": "DE",
-      "target": "ES",
-      "current_score": 47.3,
-      "previous_score": 17.52,
-      "delta": 29.78,
+      "source": "IT",
+      "target": "MT",
+      "current_score": 0.0,
+      "previous_score": 31.06,
+      "delta": -31.06,
+      "status": "lost",
+      "current_band": null,
+      "previous_band": "low",
+      "current_semantic_relationship_score": null,
+      "previous_semantic_relationship_score": null,
+      "current_relation": null,
+      "previous_relation": "unclassified"
+    },
+    {
+      "source": "FR",
+      "target": "IE",
+      "current_score": 44.6,
+      "previous_score": 14.53,
+      "delta": 30.07,
       "status": "improved",
       "current_band": "medium",
+      "previous_band": "very_low",
+      "current_semantic_relationship_score": null,
+      "previous_semantic_relationship_score": null,
+      "current_relation": null,
+      "previous_relation": "unclassified"
+    },
+    {
+      "source": "DE",
+      "target": "NL",
+      "current_score": 37.36,
+      "previous_score": 8.6,
+      "delta": 28.76,
+      "status": "improved",
+      "current_band": "low",
       "previous_band": "very_low",
       "current_semantic_relationship_score": null,
       "previous_semantic_relationship_score": null,
@@ -6403,6 +6456,20 @@
       "previous_semantic_relationship_score": null,
       "current_relation": null,
       "previous_relation": null
+    },
+    {
+      "source": "DE",
+      "target": "IE",
+      "current_score": 36.99,
+      "previous_score": 9.61,
+      "delta": 27.38,
+      "status": "improved",
+      "current_band": "low",
+      "previous_band": "very_low",
+      "current_semantic_relationship_score": null,
+      "previous_semantic_relationship_score": null,
+      "current_relation": null,
+      "previous_relation": "unclassified"
     },
     {
       "source": "DK",
@@ -6531,20 +6598,6 @@
       "previous_relation": null
     },
     {
-      "source": "IT",
-      "target": "MT",
-      "current_score": 0.0,
-      "previous_score": 16.8,
-      "delta": -16.8,
-      "status": "lost",
-      "current_band": null,
-      "previous_band": "very_low",
-      "current_semantic_relationship_score": null,
-      "previous_semantic_relationship_score": null,
-      "current_relation": null,
-      "previous_relation": "unclassified"
-    },
-    {
       "source": "PL",
       "target": "SE",
       "current_score": 16.04,
@@ -6585,6 +6638,20 @@
       "previous_semantic_relationship_score": null,
       "current_relation": null,
       "previous_relation": null
+    },
+    {
+      "source": "DE",
+      "target": "ES",
+      "current_score": 47.3,
+      "previous_score": 32.4,
+      "delta": 14.9,
+      "status": "improved",
+      "current_band": "medium",
+      "previous_band": "low",
+      "current_semantic_relationship_score": null,
+      "previous_semantic_relationship_score": null,
+      "current_relation": null,
+      "previous_relation": "unclassified"
     },
     {
       "source": "DE",
@@ -7691,537 +7758,36 @@
       ]
     },
     {
-      "country": "NL",
-      "relationship_count_current": 15,
-      "relationship_count_previous": 0,
-      "relationship_count_delta": 15,
-      "average_score_current": 35.46,
-      "average_score_previous": 0.0,
-      "average_score_delta": 35.46,
-      "gained_relationships": [
-        {
-          "partner": "FR",
-          "current_score": 43.15,
-          "previous_score": 0.0,
-          "delta": 43.15,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "PL",
-          "current_score": 42.61,
-          "previous_score": 0.0,
-          "delta": 42.61,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
+      "country": "MT",
+      "relationship_count_current": 0,
+      "relationship_count_previous": 1,
+      "relationship_count_delta": -1,
+      "average_score_current": 0.0,
+      "average_score_previous": 31.06,
+      "average_score_delta": -31.06,
+      "gained_relationships": [],
+      "lost_relationships": [
         {
           "partner": "IT",
-          "current_score": 40.41,
-          "previous_score": 0.0,
-          "delta": 40.41,
-          "status": "gained",
+          "current_score": 0.0,
+          "previous_score": 31.06,
+          "delta": -31.06,
+          "status": "lost",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
           "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "BE",
-          "current_score": 40.01,
-          "previous_score": 0.0,
-          "delta": 40.01,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "BG",
-          "current_score": 38.16,
-          "previous_score": 0.0,
-          "delta": 38.16,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "DE",
-          "current_score": 37.36,
-          "previous_score": 0.0,
-          "delta": 37.36,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "GR",
-          "current_score": 37.36,
-          "previous_score": 0.0,
-          "delta": 37.36,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "LT",
-          "current_score": 37.36,
-          "previous_score": 0.0,
-          "delta": 37.36,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "LV",
-          "current_score": 37.36,
-          "previous_score": 0.0,
-          "delta": 37.36,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "ES",
-          "current_score": 37.12,
-          "previous_score": 0.0,
-          "delta": 37.12,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
+          "previous_relation": "unclassified"
         }
       ],
-      "lost_relationships": [],
       "improved_relationships": [],
       "declined_relationships": [],
       "top_changes": [
         {
-          "partner": "FR",
-          "current_score": 43.15,
-          "previous_score": 0.0,
-          "delta": 43.15,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "PL",
-          "current_score": 42.61,
-          "previous_score": 0.0,
-          "delta": 42.61,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
           "partner": "IT",
-          "current_score": 40.41,
-          "previous_score": 0.0,
-          "delta": 40.41,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "BE",
-          "current_score": 40.01,
-          "previous_score": 0.0,
-          "delta": 40.01,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "BG",
-          "current_score": 38.16,
-          "previous_score": 0.0,
-          "delta": 38.16,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "DE",
-          "current_score": 37.36,
-          "previous_score": 0.0,
-          "delta": 37.36,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "GR",
-          "current_score": 37.36,
-          "previous_score": 0.0,
-          "delta": 37.36,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "LT",
-          "current_score": 37.36,
-          "previous_score": 0.0,
-          "delta": 37.36,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "LV",
-          "current_score": 37.36,
-          "previous_score": 0.0,
-          "delta": 37.36,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "ES",
-          "current_score": 37.12,
-          "previous_score": 0.0,
-          "delta": 37.12,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "IE",
-          "current_score": 36.86,
-          "previous_score": 0.0,
-          "delta": 36.86,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "DK",
-          "current_score": 36.07,
-          "previous_score": 0.0,
-          "delta": 36.07,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        }
-      ]
-    },
-    {
-      "country": "IE",
-      "relationship_count_current": 13,
-      "relationship_count_previous": 2,
-      "relationship_count_delta": 11,
-      "average_score_current": 41.03,
-      "average_score_previous": 6.53,
-      "average_score_delta": 34.5,
-      "gained_relationships": [
-        {
-          "partner": "GR",
-          "current_score": 51.92,
-          "previous_score": 0.0,
-          "delta": 51.92,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": "unclassified",
-          "previous_relation": null
-        },
-        {
-          "partner": "IT",
-          "current_score": 46.78,
-          "previous_score": 0.0,
-          "delta": 46.78,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "BG",
-          "current_score": 45.04,
-          "previous_score": 0.0,
-          "delta": 45.04,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "ES",
-          "current_score": 40.98,
-          "previous_score": 0.0,
-          "delta": 40.98,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "HU",
-          "current_score": 40.87,
-          "previous_score": 0.0,
-          "delta": 40.87,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "DK",
-          "current_score": 39.24,
-          "previous_score": 0.0,
-          "delta": 39.24,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "BE",
-          "current_score": 38.63,
-          "previous_score": 0.0,
-          "delta": 38.63,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "PL",
-          "current_score": 37.56,
-          "previous_score": 0.0,
-          "delta": 37.56,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "LT",
-          "current_score": 36.99,
-          "previous_score": 0.0,
-          "delta": 36.99,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "LV",
-          "current_score": 36.99,
-          "previous_score": 0.0,
-          "delta": 36.99,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        }
-      ],
-      "lost_relationships": [],
-      "improved_relationships": [
-        {
-          "partner": "FR",
-          "current_score": 44.6,
-          "previous_score": 7.85,
-          "delta": 36.75,
-          "status": "improved",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": "unclassified"
-        },
-        {
-          "partner": "DE",
-          "current_score": 36.99,
-          "previous_score": 5.2,
-          "delta": 31.79,
-          "status": "improved",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": "unclassified"
-        }
-      ],
-      "declined_relationships": [],
-      "top_changes": [
-        {
-          "partner": "GR",
-          "current_score": 51.92,
-          "previous_score": 0.0,
-          "delta": 51.92,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": "unclassified",
-          "previous_relation": null
-        },
-        {
-          "partner": "IT",
-          "current_score": 46.78,
-          "previous_score": 0.0,
-          "delta": 46.78,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "BG",
-          "current_score": 45.04,
-          "previous_score": 0.0,
-          "delta": 45.04,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "ES",
-          "current_score": 40.98,
-          "previous_score": 0.0,
-          "delta": 40.98,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "HU",
-          "current_score": 40.87,
-          "previous_score": 0.0,
-          "delta": 40.87,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "DK",
-          "current_score": 39.24,
-          "previous_score": 0.0,
-          "delta": 39.24,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "BE",
-          "current_score": 38.63,
-          "previous_score": 0.0,
-          "delta": 38.63,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "PL",
-          "current_score": 37.56,
-          "previous_score": 0.0,
-          "delta": 37.56,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "LT",
-          "current_score": 36.99,
-          "previous_score": 0.0,
-          "delta": 36.99,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "LV",
-          "current_score": 36.99,
-          "previous_score": 0.0,
-          "delta": 36.99,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "NL",
-          "current_score": 36.86,
-          "previous_score": 0.0,
-          "delta": 36.86,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "FR",
-          "current_score": 44.6,
-          "previous_score": 7.85,
-          "delta": 36.75,
-          "status": "improved",
+          "current_score": 0.0,
+          "previous_score": 31.06,
+          "delta": -31.06,
+          "status": "lost",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
           "current_relation": null,
@@ -8445,74 +8011,30 @@
       ]
     },
     {
-      "country": "PL",
-      "relationship_count_current": 15,
-      "relationship_count_previous": 1,
-      "relationship_count_delta": 14,
-      "average_score_current": 34.28,
-      "average_score_previous": 5.14,
-      "average_score_delta": 29.14,
+      "country": "IE",
+      "relationship_count_current": 13,
+      "relationship_count_previous": 2,
+      "relationship_count_delta": 11,
+      "average_score_current": 41.03,
+      "average_score_previous": 12.07,
+      "average_score_delta": 28.96,
       "gained_relationships": [
         {
+          "partner": "GR",
+          "current_score": 51.92,
+          "previous_score": 0.0,
+          "delta": 51.92,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": null
+        },
+        {
           "partner": "IT",
-          "current_score": 43.28,
+          "current_score": 46.78,
           "previous_score": 0.0,
-          "delta": 43.28,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "NL",
-          "current_score": 42.61,
-          "previous_score": 0.0,
-          "delta": 42.61,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "DK",
-          "current_score": 40.14,
-          "previous_score": 0.0,
-          "delta": 40.14,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "FR",
-          "current_score": 39.84,
-          "previous_score": 0.0,
-          "delta": 39.84,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "IE",
-          "current_score": 37.56,
-          "previous_score": 0.0,
-          "delta": 37.56,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "BE",
-          "current_score": 35.2,
-          "previous_score": 0.0,
-          "delta": 35.2,
+          "delta": 46.78,
           "status": "gained",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
@@ -8521,180 +8043,9 @@
         },
         {
           "partner": "BG",
-          "current_score": 33.46,
+          "current_score": 45.04,
           "previous_score": 0.0,
-          "delta": 33.46,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "GR",
-          "current_score": 32.69,
-          "previous_score": 0.0,
-          "delta": 32.69,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "LT",
-          "current_score": 32.69,
-          "previous_score": 0.0,
-          "delta": 32.69,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "LV",
-          "current_score": 32.69,
-          "previous_score": 0.0,
-          "delta": 32.69,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        }
-      ],
-      "lost_relationships": [],
-      "improved_relationships": [
-        {
-          "partner": "DE",
-          "current_score": 51.84,
-          "previous_score": 5.14,
-          "delta": 46.7,
-          "status": "improved",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": "unclassified",
-          "previous_relation": "unclassified"
-        }
-      ],
-      "declined_relationships": [],
-      "top_changes": [
-        {
-          "partner": "DE",
-          "current_score": 51.84,
-          "previous_score": 5.14,
-          "delta": 46.7,
-          "status": "improved",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": "unclassified",
-          "previous_relation": "unclassified"
-        },
-        {
-          "partner": "IT",
-          "current_score": 43.28,
-          "previous_score": 0.0,
-          "delta": 43.28,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "NL",
-          "current_score": 42.61,
-          "previous_score": 0.0,
-          "delta": 42.61,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "DK",
-          "current_score": 40.14,
-          "previous_score": 0.0,
-          "delta": 40.14,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "FR",
-          "current_score": 39.84,
-          "previous_score": 0.0,
-          "delta": 39.84,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "IE",
-          "current_score": 37.56,
-          "previous_score": 0.0,
-          "delta": 37.56,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "BE",
-          "current_score": 35.2,
-          "previous_score": 0.0,
-          "delta": 35.2,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "BG",
-          "current_score": 33.46,
-          "previous_score": 0.0,
-          "delta": 33.46,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "GR",
-          "current_score": 32.69,
-          "previous_score": 0.0,
-          "delta": 32.69,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "LT",
-          "current_score": 32.69,
-          "previous_score": 0.0,
-          "delta": 32.69,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "LV",
-          "current_score": 32.69,
-          "previous_score": 0.0,
-          "delta": 32.69,
+          "delta": 45.04,
           "status": "gained",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
@@ -8703,257 +8054,9 @@
         },
         {
           "partner": "ES",
-          "current_score": 32.45,
-          "previous_score": 0.0,
-          "delta": 32.45,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        }
-      ]
-    },
-    {
-      "country": "ES",
-      "relationship_count_current": 13,
-      "relationship_count_previous": 1,
-      "relationship_count_delta": 12,
-      "average_score_current": 43.21,
-      "average_score_previous": 17.52,
-      "average_score_delta": 25.69,
-      "gained_relationships": [
-        {
-          "partner": "FR",
-          "current_score": 52.62,
-          "previous_score": 0.0,
-          "delta": 52.62,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": "unclassified",
-          "previous_relation": null
-        },
-        {
-          "partner": "GR",
-          "current_score": 47.3,
-          "previous_score": 0.0,
-          "delta": 47.3,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "LT",
-          "current_score": 47.3,
-          "previous_score": 0.0,
-          "delta": 47.3,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "LV",
-          "current_score": 47.3,
-          "previous_score": 0.0,
-          "delta": 47.3,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "BE",
-          "current_score": 46.58,
-          "previous_score": 0.0,
-          "delta": 46.58,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "BG",
-          "current_score": 45.77,
-          "previous_score": 0.0,
-          "delta": 45.77,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "DK",
-          "current_score": 43.2,
-          "previous_score": 0.0,
-          "delta": 43.2,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "IE",
           "current_score": 40.98,
           "previous_score": 0.0,
           "delta": 40.98,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "IT",
-          "current_score": 40.75,
-          "previous_score": 0.0,
-          "delta": 40.75,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "NL",
-          "current_score": 37.12,
-          "previous_score": 0.0,
-          "delta": 37.12,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        }
-      ],
-      "lost_relationships": [],
-      "improved_relationships": [
-        {
-          "partner": "DE",
-          "current_score": 47.3,
-          "previous_score": 17.52,
-          "delta": 29.78,
-          "status": "improved",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": "unclassified"
-        }
-      ],
-      "declined_relationships": [],
-      "top_changes": [
-        {
-          "partner": "FR",
-          "current_score": 52.62,
-          "previous_score": 0.0,
-          "delta": 52.62,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": "unclassified",
-          "previous_relation": null
-        },
-        {
-          "partner": "GR",
-          "current_score": 47.3,
-          "previous_score": 0.0,
-          "delta": 47.3,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "LT",
-          "current_score": 47.3,
-          "previous_score": 0.0,
-          "delta": 47.3,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "LV",
-          "current_score": 47.3,
-          "previous_score": 0.0,
-          "delta": 47.3,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "BE",
-          "current_score": 46.58,
-          "previous_score": 0.0,
-          "delta": 46.58,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "BG",
-          "current_score": 45.77,
-          "previous_score": 0.0,
-          "delta": 45.77,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "DK",
-          "current_score": 43.2,
-          "previous_score": 0.0,
-          "delta": 43.2,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "IE",
-          "current_score": 40.98,
-          "previous_score": 0.0,
-          "delta": 40.98,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "IT",
-          "current_score": 40.75,
-          "previous_score": 0.0,
-          "delta": 40.75,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "NL",
-          "current_score": 37.12,
-          "previous_score": 0.0,
-          "delta": 37.12,
           "status": "gained",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
@@ -8962,86 +8065,9 @@
         },
         {
           "partner": "HU",
-          "current_score": 33.1,
+          "current_score": 40.87,
           "previous_score": 0.0,
-          "delta": 33.1,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "PL",
-          "current_score": 32.45,
-          "previous_score": 0.0,
-          "delta": 32.45,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        }
-      ]
-    },
-    {
-      "country": "IT",
-      "relationship_count_current": 14,
-      "relationship_count_previous": 1,
-      "relationship_count_delta": 13,
-      "average_score_current": 41.14,
-      "average_score_previous": 16.8,
-      "average_score_delta": 24.34,
-      "gained_relationships": [
-        {
-          "partner": "FR",
-          "current_score": 72.04,
-          "previous_score": 0.0,
-          "delta": 72.04,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": "unclassified",
-          "previous_relation": null
-        },
-        {
-          "partner": "GR",
-          "current_score": 50.49,
-          "previous_score": 0.0,
-          "delta": 50.49,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": "unclassified",
-          "previous_relation": null
-        },
-        {
-          "partner": "IE",
-          "current_score": 46.78,
-          "previous_score": 0.0,
-          "delta": 46.78,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "PL",
-          "current_score": 43.28,
-          "previous_score": 0.0,
-          "delta": 43.28,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "BG",
-          "current_score": 43.04,
-          "previous_score": 0.0,
-          "delta": 43.04,
+          "delta": 40.87,
           "status": "gained",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
@@ -9050,31 +8076,9 @@
         },
         {
           "partner": "DK",
-          "current_score": 41.78,
+          "current_score": 39.24,
           "previous_score": 0.0,
-          "delta": 41.78,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "ES",
-          "current_score": 40.75,
-          "previous_score": 0.0,
-          "delta": 40.75,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "NL",
-          "current_score": 40.41,
-          "previous_score": 0.0,
-          "delta": 40.41,
+          "delta": 39.24,
           "status": "gained",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
@@ -9083,70 +8087,9 @@
         },
         {
           "partner": "BE",
-          "current_score": 39.42,
+          "current_score": 38.63,
           "previous_score": 0.0,
-          "delta": 39.42,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "DE",
-          "current_score": 37.48,
-          "previous_score": 0.0,
-          "delta": 37.48,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        }
-      ],
-      "lost_relationships": [
-        {
-          "partner": "MT",
-          "current_score": 0.0,
-          "previous_score": 16.8,
-          "delta": -16.8,
-          "status": "lost",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": "unclassified"
-        }
-      ],
-      "improved_relationships": [],
-      "declined_relationships": [],
-      "top_changes": [
-        {
-          "partner": "FR",
-          "current_score": 72.04,
-          "previous_score": 0.0,
-          "delta": 72.04,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": "unclassified",
-          "previous_relation": null
-        },
-        {
-          "partner": "GR",
-          "current_score": 50.49,
-          "previous_score": 0.0,
-          "delta": 50.49,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": "unclassified",
-          "previous_relation": null
-        },
-        {
-          "partner": "IE",
-          "current_score": 46.78,
-          "previous_score": 0.0,
-          "delta": 46.78,
+          "delta": 38.63,
           "status": "gained",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
@@ -9155,75 +8098,9 @@
         },
         {
           "partner": "PL",
-          "current_score": 43.28,
+          "current_score": 37.56,
           "previous_score": 0.0,
-          "delta": 43.28,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "BG",
-          "current_score": 43.04,
-          "previous_score": 0.0,
-          "delta": 43.04,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "DK",
-          "current_score": 41.78,
-          "previous_score": 0.0,
-          "delta": 41.78,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "ES",
-          "current_score": 40.75,
-          "previous_score": 0.0,
-          "delta": 40.75,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "NL",
-          "current_score": 40.41,
-          "previous_score": 0.0,
-          "delta": 40.41,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "BE",
-          "current_score": 39.42,
-          "previous_score": 0.0,
-          "delta": 39.42,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "DE",
-          "current_score": 37.48,
-          "previous_score": 0.0,
-          "delta": 37.48,
+          "delta": 37.56,
           "status": "gained",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
@@ -9232,9 +8109,9 @@
         },
         {
           "partner": "LT",
-          "current_score": 37.48,
+          "current_score": 36.99,
           "previous_score": 0.0,
-          "delta": 37.48,
+          "delta": 36.99,
           "status": "gained",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
@@ -9243,9 +8120,709 @@
         },
         {
           "partner": "LV",
-          "current_score": 37.48,
+          "current_score": 36.99,
           "previous_score": 0.0,
-          "delta": 37.48,
+          "delta": 36.99,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        }
+      ],
+      "lost_relationships": [],
+      "improved_relationships": [
+        {
+          "partner": "FR",
+          "current_score": 44.6,
+          "previous_score": 14.53,
+          "delta": 30.07,
+          "status": "improved",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": "unclassified"
+        },
+        {
+          "partner": "DE",
+          "current_score": 36.99,
+          "previous_score": 9.61,
+          "delta": 27.38,
+          "status": "improved",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": "unclassified"
+        }
+      ],
+      "declined_relationships": [],
+      "top_changes": [
+        {
+          "partner": "GR",
+          "current_score": 51.92,
+          "previous_score": 0.0,
+          "delta": 51.92,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": null
+        },
+        {
+          "partner": "IT",
+          "current_score": 46.78,
+          "previous_score": 0.0,
+          "delta": 46.78,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "BG",
+          "current_score": 45.04,
+          "previous_score": 0.0,
+          "delta": 45.04,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "ES",
+          "current_score": 40.98,
+          "previous_score": 0.0,
+          "delta": 40.98,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "HU",
+          "current_score": 40.87,
+          "previous_score": 0.0,
+          "delta": 40.87,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "DK",
+          "current_score": 39.24,
+          "previous_score": 0.0,
+          "delta": 39.24,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "BE",
+          "current_score": 38.63,
+          "previous_score": 0.0,
+          "delta": 38.63,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "PL",
+          "current_score": 37.56,
+          "previous_score": 0.0,
+          "delta": 37.56,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "LT",
+          "current_score": 36.99,
+          "previous_score": 0.0,
+          "delta": 36.99,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "LV",
+          "current_score": 36.99,
+          "previous_score": 0.0,
+          "delta": 36.99,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "NL",
+          "current_score": 36.86,
+          "previous_score": 0.0,
+          "delta": 36.86,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "FR",
+          "current_score": 44.6,
+          "previous_score": 14.53,
+          "delta": 30.07,
+          "status": "improved",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": "unclassified"
+        }
+      ]
+    },
+    {
+      "country": "NL",
+      "relationship_count_current": 15,
+      "relationship_count_previous": 1,
+      "relationship_count_delta": 14,
+      "average_score_current": 35.46,
+      "average_score_previous": 8.6,
+      "average_score_delta": 26.86,
+      "gained_relationships": [
+        {
+          "partner": "FR",
+          "current_score": 43.15,
+          "previous_score": 0.0,
+          "delta": 43.15,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "PL",
+          "current_score": 42.61,
+          "previous_score": 0.0,
+          "delta": 42.61,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "IT",
+          "current_score": 40.41,
+          "previous_score": 0.0,
+          "delta": 40.41,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "BE",
+          "current_score": 40.01,
+          "previous_score": 0.0,
+          "delta": 40.01,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "BG",
+          "current_score": 38.16,
+          "previous_score": 0.0,
+          "delta": 38.16,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "GR",
+          "current_score": 37.36,
+          "previous_score": 0.0,
+          "delta": 37.36,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "LT",
+          "current_score": 37.36,
+          "previous_score": 0.0,
+          "delta": 37.36,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "LV",
+          "current_score": 37.36,
+          "previous_score": 0.0,
+          "delta": 37.36,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "ES",
+          "current_score": 37.12,
+          "previous_score": 0.0,
+          "delta": 37.12,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "IE",
+          "current_score": 36.86,
+          "previous_score": 0.0,
+          "delta": 36.86,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        }
+      ],
+      "lost_relationships": [],
+      "improved_relationships": [
+        {
+          "partner": "DE",
+          "current_score": 37.36,
+          "previous_score": 8.6,
+          "delta": 28.76,
+          "status": "improved",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": "unclassified"
+        }
+      ],
+      "declined_relationships": [],
+      "top_changes": [
+        {
+          "partner": "FR",
+          "current_score": 43.15,
+          "previous_score": 0.0,
+          "delta": 43.15,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "PL",
+          "current_score": 42.61,
+          "previous_score": 0.0,
+          "delta": 42.61,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "IT",
+          "current_score": 40.41,
+          "previous_score": 0.0,
+          "delta": 40.41,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "BE",
+          "current_score": 40.01,
+          "previous_score": 0.0,
+          "delta": 40.01,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "BG",
+          "current_score": 38.16,
+          "previous_score": 0.0,
+          "delta": 38.16,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "GR",
+          "current_score": 37.36,
+          "previous_score": 0.0,
+          "delta": 37.36,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "LT",
+          "current_score": 37.36,
+          "previous_score": 0.0,
+          "delta": 37.36,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "LV",
+          "current_score": 37.36,
+          "previous_score": 0.0,
+          "delta": 37.36,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "ES",
+          "current_score": 37.12,
+          "previous_score": 0.0,
+          "delta": 37.12,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "IE",
+          "current_score": 36.86,
+          "previous_score": 0.0,
+          "delta": 36.86,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "DK",
+          "current_score": 36.07,
+          "previous_score": 0.0,
+          "delta": 36.07,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "DE",
+          "current_score": 37.36,
+          "previous_score": 8.6,
+          "delta": 28.76,
+          "status": "improved",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": "unclassified"
+        }
+      ]
+    },
+    {
+      "country": "PL",
+      "relationship_count_current": 15,
+      "relationship_count_previous": 1,
+      "relationship_count_delta": 14,
+      "average_score_current": 34.28,
+      "average_score_previous": 9.5,
+      "average_score_delta": 24.78,
+      "gained_relationships": [
+        {
+          "partner": "IT",
+          "current_score": 43.28,
+          "previous_score": 0.0,
+          "delta": 43.28,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "NL",
+          "current_score": 42.61,
+          "previous_score": 0.0,
+          "delta": 42.61,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "DK",
+          "current_score": 40.14,
+          "previous_score": 0.0,
+          "delta": 40.14,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "FR",
+          "current_score": 39.84,
+          "previous_score": 0.0,
+          "delta": 39.84,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "IE",
+          "current_score": 37.56,
+          "previous_score": 0.0,
+          "delta": 37.56,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "BE",
+          "current_score": 35.2,
+          "previous_score": 0.0,
+          "delta": 35.2,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "BG",
+          "current_score": 33.46,
+          "previous_score": 0.0,
+          "delta": 33.46,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "GR",
+          "current_score": 32.69,
+          "previous_score": 0.0,
+          "delta": 32.69,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "LT",
+          "current_score": 32.69,
+          "previous_score": 0.0,
+          "delta": 32.69,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "LV",
+          "current_score": 32.69,
+          "previous_score": 0.0,
+          "delta": 32.69,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        }
+      ],
+      "lost_relationships": [],
+      "improved_relationships": [
+        {
+          "partner": "DE",
+          "current_score": 51.84,
+          "previous_score": 9.5,
+          "delta": 42.34,
+          "status": "improved",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": "unclassified"
+        }
+      ],
+      "declined_relationships": [],
+      "top_changes": [
+        {
+          "partner": "IT",
+          "current_score": 43.28,
+          "previous_score": 0.0,
+          "delta": 43.28,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "NL",
+          "current_score": 42.61,
+          "previous_score": 0.0,
+          "delta": 42.61,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "DE",
+          "current_score": 51.84,
+          "previous_score": 9.5,
+          "delta": 42.34,
+          "status": "improved",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": "unclassified"
+        },
+        {
+          "partner": "DK",
+          "current_score": 40.14,
+          "previous_score": 0.0,
+          "delta": 40.14,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "FR",
+          "current_score": 39.84,
+          "previous_score": 0.0,
+          "delta": 39.84,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "IE",
+          "current_score": 37.56,
+          "previous_score": 0.0,
+          "delta": 37.56,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "BE",
+          "current_score": 35.2,
+          "previous_score": 0.0,
+          "delta": 35.2,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "BG",
+          "current_score": 33.46,
+          "previous_score": 0.0,
+          "delta": 33.46,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "GR",
+          "current_score": 32.69,
+          "previous_score": 0.0,
+          "delta": 32.69,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "LT",
+          "current_score": 32.69,
+          "previous_score": 0.0,
+          "delta": 32.69,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "LV",
+          "current_score": 32.69,
+          "previous_score": 0.0,
+          "delta": 32.69,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "ES",
+          "current_score": 32.45,
+          "previous_score": 0.0,
+          "delta": 32.45,
           "status": "gained",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
@@ -9663,44 +9240,6 @@
       ]
     },
     {
-      "country": "MT",
-      "relationship_count_current": 0,
-      "relationship_count_previous": 1,
-      "relationship_count_delta": -1,
-      "average_score_current": 0.0,
-      "average_score_previous": 16.8,
-      "average_score_delta": -16.8,
-      "gained_relationships": [],
-      "lost_relationships": [
-        {
-          "partner": "IT",
-          "current_score": 0.0,
-          "previous_score": 16.8,
-          "delta": -16.8,
-          "status": "lost",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": "unclassified"
-        }
-      ],
-      "improved_relationships": [],
-      "declined_relationships": [],
-      "top_changes": [
-        {
-          "partner": "IT",
-          "current_score": 0.0,
-          "previous_score": 16.8,
-          "delta": -16.8,
-          "status": "lost",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": "unclassified"
-        }
-      ]
-    },
-    {
       "country": "AT",
       "relationship_count_current": 1,
       "relationship_count_previous": 0,
@@ -9739,295 +9278,13 @@
       ]
     },
     {
-      "country": "FR",
-      "relationship_count_current": 15,
-      "relationship_count_previous": 2,
-      "relationship_count_delta": 13,
-      "average_score_current": 42.64,
-      "average_score_previous": 28.93,
-      "average_score_delta": 13.71,
-      "gained_relationships": [
-        {
-          "partner": "IT",
-          "current_score": 72.04,
-          "previous_score": 0.0,
-          "delta": 72.04,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": "unclassified",
-          "previous_relation": null
-        },
-        {
-          "partner": "BE",
-          "current_score": 64.02,
-          "previous_score": 0.0,
-          "delta": 64.02,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": "unclassified",
-          "previous_relation": null
-        },
-        {
-          "partner": "HU",
-          "current_score": 59.98,
-          "previous_score": 0.0,
-          "delta": 59.98,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": "unclassified",
-          "previous_relation": null
-        },
-        {
-          "partner": "ES",
-          "current_score": 52.62,
-          "previous_score": 0.0,
-          "delta": 52.62,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": "unclassified",
-          "previous_relation": null
-        },
-        {
-          "partner": "LT",
-          "current_score": 45.09,
-          "previous_score": 0.0,
-          "delta": 45.09,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": "unclassified",
-          "previous_relation": null
-        },
-        {
-          "partner": "BG",
-          "current_score": 44.19,
-          "previous_score": 0.0,
-          "delta": 44.19,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "NL",
-          "current_score": 43.15,
-          "previous_score": 0.0,
-          "delta": 43.15,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "PL",
-          "current_score": 39.84,
-          "previous_score": 0.0,
-          "delta": 39.84,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "GR",
-          "current_score": 35.84,
-          "previous_score": 0.0,
-          "delta": 35.84,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "LV",
-          "current_score": 35.84,
-          "previous_score": 0.0,
-          "delta": 35.84,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        }
-      ],
-      "lost_relationships": [],
-      "improved_relationships": [
-        {
-          "partner": "IE",
-          "current_score": 44.6,
-          "previous_score": 7.85,
-          "delta": 36.75,
-          "status": "improved",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": "unclassified"
-        }
-      ],
-      "declined_relationships": [
-        {
-          "partner": "DE",
-          "current_score": 35.84,
-          "previous_score": 50.0,
-          "delta": -14.16,
-          "status": "declined",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": "unclassified"
-        }
-      ],
-      "top_changes": [
-        {
-          "partner": "IT",
-          "current_score": 72.04,
-          "previous_score": 0.0,
-          "delta": 72.04,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": "unclassified",
-          "previous_relation": null
-        },
-        {
-          "partner": "BE",
-          "current_score": 64.02,
-          "previous_score": 0.0,
-          "delta": 64.02,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": "unclassified",
-          "previous_relation": null
-        },
-        {
-          "partner": "HU",
-          "current_score": 59.98,
-          "previous_score": 0.0,
-          "delta": 59.98,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": "unclassified",
-          "previous_relation": null
-        },
-        {
-          "partner": "ES",
-          "current_score": 52.62,
-          "previous_score": 0.0,
-          "delta": 52.62,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": "unclassified",
-          "previous_relation": null
-        },
-        {
-          "partner": "LT",
-          "current_score": 45.09,
-          "previous_score": 0.0,
-          "delta": 45.09,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": "unclassified",
-          "previous_relation": null
-        },
-        {
-          "partner": "BG",
-          "current_score": 44.19,
-          "previous_score": 0.0,
-          "delta": 44.19,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "NL",
-          "current_score": 43.15,
-          "previous_score": 0.0,
-          "delta": 43.15,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "PL",
-          "current_score": 39.84,
-          "previous_score": 0.0,
-          "delta": 39.84,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "IE",
-          "current_score": 44.6,
-          "previous_score": 7.85,
-          "delta": 36.75,
-          "status": "improved",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": "unclassified"
-        },
-        {
-          "partner": "GR",
-          "current_score": 35.84,
-          "previous_score": 0.0,
-          "delta": 35.84,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "LV",
-          "current_score": 35.84,
-          "previous_score": 0.0,
-          "delta": 35.84,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "DK",
-          "current_score": 34.52,
-          "previous_score": 0.0,
-          "delta": 34.52,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        }
-      ]
-    },
-    {
       "country": "DE",
       "relationship_count_current": 14,
-      "relationship_count_previous": 8,
-      "relationship_count_delta": 6,
+      "relationship_count_previous": 9,
+      "relationship_count_delta": 5,
       "average_score_current": 45.55,
-      "average_score_previous": 34.73,
-      "average_score_delta": 10.82,
+      "average_score_previous": 34.46,
+      "average_score_delta": 11.09,
       "gained_relationships": [
         {
           "partner": "BE",
@@ -10085,17 +9342,6 @@
           "previous_relation": null
         },
         {
-          "partner": "NL",
-          "current_score": 37.36,
-          "previous_score": 0.0,
-          "delta": 37.36,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
           "partner": "AT",
           "current_score": 15.98,
           "previous_score": 0.0,
@@ -10135,8 +9381,8 @@
         {
           "partner": "PL",
           "current_score": 51.84,
-          "previous_score": 5.14,
-          "delta": 46.7,
+          "previous_score": 9.5,
+          "delta": 42.34,
           "status": "improved",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
@@ -10144,10 +9390,21 @@
           "previous_relation": "unclassified"
         },
         {
+          "partner": "NL",
+          "current_score": 37.36,
+          "previous_score": 8.6,
+          "delta": 28.76,
+          "status": "improved",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": "unclassified"
+        },
+        {
           "partner": "IE",
           "current_score": 36.99,
-          "previous_score": 5.2,
-          "delta": 31.79,
+          "previous_score": 9.61,
+          "delta": 27.38,
           "status": "improved",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
@@ -10157,8 +9414,8 @@
         {
           "partner": "ES",
           "current_score": 47.3,
-          "previous_score": 17.52,
-          "delta": 29.78,
+          "previous_score": 32.4,
+          "delta": 14.9,
           "status": "improved",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
@@ -10258,17 +9515,6 @@
           "previous_relation": null
         },
         {
-          "partner": "PL",
-          "current_score": 51.84,
-          "previous_score": 5.14,
-          "delta": 46.7,
-          "status": "improved",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": "unclassified",
-          "previous_relation": "unclassified"
-        },
-        {
           "partner": "DK",
           "current_score": 43.47,
           "previous_score": 0.0,
@@ -10278,6 +9524,17 @@
           "previous_semantic_relationship_score": null,
           "current_relation": null,
           "previous_relation": null
+        },
+        {
+          "partner": "PL",
+          "current_score": 51.84,
+          "previous_score": 9.5,
+          "delta": 42.34,
+          "status": "improved",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": "unclassified"
         },
         {
           "partner": "IT",
@@ -10293,19 +9550,8 @@
         {
           "partner": "NL",
           "current_score": 37.36,
-          "previous_score": 0.0,
-          "delta": 37.36,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "IE",
-          "current_score": 36.99,
-          "previous_score": 5.2,
-          "delta": 31.79,
+          "previous_score": 8.6,
+          "delta": 28.76,
           "status": "improved",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
@@ -10313,10 +9559,10 @@
           "previous_relation": "unclassified"
         },
         {
-          "partner": "ES",
-          "current_score": 47.3,
-          "previous_score": 17.52,
-          "delta": 29.78,
+          "partner": "IE",
+          "current_score": 36.99,
+          "previous_score": 9.61,
+          "delta": 27.38,
           "status": "improved",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
@@ -10329,6 +9575,839 @@
           "previous_score": 50.0,
           "delta": -22.36,
           "status": "declined",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "AT",
+          "current_score": 15.98,
+          "previous_score": 0.0,
+          "delta": 15.98,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": null
+        }
+      ]
+    },
+    {
+      "country": "ES",
+      "relationship_count_current": 13,
+      "relationship_count_previous": 1,
+      "relationship_count_delta": 12,
+      "average_score_current": 43.21,
+      "average_score_previous": 32.4,
+      "average_score_delta": 10.81,
+      "gained_relationships": [
+        {
+          "partner": "FR",
+          "current_score": 52.62,
+          "previous_score": 0.0,
+          "delta": 52.62,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": null
+        },
+        {
+          "partner": "GR",
+          "current_score": 47.3,
+          "previous_score": 0.0,
+          "delta": 47.3,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "LT",
+          "current_score": 47.3,
+          "previous_score": 0.0,
+          "delta": 47.3,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "LV",
+          "current_score": 47.3,
+          "previous_score": 0.0,
+          "delta": 47.3,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "BE",
+          "current_score": 46.58,
+          "previous_score": 0.0,
+          "delta": 46.58,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "BG",
+          "current_score": 45.77,
+          "previous_score": 0.0,
+          "delta": 45.77,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "DK",
+          "current_score": 43.2,
+          "previous_score": 0.0,
+          "delta": 43.2,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "IE",
+          "current_score": 40.98,
+          "previous_score": 0.0,
+          "delta": 40.98,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "IT",
+          "current_score": 40.75,
+          "previous_score": 0.0,
+          "delta": 40.75,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "NL",
+          "current_score": 37.12,
+          "previous_score": 0.0,
+          "delta": 37.12,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        }
+      ],
+      "lost_relationships": [],
+      "improved_relationships": [
+        {
+          "partner": "DE",
+          "current_score": 47.3,
+          "previous_score": 32.4,
+          "delta": 14.9,
+          "status": "improved",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": "unclassified"
+        }
+      ],
+      "declined_relationships": [],
+      "top_changes": [
+        {
+          "partner": "FR",
+          "current_score": 52.62,
+          "previous_score": 0.0,
+          "delta": 52.62,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": null
+        },
+        {
+          "partner": "GR",
+          "current_score": 47.3,
+          "previous_score": 0.0,
+          "delta": 47.3,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "LT",
+          "current_score": 47.3,
+          "previous_score": 0.0,
+          "delta": 47.3,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "LV",
+          "current_score": 47.3,
+          "previous_score": 0.0,
+          "delta": 47.3,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "BE",
+          "current_score": 46.58,
+          "previous_score": 0.0,
+          "delta": 46.58,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "BG",
+          "current_score": 45.77,
+          "previous_score": 0.0,
+          "delta": 45.77,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "DK",
+          "current_score": 43.2,
+          "previous_score": 0.0,
+          "delta": 43.2,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "IE",
+          "current_score": 40.98,
+          "previous_score": 0.0,
+          "delta": 40.98,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "IT",
+          "current_score": 40.75,
+          "previous_score": 0.0,
+          "delta": 40.75,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "NL",
+          "current_score": 37.12,
+          "previous_score": 0.0,
+          "delta": 37.12,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "HU",
+          "current_score": 33.1,
+          "previous_score": 0.0,
+          "delta": 33.1,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "PL",
+          "current_score": 32.45,
+          "previous_score": 0.0,
+          "delta": 32.45,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        }
+      ]
+    },
+    {
+      "country": "FR",
+      "relationship_count_current": 15,
+      "relationship_count_previous": 2,
+      "relationship_count_delta": 13,
+      "average_score_current": 42.64,
+      "average_score_previous": 32.27,
+      "average_score_delta": 10.37,
+      "gained_relationships": [
+        {
+          "partner": "IT",
+          "current_score": 72.04,
+          "previous_score": 0.0,
+          "delta": 72.04,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": null
+        },
+        {
+          "partner": "BE",
+          "current_score": 64.02,
+          "previous_score": 0.0,
+          "delta": 64.02,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": null
+        },
+        {
+          "partner": "HU",
+          "current_score": 59.98,
+          "previous_score": 0.0,
+          "delta": 59.98,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": null
+        },
+        {
+          "partner": "ES",
+          "current_score": 52.62,
+          "previous_score": 0.0,
+          "delta": 52.62,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": null
+        },
+        {
+          "partner": "LT",
+          "current_score": 45.09,
+          "previous_score": 0.0,
+          "delta": 45.09,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": null
+        },
+        {
+          "partner": "BG",
+          "current_score": 44.19,
+          "previous_score": 0.0,
+          "delta": 44.19,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "NL",
+          "current_score": 43.15,
+          "previous_score": 0.0,
+          "delta": 43.15,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "PL",
+          "current_score": 39.84,
+          "previous_score": 0.0,
+          "delta": 39.84,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "GR",
+          "current_score": 35.84,
+          "previous_score": 0.0,
+          "delta": 35.84,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "LV",
+          "current_score": 35.84,
+          "previous_score": 0.0,
+          "delta": 35.84,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        }
+      ],
+      "lost_relationships": [],
+      "improved_relationships": [
+        {
+          "partner": "IE",
+          "current_score": 44.6,
+          "previous_score": 14.53,
+          "delta": 30.07,
+          "status": "improved",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": "unclassified"
+        }
+      ],
+      "declined_relationships": [
+        {
+          "partner": "DE",
+          "current_score": 35.84,
+          "previous_score": 50.0,
+          "delta": -14.16,
+          "status": "declined",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": "unclassified"
+        }
+      ],
+      "top_changes": [
+        {
+          "partner": "IT",
+          "current_score": 72.04,
+          "previous_score": 0.0,
+          "delta": 72.04,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": null
+        },
+        {
+          "partner": "BE",
+          "current_score": 64.02,
+          "previous_score": 0.0,
+          "delta": 64.02,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": null
+        },
+        {
+          "partner": "HU",
+          "current_score": 59.98,
+          "previous_score": 0.0,
+          "delta": 59.98,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": null
+        },
+        {
+          "partner": "ES",
+          "current_score": 52.62,
+          "previous_score": 0.0,
+          "delta": 52.62,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": null
+        },
+        {
+          "partner": "LT",
+          "current_score": 45.09,
+          "previous_score": 0.0,
+          "delta": 45.09,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": null
+        },
+        {
+          "partner": "BG",
+          "current_score": 44.19,
+          "previous_score": 0.0,
+          "delta": 44.19,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "NL",
+          "current_score": 43.15,
+          "previous_score": 0.0,
+          "delta": 43.15,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "PL",
+          "current_score": 39.84,
+          "previous_score": 0.0,
+          "delta": 39.84,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "GR",
+          "current_score": 35.84,
+          "previous_score": 0.0,
+          "delta": 35.84,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "LV",
+          "current_score": 35.84,
+          "previous_score": 0.0,
+          "delta": 35.84,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "DK",
+          "current_score": 34.52,
+          "previous_score": 0.0,
+          "delta": 34.52,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "IE",
+          "current_score": 44.6,
+          "previous_score": 14.53,
+          "delta": 30.07,
+          "status": "improved",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": "unclassified"
+        }
+      ]
+    },
+    {
+      "country": "IT",
+      "relationship_count_current": 14,
+      "relationship_count_previous": 1,
+      "relationship_count_delta": 13,
+      "average_score_current": 41.14,
+      "average_score_previous": 31.06,
+      "average_score_delta": 10.08,
+      "gained_relationships": [
+        {
+          "partner": "FR",
+          "current_score": 72.04,
+          "previous_score": 0.0,
+          "delta": 72.04,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": null
+        },
+        {
+          "partner": "GR",
+          "current_score": 50.49,
+          "previous_score": 0.0,
+          "delta": 50.49,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": null
+        },
+        {
+          "partner": "IE",
+          "current_score": 46.78,
+          "previous_score": 0.0,
+          "delta": 46.78,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "PL",
+          "current_score": 43.28,
+          "previous_score": 0.0,
+          "delta": 43.28,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "BG",
+          "current_score": 43.04,
+          "previous_score": 0.0,
+          "delta": 43.04,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "DK",
+          "current_score": 41.78,
+          "previous_score": 0.0,
+          "delta": 41.78,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "ES",
+          "current_score": 40.75,
+          "previous_score": 0.0,
+          "delta": 40.75,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "NL",
+          "current_score": 40.41,
+          "previous_score": 0.0,
+          "delta": 40.41,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "BE",
+          "current_score": 39.42,
+          "previous_score": 0.0,
+          "delta": 39.42,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "DE",
+          "current_score": 37.48,
+          "previous_score": 0.0,
+          "delta": 37.48,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        }
+      ],
+      "lost_relationships": [
+        {
+          "partner": "MT",
+          "current_score": 0.0,
+          "previous_score": 31.06,
+          "delta": -31.06,
+          "status": "lost",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": "unclassified"
+        }
+      ],
+      "improved_relationships": [],
+      "declined_relationships": [],
+      "top_changes": [
+        {
+          "partner": "FR",
+          "current_score": 72.04,
+          "previous_score": 0.0,
+          "delta": 72.04,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": null
+        },
+        {
+          "partner": "GR",
+          "current_score": 50.49,
+          "previous_score": 0.0,
+          "delta": 50.49,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": null
+        },
+        {
+          "partner": "IE",
+          "current_score": 46.78,
+          "previous_score": 0.0,
+          "delta": 46.78,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "PL",
+          "current_score": 43.28,
+          "previous_score": 0.0,
+          "delta": 43.28,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "BG",
+          "current_score": 43.04,
+          "previous_score": 0.0,
+          "delta": 43.04,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "DK",
+          "current_score": 41.78,
+          "previous_score": 0.0,
+          "delta": 41.78,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "ES",
+          "current_score": 40.75,
+          "previous_score": 0.0,
+          "delta": 40.75,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "NL",
+          "current_score": 40.41,
+          "previous_score": 0.0,
+          "delta": 40.41,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "BE",
+          "current_score": 39.42,
+          "previous_score": 0.0,
+          "delta": 39.42,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "DE",
+          "current_score": 37.48,
+          "previous_score": 0.0,
+          "delta": 37.48,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "LT",
+          "current_score": 37.48,
+          "previous_score": 0.0,
+          "delta": 37.48,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "LV",
+          "current_score": 37.48,
+          "previous_score": 0.0,
+          "delta": 37.48,
+          "status": "gained",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
           "current_relation": null,
