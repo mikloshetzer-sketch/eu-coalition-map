@@ -10,7 +10,7 @@
     },
     {
       "id": "DE",
-      "weight": 16.09
+      "weight": 15.09
     },
     {
       "id": "ES",
@@ -34,7 +34,7 @@
     },
     {
       "id": "IT",
-      "weight": 7.07
+      "weight": 6.07
     },
     {
       "id": "LT",
@@ -138,36 +138,6 @@
       "evidence_level": "none",
       "evidence_sufficient": false,
       "directional_consistency": 0.0
-    },
-    {
-      "source": "DE",
-      "target": "IT",
-      "weight": 1.0,
-      "interaction_weight": 1.0,
-      "interaction_count": 1,
-      "topics": {
-        "ukraine_russia": 1.0
-      },
-      "relationship_score": 1.0,
-      "dominant_relation": "cooperative",
-      "observed_relationship_label": "cooperative",
-      "relationship_confidence": 0.484,
-      "relationship_counts": {
-        "cooperative": 1,
-        "conflictual": 0,
-        "neutral": 0,
-        "mixed": 0,
-        "unclassified": 0
-      },
-      "classified_events": 1,
-      "unclassified_events": 0,
-      "classification_coverage": 1.0,
-      "relationship_label": "insufficient_evidence",
-      "assessed_relationship": "insufficient_evidence",
-      "evidence_status": "below_assessment_threshold",
-      "evidence_level": "insufficient",
-      "evidence_sufficient": false,
-      "directional_consistency": 1.0
     },
     {
       "source": "DE",
@@ -404,7 +374,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 105,
+  "event_count": 87,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -418,8 +388,8 @@
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
       "equal_legacy_topic_share_fallback": 69,
-      "no_topic_evidence": 21,
-      "rule_based_topic_salience_v2": 15
+      "no_topic_evidence": 17,
+      "rule_based_topic_salience_v2": 1
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
     "note": "Topic prominence does not imply support, opposition or shared policy position."
