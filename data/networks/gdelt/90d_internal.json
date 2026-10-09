@@ -34,11 +34,11 @@
     },
     {
       "id": "IE",
-      "weight": 6.58
+      "weight": 9.0
     },
     {
       "id": "IT",
-      "weight": 11.63
+      "weight": 14.05
     },
     {
       "id": "LT",
@@ -620,6 +620,36 @@
       "directional_consistency": 0.0
     },
     {
+      "source": "IE",
+      "target": "IT",
+      "weight": 2.42,
+      "interaction_weight": 2.42,
+      "interaction_count": 1,
+      "topics": {
+        "trade": 2.42
+      },
+      "relationship_score": null,
+      "dominant_relation": "unclassified",
+      "observed_relationship_label": "unclassified",
+      "relationship_confidence": null,
+      "relationship_counts": {
+        "cooperative": 0,
+        "conflictual": 0,
+        "neutral": 0,
+        "mixed": 0,
+        "unclassified": 1
+      },
+      "classified_events": 0,
+      "unclassified_events": 1,
+      "classification_coverage": 0.0,
+      "relationship_label": "unclassified",
+      "assessed_relationship": "unclassified",
+      "evidence_status": "no_classified_evidence",
+      "evidence_level": "none",
+      "evidence_sufficient": false,
+      "directional_consistency": 0.0
+    },
+    {
       "source": "IT",
       "target": "MT",
       "weight": 5.56,
@@ -648,7 +678,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 254,
+  "event_count": 256,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -661,8 +691,8 @@
     "stance_inferred": false,
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
-      "equal_legacy_topic_share_fallback": 78,
-      "no_topic_evidence": 156,
+      "equal_legacy_topic_share_fallback": 81,
+      "no_topic_evidence": 155,
       "rule_based_topic_salience_v2": 20
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
