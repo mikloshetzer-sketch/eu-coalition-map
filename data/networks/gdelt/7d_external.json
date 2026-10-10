@@ -18,11 +18,11 @@
     },
     {
       "id": "FR",
-      "weight": 2.9
+      "weight": 5.5
     },
     {
       "id": "GB",
-      "weight": 11.62
+      "weight": 14.22
     },
     {
       "id": "GR",
@@ -204,11 +204,12 @@
     {
       "source": "FR",
       "target": "GB",
-      "weight": 2.9,
-      "interaction_weight": 2.9,
-      "interaction_count": 1,
+      "weight": 5.5,
+      "interaction_weight": 5.5,
+      "interaction_count": 2,
       "topics": {
-        "trade": 2.9
+        "trade": 4.2,
+        "fiscal": 1.3
       },
       "relationship_score": null,
       "dominant_relation": "unclassified",
@@ -219,10 +220,10 @@
         "conflictual": 0,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 1
+        "unclassified": 2
       },
       "classified_events": 0,
-      "unclassified_events": 1,
+      "unclassified_events": 2,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -322,7 +323,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 12,
+  "event_count": 13,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -335,7 +336,7 @@
     "stance_inferred": false,
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
-      "equal_legacy_topic_share_fallback": 12
+      "equal_legacy_topic_share_fallback": 13
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
     "note": "Topic prominence does not imply support, opposition or shared policy position."

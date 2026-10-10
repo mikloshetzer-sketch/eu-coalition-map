@@ -17,16 +17,12 @@
       "weight": 15.8
     },
     {
-      "id": "GR",
-      "weight": 2.26
-    },
-    {
       "id": "HU",
       "weight": 3.5
     },
     {
       "id": "IE",
-      "weight": 4.68
+      "weight": 2.42
     },
     {
       "id": "IT",
@@ -288,34 +284,6 @@
       "directional_consistency": 0.0
     },
     {
-      "source": "GR",
-      "target": "IE",
-      "weight": 2.26,
-      "interaction_weight": 2.26,
-      "interaction_count": 1,
-      "topics": {},
-      "relationship_score": null,
-      "dominant_relation": "unclassified",
-      "observed_relationship_label": "unclassified",
-      "relationship_confidence": null,
-      "relationship_counts": {
-        "cooperative": 0,
-        "conflictual": 0,
-        "neutral": 0,
-        "mixed": 0,
-        "unclassified": 1
-      },
-      "classified_events": 0,
-      "unclassified_events": 1,
-      "classification_coverage": 0.0,
-      "relationship_label": "unclassified",
-      "assessed_relationship": "unclassified",
-      "evidence_status": "no_classified_evidence",
-      "evidence_level": "none",
-      "evidence_sufficient": false,
-      "directional_consistency": 0.0
-    },
-    {
       "source": "IE",
       "target": "IT",
       "weight": 2.42,
@@ -346,7 +314,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 85,
+  "event_count": 83,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -359,8 +327,8 @@
     "stance_inferred": false,
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
-      "equal_legacy_topic_share_fallback": 81,
-      "no_topic_evidence": 4
+      "equal_legacy_topic_share_fallback": 82,
+      "no_topic_evidence": 1
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
     "note": "Topic prominence does not imply support, opposition or shared policy position."
