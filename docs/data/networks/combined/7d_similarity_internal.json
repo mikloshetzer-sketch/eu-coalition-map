@@ -1,15 +1,15 @@
 {
   "nodes": [
     {
+      "id": "BG",
+      "weight": 1
+    },
+    {
       "id": "DE",
       "weight": 1
     },
     {
       "id": "DK",
-      "weight": 1
-    },
-    {
-      "id": "ES",
       "weight": 1
     },
     {
@@ -39,24 +39,29 @@
   ],
   "edges": [
     {
-      "source": "DE",
-      "target": "ES",
-      "weight": 0.707
+      "source": "BG",
+      "target": "FR",
+      "weight": 0.703
+    },
+    {
+      "source": "BG",
+      "target": "IE",
+      "weight": 0.981
+    },
+    {
+      "source": "BG",
+      "target": "IT",
+      "weight": 0.981
     },
     {
       "source": "DE",
       "target": "FR",
-      "weight": 0.222
+      "weight": 0.478
     },
     {
       "source": "DE",
       "target": "GR",
       "weight": 1.0
-    },
-    {
-      "source": "DE",
-      "target": "IE",
-      "weight": 0.788
     },
     {
       "source": "DE",
@@ -69,54 +74,29 @@
       "weight": 1.0
     },
     {
-      "source": "ES",
-      "target": "GR",
-      "weight": 0.707
-    },
-    {
-      "source": "ES",
-      "target": "IE",
-      "weight": 0.557
-    },
-    {
-      "source": "ES",
-      "target": "PL",
-      "weight": 0.707
-    },
-    {
-      "source": "ES",
-      "target": "SE",
-      "weight": 0.707
-    },
-    {
       "source": "FR",
       "target": "GR",
-      "weight": 0.222
+      "weight": 0.478
     },
     {
       "source": "FR",
       "target": "IE",
-      "weight": 0.748
+      "weight": 0.621
     },
     {
       "source": "FR",
       "target": "IT",
-      "weight": 0.931
+      "weight": 0.621
     },
     {
       "source": "FR",
       "target": "PL",
-      "weight": 0.222
+      "weight": 0.478
     },
     {
       "source": "FR",
       "target": "SE",
-      "weight": 0.222
-    },
-    {
-      "source": "GR",
-      "target": "IE",
-      "weight": 0.788
+      "weight": 0.478
     },
     {
       "source": "GR",
@@ -131,17 +111,7 @@
     {
       "source": "IE",
       "target": "IT",
-      "weight": 0.615
-    },
-    {
-      "source": "IE",
-      "target": "PL",
-      "weight": 0.788
-    },
-    {
-      "source": "IE",
-      "target": "SE",
-      "weight": 0.788
+      "weight": 1.0
     },
     {
       "source": "PL",
@@ -149,7 +119,7 @@
       "weight": 1.0
     }
   ],
-  "event_count": 11,
+  "event_count": 9,
   "mode": "internal",
   "method": "topic_salience_cosine_similarity_v2",
   "semantic_dimension": "salience_similarity",
