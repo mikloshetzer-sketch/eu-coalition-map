@@ -5,7 +5,15 @@
       "weight": 1
     },
     {
+      "id": "DE",
+      "weight": 1
+    },
+    {
       "id": "DK",
+      "weight": 1
+    },
+    {
+      "id": "ES",
       "weight": 1
     },
     {
@@ -14,6 +22,10 @@
     },
     {
       "id": "GR",
+      "weight": 1
+    },
+    {
+      "id": "HR",
       "weight": 1
     },
     {
@@ -31,6 +43,10 @@
     {
       "id": "MT",
       "weight": 1
+    },
+    {
+      "id": "NL",
+      "weight": 1
     }
   ],
   "edges": [
@@ -47,7 +63,42 @@
     {
       "source": "BG",
       "target": "IT",
-      "weight": 0.981
+      "weight": 0.915
+    },
+    {
+      "source": "DE",
+      "target": "ES",
+      "weight": 1.0
+    },
+    {
+      "source": "DE",
+      "target": "GR",
+      "weight": 1.0
+    },
+    {
+      "source": "DE",
+      "target": "HR",
+      "weight": 1.0
+    },
+    {
+      "source": "DE",
+      "target": "IE",
+      "weight": 0.876
+    },
+    {
+      "source": "DE",
+      "target": "IT",
+      "weight": 0.575
+    },
+    {
+      "source": "DE",
+      "target": "MT",
+      "weight": 1.0
+    },
+    {
+      "source": "DE",
+      "target": "NL",
+      "weight": 1.0
     },
     {
       "source": "DK",
@@ -60,9 +111,39 @@
       "weight": 1.0
     },
     {
+      "source": "ES",
+      "target": "GR",
+      "weight": 1.0
+    },
+    {
+      "source": "ES",
+      "target": "HR",
+      "weight": 1.0
+    },
+    {
+      "source": "ES",
+      "target": "IE",
+      "weight": 0.876
+    },
+    {
+      "source": "ES",
+      "target": "IT",
+      "weight": 0.575
+    },
+    {
+      "source": "ES",
+      "target": "MT",
+      "weight": 1.0
+    },
+    {
+      "source": "ES",
+      "target": "NL",
+      "weight": 1.0
+    },
+    {
       "source": "FR",
       "target": "IT",
-      "weight": 0.322
+      "weight": 0.263
     },
     {
       "source": "FR",
@@ -71,8 +152,18 @@
     },
     {
       "source": "GR",
+      "target": "HR",
+      "weight": 1.0
+    },
+    {
+      "source": "GR",
       "target": "IE",
       "weight": 0.876
+    },
+    {
+      "source": "GR",
+      "target": "IT",
+      "weight": 0.575
     },
     {
       "source": "GR",
@@ -80,17 +171,62 @@
       "weight": 1.0
     },
     {
+      "source": "GR",
+      "target": "NL",
+      "weight": 1.0
+    },
+    {
+      "source": "HR",
+      "target": "IE",
+      "weight": 0.876
+    },
+    {
+      "source": "HR",
+      "target": "IT",
+      "weight": 0.575
+    },
+    {
+      "source": "HR",
+      "target": "MT",
+      "weight": 1.0
+    },
+    {
+      "source": "HR",
+      "target": "NL",
+      "weight": 1.0
+    },
+    {
       "source": "IE",
       "target": "IT",
-      "weight": 0.482
+      "weight": 0.898
     },
     {
       "source": "IE",
       "target": "MT",
       "weight": 0.876
+    },
+    {
+      "source": "IE",
+      "target": "NL",
+      "weight": 0.876
+    },
+    {
+      "source": "IT",
+      "target": "MT",
+      "weight": 0.575
+    },
+    {
+      "source": "IT",
+      "target": "NL",
+      "weight": 0.575
+    },
+    {
+      "source": "MT",
+      "target": "NL",
+      "weight": 1.0
     }
   ],
-  "event_count": 10,
+  "event_count": 14,
   "mode": "internal",
   "method": "topic_salience_cosine_similarity_v2",
   "semantic_dimension": "salience_similarity",
