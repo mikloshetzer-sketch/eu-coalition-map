@@ -62,7 +62,7 @@
     },
     {
       "id": "HU",
-      "weight": 12.0
+      "weight": 10.0
     },
     {
       "id": "IE",
@@ -90,7 +90,7 @@
     },
     {
       "id": "PL",
-      "weight": 50.0
+      "weight": 48.0
     },
     {
       "id": "PT",
@@ -118,7 +118,7 @@
     },
     {
       "id": "UA",
-      "weight": 114.0
+      "weight": 112.0
     },
     {
       "id": "US",
@@ -3307,37 +3307,6 @@
     },
     {
       "source": "HU",
-      "target": "PL",
-      "weight": 1.0,
-      "interaction_weight": 1.0,
-      "interaction_count": 1,
-      "topics": {
-        "ukraine_russia": 0.542,
-        "energy": 0.458
-      },
-      "relationship_score": null,
-      "dominant_relation": "unclassified",
-      "observed_relationship_label": "unclassified",
-      "relationship_confidence": null,
-      "relationship_counts": {
-        "cooperative": 0,
-        "conflictual": 0,
-        "neutral": 0,
-        "mixed": 0,
-        "unclassified": 1
-      },
-      "classified_events": 0,
-      "unclassified_events": 1,
-      "classification_coverage": 0.0,
-      "relationship_label": "unclassified",
-      "assessed_relationship": "unclassified",
-      "evidence_status": "no_classified_evidence",
-      "evidence_level": "none",
-      "evidence_sufficient": false,
-      "directional_consistency": 0.0
-    },
-    {
-      "source": "HU",
       "target": "RO",
       "weight": 3.0,
       "interaction_weight": 3.0,
@@ -3399,13 +3368,12 @@
     {
       "source": "HU",
       "target": "UA",
-      "weight": 2.0,
-      "interaction_weight": 2.0,
-      "interaction_count": 2,
+      "weight": 1.0,
+      "interaction_weight": 1.0,
+      "interaction_count": 1,
       "topics": {
-        "ukraine_russia": 1.042,
         "enlargement": 0.5,
-        "energy": 0.458
+        "ukraine_russia": 0.5
       },
       "relationship_score": null,
       "dominant_relation": "unclassified",
@@ -3416,10 +3384,10 @@
         "conflictual": 0,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 2
+        "unclassified": 1
       },
       "classified_events": 0,
-      "unclassified_events": 2,
+      "unclassified_events": 1,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -3986,14 +3954,14 @@
     {
       "source": "PL",
       "target": "UA",
-      "weight": 18.0,
-      "interaction_weight": 18.0,
-      "interaction_count": 18,
+      "weight": 17.0,
+      "interaction_weight": 17.0,
+      "interaction_count": 17,
       "topics": {
-        "ukraine_russia": 15.705,
-        "energy": 0.942,
+        "ukraine_russia": 15.163,
         "defence": 0.69,
-        "migration": 0.663
+        "migration": 0.663,
+        "energy": 0.485
       },
       "relationship_score": -0.861,
       "dominant_relation": "conflictual",
@@ -4004,11 +3972,11 @@
         "conflictual": 3,
         "neutral": 1,
         "mixed": 0,
-        "unclassified": 14
+        "unclassified": 13
       },
       "classified_events": 4,
-      "unclassified_events": 14,
-      "classification_coverage": 0.222,
+      "unclassified_events": 13,
+      "classification_coverage": 0.235,
       "relationship_label": "conflictual",
       "assessed_relationship": "conflictual",
       "evidence_status": "assessment_threshold_met",
@@ -4308,7 +4276,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 847,
+  "event_count": 830,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -4322,7 +4290,7 @@
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
       "no_topic_evidence": 25,
-      "rule_based_topic_salience_v2": 822
+      "rule_based_topic_salience_v2": 805
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
     "note": "Topic prominence does not imply support, opposition or shared policy position."
