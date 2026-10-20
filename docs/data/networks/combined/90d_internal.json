@@ -18,7 +18,7 @@
     },
     {
       "id": "DE",
-      "weight": 93.4
+      "weight": 96.2
     },
     {
       "id": "DK",
@@ -38,7 +38,7 @@
     },
     {
       "id": "FR",
-      "weight": 78.77
+      "weight": 81.57
     },
     {
       "id": "GR",
@@ -656,13 +656,13 @@
     {
       "source": "DE",
       "target": "FR",
-      "weight": 29.55,
-      "interaction_weight": 29.55,
-      "interaction_count": 15,
+      "weight": 32.35,
+      "interaction_weight": 32.35,
+      "interaction_count": 16,
       "topics": {
         "ukraine_russia": 6.273,
+        "defence": 4.348,
         "fiscal": 2.03,
-        "defence": 1.548,
         "migration": 1.031,
         "trade": 1.0,
         "energy": 0.118
@@ -676,10 +676,10 @@
         "conflictual": 0,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 15
+        "unclassified": 16
       },
       "classified_events": 0,
-      "unclassified_events": 15,
+      "unclassified_events": 16,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -2309,7 +2309,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 1057,
+  "event_count": 1038,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -2322,9 +2322,9 @@
     "stance_inferred": false,
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
-      "equal_legacy_topic_share_fallback": 92,
-      "no_topic_evidence": 143,
-      "rule_based_topic_salience_v2": 822
+      "equal_legacy_topic_share_fallback": 95,
+      "no_topic_evidence": 138,
+      "rule_based_topic_salience_v2": 805
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
     "note": "Topic prominence does not imply support, opposition or shared policy position."
