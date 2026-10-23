@@ -1,6 +1,10 @@
 {
   "nodes": [
     {
+      "id": "AT",
+      "weight": 1
+    },
+    {
       "id": "DE",
       "weight": 1
     },
@@ -10,10 +14,6 @@
     },
     {
       "id": "FR",
-      "weight": 1
-    },
-    {
-      "id": "HR",
       "weight": 1
     },
     {
@@ -35,39 +35,54 @@
   ],
   "edges": [
     {
+      "source": "AT",
+      "target": "DE",
+      "weight": 0.402
+    },
+    {
+      "source": "AT",
+      "target": "FR",
+      "weight": 0.909
+    },
+    {
+      "source": "AT",
+      "target": "IE",
+      "weight": 0.435
+    },
+    {
+      "source": "AT",
+      "target": "IT",
+      "weight": 0.775
+    },
+    {
       "source": "DE",
       "target": "ES",
-      "weight": 1.0
+      "weight": 0.916
     },
     {
       "source": "DE",
       "target": "FR",
-      "weight": 0.417
-    },
-    {
-      "source": "DE",
-      "target": "HR",
-      "weight": 1.0
+      "weight": 0.747
     },
     {
       "source": "DE",
       "target": "IE",
-      "weight": 1.0
+      "weight": 0.881
     },
     {
       "source": "DE",
       "target": "IT",
-      "weight": 0.917
+      "weight": 0.89
     },
     {
       "source": "DE",
       "target": "NL",
-      "weight": 0.957
+      "weight": 0.803
     },
     {
       "source": "DE",
       "target": "PT",
-      "weight": 1.0
+      "weight": 0.916
     },
     {
       "source": "ES",
@@ -76,106 +91,76 @@
     },
     {
       "source": "ES",
-      "target": "HR",
-      "weight": 1.0
-    },
-    {
-      "source": "ES",
       "target": "IE",
-      "weight": 1.0
+      "weight": 0.771
     },
     {
       "source": "ES",
       "target": "IT",
-      "weight": 0.917
+      "weight": 0.632
     },
     {
       "source": "ES",
-      "target": "NL",
-      "weight": 0.957
-    },
-    {
-      "source": "ES",
-      "target": "PT",
-      "weight": 1.0
-    },
-    {
-      "source": "FR",
-      "target": "HR",
-      "weight": 0.417
-    },
-    {
-      "source": "FR",
-      "target": "IE",
-      "weight": 0.417
-    },
-    {
-      "source": "FR",
-      "target": "IT",
-      "weight": 0.745
-    },
-    {
-      "source": "FR",
-      "target": "NL",
-      "weight": 0.399
-    },
-    {
-      "source": "FR",
-      "target": "PT",
-      "weight": 0.417
-    },
-    {
-      "source": "HR",
-      "target": "IE",
-      "weight": 1.0
-    },
-    {
-      "source": "HR",
-      "target": "IT",
-      "weight": 0.917
-    },
-    {
-      "source": "HR",
-      "target": "NL",
-      "weight": 0.957
-    },
-    {
-      "source": "HR",
-      "target": "PT",
-      "weight": 1.0
-    },
-    {
-      "source": "IE",
-      "target": "IT",
-      "weight": 0.917
-    },
-    {
-      "source": "IE",
-      "target": "NL",
-      "weight": 0.957
-    },
-    {
-      "source": "IE",
-      "target": "PT",
-      "weight": 1.0
-    },
-    {
-      "source": "IT",
       "target": "NL",
       "weight": 0.878
     },
     {
+      "source": "ES",
+      "target": "PT",
+      "weight": 1.0
+    },
+    {
+      "source": "FR",
+      "target": "IE",
+      "weight": 0.717
+    },
+    {
+      "source": "FR",
+      "target": "IT",
+      "weight": 0.968
+    },
+    {
+      "source": "FR",
+      "target": "NL",
+      "weight": 0.366
+    },
+    {
+      "source": "FR",
+      "target": "PT",
+      "weight": 0.417
+    },
+    {
+      "source": "IE",
+      "target": "IT",
+      "weight": 0.824
+    },
+    {
+      "source": "IE",
+      "target": "NL",
+      "weight": 0.677
+    },
+    {
+      "source": "IE",
+      "target": "PT",
+      "weight": 0.771
+    },
+    {
+      "source": "IT",
+      "target": "NL",
+      "weight": 0.554
+    },
+    {
       "source": "IT",
       "target": "PT",
-      "weight": 0.917
+      "weight": 0.632
     },
     {
       "source": "NL",
       "target": "PT",
-      "weight": 0.957
+      "weight": 0.878
     }
   ],
-  "event_count": 18,
+  "event_count": 20,
   "mode": "internal",
   "method": "topic_salience_cosine_similarity_v2",
   "semantic_dimension": "salience_similarity",

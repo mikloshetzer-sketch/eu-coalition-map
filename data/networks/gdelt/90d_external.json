@@ -10,7 +10,7 @@
     },
     {
       "id": "CN",
-      "weight": 32.75
+      "weight": 29.85
     },
     {
       "id": "CY",
@@ -26,7 +26,7 @@
     },
     {
       "id": "ES",
-      "weight": 41.39
+      "weight": 43.39
     },
     {
       "id": "FI",
@@ -38,7 +38,7 @@
     },
     {
       "id": "GB",
-      "weight": 218.19
+      "weight": 223.58
     },
     {
       "id": "GR",
@@ -50,7 +50,7 @@
     },
     {
       "id": "IE",
-      "weight": 90.69
+      "weight": 96.08
     },
     {
       "id": "IT",
@@ -70,7 +70,7 @@
     },
     {
       "id": "NL",
-      "weight": 17.54
+      "weight": 14.64
     },
     {
       "id": "PL",
@@ -94,7 +94,7 @@
     },
     {
       "id": "UA",
-      "weight": 34.9
+      "weight": 36.9
     },
     {
       "id": "US",
@@ -435,9 +435,9 @@
     {
       "source": "CN",
       "target": "NL",
-      "weight": 3.9,
-      "interaction_weight": 3.9,
-      "interaction_count": 2,
+      "weight": 1.0,
+      "interaction_weight": 1.0,
+      "interaction_count": 1,
       "topics": {
         "defence": 1.0
       },
@@ -450,10 +450,10 @@
         "conflictual": 0,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 2
+        "unclassified": 1
       },
       "classified_events": 0,
-      "unclassified_events": 2,
+      "unclassified_events": 1,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -764,6 +764,36 @@
     },
     {
       "source": "ES",
+      "target": "UA",
+      "weight": 2.0,
+      "interaction_weight": 2.0,
+      "interaction_count": 1,
+      "topics": {
+        "defence": 2.0
+      },
+      "relationship_score": null,
+      "dominant_relation": "unclassified",
+      "observed_relationship_label": "unclassified",
+      "relationship_confidence": null,
+      "relationship_counts": {
+        "cooperative": 0,
+        "conflictual": 0,
+        "neutral": 0,
+        "mixed": 0,
+        "unclassified": 1
+      },
+      "classified_events": 0,
+      "unclassified_events": 1,
+      "classification_coverage": 0.0,
+      "relationship_label": "unclassified",
+      "assessed_relationship": "unclassified",
+      "evidence_status": "no_classified_evidence",
+      "evidence_level": "none",
+      "evidence_sufficient": false,
+      "directional_consistency": 0.0
+    },
+    {
+      "source": "ES",
       "target": "US",
       "weight": 22.39,
       "interaction_weight": 22.39,
@@ -1038,12 +1068,12 @@
     {
       "source": "GB",
       "target": "IE",
-      "weight": 71.8,
-      "interaction_weight": 71.8,
-      "interaction_count": 17,
+      "weight": 77.19,
+      "interaction_weight": 77.19,
+      "interaction_count": 19,
       "topics": {
-        "defence": 26.62,
-        "rule_of_law": 11.4,
+        "defence": 28.59,
+        "rule_of_law": 14.82,
         "ukraine_russia": 4.3
       },
       "relationship_score": null,
@@ -1055,10 +1085,10 @@
         "conflictual": 0,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 17
+        "unclassified": 19
       },
       "classified_events": 0,
-      "unclassified_events": 17,
+      "unclassified_events": 19,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -1557,7 +1587,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 235,
+  "event_count": 237,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -1570,8 +1600,8 @@
     "stance_inferred": false,
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
-      "equal_legacy_topic_share_fallback": 106,
-      "no_topic_evidence": 110,
+      "equal_legacy_topic_share_fallback": 112,
+      "no_topic_evidence": 106,
       "rule_based_topic_salience_v2": 19
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
