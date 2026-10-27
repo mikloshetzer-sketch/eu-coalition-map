@@ -30,7 +30,7 @@
     },
     {
       "id": "ES",
-      "weight": 68.21
+      "weight": 67.21
     },
     {
       "id": "FI",
@@ -38,7 +38,7 @@
     },
     {
       "id": "FR",
-      "weight": 78.8
+      "weight": 77.8
     },
     {
       "id": "GR",
@@ -1329,14 +1329,14 @@
     {
       "source": "ES",
       "target": "FR",
-      "weight": 9.0,
-      "interaction_weight": 9.0,
-      "interaction_count": 8,
+      "weight": 8.0,
+      "interaction_weight": 8.0,
+      "interaction_count": 7,
       "topics": {
         "defence": 3.182,
         "migration": 3.031,
-        "ukraine_russia": 1.787,
-        "energy": 1.0
+        "energy": 1.0,
+        "ukraine_russia": 0.787
       },
       "relationship_score": 0.543,
       "dominant_relation": "mixed",
@@ -1347,11 +1347,11 @@
         "conflictual": 0,
         "neutral": 1,
         "mixed": 0,
-        "unclassified": 6
+        "unclassified": 5
       },
       "classified_events": 2,
-      "unclassified_events": 6,
-      "classification_coverage": 0.25,
+      "unclassified_events": 5,
+      "classification_coverage": 0.286,
       "relationship_label": "insufficient_evidence",
       "assessed_relationship": "insufficient_evidence",
       "evidence_status": "below_assessment_threshold",
@@ -2281,7 +2281,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 952,
+  "event_count": 933,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -2295,8 +2295,8 @@
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
       "equal_legacy_topic_share_fallback": 113,
-      "no_topic_evidence": 125,
-      "rule_based_topic_salience_v2": 714
+      "no_topic_evidence": 124,
+      "rule_based_topic_salience_v2": 696
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
     "note": "Topic prominence does not imply support, opposition or shared policy position."
