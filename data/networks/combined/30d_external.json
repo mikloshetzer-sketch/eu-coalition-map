@@ -26,7 +26,7 @@
     },
     {
       "id": "FR",
-      "weight": 36.45
+      "weight": 40.45
     },
     {
       "id": "GB",
@@ -78,7 +78,7 @@
     },
     {
       "id": "US",
-      "weight": 67.03
+      "weight": 71.03
     }
   ],
   "edges": [
@@ -538,11 +538,11 @@
     {
       "source": "FR",
       "target": "US",
-      "weight": 16.7,
-      "interaction_weight": 16.7,
-      "interaction_count": 3,
+      "weight": 20.7,
+      "interaction_weight": 20.7,
+      "interaction_count": 4,
       "topics": {
-        "defence": 9.6,
+        "defence": 13.6,
         "rule_of_law": 3.6,
         "trade": 3.5
       },
@@ -555,10 +555,10 @@
         "conflictual": 0,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 3
+        "unclassified": 4
       },
       "classified_events": 0,
-      "unclassified_events": 3,
+      "unclassified_events": 4,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -874,7 +874,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 67,
+  "event_count": 68,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -887,7 +887,7 @@
     "stance_inferred": false,
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
-      "equal_legacy_topic_share_fallback": 67
+      "equal_legacy_topic_share_fallback": 68
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
     "note": "Topic prominence does not imply support, opposition or shared policy position."
