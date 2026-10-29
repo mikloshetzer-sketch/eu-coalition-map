@@ -34,11 +34,11 @@
     },
     {
       "id": "IE",
-      "weight": 12.2
+      "weight": 16.68
     },
     {
       "id": "IT",
-      "weight": 21.85
+      "weight": 26.33
     },
     {
       "id": "LT",
@@ -663,11 +663,12 @@
     {
       "source": "IE",
       "target": "IT",
-      "weight": 5.62,
-      "interaction_weight": 5.62,
-      "interaction_count": 2,
+      "weight": 10.1,
+      "interaction_weight": 10.1,
+      "interaction_count": 4,
       "topics": {
-        "trade": 5.62
+        "trade": 5.62,
+        "defence": 4.48
       },
       "relationship_score": null,
       "dominant_relation": "unclassified",
@@ -678,10 +679,10 @@
         "conflictual": 0,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 2
+        "unclassified": 4
       },
       "classified_events": 0,
-      "unclassified_events": 2,
+      "unclassified_events": 4,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -732,8 +733,8 @@
     "stance_inferred": false,
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
-      "equal_legacy_topic_share_fallback": 114,
-      "no_topic_evidence": 102,
+      "equal_legacy_topic_share_fallback": 117,
+      "no_topic_evidence": 99,
       "rule_based_topic_salience_v2": 18
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
