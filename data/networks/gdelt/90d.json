@@ -30,7 +30,7 @@
     },
     {
       "id": "ES",
-      "weight": 52.3
+      "weight": 53.9
     },
     {
       "id": "FI",
@@ -42,7 +42,7 @@
     },
     {
       "id": "GB",
-      "weight": 218.37
+      "weight": 220.57
     },
     {
       "id": "GR",
@@ -98,7 +98,7 @@
     },
     {
       "id": "SE",
-      "weight": 6.2
+      "weight": 8.4
     },
     {
       "id": "TR",
@@ -110,7 +110,7 @@
     },
     {
       "id": "US",
-      "weight": 163.2
+      "weight": 164.8
     }
   ],
   "edges": [
@@ -1108,11 +1108,11 @@
     {
       "source": "ES",
       "target": "US",
-      "weight": 22.39,
-      "interaction_weight": 22.39,
-      "interaction_count": 7,
+      "weight": 23.99,
+      "interaction_weight": 23.99,
+      "interaction_count": 8,
       "topics": {
-        "defence": 13.94,
+        "defence": 15.54,
         "ukraine_russia": 3.95
       },
       "relationship_score": null,
@@ -1124,10 +1124,10 @@
         "conflictual": 0,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 7
+        "unclassified": 8
       },
       "classified_events": 0,
-      "unclassified_events": 7,
+      "unclassified_events": 8,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -1598,6 +1598,36 @@
       "interaction_count": 1,
       "topics": {
         "defence": 1.97
+      },
+      "relationship_score": null,
+      "dominant_relation": "unclassified",
+      "observed_relationship_label": "unclassified",
+      "relationship_confidence": null,
+      "relationship_counts": {
+        "cooperative": 0,
+        "conflictual": 0,
+        "neutral": 0,
+        "mixed": 0,
+        "unclassified": 1
+      },
+      "classified_events": 0,
+      "unclassified_events": 1,
+      "classification_coverage": 0.0,
+      "relationship_label": "unclassified",
+      "assessed_relationship": "unclassified",
+      "evidence_status": "no_classified_evidence",
+      "evidence_level": "none",
+      "evidence_sufficient": false,
+      "directional_consistency": 0.0
+    },
+    {
+      "source": "GB",
+      "target": "SE",
+      "weight": 2.2,
+      "interaction_weight": 2.2,
+      "interaction_count": 1,
+      "topics": {
+        "rule_of_law": 2.2
       },
       "relationship_score": null,
       "dominant_relation": "unclassified",
@@ -2134,7 +2164,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 225,
+  "event_count": 227,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -2147,7 +2177,7 @@
     "stance_inferred": false,
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
-      "equal_legacy_topic_share_fallback": 120,
+      "equal_legacy_topic_share_fallback": 122,
       "no_topic_evidence": 90,
       "rule_based_topic_salience_v2": 15
     },

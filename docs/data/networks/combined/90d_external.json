@@ -34,7 +34,7 @@
     },
     {
       "id": "ES",
-      "weight": 49.09
+      "weight": 50.69
     },
     {
       "id": "FI",
@@ -42,11 +42,11 @@
     },
     {
       "id": "FR",
-      "weight": 159.45
+      "weight": 158.45
     },
     {
       "id": "GB",
-      "weight": 243.37
+      "weight": 245.57
     },
     {
       "id": "GR",
@@ -102,11 +102,11 @@
     },
     {
       "id": "RU",
-      "weight": 196.26
+      "weight": 195.26
     },
     {
       "id": "SE",
-      "weight": 19.2
+      "weight": 21.4
     },
     {
       "id": "SK",
@@ -122,7 +122,7 @@
     },
     {
       "id": "US",
-      "weight": 168.2
+      "weight": 169.8
     }
   ],
   "edges": [
@@ -1075,11 +1075,11 @@
     {
       "source": "ES",
       "target": "US",
-      "weight": 23.39,
-      "interaction_weight": 23.39,
-      "interaction_count": 8,
+      "weight": 24.99,
+      "interaction_weight": 24.99,
+      "interaction_count": 9,
       "topics": {
-        "defence": 13.94,
+        "defence": 15.54,
         "ukraine_russia": 3.95,
         "migration": 1.0
       },
@@ -1092,10 +1092,10 @@
         "conflictual": 0,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 8
+        "unclassified": 9
       },
       "classified_events": 0,
-      "unclassified_events": 8,
+      "unclassified_events": 9,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -1239,11 +1239,11 @@
     {
       "source": "FR",
       "target": "RU",
-      "weight": 33.36,
-      "interaction_weight": 33.36,
-      "interaction_count": 26,
+      "weight": 32.36,
+      "interaction_weight": 32.36,
+      "interaction_count": 25,
       "topics": {
-        "ukraine_russia": 23.027,
+        "ukraine_russia": 22.027,
         "rule_of_law": 8.36,
         "defence": 1.107,
         "energy": 0.805,
@@ -1259,10 +1259,10 @@
         "conflictual": 0,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 26
+        "unclassified": 25
       },
       "classified_events": 0,
-      "unclassified_events": 26,
+      "unclassified_events": 25,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -1555,11 +1555,12 @@
     {
       "source": "GB",
       "target": "SE",
-      "weight": 7.0,
-      "interaction_weight": 7.0,
-      "interaction_count": 7,
+      "weight": 9.2,
+      "interaction_weight": 9.2,
+      "interaction_count": 8,
       "topics": {
         "migration": 4.167,
+        "rule_of_law": 2.2,
         "ukraine_russia": 1.195,
         "defence": 0.491,
         "energy": 0.118,
@@ -1574,10 +1575,10 @@
         "conflictual": 0,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 7
+        "unclassified": 8
       },
       "classified_events": 0,
-      "unclassified_events": 7,
+      "unclassified_events": 8,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -2652,7 +2653,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 797,
+  "event_count": 794,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -2665,9 +2666,9 @@
     "stance_inferred": false,
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
-      "equal_legacy_topic_share_fallback": 120,
+      "equal_legacy_topic_share_fallback": 122,
       "no_topic_evidence": 107,
-      "rule_based_topic_salience_v2": 570
+      "rule_based_topic_salience_v2": 565
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
     "note": "Topic prominence does not imply support, opposition or shared policy position."
