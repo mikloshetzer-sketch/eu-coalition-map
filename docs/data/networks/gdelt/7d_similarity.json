@@ -5,6 +5,10 @@
       "weight": 1
     },
     {
+      "id": "BG",
+      "weight": 1
+    },
+    {
       "id": "DE",
       "weight": 1
     },
@@ -14,10 +18,6 @@
     },
     {
       "id": "ES",
-      "weight": 1
-    },
-    {
-      "id": "FR",
       "weight": 1
     },
     {
@@ -41,6 +41,14 @@
       "weight": 1
     },
     {
+      "id": "TR",
+      "weight": 1
+    },
+    {
+      "id": "UA",
+      "weight": 1
+    },
+    {
       "id": "US",
       "weight": 1
     }
@@ -52,6 +60,51 @@
       "weight": 1.0
     },
     {
+      "source": "BG",
+      "target": "DE",
+      "weight": 0.707
+    },
+    {
+      "source": "BG",
+      "target": "DK",
+      "weight": 1.0
+    },
+    {
+      "source": "BG",
+      "target": "ES",
+      "weight": 1.0
+    },
+    {
+      "source": "BG",
+      "target": "GB",
+      "weight": 0.961
+    },
+    {
+      "source": "BG",
+      "target": "IE",
+      "weight": 1.0
+    },
+    {
+      "source": "BG",
+      "target": "IT",
+      "weight": 1.0
+    },
+    {
+      "source": "BG",
+      "target": "TR",
+      "weight": 1.0
+    },
+    {
+      "source": "BG",
+      "target": "UA",
+      "weight": 1.0
+    },
+    {
+      "source": "BG",
+      "target": "US",
+      "weight": 0.923
+    },
+    {
       "source": "DE",
       "target": "DK",
       "weight": 0.707
@@ -59,11 +112,6 @@
     {
       "source": "DE",
       "target": "ES",
-      "weight": 0.707
-    },
-    {
-      "source": "DE",
-      "target": "FR",
       "weight": 0.707
     },
     {
@@ -83,8 +131,18 @@
     },
     {
       "source": "DE",
+      "target": "TR",
+      "weight": 0.707
+    },
+    {
+      "source": "DE",
+      "target": "UA",
+      "weight": 0.707
+    },
+    {
+      "source": "DE",
       "target": "US",
-      "weight": 0.842
+      "weight": 0.924
     },
     {
       "source": "DK",
@@ -93,11 +151,6 @@
     },
     {
       "source": "DK",
-      "target": "FR",
-      "weight": 1.0
-    },
-    {
-      "source": "DK",
       "target": "GB",
       "weight": 0.961
     },
@@ -113,13 +166,18 @@
     },
     {
       "source": "DK",
-      "target": "US",
-      "weight": 0.977
+      "target": "TR",
+      "weight": 1.0
     },
     {
-      "source": "ES",
-      "target": "FR",
+      "source": "DK",
+      "target": "UA",
       "weight": 1.0
+    },
+    {
+      "source": "DK",
+      "target": "US",
+      "weight": 0.923
     },
     {
       "source": "ES",
@@ -138,28 +196,18 @@
     },
     {
       "source": "ES",
-      "target": "US",
-      "weight": 0.977
-    },
-    {
-      "source": "FR",
-      "target": "GB",
-      "weight": 0.961
-    },
-    {
-      "source": "FR",
-      "target": "IE",
+      "target": "TR",
       "weight": 1.0
     },
     {
-      "source": "FR",
-      "target": "IT",
+      "source": "ES",
+      "target": "UA",
       "weight": 1.0
     },
     {
-      "source": "FR",
+      "source": "ES",
       "target": "US",
-      "weight": 0.977
+      "weight": 0.923
     },
     {
       "source": "GB",
@@ -178,8 +226,18 @@
     },
     {
       "source": "GB",
+      "target": "TR",
+      "weight": 0.961
+    },
+    {
+      "source": "GB",
+      "target": "UA",
+      "weight": 0.961
+    },
+    {
+      "source": "GB",
       "target": "US",
-      "weight": 0.938
+      "weight": 0.887
     },
     {
       "source": "IE",
@@ -188,16 +246,51 @@
     },
     {
       "source": "IE",
+      "target": "TR",
+      "weight": 1.0
+    },
+    {
+      "source": "IE",
+      "target": "UA",
+      "weight": 1.0
+    },
+    {
+      "source": "IE",
       "target": "US",
-      "weight": 0.977
+      "weight": 0.923
+    },
+    {
+      "source": "IT",
+      "target": "TR",
+      "weight": 1.0
+    },
+    {
+      "source": "IT",
+      "target": "UA",
+      "weight": 1.0
     },
     {
       "source": "IT",
       "target": "US",
-      "weight": 0.977
+      "weight": 0.923
+    },
+    {
+      "source": "TR",
+      "target": "UA",
+      "weight": 1.0
+    },
+    {
+      "source": "TR",
+      "target": "US",
+      "weight": 0.923
+    },
+    {
+      "source": "UA",
+      "target": "US",
+      "weight": 0.923
     }
   ],
-  "event_count": 9,
+  "event_count": 12,
   "mode": "all",
   "method": "topic_salience_cosine_similarity_v2",
   "semantic_dimension": "salience_similarity",

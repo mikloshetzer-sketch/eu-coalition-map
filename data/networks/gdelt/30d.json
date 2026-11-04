@@ -10,7 +10,7 @@
     },
     {
       "id": "BG",
-      "weight": 6.02
+      "weight": 12.12
     },
     {
       "id": "CN",
@@ -26,7 +26,7 @@
     },
     {
       "id": "ES",
-      "weight": 24.18
+      "weight": 26.88
     },
     {
       "id": "FR",
@@ -46,11 +46,11 @@
     },
     {
       "id": "IE",
-      "weight": 30.69
+      "weight": 31.96
     },
     {
       "id": "IT",
-      "weight": 22.39
+      "weight": 23.66
     },
     {
       "id": "LU",
@@ -85,8 +85,12 @@
       "weight": 3.2
     },
     {
+      "id": "TR",
+      "weight": 6.1
+    },
+    {
       "id": "UA",
-      "weight": 7.02
+      "weight": 9.72
     },
     {
       "id": "US",
@@ -176,6 +180,36 @@
       },
       "classified_events": 0,
       "unclassified_events": 1,
+      "classification_coverage": 0.0,
+      "relationship_label": "unclassified",
+      "assessed_relationship": "unclassified",
+      "evidence_status": "no_classified_evidence",
+      "evidence_level": "none",
+      "evidence_sufficient": false,
+      "directional_consistency": 0.0
+    },
+    {
+      "source": "BG",
+      "target": "TR",
+      "weight": 6.1,
+      "interaction_weight": 6.1,
+      "interaction_count": 2,
+      "topics": {
+        "defence": 6.1
+      },
+      "relationship_score": null,
+      "dominant_relation": "unclassified",
+      "observed_relationship_label": "unclassified",
+      "relationship_confidence": null,
+      "relationship_counts": {
+        "cooperative": 0,
+        "conflictual": 0,
+        "neutral": 0,
+        "mixed": 0,
+        "unclassified": 2
+      },
+      "classified_events": 0,
+      "unclassified_events": 2,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -579,11 +613,11 @@
     {
       "source": "ES",
       "target": "UA",
-      "weight": 2.0,
-      "interaction_weight": 2.0,
-      "interaction_count": 1,
+      "weight": 4.7,
+      "interaction_weight": 4.7,
+      "interaction_count": 2,
       "topics": {
-        "defence": 2.0
+        "defence": 4.7
       },
       "relationship_score": null,
       "dominant_relation": "unclassified",
@@ -594,10 +628,10 @@
         "conflictual": 0,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 1
+        "unclassified": 2
       },
       "classified_events": 0,
-      "unclassified_events": 1,
+      "unclassified_events": 2,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -974,12 +1008,12 @@
     {
       "source": "IE",
       "target": "IT",
-      "weight": 10.1,
-      "interaction_weight": 10.1,
-      "interaction_count": 4,
+      "weight": 11.37,
+      "interaction_weight": 11.37,
+      "interaction_count": 5,
       "topics": {
-        "trade": 5.62,
-        "defence": 4.48
+        "defence": 5.75,
+        "trade": 5.62
       },
       "relationship_score": null,
       "dominant_relation": "unclassified",
@@ -990,10 +1024,10 @@
         "conflictual": 0,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 4
+        "unclassified": 5
       },
       "classified_events": 0,
-      "unclassified_events": 4,
+      "unclassified_events": 5,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -1124,7 +1158,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 53,
+  "event_count": 57,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -1137,7 +1171,7 @@
     "stance_inferred": false,
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
-      "equal_legacy_topic_share_fallback": 53
+      "equal_legacy_topic_share_fallback": 57
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
     "note": "Topic prominence does not imply support, opposition or shared policy position."

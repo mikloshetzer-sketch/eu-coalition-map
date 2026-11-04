@@ -5,6 +5,10 @@
       "weight": 1
     },
     {
+      "id": "BG",
+      "weight": 1
+    },
+    {
       "id": "DE",
       "weight": 1
     },
@@ -14,10 +18,6 @@
     },
     {
       "id": "ES",
-      "weight": 1
-    },
-    {
-      "id": "FR",
       "weight": 1
     },
     {
@@ -44,6 +44,31 @@
       "weight": 1.0
     },
     {
+      "source": "BG",
+      "target": "DE",
+      "weight": 0.707
+    },
+    {
+      "source": "BG",
+      "target": "DK",
+      "weight": 1.0
+    },
+    {
+      "source": "BG",
+      "target": "ES",
+      "weight": 1.0
+    },
+    {
+      "source": "BG",
+      "target": "IE",
+      "weight": 1.0
+    },
+    {
+      "source": "BG",
+      "target": "IT",
+      "weight": 1.0
+    },
+    {
       "source": "DE",
       "target": "DK",
       "weight": 0.707
@@ -55,11 +80,6 @@
     },
     {
       "source": "DE",
-      "target": "FR",
-      "weight": 0.707
-    },
-    {
-      "source": "DE",
       "target": "IE",
       "weight": 0.707
     },
@@ -75,11 +95,6 @@
     },
     {
       "source": "DK",
-      "target": "FR",
-      "weight": 1.0
-    },
-    {
-      "source": "DK",
       "target": "IE",
       "weight": 1.0
     },
@@ -90,26 +105,11 @@
     },
     {
       "source": "ES",
-      "target": "FR",
-      "weight": 1.0
-    },
-    {
-      "source": "ES",
       "target": "IE",
       "weight": 1.0
     },
     {
       "source": "ES",
-      "target": "IT",
-      "weight": 1.0
-    },
-    {
-      "source": "FR",
-      "target": "IE",
-      "weight": 1.0
-    },
-    {
-      "source": "FR",
       "target": "IT",
       "weight": 1.0
     },
@@ -119,7 +119,7 @@
       "weight": 1.0
     }
   ],
-  "event_count": 9,
+  "event_count": 12,
   "mode": "internal",
   "method": "topic_salience_cosine_similarity_v2",
   "semantic_dimension": "salience_similarity",
