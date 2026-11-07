@@ -2,8 +2,8 @@
   "layer": "combined",
   "mode": "internal",
   "window_days": 7,
-  "pair_count": 11,
-  "country_count": 8,
+  "pair_count": 10,
+  "country_count": 6,
   "weights": {
     "direct": 0.5,
     "similarity": 0.3,
@@ -33,45 +33,11 @@
   },
   "pairs": [
     {
-      "source": "BE",
-      "target": "LU",
+      "source": "IE",
+      "target": "IT",
       "score": 100.0,
       "band": "very_high",
       "direct_score": 100.0,
-      "similarity_score": 100.0,
-      "topic_score": 100.0,
-      "direct_weight": 2.8,
-      "similarity_weight": 1.0,
-      "score_meaning": "interaction_policy_affinity",
-      "semantic_relationship_score": null,
-      "dominant_relation": "unclassified",
-      "relationship_label": "unclassified",
-      "assessed_relationship": "unclassified",
-      "observed_relationship_label": "unclassified",
-      "evidence_status": "no_classified_evidence",
-      "evidence_level": "none",
-      "evidence_sufficient": false,
-      "directional_consistency": 0.0,
-      "relationship_confidence": null,
-      "classification_coverage": 0.0,
-      "interaction_count": 1,
-      "relationship_counts": {
-        "cooperative": 0,
-        "conflictual": 0,
-        "neutral": 0,
-        "mixed": 0,
-        "unclassified": 1
-      },
-      "topics": {
-        "trade": 2.8
-      }
-    },
-    {
-      "source": "IE",
-      "target": "IT",
-      "score": 72.68,
-      "band": "high",
-      "direct_score": 45.36,
       "similarity_score": 100.0,
       "topic_score": 100.0,
       "direct_weight": 1.27,
@@ -211,69 +177,17 @@
   ],
   "by_country": [
     {
-      "country": "BE",
-      "relationship_count": 1,
-      "average_score": 100.0,
-      "strongest_partner": "LU",
-      "strongest_score": 100.0,
-      "top_partners": [
-        {
-          "partner": "LU",
-          "score": 100.0,
-          "band": "very_high",
-          "direct_score": 100.0,
-          "similarity_score": 100.0,
-          "topic_score": 100.0,
-          "semantic_relationship_score": null,
-          "dominant_relation": "unclassified",
-          "relationship_label": "unclassified",
-          "assessed_relationship": "unclassified",
-          "observed_relationship_label": "unclassified",
-          "evidence_level": "none",
-          "evidence_sufficient": false,
-          "relationship_confidence": null,
-          "classification_coverage": 0.0
-        }
-      ]
-    },
-    {
-      "country": "LU",
-      "relationship_count": 1,
-      "average_score": 100.0,
-      "strongest_partner": "BE",
-      "strongest_score": 100.0,
-      "top_partners": [
-        {
-          "partner": "BE",
-          "score": 100.0,
-          "band": "very_high",
-          "direct_score": 100.0,
-          "similarity_score": 100.0,
-          "topic_score": 100.0,
-          "semantic_relationship_score": null,
-          "dominant_relation": "unclassified",
-          "relationship_label": "unclassified",
-          "assessed_relationship": "unclassified",
-          "observed_relationship_label": "unclassified",
-          "evidence_level": "none",
-          "evidence_sufficient": false,
-          "relationship_confidence": null,
-          "classification_coverage": 0.0
-        }
-      ]
-    },
-    {
       "country": "IE",
       "relationship_count": 4,
-      "average_score": 50.97,
+      "average_score": 57.8,
       "strongest_partner": "IT",
-      "strongest_score": 72.68,
+      "strongest_score": 100.0,
       "top_partners": [
         {
           "partner": "IT",
-          "score": 72.68,
-          "band": "high",
-          "direct_score": 45.36,
+          "score": 100.0,
+          "band": "very_high",
+          "direct_score": 100.0,
           "similarity_score": 100.0,
           "topic_score": 100.0,
           "semantic_relationship_score": null,
@@ -342,15 +256,15 @@
     {
       "country": "IT",
       "relationship_count": 4,
-      "average_score": 50.97,
+      "average_score": 57.8,
       "strongest_partner": "IE",
-      "strongest_score": 72.68,
+      "strongest_score": 100.0,
       "top_partners": [
         {
           "partner": "IE",
-          "score": 72.68,
-          "band": "high",
-          "direct_score": 45.36,
+          "score": 100.0,
+          "band": "very_high",
+          "direct_score": 100.0,
           "similarity_score": 100.0,
           "topic_score": 100.0,
           "semantic_relationship_score": null,
@@ -657,7 +571,7 @@
     }
   ],
   "current": {
-    "event_count": 9,
-    "graph_event_count": 9
+    "event_count": 8,
+    "graph_event_count": 8
   }
 }
