@@ -6,7 +6,7 @@
     },
     {
       "id": "CN",
-      "weight": 2.54
+      "weight": 4.24
     },
     {
       "id": "DE",
@@ -14,7 +14,7 @@
     },
     {
       "id": "DK",
-      "weight": 13.12
+      "weight": 7.6
     },
     {
       "id": "ES",
@@ -26,11 +26,7 @@
     },
     {
       "id": "GB",
-      "weight": 40.33
-    },
-    {
-      "id": "GR",
-      "weight": 1.4
+      "weight": 38.93
     },
     {
       "id": "IE",
@@ -50,7 +46,7 @@
     },
     {
       "id": "NL",
-      "weight": 7.5
+      "weight": 9.2
     },
     {
       "id": "PT",
@@ -58,7 +54,7 @@
     },
     {
       "id": "RU",
-      "weight": 10.72
+      "weight": 5.2
     },
     {
       "id": "SE",
@@ -201,11 +197,11 @@
     {
       "source": "CN",
       "target": "NL",
-      "weight": 1.0,
-      "interaction_weight": 1.0,
-      "interaction_count": 1,
+      "weight": 2.7,
+      "interaction_weight": 2.7,
+      "interaction_count": 2,
       "topics": {
-        "defence": 1.0
+        "defence": 2.7
       },
       "relationship_score": null,
       "dominant_relation": "unclassified",
@@ -216,10 +212,10 @@
         "conflictual": 0,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 1
+        "unclassified": 2
       },
       "classified_events": 0,
-      "unclassified_events": 1,
+      "unclassified_events": 2,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -327,36 +323,6 @@
       "interaction_count": 1,
       "topics": {
         "defence": 7.6
-      },
-      "relationship_score": null,
-      "dominant_relation": "unclassified",
-      "observed_relationship_label": "unclassified",
-      "relationship_confidence": null,
-      "relationship_counts": {
-        "cooperative": 0,
-        "conflictual": 0,
-        "neutral": 0,
-        "mixed": 0,
-        "unclassified": 1
-      },
-      "classified_events": 0,
-      "unclassified_events": 1,
-      "classification_coverage": 0.0,
-      "relationship_label": "unclassified",
-      "assessed_relationship": "unclassified",
-      "evidence_status": "no_classified_evidence",
-      "evidence_level": "none",
-      "evidence_sufficient": false,
-      "directional_consistency": 0.0
-    },
-    {
-      "source": "DK",
-      "target": "RU",
-      "weight": 5.52,
-      "interaction_weight": 5.52,
-      "interaction_count": 1,
-      "topics": {
-        "rule_of_law": 5.52
       },
       "relationship_score": null,
       "dominant_relation": "unclassified",
@@ -494,36 +460,6 @@
       },
       "classified_events": 0,
       "unclassified_events": 3,
-      "classification_coverage": 0.0,
-      "relationship_label": "unclassified",
-      "assessed_relationship": "unclassified",
-      "evidence_status": "no_classified_evidence",
-      "evidence_level": "none",
-      "evidence_sufficient": false,
-      "directional_consistency": 0.0
-    },
-    {
-      "source": "GB",
-      "target": "GR",
-      "weight": 1.4,
-      "interaction_weight": 1.4,
-      "interaction_count": 1,
-      "topics": {
-        "defence": 1.4
-      },
-      "relationship_score": null,
-      "dominant_relation": "unclassified",
-      "observed_relationship_label": "unclassified",
-      "relationship_confidence": null,
-      "relationship_counts": {
-        "cooperative": 0,
-        "conflictual": 0,
-        "neutral": 0,
-        "mixed": 0,
-        "unclassified": 1
-      },
-      "classified_events": 0,
-      "unclassified_events": 1,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -775,7 +711,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 48,
+  "event_count": 46,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -788,7 +724,7 @@
     "stance_inferred": false,
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
-      "equal_legacy_topic_share_fallback": 48
+      "equal_legacy_topic_share_fallback": 46
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
     "note": "Topic prominence does not imply support, opposition or shared policy position."
