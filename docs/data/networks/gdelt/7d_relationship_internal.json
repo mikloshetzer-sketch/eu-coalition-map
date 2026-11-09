@@ -2,8 +2,8 @@
   "layer": "gdelt",
   "mode": "internal",
   "window_days": 7,
-  "pair_count": 10,
-  "country_count": 6,
+  "pair_count": 16,
+  "country_count": 8,
   "weights": {
     "direct": 0.5,
     "similarity": 0.3,
@@ -33,11 +33,45 @@
   },
   "pairs": [
     {
-      "source": "IE",
-      "target": "IT",
+      "source": "DK",
+      "target": "SE",
       "score": 100.0,
       "band": "very_high",
       "direct_score": 100.0,
+      "similarity_score": 100.0,
+      "topic_score": 100.0,
+      "direct_weight": 8.5,
+      "similarity_weight": 1.0,
+      "score_meaning": "interaction_policy_affinity",
+      "semantic_relationship_score": null,
+      "dominant_relation": "unclassified",
+      "relationship_label": "unclassified",
+      "assessed_relationship": "unclassified",
+      "observed_relationship_label": "unclassified",
+      "evidence_status": "no_classified_evidence",
+      "evidence_level": "none",
+      "evidence_sufficient": false,
+      "directional_consistency": 0.0,
+      "relationship_confidence": null,
+      "classification_coverage": 0.0,
+      "interaction_count": 1,
+      "relationship_counts": {
+        "cooperative": 0,
+        "conflictual": 0,
+        "neutral": 0,
+        "mixed": 0,
+        "unclassified": 1
+      },
+      "topics": {
+        "rule_of_law": 8.5
+      }
+    },
+    {
+      "source": "IE",
+      "target": "IT",
+      "score": 57.47,
+      "band": "medium",
+      "direct_score": 14.94,
       "similarity_score": 100.0,
       "topic_score": 100.0,
       "direct_weight": 1.27,
@@ -65,6 +99,66 @@
       "topics": {
         "defence": 1.27
       }
+    },
+    {
+      "source": "BE",
+      "target": "BG",
+      "score": 50.0,
+      "band": "medium",
+      "direct_score": 0.0,
+      "similarity_score": 100.0,
+      "topic_score": 100.0,
+      "direct_weight": 0.0,
+      "similarity_weight": 1.0,
+      "score_meaning": "interaction_policy_affinity"
+    },
+    {
+      "source": "BE",
+      "target": "ES",
+      "score": 50.0,
+      "band": "medium",
+      "direct_score": 0.0,
+      "similarity_score": 100.0,
+      "topic_score": 100.0,
+      "direct_weight": 0.0,
+      "similarity_weight": 1.0,
+      "score_meaning": "interaction_policy_affinity"
+    },
+    {
+      "source": "BE",
+      "target": "IE",
+      "score": 50.0,
+      "band": "medium",
+      "direct_score": 0.0,
+      "similarity_score": 100.0,
+      "topic_score": 100.0,
+      "direct_weight": 0.0,
+      "similarity_weight": 1.0,
+      "score_meaning": "interaction_policy_affinity"
+    },
+    {
+      "source": "BE",
+      "target": "IT",
+      "score": 50.0,
+      "band": "medium",
+      "direct_score": 0.0,
+      "similarity_score": 100.0,
+      "topic_score": 100.0,
+      "direct_weight": 0.0,
+      "similarity_weight": 1.0,
+      "score_meaning": "interaction_policy_affinity"
+    },
+    {
+      "source": "BE",
+      "target": "NL",
+      "score": 50.0,
+      "band": "medium",
+      "direct_score": 0.0,
+      "similarity_score": 100.0,
+      "topic_score": 100.0,
+      "direct_weight": 0.0,
+      "similarity_weight": 1.0,
+      "score_meaning": "interaction_policy_affinity"
     },
     {
       "source": "BG",
@@ -177,17 +271,86 @@
   ],
   "by_country": [
     {
-      "country": "IE",
-      "relationship_count": 4,
-      "average_score": 62.5,
-      "strongest_partner": "IT",
+      "country": "DK",
+      "relationship_count": 1,
+      "average_score": 100.0,
+      "strongest_partner": "SE",
       "strongest_score": 100.0,
       "top_partners": [
         {
-          "partner": "IT",
+          "partner": "SE",
           "score": 100.0,
           "band": "very_high",
           "direct_score": 100.0,
+          "similarity_score": 100.0,
+          "topic_score": 100.0,
+          "semantic_relationship_score": null,
+          "dominant_relation": "unclassified",
+          "relationship_label": "unclassified",
+          "assessed_relationship": "unclassified",
+          "observed_relationship_label": "unclassified",
+          "evidence_level": "none",
+          "evidence_sufficient": false,
+          "relationship_confidence": null,
+          "classification_coverage": 0.0
+        }
+      ]
+    },
+    {
+      "country": "SE",
+      "relationship_count": 1,
+      "average_score": 100.0,
+      "strongest_partner": "DK",
+      "strongest_score": 100.0,
+      "top_partners": [
+        {
+          "partner": "DK",
+          "score": 100.0,
+          "band": "very_high",
+          "direct_score": 100.0,
+          "similarity_score": 100.0,
+          "topic_score": 100.0,
+          "semantic_relationship_score": null,
+          "dominant_relation": "unclassified",
+          "relationship_label": "unclassified",
+          "assessed_relationship": "unclassified",
+          "observed_relationship_label": "unclassified",
+          "evidence_level": "none",
+          "evidence_sufficient": false,
+          "relationship_confidence": null,
+          "classification_coverage": 0.0
+        }
+      ]
+    },
+    {
+      "country": "IE",
+      "relationship_count": 5,
+      "average_score": 51.49,
+      "strongest_partner": "IT",
+      "strongest_score": 57.47,
+      "top_partners": [
+        {
+          "partner": "IT",
+          "score": 57.47,
+          "band": "medium",
+          "direct_score": 14.94,
+          "similarity_score": 100.0,
+          "topic_score": 100.0,
+          "semantic_relationship_score": null,
+          "dominant_relation": "unclassified",
+          "relationship_label": "unclassified",
+          "assessed_relationship": "unclassified",
+          "observed_relationship_label": "unclassified",
+          "evidence_level": "none",
+          "evidence_sufficient": false,
+          "relationship_confidence": null,
+          "classification_coverage": 0.0
+        },
+        {
+          "partner": "BE",
+          "score": 50.0,
+          "band": "medium",
+          "direct_score": 0.0,
           "similarity_score": 100.0,
           "topic_score": 100.0,
           "semantic_relationship_score": null,
@@ -255,16 +418,33 @@
     },
     {
       "country": "IT",
-      "relationship_count": 4,
-      "average_score": 62.5,
+      "relationship_count": 5,
+      "average_score": 51.49,
       "strongest_partner": "IE",
-      "strongest_score": 100.0,
+      "strongest_score": 57.47,
       "top_partners": [
         {
           "partner": "IE",
-          "score": 100.0,
-          "band": "very_high",
-          "direct_score": 100.0,
+          "score": 57.47,
+          "band": "medium",
+          "direct_score": 14.94,
+          "similarity_score": 100.0,
+          "topic_score": 100.0,
+          "semantic_relationship_score": null,
+          "dominant_relation": "unclassified",
+          "relationship_label": "unclassified",
+          "assessed_relationship": "unclassified",
+          "observed_relationship_label": "unclassified",
+          "evidence_level": "none",
+          "evidence_sufficient": false,
+          "relationship_confidence": null,
+          "classification_coverage": 0.0
+        },
+        {
+          "partner": "BE",
+          "score": 50.0,
+          "band": "medium",
+          "direct_score": 0.0,
           "similarity_score": 100.0,
           "topic_score": 100.0,
           "semantic_relationship_score": null,
@@ -331,12 +511,123 @@
       ]
     },
     {
-      "country": "BG",
-      "relationship_count": 4,
+      "country": "BE",
+      "relationship_count": 5,
       "average_score": 50.0,
-      "strongest_partner": "ES",
+      "strongest_partner": "BG",
       "strongest_score": 50.0,
       "top_partners": [
+        {
+          "partner": "BG",
+          "score": 50.0,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 100.0,
+          "topic_score": 100.0,
+          "semantic_relationship_score": null,
+          "dominant_relation": "unclassified",
+          "relationship_label": "unclassified",
+          "assessed_relationship": "unclassified",
+          "observed_relationship_label": "unclassified",
+          "evidence_level": "none",
+          "evidence_sufficient": false,
+          "relationship_confidence": null,
+          "classification_coverage": 0.0
+        },
+        {
+          "partner": "ES",
+          "score": 50.0,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 100.0,
+          "topic_score": 100.0,
+          "semantic_relationship_score": null,
+          "dominant_relation": "unclassified",
+          "relationship_label": "unclassified",
+          "assessed_relationship": "unclassified",
+          "observed_relationship_label": "unclassified",
+          "evidence_level": "none",
+          "evidence_sufficient": false,
+          "relationship_confidence": null,
+          "classification_coverage": 0.0
+        },
+        {
+          "partner": "IE",
+          "score": 50.0,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 100.0,
+          "topic_score": 100.0,
+          "semantic_relationship_score": null,
+          "dominant_relation": "unclassified",
+          "relationship_label": "unclassified",
+          "assessed_relationship": "unclassified",
+          "observed_relationship_label": "unclassified",
+          "evidence_level": "none",
+          "evidence_sufficient": false,
+          "relationship_confidence": null,
+          "classification_coverage": 0.0
+        },
+        {
+          "partner": "IT",
+          "score": 50.0,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 100.0,
+          "topic_score": 100.0,
+          "semantic_relationship_score": null,
+          "dominant_relation": "unclassified",
+          "relationship_label": "unclassified",
+          "assessed_relationship": "unclassified",
+          "observed_relationship_label": "unclassified",
+          "evidence_level": "none",
+          "evidence_sufficient": false,
+          "relationship_confidence": null,
+          "classification_coverage": 0.0
+        },
+        {
+          "partner": "NL",
+          "score": 50.0,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 100.0,
+          "topic_score": 100.0,
+          "semantic_relationship_score": null,
+          "dominant_relation": "unclassified",
+          "relationship_label": "unclassified",
+          "assessed_relationship": "unclassified",
+          "observed_relationship_label": "unclassified",
+          "evidence_level": "none",
+          "evidence_sufficient": false,
+          "relationship_confidence": null,
+          "classification_coverage": 0.0
+        }
+      ]
+    },
+    {
+      "country": "BG",
+      "relationship_count": 5,
+      "average_score": 50.0,
+      "strongest_partner": "BE",
+      "strongest_score": 50.0,
+      "top_partners": [
+        {
+          "partner": "BE",
+          "score": 50.0,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 100.0,
+          "topic_score": 100.0,
+          "semantic_relationship_score": null,
+          "dominant_relation": "unclassified",
+          "relationship_label": "unclassified",
+          "assessed_relationship": "unclassified",
+          "observed_relationship_label": "unclassified",
+          "evidence_level": "none",
+          "evidence_sufficient": false,
+          "relationship_confidence": null,
+          "classification_coverage": 0.0
+        },
         {
           "partner": "ES",
           "score": 50.0,
@@ -409,11 +700,28 @@
     },
     {
       "country": "ES",
-      "relationship_count": 4,
+      "relationship_count": 5,
       "average_score": 50.0,
-      "strongest_partner": "BG",
+      "strongest_partner": "BE",
       "strongest_score": 50.0,
       "top_partners": [
+        {
+          "partner": "BE",
+          "score": 50.0,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 100.0,
+          "topic_score": 100.0,
+          "semantic_relationship_score": null,
+          "dominant_relation": "unclassified",
+          "relationship_label": "unclassified",
+          "assessed_relationship": "unclassified",
+          "observed_relationship_label": "unclassified",
+          "evidence_level": "none",
+          "evidence_sufficient": false,
+          "relationship_confidence": null,
+          "classification_coverage": 0.0
+        },
         {
           "partner": "BG",
           "score": 50.0,
@@ -486,11 +794,28 @@
     },
     {
       "country": "NL",
-      "relationship_count": 4,
+      "relationship_count": 5,
       "average_score": 50.0,
-      "strongest_partner": "BG",
+      "strongest_partner": "BE",
       "strongest_score": 50.0,
       "top_partners": [
+        {
+          "partner": "BE",
+          "score": 50.0,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 100.0,
+          "topic_score": 100.0,
+          "semantic_relationship_score": null,
+          "dominant_relation": "unclassified",
+          "relationship_label": "unclassified",
+          "assessed_relationship": "unclassified",
+          "observed_relationship_label": "unclassified",
+          "evidence_level": "none",
+          "evidence_sufficient": false,
+          "relationship_confidence": null,
+          "classification_coverage": 0.0
+        },
         {
           "partner": "BG",
           "score": 50.0,
@@ -560,18 +885,10 @@
           "classification_coverage": 0.0
         }
       ]
-    },
-    {
-      "country": "SE",
-      "relationship_count": 0,
-      "average_score": 0.0,
-      "strongest_partner": null,
-      "strongest_score": null,
-      "top_partners": []
     }
   ],
   "current": {
-    "event_count": 7,
-    "graph_event_count": 7
+    "event_count": 10,
+    "graph_event_count": 10
   }
 }

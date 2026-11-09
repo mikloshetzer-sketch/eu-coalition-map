@@ -3,13 +3,13 @@
   "mode": "internal",
   "window_days": 7,
   "current": {
-    "event_count": 7,
+    "event_count": 10,
     "relationship_index": {
       "layer": "combined",
       "mode": "internal",
       "window_days": 7,
-      "pair_count": 10,
-      "country_count": 6,
+      "pair_count": 16,
+      "country_count": 8,
       "weights": {
         "direct": 0.5,
         "similarity": 0.3,
@@ -39,11 +39,45 @@
       },
       "pairs": [
         {
-          "source": "IE",
-          "target": "IT",
+          "source": "DK",
+          "target": "SE",
           "score": 100.0,
           "band": "very_high",
           "direct_score": 100.0,
+          "similarity_score": 100.0,
+          "topic_score": 100.0,
+          "direct_weight": 8.5,
+          "similarity_weight": 1.0,
+          "score_meaning": "interaction_policy_affinity",
+          "semantic_relationship_score": null,
+          "dominant_relation": "unclassified",
+          "relationship_label": "unclassified",
+          "assessed_relationship": "unclassified",
+          "observed_relationship_label": "unclassified",
+          "evidence_status": "no_classified_evidence",
+          "evidence_level": "none",
+          "evidence_sufficient": false,
+          "directional_consistency": 0.0,
+          "relationship_confidence": null,
+          "classification_coverage": 0.0,
+          "interaction_count": 1,
+          "relationship_counts": {
+            "cooperative": 0,
+            "conflictual": 0,
+            "neutral": 0,
+            "mixed": 0,
+            "unclassified": 1
+          },
+          "topics": {
+            "rule_of_law": 8.5
+          }
+        },
+        {
+          "source": "IE",
+          "target": "IT",
+          "score": 57.47,
+          "band": "medium",
+          "direct_score": 14.94,
           "similarity_score": 100.0,
           "topic_score": 100.0,
           "direct_weight": 1.27,
@@ -71,6 +105,66 @@
           "topics": {
             "defence": 1.27
           }
+        },
+        {
+          "source": "BE",
+          "target": "BG",
+          "score": 50.0,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 100.0,
+          "topic_score": 100.0,
+          "direct_weight": 0.0,
+          "similarity_weight": 1.0,
+          "score_meaning": "interaction_policy_affinity"
+        },
+        {
+          "source": "BE",
+          "target": "ES",
+          "score": 50.0,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 100.0,
+          "topic_score": 100.0,
+          "direct_weight": 0.0,
+          "similarity_weight": 1.0,
+          "score_meaning": "interaction_policy_affinity"
+        },
+        {
+          "source": "BE",
+          "target": "IE",
+          "score": 50.0,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 100.0,
+          "topic_score": 100.0,
+          "direct_weight": 0.0,
+          "similarity_weight": 1.0,
+          "score_meaning": "interaction_policy_affinity"
+        },
+        {
+          "source": "BE",
+          "target": "IT",
+          "score": 50.0,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 100.0,
+          "topic_score": 100.0,
+          "direct_weight": 0.0,
+          "similarity_weight": 1.0,
+          "score_meaning": "interaction_policy_affinity"
+        },
+        {
+          "source": "BE",
+          "target": "NL",
+          "score": 50.0,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 100.0,
+          "topic_score": 100.0,
+          "direct_weight": 0.0,
+          "similarity_weight": 1.0,
+          "score_meaning": "interaction_policy_affinity"
         },
         {
           "source": "BG",
@@ -183,17 +277,86 @@
       ],
       "by_country": [
         {
-          "country": "IE",
-          "relationship_count": 4,
-          "average_score": 62.5,
-          "strongest_partner": "IT",
+          "country": "DK",
+          "relationship_count": 1,
+          "average_score": 100.0,
+          "strongest_partner": "SE",
           "strongest_score": 100.0,
           "top_partners": [
             {
-              "partner": "IT",
+              "partner": "SE",
               "score": 100.0,
               "band": "very_high",
               "direct_score": 100.0,
+              "similarity_score": 100.0,
+              "topic_score": 100.0,
+              "semantic_relationship_score": null,
+              "dominant_relation": "unclassified",
+              "relationship_label": "unclassified",
+              "assessed_relationship": "unclassified",
+              "observed_relationship_label": "unclassified",
+              "evidence_level": "none",
+              "evidence_sufficient": false,
+              "relationship_confidence": null,
+              "classification_coverage": 0.0
+            }
+          ]
+        },
+        {
+          "country": "SE",
+          "relationship_count": 1,
+          "average_score": 100.0,
+          "strongest_partner": "DK",
+          "strongest_score": 100.0,
+          "top_partners": [
+            {
+              "partner": "DK",
+              "score": 100.0,
+              "band": "very_high",
+              "direct_score": 100.0,
+              "similarity_score": 100.0,
+              "topic_score": 100.0,
+              "semantic_relationship_score": null,
+              "dominant_relation": "unclassified",
+              "relationship_label": "unclassified",
+              "assessed_relationship": "unclassified",
+              "observed_relationship_label": "unclassified",
+              "evidence_level": "none",
+              "evidence_sufficient": false,
+              "relationship_confidence": null,
+              "classification_coverage": 0.0
+            }
+          ]
+        },
+        {
+          "country": "IE",
+          "relationship_count": 5,
+          "average_score": 51.49,
+          "strongest_partner": "IT",
+          "strongest_score": 57.47,
+          "top_partners": [
+            {
+              "partner": "IT",
+              "score": 57.47,
+              "band": "medium",
+              "direct_score": 14.94,
+              "similarity_score": 100.0,
+              "topic_score": 100.0,
+              "semantic_relationship_score": null,
+              "dominant_relation": "unclassified",
+              "relationship_label": "unclassified",
+              "assessed_relationship": "unclassified",
+              "observed_relationship_label": "unclassified",
+              "evidence_level": "none",
+              "evidence_sufficient": false,
+              "relationship_confidence": null,
+              "classification_coverage": 0.0
+            },
+            {
+              "partner": "BE",
+              "score": 50.0,
+              "band": "medium",
+              "direct_score": 0.0,
               "similarity_score": 100.0,
               "topic_score": 100.0,
               "semantic_relationship_score": null,
@@ -261,16 +424,33 @@
         },
         {
           "country": "IT",
-          "relationship_count": 4,
-          "average_score": 62.5,
+          "relationship_count": 5,
+          "average_score": 51.49,
           "strongest_partner": "IE",
-          "strongest_score": 100.0,
+          "strongest_score": 57.47,
           "top_partners": [
             {
               "partner": "IE",
-              "score": 100.0,
-              "band": "very_high",
-              "direct_score": 100.0,
+              "score": 57.47,
+              "band": "medium",
+              "direct_score": 14.94,
+              "similarity_score": 100.0,
+              "topic_score": 100.0,
+              "semantic_relationship_score": null,
+              "dominant_relation": "unclassified",
+              "relationship_label": "unclassified",
+              "assessed_relationship": "unclassified",
+              "observed_relationship_label": "unclassified",
+              "evidence_level": "none",
+              "evidence_sufficient": false,
+              "relationship_confidence": null,
+              "classification_coverage": 0.0
+            },
+            {
+              "partner": "BE",
+              "score": 50.0,
+              "band": "medium",
+              "direct_score": 0.0,
               "similarity_score": 100.0,
               "topic_score": 100.0,
               "semantic_relationship_score": null,
@@ -337,12 +517,123 @@
           ]
         },
         {
-          "country": "BG",
-          "relationship_count": 4,
+          "country": "BE",
+          "relationship_count": 5,
           "average_score": 50.0,
-          "strongest_partner": "ES",
+          "strongest_partner": "BG",
           "strongest_score": 50.0,
           "top_partners": [
+            {
+              "partner": "BG",
+              "score": 50.0,
+              "band": "medium",
+              "direct_score": 0.0,
+              "similarity_score": 100.0,
+              "topic_score": 100.0,
+              "semantic_relationship_score": null,
+              "dominant_relation": "unclassified",
+              "relationship_label": "unclassified",
+              "assessed_relationship": "unclassified",
+              "observed_relationship_label": "unclassified",
+              "evidence_level": "none",
+              "evidence_sufficient": false,
+              "relationship_confidence": null,
+              "classification_coverage": 0.0
+            },
+            {
+              "partner": "ES",
+              "score": 50.0,
+              "band": "medium",
+              "direct_score": 0.0,
+              "similarity_score": 100.0,
+              "topic_score": 100.0,
+              "semantic_relationship_score": null,
+              "dominant_relation": "unclassified",
+              "relationship_label": "unclassified",
+              "assessed_relationship": "unclassified",
+              "observed_relationship_label": "unclassified",
+              "evidence_level": "none",
+              "evidence_sufficient": false,
+              "relationship_confidence": null,
+              "classification_coverage": 0.0
+            },
+            {
+              "partner": "IE",
+              "score": 50.0,
+              "band": "medium",
+              "direct_score": 0.0,
+              "similarity_score": 100.0,
+              "topic_score": 100.0,
+              "semantic_relationship_score": null,
+              "dominant_relation": "unclassified",
+              "relationship_label": "unclassified",
+              "assessed_relationship": "unclassified",
+              "observed_relationship_label": "unclassified",
+              "evidence_level": "none",
+              "evidence_sufficient": false,
+              "relationship_confidence": null,
+              "classification_coverage": 0.0
+            },
+            {
+              "partner": "IT",
+              "score": 50.0,
+              "band": "medium",
+              "direct_score": 0.0,
+              "similarity_score": 100.0,
+              "topic_score": 100.0,
+              "semantic_relationship_score": null,
+              "dominant_relation": "unclassified",
+              "relationship_label": "unclassified",
+              "assessed_relationship": "unclassified",
+              "observed_relationship_label": "unclassified",
+              "evidence_level": "none",
+              "evidence_sufficient": false,
+              "relationship_confidence": null,
+              "classification_coverage": 0.0
+            },
+            {
+              "partner": "NL",
+              "score": 50.0,
+              "band": "medium",
+              "direct_score": 0.0,
+              "similarity_score": 100.0,
+              "topic_score": 100.0,
+              "semantic_relationship_score": null,
+              "dominant_relation": "unclassified",
+              "relationship_label": "unclassified",
+              "assessed_relationship": "unclassified",
+              "observed_relationship_label": "unclassified",
+              "evidence_level": "none",
+              "evidence_sufficient": false,
+              "relationship_confidence": null,
+              "classification_coverage": 0.0
+            }
+          ]
+        },
+        {
+          "country": "BG",
+          "relationship_count": 5,
+          "average_score": 50.0,
+          "strongest_partner": "BE",
+          "strongest_score": 50.0,
+          "top_partners": [
+            {
+              "partner": "BE",
+              "score": 50.0,
+              "band": "medium",
+              "direct_score": 0.0,
+              "similarity_score": 100.0,
+              "topic_score": 100.0,
+              "semantic_relationship_score": null,
+              "dominant_relation": "unclassified",
+              "relationship_label": "unclassified",
+              "assessed_relationship": "unclassified",
+              "observed_relationship_label": "unclassified",
+              "evidence_level": "none",
+              "evidence_sufficient": false,
+              "relationship_confidence": null,
+              "classification_coverage": 0.0
+            },
             {
               "partner": "ES",
               "score": 50.0,
@@ -415,11 +706,28 @@
         },
         {
           "country": "ES",
-          "relationship_count": 4,
+          "relationship_count": 5,
           "average_score": 50.0,
-          "strongest_partner": "BG",
+          "strongest_partner": "BE",
           "strongest_score": 50.0,
           "top_partners": [
+            {
+              "partner": "BE",
+              "score": 50.0,
+              "band": "medium",
+              "direct_score": 0.0,
+              "similarity_score": 100.0,
+              "topic_score": 100.0,
+              "semantic_relationship_score": null,
+              "dominant_relation": "unclassified",
+              "relationship_label": "unclassified",
+              "assessed_relationship": "unclassified",
+              "observed_relationship_label": "unclassified",
+              "evidence_level": "none",
+              "evidence_sufficient": false,
+              "relationship_confidence": null,
+              "classification_coverage": 0.0
+            },
             {
               "partner": "BG",
               "score": 50.0,
@@ -492,11 +800,28 @@
         },
         {
           "country": "NL",
-          "relationship_count": 4,
+          "relationship_count": 5,
           "average_score": 50.0,
-          "strongest_partner": "BG",
+          "strongest_partner": "BE",
           "strongest_score": 50.0,
           "top_partners": [
+            {
+              "partner": "BE",
+              "score": 50.0,
+              "band": "medium",
+              "direct_score": 0.0,
+              "similarity_score": 100.0,
+              "topic_score": 100.0,
+              "semantic_relationship_score": null,
+              "dominant_relation": "unclassified",
+              "relationship_label": "unclassified",
+              "assessed_relationship": "unclassified",
+              "observed_relationship_label": "unclassified",
+              "evidence_level": "none",
+              "evidence_sufficient": false,
+              "relationship_confidence": null,
+              "classification_coverage": 0.0
+            },
             {
               "partner": "BG",
               "score": 50.0,
@@ -566,26 +891,18 @@
               "classification_coverage": 0.0
             }
           ]
-        },
-        {
-          "country": "SE",
-          "relationship_count": 0,
-          "average_score": 0.0,
-          "strongest_partner": null,
-          "strongest_score": null,
-          "top_partners": []
         }
       ]
     }
   },
   "previous": {
-    "event_count": 7,
+    "event_count": 9,
     "relationship_index": {
       "layer": "combined",
       "mode": "internal",
       "window_days": 7,
-      "pair_count": 11,
-      "country_count": 7,
+      "pair_count": 16,
+      "country_count": 9,
       "weights": {
         "direct": 0.5,
         "similarity": 0.3,
@@ -684,6 +1001,18 @@
         },
         {
           "source": "DK",
+          "target": "ES",
+          "score": 50.0,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 100.0,
+          "topic_score": 100.0,
+          "direct_weight": 0.0,
+          "similarity_weight": 1.0,
+          "score_meaning": "interaction_policy_affinity"
+        },
+        {
+          "source": "DK",
           "target": "FR",
           "score": 50.0,
           "band": "medium",
@@ -708,6 +1037,42 @@
         },
         {
           "source": "DK",
+          "target": "IT",
+          "score": 50.0,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 100.0,
+          "topic_score": 100.0,
+          "direct_weight": 0.0,
+          "similarity_weight": 1.0,
+          "score_meaning": "interaction_policy_affinity"
+        },
+        {
+          "source": "ES",
+          "target": "FR",
+          "score": 50.0,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 100.0,
+          "topic_score": 100.0,
+          "direct_weight": 0.0,
+          "similarity_weight": 1.0,
+          "score_meaning": "interaction_policy_affinity"
+        },
+        {
+          "source": "ES",
+          "target": "IE",
+          "score": 50.0,
+          "band": "medium",
+          "direct_score": 0.0,
+          "similarity_score": 100.0,
+          "topic_score": 100.0,
+          "direct_weight": 0.0,
+          "similarity_weight": 1.0,
+          "score_meaning": "interaction_policy_affinity"
+        },
+        {
+          "source": "ES",
           "target": "IT",
           "score": 50.0,
           "band": "medium",
@@ -745,6 +1110,18 @@
         {
           "source": "DE",
           "target": "DK",
+          "score": 31.21,
+          "band": "low",
+          "direct_score": 0.0,
+          "similarity_score": 70.7,
+          "topic_score": 50.0,
+          "direct_weight": 0.0,
+          "similarity_weight": 0.707,
+          "score_meaning": "interaction_policy_affinity"
+        },
+        {
+          "source": "DE",
+          "target": "ES",
           "score": 31.21,
           "band": "low",
           "direct_score": 0.0,
@@ -846,8 +1223,8 @@
         },
         {
           "country": "IE",
-          "relationship_count": 4,
-          "average_score": 57.8,
+          "relationship_count": 5,
+          "average_score": 56.24,
           "strongest_partner": "IT",
           "strongest_score": 100.0,
           "top_partners": [
@@ -870,6 +1247,23 @@
             },
             {
               "partner": "DK",
+              "score": 50.0,
+              "band": "medium",
+              "direct_score": 0.0,
+              "similarity_score": 100.0,
+              "topic_score": 100.0,
+              "semantic_relationship_score": null,
+              "dominant_relation": "unclassified",
+              "relationship_label": "unclassified",
+              "assessed_relationship": "unclassified",
+              "observed_relationship_label": "unclassified",
+              "evidence_level": "none",
+              "evidence_sufficient": false,
+              "relationship_confidence": null,
+              "classification_coverage": 0.0
+            },
+            {
+              "partner": "ES",
               "score": 50.0,
               "band": "medium",
               "direct_score": 0.0,
@@ -923,8 +1317,8 @@
         },
         {
           "country": "IT",
-          "relationship_count": 4,
-          "average_score": 57.8,
+          "relationship_count": 5,
+          "average_score": 56.24,
           "strongest_partner": "IE",
           "strongest_score": 100.0,
           "top_partners": [
@@ -947,6 +1341,23 @@
             },
             {
               "partner": "DK",
+              "score": 50.0,
+              "band": "medium",
+              "direct_score": 0.0,
+              "similarity_score": 100.0,
+              "topic_score": 100.0,
+              "semantic_relationship_score": null,
+              "dominant_relation": "unclassified",
+              "relationship_label": "unclassified",
+              "assessed_relationship": "unclassified",
+              "observed_relationship_label": "unclassified",
+              "evidence_level": "none",
+              "evidence_sufficient": false,
+              "relationship_confidence": null,
+              "classification_coverage": 0.0
+            },
+            {
+              "partner": "ES",
               "score": 50.0,
               "band": "medium",
               "direct_score": 0.0,
@@ -1000,11 +1411,122 @@
         },
         {
           "country": "DK",
-          "relationship_count": 4,
-          "average_score": 45.3,
-          "strongest_partner": "FR",
+          "relationship_count": 5,
+          "average_score": 46.24,
+          "strongest_partner": "ES",
           "strongest_score": 50.0,
           "top_partners": [
+            {
+              "partner": "ES",
+              "score": 50.0,
+              "band": "medium",
+              "direct_score": 0.0,
+              "similarity_score": 100.0,
+              "topic_score": 100.0,
+              "semantic_relationship_score": null,
+              "dominant_relation": "unclassified",
+              "relationship_label": "unclassified",
+              "assessed_relationship": "unclassified",
+              "observed_relationship_label": "unclassified",
+              "evidence_level": "none",
+              "evidence_sufficient": false,
+              "relationship_confidence": null,
+              "classification_coverage": 0.0
+            },
+            {
+              "partner": "FR",
+              "score": 50.0,
+              "band": "medium",
+              "direct_score": 0.0,
+              "similarity_score": 100.0,
+              "topic_score": 100.0,
+              "semantic_relationship_score": null,
+              "dominant_relation": "unclassified",
+              "relationship_label": "unclassified",
+              "assessed_relationship": "unclassified",
+              "observed_relationship_label": "unclassified",
+              "evidence_level": "none",
+              "evidence_sufficient": false,
+              "relationship_confidence": null,
+              "classification_coverage": 0.0
+            },
+            {
+              "partner": "IE",
+              "score": 50.0,
+              "band": "medium",
+              "direct_score": 0.0,
+              "similarity_score": 100.0,
+              "topic_score": 100.0,
+              "semantic_relationship_score": null,
+              "dominant_relation": "unclassified",
+              "relationship_label": "unclassified",
+              "assessed_relationship": "unclassified",
+              "observed_relationship_label": "unclassified",
+              "evidence_level": "none",
+              "evidence_sufficient": false,
+              "relationship_confidence": null,
+              "classification_coverage": 0.0
+            },
+            {
+              "partner": "IT",
+              "score": 50.0,
+              "band": "medium",
+              "direct_score": 0.0,
+              "similarity_score": 100.0,
+              "topic_score": 100.0,
+              "semantic_relationship_score": null,
+              "dominant_relation": "unclassified",
+              "relationship_label": "unclassified",
+              "assessed_relationship": "unclassified",
+              "observed_relationship_label": "unclassified",
+              "evidence_level": "none",
+              "evidence_sufficient": false,
+              "relationship_confidence": null,
+              "classification_coverage": 0.0
+            },
+            {
+              "partner": "DE",
+              "score": 31.21,
+              "band": "low",
+              "direct_score": 0.0,
+              "similarity_score": 70.7,
+              "topic_score": 50.0,
+              "semantic_relationship_score": null,
+              "dominant_relation": "unclassified",
+              "relationship_label": "unclassified",
+              "assessed_relationship": "unclassified",
+              "observed_relationship_label": "unclassified",
+              "evidence_level": "none",
+              "evidence_sufficient": false,
+              "relationship_confidence": null,
+              "classification_coverage": 0.0
+            }
+          ]
+        },
+        {
+          "country": "ES",
+          "relationship_count": 5,
+          "average_score": 46.24,
+          "strongest_partner": "DK",
+          "strongest_score": 50.0,
+          "top_partners": [
+            {
+              "partner": "DK",
+              "score": 50.0,
+              "band": "medium",
+              "direct_score": 0.0,
+              "similarity_score": 100.0,
+              "topic_score": 100.0,
+              "semantic_relationship_score": null,
+              "dominant_relation": "unclassified",
+              "relationship_label": "unclassified",
+              "assessed_relationship": "unclassified",
+              "observed_relationship_label": "unclassified",
+              "evidence_level": "none",
+              "evidence_sufficient": false,
+              "relationship_confidence": null,
+              "classification_coverage": 0.0
+            },
             {
               "partner": "FR",
               "score": 50.0,
@@ -1077,13 +1599,30 @@
         },
         {
           "country": "FR",
-          "relationship_count": 4,
-          "average_score": 45.3,
+          "relationship_count": 5,
+          "average_score": 46.24,
           "strongest_partner": "DK",
           "strongest_score": 50.0,
           "top_partners": [
             {
               "partner": "DK",
+              "score": 50.0,
+              "band": "medium",
+              "direct_score": 0.0,
+              "similarity_score": 100.0,
+              "topic_score": 100.0,
+              "semantic_relationship_score": null,
+              "dominant_relation": "unclassified",
+              "relationship_label": "unclassified",
+              "assessed_relationship": "unclassified",
+              "observed_relationship_label": "unclassified",
+              "evidence_level": "none",
+              "evidence_sufficient": false,
+              "relationship_confidence": null,
+              "classification_coverage": 0.0
+            },
+            {
+              "partner": "ES",
               "score": 50.0,
               "band": "medium",
               "direct_score": 0.0,
@@ -1154,13 +1693,30 @@
         },
         {
           "country": "DE",
-          "relationship_count": 4,
+          "relationship_count": 5,
           "average_score": 31.21,
           "strongest_partner": "DK",
           "strongest_score": 31.21,
           "top_partners": [
             {
               "partner": "DK",
+              "score": 31.21,
+              "band": "low",
+              "direct_score": 0.0,
+              "similarity_score": 70.7,
+              "topic_score": 50.0,
+              "semantic_relationship_score": null,
+              "dominant_relation": "unclassified",
+              "relationship_label": "unclassified",
+              "assessed_relationship": "unclassified",
+              "observed_relationship_label": "unclassified",
+              "evidence_level": "none",
+              "evidence_sufficient": false,
+              "relationship_confidence": null,
+              "classification_coverage": 0.0
+            },
+            {
+              "partner": "ES",
               "score": 31.21,
               "band": "low",
               "direct_score": 0.0,
@@ -1228,11 +1784,33 @@
               "classification_coverage": 0.0
             }
           ]
+        },
+        {
+          "country": "SE",
+          "relationship_count": 0,
+          "average_score": 0.0,
+          "strongest_partner": null,
+          "strongest_score": null,
+          "top_partners": []
         }
       ]
     }
   },
   "pair_changes": [
+    {
+      "source": "DK",
+      "target": "SE",
+      "current_score": 100.0,
+      "previous_score": 0.0,
+      "delta": 100.0,
+      "status": "gained",
+      "current_band": "very_high",
+      "previous_band": null,
+      "current_semantic_relationship_score": null,
+      "previous_semantic_relationship_score": null,
+      "current_relation": "unclassified",
+      "previous_relation": null
+    },
     {
       "source": "BE",
       "target": "LU",
@@ -1246,6 +1824,76 @@
       "previous_semantic_relationship_score": null,
       "current_relation": null,
       "previous_relation": "unclassified"
+    },
+    {
+      "source": "BE",
+      "target": "BG",
+      "current_score": 50.0,
+      "previous_score": 0.0,
+      "delta": 50.0,
+      "status": "gained",
+      "current_band": "medium",
+      "previous_band": null,
+      "current_semantic_relationship_score": null,
+      "previous_semantic_relationship_score": null,
+      "current_relation": null,
+      "previous_relation": null
+    },
+    {
+      "source": "BE",
+      "target": "ES",
+      "current_score": 50.0,
+      "previous_score": 0.0,
+      "delta": 50.0,
+      "status": "gained",
+      "current_band": "medium",
+      "previous_band": null,
+      "current_semantic_relationship_score": null,
+      "previous_semantic_relationship_score": null,
+      "current_relation": null,
+      "previous_relation": null
+    },
+    {
+      "source": "BE",
+      "target": "IE",
+      "current_score": 50.0,
+      "previous_score": 0.0,
+      "delta": 50.0,
+      "status": "gained",
+      "current_band": "medium",
+      "previous_band": null,
+      "current_semantic_relationship_score": null,
+      "previous_semantic_relationship_score": null,
+      "current_relation": null,
+      "previous_relation": null
+    },
+    {
+      "source": "BE",
+      "target": "IT",
+      "current_score": 50.0,
+      "previous_score": 0.0,
+      "delta": 50.0,
+      "status": "gained",
+      "current_band": "medium",
+      "previous_band": null,
+      "current_semantic_relationship_score": null,
+      "previous_semantic_relationship_score": null,
+      "current_relation": null,
+      "previous_relation": null
+    },
+    {
+      "source": "BE",
+      "target": "NL",
+      "current_score": 50.0,
+      "previous_score": 0.0,
+      "delta": 50.0,
+      "status": "gained",
+      "current_band": "medium",
+      "previous_band": null,
+      "current_semantic_relationship_score": null,
+      "previous_semantic_relationship_score": null,
+      "current_relation": null,
+      "previous_relation": null
     },
     {
       "source": "BG",
@@ -1305,6 +1953,20 @@
     },
     {
       "source": "DK",
+      "target": "ES",
+      "current_score": 0.0,
+      "previous_score": 50.0,
+      "delta": -50.0,
+      "status": "lost",
+      "current_band": null,
+      "previous_band": "medium",
+      "current_semantic_relationship_score": null,
+      "previous_semantic_relationship_score": null,
+      "current_relation": null,
+      "previous_relation": null
+    },
+    {
+      "source": "DK",
       "target": "FR",
       "current_score": 0.0,
       "previous_score": 50.0,
@@ -1347,27 +2009,13 @@
     },
     {
       "source": "ES",
-      "target": "IE",
-      "current_score": 50.0,
-      "previous_score": 0.0,
-      "delta": 50.0,
-      "status": "gained",
-      "current_band": "medium",
-      "previous_band": null,
-      "current_semantic_relationship_score": null,
-      "previous_semantic_relationship_score": null,
-      "current_relation": null,
-      "previous_relation": null
-    },
-    {
-      "source": "ES",
-      "target": "IT",
-      "current_score": 50.0,
-      "previous_score": 0.0,
-      "delta": 50.0,
-      "status": "gained",
-      "current_band": "medium",
-      "previous_band": null,
+      "target": "FR",
+      "current_score": 0.0,
+      "previous_score": 50.0,
+      "delta": -50.0,
+      "status": "lost",
+      "current_band": null,
+      "previous_band": "medium",
       "current_semantic_relationship_score": null,
       "previous_semantic_relationship_score": null,
       "current_relation": null,
@@ -1444,8 +2092,36 @@
       "previous_relation": null
     },
     {
+      "source": "IE",
+      "target": "IT",
+      "current_score": 57.47,
+      "previous_score": 100.0,
+      "delta": -42.53,
+      "status": "declined",
+      "current_band": "medium",
+      "previous_band": "very_high",
+      "current_semantic_relationship_score": null,
+      "previous_semantic_relationship_score": null,
+      "current_relation": "unclassified",
+      "previous_relation": "unclassified"
+    },
+    {
       "source": "DE",
       "target": "DK",
+      "current_score": 0.0,
+      "previous_score": 31.21,
+      "delta": -31.21,
+      "status": "lost",
+      "current_band": null,
+      "previous_band": "low",
+      "current_semantic_relationship_score": null,
+      "previous_semantic_relationship_score": null,
+      "current_relation": null,
+      "previous_relation": null
+    },
+    {
+      "source": "DE",
+      "target": "ES",
       "current_score": 0.0,
       "previous_score": 31.21,
       "delta": -31.21,
@@ -1500,56 +2176,70 @@
       "previous_relation": null
     },
     {
-      "source": "IE",
-      "target": "IT",
-      "current_score": 100.0,
-      "previous_score": 100.0,
+      "source": "ES",
+      "target": "IE",
+      "current_score": 50.0,
+      "previous_score": 50.0,
       "delta": 0.0,
       "status": "stable",
-      "current_band": "very_high",
-      "previous_band": "very_high",
+      "current_band": "medium",
+      "previous_band": "medium",
       "current_semantic_relationship_score": null,
       "previous_semantic_relationship_score": null,
-      "current_relation": "unclassified",
-      "previous_relation": "unclassified"
+      "current_relation": null,
+      "previous_relation": null
+    },
+    {
+      "source": "ES",
+      "target": "IT",
+      "current_score": 50.0,
+      "previous_score": 50.0,
+      "delta": 0.0,
+      "status": "stable",
+      "current_band": "medium",
+      "previous_band": "medium",
+      "current_semantic_relationship_score": null,
+      "previous_semantic_relationship_score": null,
+      "current_relation": null,
+      "previous_relation": null
     }
   ],
   "by_country": [
     {
-      "country": "BE",
-      "relationship_count_current": 0,
-      "relationship_count_previous": 1,
-      "relationship_count_delta": -1,
-      "average_score_current": 0.0,
-      "average_score_previous": 81.25,
-      "average_score_delta": -81.25,
-      "gained_relationships": [],
-      "lost_relationships": [
+      "country": "SE",
+      "relationship_count_current": 1,
+      "relationship_count_previous": 0,
+      "relationship_count_delta": 1,
+      "average_score_current": 100.0,
+      "average_score_previous": 0.0,
+      "average_score_delta": 100.0,
+      "gained_relationships": [
         {
-          "partner": "LU",
-          "current_score": 0.0,
-          "previous_score": 81.25,
-          "delta": -81.25,
-          "status": "lost",
+          "partner": "DK",
+          "current_score": 100.0,
+          "previous_score": 0.0,
+          "delta": 100.0,
+          "status": "gained",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": "unclassified"
+          "current_relation": "unclassified",
+          "previous_relation": null
         }
       ],
+      "lost_relationships": [],
       "improved_relationships": [],
       "declined_relationships": [],
       "top_changes": [
         {
-          "partner": "LU",
-          "current_score": 0.0,
-          "previous_score": 81.25,
-          "delta": -81.25,
-          "status": "lost",
+          "partner": "DK",
+          "current_score": 100.0,
+          "previous_score": 0.0,
+          "delta": 100.0,
+          "status": "gained",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": "unclassified"
+          "current_relation": "unclassified",
+          "previous_relation": null
         }
       ]
     },
@@ -1592,20 +2282,44 @@
       ]
     },
     {
-      "country": "BG",
-      "relationship_count_current": 4,
-      "relationship_count_previous": 0,
-      "relationship_count_delta": 4,
-      "average_score_current": 50.0,
-      "average_score_previous": 0.0,
-      "average_score_delta": 50.0,
+      "country": "DK",
+      "relationship_count_current": 1,
+      "relationship_count_previous": 5,
+      "relationship_count_delta": -4,
+      "average_score_current": 100.0,
+      "average_score_previous": 46.24,
+      "average_score_delta": 53.76,
       "gained_relationships": [
         {
-          "partner": "ES",
-          "current_score": 50.0,
+          "partner": "SE",
+          "current_score": 100.0,
           "previous_score": 0.0,
-          "delta": 50.0,
+          "delta": 100.0,
           "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": null
+        }
+      ],
+      "lost_relationships": [
+        {
+          "partner": "ES",
+          "current_score": 0.0,
+          "previous_score": 50.0,
+          "delta": -50.0,
+          "status": "lost",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "FR",
+          "current_score": 0.0,
+          "previous_score": 50.0,
+          "delta": -50.0,
+          "status": "lost",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
           "current_relation": null,
@@ -1613,10 +2327,10 @@
         },
         {
           "partner": "IE",
-          "current_score": 50.0,
-          "previous_score": 0.0,
-          "delta": 50.0,
-          "status": "gained",
+          "current_score": 0.0,
+          "previous_score": 50.0,
+          "delta": -50.0,
+          "status": "lost",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
           "current_relation": null,
@@ -1624,37 +2338,58 @@
         },
         {
           "partner": "IT",
-          "current_score": 50.0,
-          "previous_score": 0.0,
-          "delta": 50.0,
-          "status": "gained",
+          "current_score": 0.0,
+          "previous_score": 50.0,
+          "delta": -50.0,
+          "status": "lost",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
           "current_relation": null,
           "previous_relation": null
         },
         {
-          "partner": "NL",
-          "current_score": 50.0,
-          "previous_score": 0.0,
-          "delta": 50.0,
-          "status": "gained",
+          "partner": "DE",
+          "current_score": 0.0,
+          "previous_score": 31.21,
+          "delta": -31.21,
+          "status": "lost",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
           "current_relation": null,
           "previous_relation": null
         }
       ],
-      "lost_relationships": [],
       "improved_relationships": [],
       "declined_relationships": [],
       "top_changes": [
         {
-          "partner": "ES",
-          "current_score": 50.0,
+          "partner": "SE",
+          "current_score": 100.0,
           "previous_score": 0.0,
-          "delta": 50.0,
+          "delta": 100.0,
           "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": null
+        },
+        {
+          "partner": "ES",
+          "current_score": 0.0,
+          "previous_score": 50.0,
+          "delta": -50.0,
+          "status": "lost",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "FR",
+          "current_score": 0.0,
+          "previous_score": 50.0,
+          "delta": -50.0,
+          "status": "lost",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
           "current_relation": null,
@@ -1662,10 +2397,10 @@
         },
         {
           "partner": "IE",
-          "current_score": 50.0,
-          "previous_score": 0.0,
-          "delta": 50.0,
-          "status": "gained",
+          "current_score": 0.0,
+          "previous_score": 50.0,
+          "delta": -50.0,
+          "status": "lost",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
           "current_relation": null,
@@ -1673,21 +2408,21 @@
         },
         {
           "partner": "IT",
-          "current_score": 50.0,
-          "previous_score": 0.0,
-          "delta": 50.0,
-          "status": "gained",
+          "current_score": 0.0,
+          "previous_score": 50.0,
+          "delta": -50.0,
+          "status": "lost",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
           "current_relation": null,
           "previous_relation": null
         },
         {
-          "partner": "NL",
-          "current_score": 50.0,
-          "previous_score": 0.0,
-          "delta": 50.0,
-          "status": "gained",
+          "partner": "DE",
+          "current_score": 0.0,
+          "previous_score": 31.21,
+          "delta": -31.21,
+          "status": "lost",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
           "current_relation": null,
@@ -1696,16 +2431,27 @@
       ]
     },
     {
-      "country": "ES",
-      "relationship_count_current": 4,
+      "country": "BG",
+      "relationship_count_current": 5,
       "relationship_count_previous": 0,
-      "relationship_count_delta": 4,
+      "relationship_count_delta": 5,
       "average_score_current": 50.0,
       "average_score_previous": 0.0,
       "average_score_delta": 50.0,
       "gained_relationships": [
         {
-          "partner": "BG",
+          "partner": "BE",
+          "current_score": 50.0,
+          "previous_score": 0.0,
+          "delta": 50.0,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "ES",
           "current_score": 50.0,
           "previous_score": 0.0,
           "delta": 50.0,
@@ -1754,7 +2500,18 @@
       "declined_relationships": [],
       "top_changes": [
         {
-          "partner": "BG",
+          "partner": "BE",
+          "current_score": 50.0,
+          "previous_score": 0.0,
+          "delta": 50.0,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "ES",
           "current_score": 50.0,
           "previous_score": 0.0,
           "delta": 50.0,
@@ -1801,13 +2558,24 @@
     },
     {
       "country": "NL",
-      "relationship_count_current": 4,
+      "relationship_count_current": 5,
       "relationship_count_previous": 0,
-      "relationship_count_delta": 4,
+      "relationship_count_delta": 5,
       "average_score_current": 50.0,
       "average_score_previous": 0.0,
       "average_score_delta": 50.0,
       "gained_relationships": [
+        {
+          "partner": "BE",
+          "current_score": 50.0,
+          "previous_score": 0.0,
+          "delta": 50.0,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
         {
           "partner": "BG",
           "current_score": 50.0,
@@ -1858,6 +2626,17 @@
       "declined_relationships": [],
       "top_changes": [
         {
+          "partner": "BE",
+          "current_score": 50.0,
+          "previous_score": 0.0,
+          "delta": 50.0,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
           "partner": "BG",
           "current_score": 50.0,
           "previous_score": 0.0,
@@ -1904,17 +2683,28 @@
       ]
     },
     {
-      "country": "DK",
+      "country": "FR",
       "relationship_count_current": 0,
-      "relationship_count_previous": 4,
-      "relationship_count_delta": -4,
+      "relationship_count_previous": 5,
+      "relationship_count_delta": -5,
       "average_score_current": 0.0,
-      "average_score_previous": 45.3,
-      "average_score_delta": -45.3,
+      "average_score_previous": 46.24,
+      "average_score_delta": -46.24,
       "gained_relationships": [],
       "lost_relationships": [
         {
-          "partner": "FR",
+          "partner": "DK",
+          "current_score": 0.0,
+          "previous_score": 50.0,
+          "delta": -50.0,
+          "status": "lost",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "ES",
           "current_score": 0.0,
           "previous_score": 50.0,
           "delta": -50.0,
@@ -1962,7 +2752,18 @@
       "declined_relationships": [],
       "top_changes": [
         {
-          "partner": "FR",
+          "partner": "DK",
+          "current_score": 0.0,
+          "previous_score": 50.0,
+          "delta": -50.0,
+          "status": "lost",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "ES",
           "current_score": 0.0,
           "previous_score": 50.0,
           "delta": -50.0,
@@ -2008,21 +2809,31 @@
       ]
     },
     {
-      "country": "FR",
-      "relationship_count_current": 0,
-      "relationship_count_previous": 4,
-      "relationship_count_delta": -4,
-      "average_score_current": 0.0,
-      "average_score_previous": 45.3,
-      "average_score_delta": -45.3,
-      "gained_relationships": [],
-      "lost_relationships": [
+      "country": "BE",
+      "relationship_count_current": 5,
+      "relationship_count_previous": 1,
+      "relationship_count_delta": 4,
+      "average_score_current": 50.0,
+      "average_score_previous": 81.25,
+      "average_score_delta": -31.25,
+      "gained_relationships": [
         {
-          "partner": "DK",
-          "current_score": 0.0,
-          "previous_score": 50.0,
-          "delta": -50.0,
-          "status": "lost",
+          "partner": "BG",
+          "current_score": 50.0,
+          "previous_score": 0.0,
+          "delta": 50.0,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "ES",
+          "current_score": 50.0,
+          "previous_score": 0.0,
+          "delta": 50.0,
+          "status": "gained",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
           "current_relation": null,
@@ -2030,10 +2841,10 @@
         },
         {
           "partner": "IE",
-          "current_score": 0.0,
-          "previous_score": 50.0,
-          "delta": -50.0,
-          "status": "lost",
+          "current_score": 50.0,
+          "previous_score": 0.0,
+          "delta": 50.0,
+          "status": "gained",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
           "current_relation": null,
@@ -2041,36 +2852,71 @@
         },
         {
           "partner": "IT",
-          "current_score": 0.0,
-          "previous_score": 50.0,
-          "delta": -50.0,
-          "status": "lost",
+          "current_score": 50.0,
+          "previous_score": 0.0,
+          "delta": 50.0,
+          "status": "gained",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
           "current_relation": null,
           "previous_relation": null
         },
         {
-          "partner": "DE",
-          "current_score": 0.0,
-          "previous_score": 31.21,
-          "delta": -31.21,
-          "status": "lost",
+          "partner": "NL",
+          "current_score": 50.0,
+          "previous_score": 0.0,
+          "delta": 50.0,
+          "status": "gained",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
           "current_relation": null,
           "previous_relation": null
         }
       ],
+      "lost_relationships": [
+        {
+          "partner": "LU",
+          "current_score": 0.0,
+          "previous_score": 81.25,
+          "delta": -81.25,
+          "status": "lost",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": "unclassified"
+        }
+      ],
       "improved_relationships": [],
       "declined_relationships": [],
       "top_changes": [
         {
-          "partner": "DK",
+          "partner": "LU",
           "current_score": 0.0,
-          "previous_score": 50.0,
-          "delta": -50.0,
+          "previous_score": 81.25,
+          "delta": -81.25,
           "status": "lost",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": "unclassified"
+        },
+        {
+          "partner": "BG",
+          "current_score": 50.0,
+          "previous_score": 0.0,
+          "delta": 50.0,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "ES",
+          "current_score": 50.0,
+          "previous_score": 0.0,
+          "delta": 50.0,
+          "status": "gained",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
           "current_relation": null,
@@ -2078,10 +2924,10 @@
         },
         {
           "partner": "IE",
-          "current_score": 0.0,
-          "previous_score": 50.0,
-          "delta": -50.0,
-          "status": "lost",
+          "current_score": 50.0,
+          "previous_score": 0.0,
+          "delta": 50.0,
+          "status": "gained",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
           "current_relation": null,
@@ -2089,21 +2935,21 @@
         },
         {
           "partner": "IT",
-          "current_score": 0.0,
-          "previous_score": 50.0,
-          "delta": -50.0,
-          "status": "lost",
+          "current_score": 50.0,
+          "previous_score": 0.0,
+          "delta": 50.0,
+          "status": "gained",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
           "current_relation": null,
           "previous_relation": null
         },
         {
-          "partner": "DE",
-          "current_score": 0.0,
-          "previous_score": 31.21,
-          "delta": -31.21,
-          "status": "lost",
+          "partner": "NL",
+          "current_score": 50.0,
+          "previous_score": 0.0,
+          "delta": 50.0,
+          "status": "gained",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
           "current_relation": null,
@@ -2114,8 +2960,8 @@
     {
       "country": "DE",
       "relationship_count_current": 0,
-      "relationship_count_previous": 4,
-      "relationship_count_delta": -4,
+      "relationship_count_previous": 5,
+      "relationship_count_delta": -5,
       "average_score_current": 0.0,
       "average_score_previous": 31.21,
       "average_score_delta": -31.21,
@@ -2133,6 +2979,17 @@
           "previous_relation": null
         },
         {
+          "partner": "ES",
+          "current_score": 0.0,
+          "previous_score": 31.21,
+          "delta": -31.21,
+          "status": "lost",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
           "partner": "FR",
           "current_score": 0.0,
           "previous_score": 31.21,
@@ -2171,6 +3028,17 @@
       "top_changes": [
         {
           "partner": "DK",
+          "current_score": 0.0,
+          "previous_score": 31.21,
+          "delta": -31.21,
+          "status": "lost",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "ES",
           "current_score": 0.0,
           "previous_score": 31.21,
           "delta": -31.21,
@@ -2217,15 +3085,15 @@
     },
     {
       "country": "IE",
-      "relationship_count_current": 4,
-      "relationship_count_previous": 4,
+      "relationship_count_current": 5,
+      "relationship_count_previous": 5,
       "relationship_count_delta": 0,
-      "average_score_current": 62.5,
-      "average_score_previous": 57.8,
-      "average_score_delta": 4.7,
+      "average_score_current": 51.49,
+      "average_score_previous": 56.24,
+      "average_score_delta": -4.75,
       "gained_relationships": [
         {
-          "partner": "BG",
+          "partner": "BE",
           "current_score": 50.0,
           "previous_score": 0.0,
           "delta": 50.0,
@@ -2236,7 +3104,7 @@
           "previous_relation": null
         },
         {
-          "partner": "ES",
+          "partner": "BG",
           "current_score": 50.0,
           "previous_score": 0.0,
           "delta": 50.0,
@@ -2294,8 +3162,31 @@
         }
       ],
       "improved_relationships": [],
-      "declined_relationships": [],
+      "declined_relationships": [
+        {
+          "partner": "IT",
+          "current_score": 57.47,
+          "previous_score": 100.0,
+          "delta": -42.53,
+          "status": "declined",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": "unclassified"
+        }
+      ],
       "top_changes": [
+        {
+          "partner": "BE",
+          "current_score": 50.0,
+          "previous_score": 0.0,
+          "delta": 50.0,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
         {
           "partner": "BG",
           "current_score": 50.0,
@@ -2319,17 +3210,6 @@
           "previous_relation": null
         },
         {
-          "partner": "ES",
-          "current_score": 50.0,
-          "previous_score": 0.0,
-          "delta": 50.0,
-          "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
           "partner": "FR",
           "current_score": 0.0,
           "previous_score": 50.0,
@@ -2346,17 +3226,6 @@
           "previous_score": 0.0,
           "delta": 50.0,
           "status": "gained",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "DE",
-          "current_score": 0.0,
-          "previous_score": 31.21,
-          "delta": -31.21,
-          "status": "lost",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
           "current_relation": null,
@@ -2364,26 +3233,59 @@
         },
         {
           "partner": "IT",
-          "current_score": 100.0,
+          "current_score": 57.47,
           "previous_score": 100.0,
-          "delta": 0.0,
-          "status": "stable",
+          "delta": -42.53,
+          "status": "declined",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
           "current_relation": "unclassified",
           "previous_relation": "unclassified"
+        },
+        {
+          "partner": "DE",
+          "current_score": 0.0,
+          "previous_score": 31.21,
+          "delta": -31.21,
+          "status": "lost",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "ES",
+          "current_score": 50.0,
+          "previous_score": 50.0,
+          "delta": 0.0,
+          "status": "stable",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
         }
       ]
     },
     {
       "country": "IT",
-      "relationship_count_current": 4,
-      "relationship_count_previous": 4,
+      "relationship_count_current": 5,
+      "relationship_count_previous": 5,
       "relationship_count_delta": 0,
-      "average_score_current": 62.5,
-      "average_score_previous": 57.8,
-      "average_score_delta": 4.7,
+      "average_score_current": 51.49,
+      "average_score_previous": 56.24,
+      "average_score_delta": -4.75,
       "gained_relationships": [
+        {
+          "partner": "BE",
+          "current_score": 50.0,
+          "previous_score": 0.0,
+          "delta": 50.0,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
         {
           "partner": "BG",
           "current_score": 50.0,
@@ -2396,7 +3298,179 @@
           "previous_relation": null
         },
         {
+          "partner": "NL",
+          "current_score": 50.0,
+          "previous_score": 0.0,
+          "delta": 50.0,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        }
+      ],
+      "lost_relationships": [
+        {
+          "partner": "DK",
+          "current_score": 0.0,
+          "previous_score": 50.0,
+          "delta": -50.0,
+          "status": "lost",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "FR",
+          "current_score": 0.0,
+          "previous_score": 50.0,
+          "delta": -50.0,
+          "status": "lost",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "DE",
+          "current_score": 0.0,
+          "previous_score": 31.21,
+          "delta": -31.21,
+          "status": "lost",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        }
+      ],
+      "improved_relationships": [],
+      "declined_relationships": [
+        {
+          "partner": "IE",
+          "current_score": 57.47,
+          "previous_score": 100.0,
+          "delta": -42.53,
+          "status": "declined",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": "unclassified"
+        }
+      ],
+      "top_changes": [
+        {
+          "partner": "BE",
+          "current_score": 50.0,
+          "previous_score": 0.0,
+          "delta": 50.0,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "BG",
+          "current_score": 50.0,
+          "previous_score": 0.0,
+          "delta": 50.0,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "DK",
+          "current_score": 0.0,
+          "previous_score": 50.0,
+          "delta": -50.0,
+          "status": "lost",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "FR",
+          "current_score": 0.0,
+          "previous_score": 50.0,
+          "delta": -50.0,
+          "status": "lost",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "NL",
+          "current_score": 50.0,
+          "previous_score": 0.0,
+          "delta": 50.0,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "IE",
+          "current_score": 57.47,
+          "previous_score": 100.0,
+          "delta": -42.53,
+          "status": "declined",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": "unclassified",
+          "previous_relation": "unclassified"
+        },
+        {
+          "partner": "DE",
+          "current_score": 0.0,
+          "previous_score": 31.21,
+          "delta": -31.21,
+          "status": "lost",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
           "partner": "ES",
+          "current_score": 50.0,
+          "previous_score": 50.0,
+          "delta": 0.0,
+          "status": "stable",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        }
+      ]
+    },
+    {
+      "country": "ES",
+      "relationship_count_current": 5,
+      "relationship_count_previous": 5,
+      "relationship_count_delta": 0,
+      "average_score_current": 50.0,
+      "average_score_previous": 46.24,
+      "average_score_delta": 3.76,
+      "gained_relationships": [
+        {
+          "partner": "BE",
+          "current_score": 50.0,
+          "previous_score": 0.0,
+          "delta": 50.0,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "BG",
           "current_score": 50.0,
           "previous_score": 0.0,
           "delta": 50.0,
@@ -2457,6 +3531,17 @@
       "declined_relationships": [],
       "top_changes": [
         {
+          "partner": "BE",
+          "current_score": 50.0,
+          "previous_score": 0.0,
+          "delta": 50.0,
+          "status": "gained",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
           "partner": "BG",
           "current_score": 50.0,
           "previous_score": 0.0,
@@ -2473,17 +3558,6 @@
           "previous_score": 50.0,
           "delta": -50.0,
           "status": "lost",
-          "current_semantic_relationship_score": null,
-          "previous_semantic_relationship_score": null,
-          "current_relation": null,
-          "previous_relation": null
-        },
-        {
-          "partner": "ES",
-          "current_score": 50.0,
-          "previous_score": 0.0,
-          "delta": 50.0,
-          "status": "gained",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
           "current_relation": null,
@@ -2524,14 +3598,25 @@
         },
         {
           "partner": "IE",
-          "current_score": 100.0,
-          "previous_score": 100.0,
+          "current_score": 50.0,
+          "previous_score": 50.0,
           "delta": 0.0,
           "status": "stable",
           "current_semantic_relationship_score": null,
           "previous_semantic_relationship_score": null,
-          "current_relation": "unclassified",
-          "previous_relation": "unclassified"
+          "current_relation": null,
+          "previous_relation": null
+        },
+        {
+          "partner": "IT",
+          "current_score": 50.0,
+          "previous_score": 50.0,
+          "delta": 0.0,
+          "status": "stable",
+          "current_semantic_relationship_score": null,
+          "previous_semantic_relationship_score": null,
+          "current_relation": null,
+          "previous_relation": null
         }
       ]
     }
