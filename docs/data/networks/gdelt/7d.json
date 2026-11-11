@@ -2,7 +2,7 @@
   "nodes": [
     {
       "id": "BE",
-      "weight": 1.27
+      "weight": 5.34
     },
     {
       "id": "BG",
@@ -22,11 +22,11 @@
     },
     {
       "id": "FR",
-      "weight": 5.2
+      "weight": 10.6
     },
     {
       "id": "GB",
-      "weight": 32.66
+      "weight": 41.13
     },
     {
       "id": "IE",
@@ -39,6 +39,10 @@
     {
       "id": "NL",
       "weight": 1.7
+    },
+    {
+      "id": "PL",
+      "weight": 4.4
     },
     {
       "id": "SE",
@@ -54,10 +58,40 @@
     },
     {
       "id": "US",
-      "weight": 21.93
+      "weight": 27.33
     }
   ],
   "edges": [
+    {
+      "source": "BE",
+      "target": "GB",
+      "weight": 4.07,
+      "interaction_weight": 4.07,
+      "interaction_count": 1,
+      "topics": {
+        "defence": 4.07
+      },
+      "relationship_score": null,
+      "dominant_relation": "unclassified",
+      "observed_relationship_label": "unclassified",
+      "relationship_confidence": null,
+      "relationship_counts": {
+        "cooperative": 0,
+        "conflictual": 0,
+        "neutral": 0,
+        "mixed": 0,
+        "unclassified": 1
+      },
+      "classified_events": 0,
+      "unclassified_events": 1,
+      "classification_coverage": 0.0,
+      "relationship_label": "unclassified",
+      "assessed_relationship": "unclassified",
+      "evidence_status": "no_classified_evidence",
+      "evidence_level": "none",
+      "evidence_sufficient": false,
+      "directional_consistency": 0.0
+    },
     {
       "source": "BE",
       "target": "US",
@@ -211,11 +245,11 @@
     {
       "source": "FR",
       "target": "US",
-      "weight": 5.2,
-      "interaction_weight": 5.2,
-      "interaction_count": 2,
+      "weight": 10.6,
+      "interaction_weight": 10.6,
+      "interaction_count": 3,
       "topics": {
-        "defence": 5.2
+        "defence": 10.6
       },
       "relationship_score": null,
       "dominant_relation": "unclassified",
@@ -226,10 +260,10 @@
         "conflictual": 0,
         "neutral": 0,
         "mixed": 0,
-        "unclassified": 2
+        "unclassified": 3
       },
       "classified_events": 0,
-      "unclassified_events": 2,
+      "unclassified_events": 3,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -260,6 +294,37 @@
       },
       "classified_events": 0,
       "unclassified_events": 4,
+      "classification_coverage": 0.0,
+      "relationship_label": "unclassified",
+      "assessed_relationship": "unclassified",
+      "evidence_status": "no_classified_evidence",
+      "evidence_level": "none",
+      "evidence_sufficient": false,
+      "directional_consistency": 0.0
+    },
+    {
+      "source": "GB",
+      "target": "PL",
+      "weight": 4.4,
+      "interaction_weight": 4.4,
+      "interaction_count": 1,
+      "topics": {
+        "defence": 2.2,
+        "ukraine_russia": 2.2
+      },
+      "relationship_score": null,
+      "dominant_relation": "unclassified",
+      "observed_relationship_label": "unclassified",
+      "relationship_confidence": null,
+      "relationship_counts": {
+        "cooperative": 0,
+        "conflictual": 0,
+        "neutral": 0,
+        "mixed": 0,
+        "unclassified": 1
+      },
+      "classified_events": 0,
+      "unclassified_events": 1,
       "classification_coverage": 0.0,
       "relationship_label": "unclassified",
       "assessed_relationship": "unclassified",
@@ -329,7 +394,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 15,
+  "event_count": 18,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -342,7 +407,7 @@
     "stance_inferred": false,
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
-      "equal_legacy_topic_share_fallback": 15
+      "equal_legacy_topic_share_fallback": 18
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
     "note": "Topic prominence does not imply support, opposition or shared policy position."
