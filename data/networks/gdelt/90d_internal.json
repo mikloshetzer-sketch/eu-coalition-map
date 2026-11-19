@@ -18,7 +18,7 @@
     },
     {
       "id": "ES",
-      "weight": 10.41
+      "weight": 16.91
     },
     {
       "id": "FR",
@@ -42,7 +42,7 @@
     },
     {
       "id": "IT",
-      "weight": 27.6
+      "weight": 22.04
     },
     {
       "id": "LT",
@@ -58,7 +58,7 @@
     },
     {
       "id": "MT",
-      "weight": 5.56
+      "weight": 6.5
     },
     {
       "id": "NL",
@@ -409,6 +409,36 @@
     },
     {
       "source": "ES",
+      "target": "MT",
+      "weight": 6.5,
+      "interaction_weight": 6.5,
+      "interaction_count": 2,
+      "topics": {
+        "defence": 6.5
+      },
+      "relationship_score": null,
+      "dominant_relation": "unclassified",
+      "observed_relationship_label": "unclassified",
+      "relationship_confidence": null,
+      "relationship_counts": {
+        "cooperative": 0,
+        "conflictual": 0,
+        "neutral": 0,
+        "mixed": 0,
+        "unclassified": 2
+      },
+      "classified_events": 0,
+      "unclassified_events": 2,
+      "classification_coverage": 0.0,
+      "relationship_label": "unclassified",
+      "assessed_relationship": "unclassified",
+      "evidence_status": "no_classified_evidence",
+      "evidence_level": "none",
+      "evidence_sufficient": false,
+      "directional_consistency": 0.0
+    },
+    {
+      "source": "ES",
       "target": "NL",
       "weight": 4.77,
       "interaction_weight": 4.77,
@@ -732,37 +762,9 @@
       "evidence_level": "none",
       "evidence_sufficient": false,
       "directional_consistency": 0.0
-    },
-    {
-      "source": "IT",
-      "target": "MT",
-      "weight": 5.56,
-      "interaction_weight": 5.56,
-      "interaction_count": 1,
-      "topics": {},
-      "relationship_score": null,
-      "dominant_relation": "unclassified",
-      "observed_relationship_label": "unclassified",
-      "relationship_confidence": null,
-      "relationship_counts": {
-        "cooperative": 0,
-        "conflictual": 0,
-        "neutral": 0,
-        "mixed": 0,
-        "unclassified": 1
-      },
-      "classified_events": 0,
-      "unclassified_events": 1,
-      "classification_coverage": 0.0,
-      "relationship_label": "unclassified",
-      "assessed_relationship": "unclassified",
-      "evidence_status": "no_classified_evidence",
-      "evidence_level": "none",
-      "evidence_sufficient": false,
-      "directional_consistency": 0.0
     }
   ],
-  "event_count": 218,
+  "event_count": 219,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -775,9 +777,9 @@
     "stance_inferred": false,
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
-      "equal_legacy_topic_share_fallback": 146,
-      "no_topic_evidence": 61,
-      "rule_based_topic_salience_v2": 11
+      "equal_legacy_topic_share_fallback": 150,
+      "no_topic_evidence": 59,
+      "rule_based_topic_salience_v2": 10
     },
     "legacy_fallback": "events without topic_salience/topic_scores split one unit equally across their legacy topic list",
     "note": "Topic prominence does not imply support, opposition or shared policy position."
