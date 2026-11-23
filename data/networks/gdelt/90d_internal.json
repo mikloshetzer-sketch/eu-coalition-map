@@ -18,7 +18,7 @@
     },
     {
       "id": "ES",
-      "weight": 16.91
+      "weight": 24.81
     },
     {
       "id": "FR",
@@ -66,7 +66,7 @@
     },
     {
       "id": "PL",
-      "weight": 2.9
+      "weight": 10.8
     },
     {
       "id": "PT",
@@ -469,6 +469,36 @@
     },
     {
       "source": "ES",
+      "target": "PL",
+      "weight": 7.9,
+      "interaction_weight": 7.9,
+      "interaction_count": 1,
+      "topics": {
+        "defence": 7.9
+      },
+      "relationship_score": null,
+      "dominant_relation": "unclassified",
+      "observed_relationship_label": "unclassified",
+      "relationship_confidence": null,
+      "relationship_counts": {
+        "cooperative": 0,
+        "conflictual": 0,
+        "neutral": 0,
+        "mixed": 0,
+        "unclassified": 1
+      },
+      "classified_events": 0,
+      "unclassified_events": 1,
+      "classification_coverage": 0.0,
+      "relationship_label": "unclassified",
+      "assessed_relationship": "unclassified",
+      "evidence_status": "no_classified_evidence",
+      "evidence_level": "none",
+      "evidence_sufficient": false,
+      "directional_consistency": 0.0
+    },
+    {
+      "source": "ES",
       "target": "PT",
       "weight": 3.64,
       "interaction_weight": 3.64,
@@ -764,7 +794,7 @@
       "directional_consistency": 0.0
     }
   ],
-  "event_count": 216,
+  "event_count": 218,
   "deduplication": {
     "enabled": true,
     "method": "gdelt_id_or_url_then_source_title_date_v1",
@@ -777,7 +807,7 @@
     "stance_inferred": false,
     "aggregation": "event interaction weight multiplied by normalized event-level topic salience",
     "event_topic_method_counts": {
-      "equal_legacy_topic_share_fallback": 153,
+      "equal_legacy_topic_share_fallback": 155,
       "no_topic_evidence": 54,
       "rule_based_topic_salience_v2": 9
     },
